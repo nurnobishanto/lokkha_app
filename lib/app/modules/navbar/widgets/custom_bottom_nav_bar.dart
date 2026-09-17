@@ -20,16 +20,16 @@ class CustomBottomNavBar extends StatelessWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      color: Colors.transparent,
+      color: const Color(0xFFF8FAFC),
       padding: EdgeInsets.only(
         left: 14.w,
         right: 14.w,
-        top: 6.h,
-        bottom: 20.h,
+        top: 4.h,
+        bottom: bottomInset > 0 ? bottomInset : 12.h,
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.r),
+          borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.09),
@@ -46,14 +46,14 @@ class CustomBottomNavBar extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(15.r),
+          borderRadius: BorderRadius.circular(16.r),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(15.r),
+                color: Colors.white.withValues(alpha: 0.88),
+                borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
                   color: Colors.white.withValues(alpha: 0.9),
                   width: 1.5,

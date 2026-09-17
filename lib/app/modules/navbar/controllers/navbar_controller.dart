@@ -1,7 +1,6 @@
 import 'package:lokkha/app/data/local/my_get_storage.dart';
 import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/modules/exam_category/views/exam_category_view.dart';
-import 'package:lokkha/app/modules/profile_module/profile/views/profile_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:lokkha/app/modules/premium_packages/views/premium_packages_view.dart';
@@ -12,6 +11,7 @@ import '../../../services/api_call_status.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/base_client.dart';
 import '../../messanger_redirect/messenger_redirect.dart';
+import '../../profile_module/dashboard_portal/views/dashboard_portal_view.dart';
 import '../../nav_bar_views/home/views/home_view.dart';
 import '../model/profile_data_model.dart';
 
@@ -23,7 +23,7 @@ class NavbarController extends GetxController {
     const ExamCategoryView(),
     const MessengerRedirectScreen(),
     const PremiumPackagesView(),
-    const ProfileView(),
+    const DashboardPortalView(),
   ];
 
   void changeIndex(int index) {

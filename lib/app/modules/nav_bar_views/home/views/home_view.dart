@@ -114,7 +114,7 @@ class HomeView extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: onRefresh,
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 8.r, vertical: 2.h),
+          padding: EdgeInsets.fromLTRB(8.r, 2.h, 8.r, 16.h),
           children: [
             3.h.height,
             _SliderSection(
@@ -443,61 +443,71 @@ class _ShortcutGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      itemCount: controller.gridViewTitle.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10.0,
-        childAspectRatio: 4,
-      ),
-      itemBuilder: (_, i) {
-        final title = controller.gridViewTitle[i];
-        final route = controller.gridViewRoutePage[i];
-        return GestureDetector(
-          onTap: () => Get.to(route),
-          child:
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            decoration: BoxDecoration(
-                color: LightThemeColors.softBg, // soft premium look
-              borderRadius: BorderRadius.circular(10.0),
-              border: Border.all(
-                color: LightThemeColors.primaryColor.withOpacity(0.4),
-                width: 1.2,
+    return Column(
+      children: [
+        for (int i = 0; i < controller.gridViewTitle.length; i += 2) ...[
+          if (i > 0) SizedBox(height: 10.h),
+          Row(
+            children: [
+              Expanded(
+                child: _buildItem(
+                  controller.gridViewTitle[i],
+                  controller.gridViewRoutePage[i],
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
+              if (i + 1 < controller.gridViewTitle.length) ...[
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: _buildItem(
+                    controller.gridViewTitle[i + 1],
+                    controller.gridViewRoutePage[i + 1],
+                  ),
                 ),
               ],
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildItem(String title, Widget route) {
+    return GestureDetector(
+      onTap: () => Get.to(route),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: LightThemeColors.softBg, // soft premium look
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(
+            color: LightThemeColors.primaryColor.withValues(alpha: 0.4),
+            width: 1.2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
             ),
-            child:    Center(
-              child: Text(
-                title,
-                style: AppTextStyles.heading5.copyWith(
-                  color: LightThemeColors.primaryColor,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            title,
+            style: AppTextStyles.heading5.copyWith(
+              color: LightThemeColors.primaryColor,
+              fontWeight: FontWeight.w500,
             ),
-          )
-
-
-
-        );
-      },
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class _PremiumExamSection extends StatelessWidget {
-  const _PremiumExamSection({super.key});
+  const _PremiumExamSection();
 
   @override
   Widget build(BuildContext context) {
@@ -612,6 +622,7 @@ class _SubjectSection extends StatelessWidget {
               mainAxisSpacing: 10,
               childAspectRatio: 4,
             ),
+            padding: EdgeInsets.zero,
             itemCount: list.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

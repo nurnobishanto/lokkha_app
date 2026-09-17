@@ -57,6 +57,10 @@ abstract class Routes {
   static const JOB_DETAILS = _Paths.JOB_DETAILS;
   static const NOTIFICATIONS = _Paths.NOTIFICATIONS;
   static const MY_COURSES = _Paths.MY_COURSES;
+  static const DASHBOARD_PORTAL = _Paths.DASHBOARD_PORTAL;
+  static const SELF_EXAM_HISTORY = _Paths.SELF_EXAM_HISTORY;
+  static const CONTEST_HISTORY = _Paths.CONTEST_HISTORY;
+  static const ACCURACY_PROGRESS = _Paths.ACCURACY_PROGRESS;
 }
 
 abstract class _Paths {
@@ -115,4 +119,8 @@ abstract class _Paths {
   static const JOB_DETAILS = '/job-details';
   static const NOTIFICATIONS = '/notifications';
   static const MY_COURSES = '/my-courses';
+  static const DASHBOARD_PORTAL = '/dashboard-portal';
+  static const SELF_EXAM_HISTORY = '/self-exam-history';
+  static const CONTEST_HISTORY = '/contest-history';
+  static const ACCURACY_PROGRESS = '/accuracy-progress';
 }

@@ -68,6 +68,12 @@ import '../modules/profile_module/profile/bindings/profile_binding.dart';
 import '../modules/profile_module/profile/views/profile_view.dart';
 import '../modules/profile_module/profile_history/bindings/profile_history_binding.dart';
 import '../modules/profile_module/profile_history/views/profile_history_view.dart';
+import '../modules/profile_module/self_exam_history/bindings/self_exam_history_binding.dart';
+import '../modules/profile_module/self_exam_history/views/self_exam_history_view.dart';
+import '../modules/profile_module/contest_history/bindings/contest_history_binding.dart';
+import '../modules/profile_module/contest_history/views/contest_history_view.dart';
+import '../modules/profile_module/accuracy_progress/bindings/accuracy_progress_binding.dart';
+import '../modules/profile_module/accuracy_progress/views/accuracy_progress_view.dart';
 import '../modules/profile_module/profile_update/bindings/profile_update_binding.dart';
 import '../modules/profile_module/profile_update/views/profile_update_view.dart';
 import '../modules/profile_update_required/bindings/profile_update_required_binding.dart';
@@ -81,6 +87,7 @@ import '../modules/sponsor_ads/bindings/sponsor_ads_binding.dart';
 import '../modules/sponsor_ads/views/sponsor_ads_view.dart';
 import '../modules/vocabulary/bindings/vocabulary_binding.dart';
 import '../modules/vocabulary/views/vocabulary_view.dart';
+import '../modules/profile_module/dashboard_portal/views/dashboard_portal_view.dart';
 import '../views/views/onboarding_view.dart';
 
 part 'app_routes.dart';
@@ -182,6 +189,21 @@ class AppPages {
       name: _Paths.PROFILE_HISTORY,
       page: () => const ProfileHistoryView(),
       binding: ProfileHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.SELF_EXAM_HISTORY,
+      page: () => const SelfExamHistoryView(),
+      binding: SelfExamHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.CONTEST_HISTORY,
+      page: () => const ContestHistoryView(),
+      binding: ContestHistoryBinding(),
+    ),
+    GetPage(
+      name: _Paths.ACCURACY_PROGRESS,
+      page: () => const AccuracyProgressView(),
+      binding: AccuracyProgressBinding(),
     ),
     GetPage(
       name: _Paths.PROFILE_UPDATE_REQUIRED,
@@ -331,6 +353,10 @@ class AppPages {
       name: _Paths.MY_COURSES,
       page: () => const MyCoursesView(),
       binding: MyCoursesBinding(),
+    ),
+    GetPage(
+      name: _Paths.DASHBOARD_PORTAL,
+      page: () => const DashboardPortalView(),
     ),
   ];
 }
