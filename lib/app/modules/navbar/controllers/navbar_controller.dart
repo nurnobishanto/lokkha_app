@@ -3,6 +3,7 @@ import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/modules/exam_category/views/exam_category_view.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:lokkha/app/modules/nav_bar_views/blog/views/blog_view.dart';
 import 'package:lokkha/app/modules/premium_packages/views/premium_packages_view.dart';
 import '../../../../utils/constants.dart';
 import '../../../helper/global.dart';
@@ -24,6 +25,7 @@ class NavbarController extends GetxController {
     const MessengerRedirectScreen(),
     const PremiumPackagesView(),
     const DashboardPortalView(),
+    const BlogView(),
   ];
 
   void changeIndex(int index) {

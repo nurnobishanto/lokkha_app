@@ -45,7 +45,9 @@ import '../modules/maintenance_mode/views/maintenance_mode_view_view.dart';
 import '../modules/my_courses/bindings/my_courses_binding.dart';
 import '../modules/my_courses/views/my_courses_view.dart';
 import '../modules/nav_bar_views/blog/bindings/blog_binding.dart';
+import '../modules/nav_bar_views/blog/bindings/blog_detail_binding.dart';
 import '../modules/nav_bar_views/blog/views/blog_view.dart';
+import '../modules/nav_bar_views/blog/views/blog_detail_view.dart';
 import '../modules/nav_bar_views/contest/all_contest/bindings/all_contest_binding.dart';
 import '../modules/nav_bar_views/contest/all_contest/views/all_contest_view.dart';
 import '../modules/nav_bar_views/contest/bindings/contest_binding.dart';
@@ -74,6 +76,8 @@ import '../modules/profile_module/contest_history/bindings/contest_history_bindi
 import '../modules/profile_module/contest_history/views/contest_history_view.dart';
 import '../modules/profile_module/accuracy_progress/bindings/accuracy_progress_binding.dart';
 import '../modules/profile_module/accuracy_progress/views/accuracy_progress_view.dart';
+import '../modules/profile_module/referral/bindings/referral_binding.dart';
+import '../modules/profile_module/referral/views/referral_view.dart';
 import '../modules/profile_module/profile_update/bindings/profile_update_binding.dart';
 import '../modules/profile_module/profile_update/views/profile_update_view.dart';
 import '../modules/profile_update_required/bindings/profile_update_required_binding.dart';
@@ -134,6 +138,11 @@ class AppPages {
       name: _Paths.BLOG,
       page: () => const BlogView(),
       binding: BlogBinding(),
+    ),
+    GetPage(
+      name: _Paths.BLOG_DETAILS,
+      page: () => const BlogDetailView(),
+      binding: BlogDetailBinding(),
     ),
     GetPage(
       name: _Paths.PROFILE,
@@ -204,6 +213,11 @@ class AppPages {
       name: _Paths.ACCURACY_PROGRESS,
       page: () => const AccuracyProgressView(),
       binding: AccuracyProgressBinding(),
+    ),
+    GetPage(
+      name: _Paths.REFERRAL,
+      page: () => const ReferralView(),
+      binding: ReferralBinding(),
     ),
     GetPage(
       name: _Paths.PROFILE_UPDATE_REQUIRED,

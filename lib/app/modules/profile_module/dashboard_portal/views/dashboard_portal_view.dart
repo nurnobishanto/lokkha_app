@@ -130,166 +130,277 @@ class DashboardPortalView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF064E3B),
+            Color(0xFF095A43),
+            Color(0xFF0F6E52),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF064E3B).withValues(alpha: 0.3),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: LightThemeColors.primaryColor.withValues(alpha: 0.3),
-                width: 2.5,
-              ),
-            ),
-            child: buildAvatar(user, radius: 28.r),
-          ),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        user.name ?? "User Name",
-                        style: AppTextStyles.body1.copyWith(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF0F172A),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar with checkmark badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2.2,
                       ),
                     ),
-                    if (havePackage.value) ...[
-                      SizedBox(width: 6.w),
-                      Icon(
-                        Icons.verified,
-                        size: 16.sp,
-                        color: LightThemeColors.primaryColor,
-                      ),
-                    ],
-                  ],
-                ),
-                SizedBox(height: 5.h),
-                Wrap(
-                  spacing: 6.w,
-                  runSpacing: 4.h,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: user.userId ?? referralCode));
-                        CustomSnackBar.showCustomToast(message: "আইডি কপি করা হয়েছে!");
-                      },
-                      borderRadius: BorderRadius.circular(6.r),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "আইডি: ${user.userId ?? referralCode}",
-                              style: TextStyle(
-                                color: const Color(0xFF475569),
-                                fontSize: 11.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(width: 3.w),
-                            Icon(Icons.copy_rounded, size: 10.sp, color: const Color(0xFF64748B)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.5.h),
+                    child: buildAvatar(user, radius: 32.r),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: EdgeInsets.all(3.r),
                       decoration: BoxDecoration(
-                        color: havePackage.value
-                            ? LightThemeColors.primaryColor.withValues(alpha: 0.1)
-                            : const Color(0xFFF8FAFC),
-                        borderRadius: BorderRadius.circular(6.r),
+                        color: const Color(0xFFF59E0B),
+                        shape: BoxShape.circle,
                         border: Border.all(
-                          color: havePackage.value
-                              ? LightThemeColors.primaryColor.withValues(alpha: 0.25)
-                              : const Color(0xFFE2E8F0),
-                          width: 0.8,
+                          color: Colors.white,
+                          width: 1.5,
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            havePackage.value ? Icons.workspace_premium_rounded : Icons.school_outlined,
-                            size: 11.5.sp,
-                            color: havePackage.value
-                                ? LightThemeColors.primaryColor
-                                : const Color(0xFF64748B),
-                          ),
-                          SizedBox(width: 3.w),
-                          Text(
-                            havePackage.value ? "প্রিমিয়াম শিক্ষার্থী" : "সাধারণ শিক্ষার্থী",
-                            style: TextStyle(
-                              color: havePackage.value
-                                  ? LightThemeColors.primaryColor
-                                  : const Color(0xFF64748B),
-                              fontSize: 10.5.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      child: Icon(
+                        Icons.check,
+                        size: 11.sp,
+                        color: const Color(0xFF0F172A),
                       ),
-                    ),
-                  ],
-                ),
-                if (user.phone != null && user.phone!.isNotEmpty) ...[
-                  SizedBox(height: 3.h),
-                  Text(
-                    user.phone!,
-                    style: TextStyle(
-                      color: const Color(0xFF94A3B8),
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () => Get.toNamed(Routes.PROFILE_UPDATE),
-            borderRadius: BorderRadius.circular(10.r),
-            child: Container(
-              padding: EdgeInsets.all(8.r),
-              decoration: BoxDecoration(
-                color: LightThemeColors.primaryColor.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(
-                  color: LightThemeColors.primaryColor.withValues(alpha: 0.2),
-                  width: 1,
+              ),
+              SizedBox(width: 14.w),
+
+              // Name, Feature Badge, ID & Phone
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Row 1: Name + Crown Badge
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            user.name ?? "sadman",
+                            style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 9.w,
+                            vertical: 3.5.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.workspace_premium_rounded,
+                                size: 13.sp,
+                                color: const Color(0xFF0F172A),
+                              ),
+                              SizedBox(width: 4.w),
+                              Text(
+                                "ফিচারসমূহ",
+                                style: TextStyle(
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w800,
+                                  color: const Color(0xFF0F172A),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+
+                    // Row 2: ID + Phone
+                    Row(
+                      children: [
+                        // White ID Box
+                        InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(
+                              text: user.userId ?? referralCode,
+                            ));
+                            CustomSnackBar.showCustomToast(
+                              message: "আইডি কপি করা হয়েছে!",
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 3.h,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            child: Text(
+                              "ID: ${user.userId ?? referralCode}",
+                              style: TextStyle(
+                                fontSize: 11.5.sp,
+                                fontWeight: FontWeight.w800,
+                                color: const Color(0xFF0F172A),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+
+                        // Phone Icon + Number
+                        Icon(
+                          Icons.call_rounded,
+                          size: 13.sp,
+                          color: const Color(0xFF6EE7B7),
+                        ),
+                        SizedBox(width: 4.w),
+                        Flexible(
+                          child: Text(
+                            user.phone ?? "8801749784788",
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              child: const Icon(
-                Icons.edit_outlined,
-                size: 17,
-                color: LightThemeColors.primaryColor,
+            ],
+          ),
+
+          SizedBox(height: 16.h),
+
+          // Bottom Row: Points Pill + Edit Profile Button
+          Row(
+            children: [
+              // Left: 90 পয়েন্ট >
+              InkWell(
+                onTap: () => Get.toNamed(Routes.REFERRAL),
+                borderRadius: BorderRadius.circular(20.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 7.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.monetization_on_rounded,
+                        size: 16.sp,
+                        color: const Color(0xFFF59E0B),
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        "${user.points ?? 90} পয়েন্ট",
+                        style: TextStyle(
+                          color: const Color(0xFFFDE68A),
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16.sp,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+
+              SizedBox(width: 10.w),
+
+              // Right: প্রোফাইল এডিট
+              InkWell(
+                onTap: () => Get.toNamed(Routes.PROFILE_UPDATE),
+                borderRadius: BorderRadius.circular(20.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 7.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.manage_accounts_rounded,
+                        size: 16.sp,
+                        color: const Color(0xFF064E3B),
+                      ),
+                      SizedBox(width: 6.w),
+                      Text(
+                        "প্রোফাইল এডিট",
+                        style: TextStyle(
+                          color: const Color(0xFF064E3B),
+                          fontSize: 12.5.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1037,30 +1148,33 @@ class DashboardPortalView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(6.r),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
+              InkWell(
+                onTap: () => Get.toNamed(Routes.REFERRAL),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(6.r),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.card_giftcard_rounded,
+                        color: Color(0xFFFDE68A),
+                        size: 17,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.card_giftcard_rounded,
-                      color: Color(0xFFFDE68A),
-                      size: 17,
+                    SizedBox(width: 8.w),
+                    Text(
+                      "রেফার করুন ও পয়েন্ট জিতুন",
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Text(
-                    "রেফার করুন ও পয়েন্ট জিতুন",
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               InkWell(
                 onTap: () {
@@ -1160,7 +1274,7 @@ class DashboardPortalView extends StatelessWidget {
               ),
               const Spacer(),
               InkWell(
-                onTap: () => Get.to(const ComingSoonPage()),
+                onTap: () => Get.toNamed(Routes.REFERRAL),
                 child: Text(
                   "লিস্ট দেখুন →",
                   style: TextStyle(

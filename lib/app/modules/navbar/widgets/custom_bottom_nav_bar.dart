@@ -69,7 +69,8 @@ class CustomBottomNavBar extends StatelessWidget {
                     iconBuilder: (isSelected) => Icon(
                       isSelected ? Icons.home_rounded : Icons.home_outlined,
                       size: 20.r,
-                      color: isSelected ? Colors.white : const Color(0xFF64748B),
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF64748B),
                     ),
                   ),
 
@@ -80,7 +81,8 @@ class CustomBottomNavBar extends StatelessWidget {
                     iconBuilder: (isSelected) => FaIcon(
                       FontAwesomeIcons.graduationCap,
                       size: 17.r,
-                      color: isSelected ? Colors.white : const Color(0xFF64748B),
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF64748B),
                     ),
                   ),
 
@@ -152,7 +154,10 @@ class CustomBottomNavBar extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFFF3D00), Color(0xFFFF9100)],
+                                  colors: [
+                                    Color(0xFFFF3D00),
+                                    Color(0xFFFF9100)
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(5.r),
                                 boxShadow: [
@@ -191,10 +196,24 @@ class CustomBottomNavBar extends StatelessWidget {
                             ? Icons.person_rounded
                             : Icons.person_outline_rounded,
                         size: 20.r,
-                        color: isSelected ? Colors.white : const Color(0xFF64748B),
+                        color:
+                            isSelected ? Colors.white : const Color(0xFF64748B),
                       ),
                     );
                   }),
+
+                  _buildNavItem(
+                    index: 5,
+                    label: "ব্লগ",
+                    iconBuilder: (isSelected) => Icon(
+                      isSelected
+                          ? Icons.article_rounded
+                          : Icons.article_outlined,
+                      size: 20.r,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF64748B),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -9,6 +9,7 @@ abstract class Routes {
   static const QUESTION_BANK = _Paths.QUESTION_BANK;
   static const CONTEST = _Paths.CONTEST;
   static const BLOG = _Paths.BLOG;
+  static const BLOG_DETAILS = _Paths.BLOG_DETAILS;
   static const PROFILE = _Paths.PROFILE;
   static var MOCK_TEST = _Paths.MOCK_TEST;
   static const AJKER_PORIKKHA = _Paths.AJKER_PORIKKHA;
@@ -61,6 +62,7 @@ abstract class Routes {
   static const SELF_EXAM_HISTORY = _Paths.SELF_EXAM_HISTORY;
   static const CONTEST_HISTORY = _Paths.CONTEST_HISTORY;
   static const ACCURACY_PROGRESS = _Paths.ACCURACY_PROGRESS;
+  static const REFERRAL = _Paths.REFERRAL;
 }
 
 abstract class _Paths {
@@ -71,6 +73,7 @@ abstract class _Paths {
   static const QUESTION_BANK = '/question-bank';
   static const CONTEST = '/contest';
   static const BLOG = '/blog';
+  static const BLOG_DETAILS = '/blog-details';
   static const PROFILE = '/profile';
   static const MOCK_TEST = '/mock-test';
   static const AJKER_PORIKKHA = '/ajker-porikkha';
@@ -123,4 +126,5 @@ abstract class _Paths {
   static const SELF_EXAM_HISTORY = '/self-exam-history';
   static const CONTEST_HISTORY = '/contest-history';
   static const ACCURACY_PROGRESS = '/accuracy-progress';
+  static const REFERRAL = '/referral';
 }
