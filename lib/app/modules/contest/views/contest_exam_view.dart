@@ -21,14 +21,19 @@ class ContestExamView extends StatefulWidget {
 }
 
 class _ContestExamViewState extends State<ContestExamView> {
+  late final ContestStartController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(ContestStartController(widget.examStartModel));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ContestStartController controller =
-        Get.put(ContestStartController(widget.examStartModel));
-
     final questionList = widget.examStartModel.questions;
 
-    if (questionList!.isEmpty) {
+    if (questionList == null || questionList.isEmpty) {
       return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -64,36 +69,38 @@ class _ContestExamViewState extends State<ContestExamView> {
           style: AppTextStyles.heading4.copyWith(color: LightThemeColors.white),
         ),
       ),
-      body: Obx(() {
-        return Column(
-          children: [
-            // Display timer
-            controller.timerWork.value == true
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.access_time,
-                              size: 18.0, color: Colors.white),
-                          const SizedBox(width: 8.0),
-                          Text(
-                            "সময় বাকি : ${_formatDuration(controller.duration!.value)} মিনিট",
-                            style: AppTextStyles.heading4
-                                .copyWith(color: LightThemeColors.white),
-                          ),
-                        ],
-                      ),
+      body: Column(
+        children: [
+          // Display timer (isolated Obx so only timer updates every second)
+          Obx(() {
+            if (controller.timerWork.value != true || controller.duration == null) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.access_time,
+                        size: 18.0, color: Colors.white),
+                    const SizedBox(width: 8.0),
+                    Text(
+                      "সময় বাকি : ${_formatDuration(controller.duration!.value)} মিনিট",
+                      style: AppTextStyles.heading4
+                          .copyWith(color: LightThemeColors.white),
                     ),
-                  )
-                : const SizedBox(),
+                  ],
+                ),
+              ),
+            );
+          }),
 
             // Question choice area
             Expanded(
@@ -171,15 +178,14 @@ class _ContestExamViewState extends State<ContestExamView> {
               ),
             ),
 
-            CustomActionButton(
-              text: "সাবমিট এক্সাম",
-              onPressed: () {
-                controller.showSubmitConfirmationDialog();
-              },
-            ),
-          ],
-        );
-      }),
+          CustomActionButton(
+            text: "সাবমিট এক্সাম",
+            onPressed: () {
+              controller.showSubmitConfirmationDialog();
+            },
+          ),
+        ],
+      ),
     );
   }
 

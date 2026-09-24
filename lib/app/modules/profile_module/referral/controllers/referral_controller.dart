@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../components/custom_snackbar.dart';
 import '../../../../helper/global.dart';
+import 'package:lokkha/app/data/repositories/referral_repository.dart';
 
 class ReferralController extends GetxController {
   final referralCode = ''.obs;
@@ -14,11 +15,13 @@ class ReferralController extends GetxController {
   final successfulReferrals = 0.obs;
 
   final referredUsers = <dynamic>[].obs;
+  final ReferralRepository _referralRepo = ReferralRepository();
 
   @override
   void onInit() {
     super.onInit();
     _initReferralData();
+    _loadStats();
   }
 
   void _initReferralData() {
@@ -28,6 +31,22 @@ class ReferralController extends GetxController {
         : "LK${user.userId ?? 'C05189'}";
     referralCode.value = code;
     referralLink.value = "https://lokkha.com/register?ref=$code";
+  }
+
+  Future<void> _loadStats() async {
+    final stats = await _referralRepo.getReferralStats();
+    if (stats != null) {
+      if (stats.referralCode.isNotEmpty) {
+        referralCode.value = stats.referralCode;
+      }
+      if (stats.referralLink.isNotEmpty) {
+        referralLink.value = stats.referralLink;
+      }
+      totalInvited.value = stats.totalInvited;
+      earnedPoints.value = stats.earnedPoints;
+      successfulReferrals.value = stats.successfulReferrals;
+      referredUsers.assignAll(stats.referredUsers);
+    }
   }
 
   void copyReferralCode() {

@@ -10,6 +10,8 @@ import '../../../grid_views/jobs/views/jobs_view.dart';
 import '../../../grid_views/mock_test_tab/views/mock_test_tab_view.dart';
 import '../../../latest_exam/views/latest_exam_view.dart';
 import '../../../vocabulary/views/vocabulary_view.dart';
+import 'package:lokkha/app/data/models/dashboard_overview_model.dart';
+import 'package:lokkha/app/data/repositories/dashboard_repository.dart';
 import '../models/slider_model.dart';
 import '../models/subject_sections_model.dart';
 import '../services/home_api_service.dart';
@@ -36,8 +38,13 @@ class HomeController extends GetxController {
   ];
 
   final HomeApiService homeApiService = HomeApiService();
+  final DashboardRepository dashboardRepository = DashboardRepository();
 
-  // Reactive API statuses & models
+  // V1 Dashboard Overview State
+  final Rx<DashboardOverviewModel?> dashboardOverview = Rx<DashboardOverviewModel?>(null);
+  final RxBool isOverviewLoading = false.obs;
+
+  // Reactive API statuses & models (backward compatibility)
   Rx<ApiCallStatus> get sliderApiStatus => homeApiService.sliderApiStatus;
   Rx<ApiCallStatus> get subjectSectionApiStatus =>
       homeApiService.subjectSectionApiStatus;
@@ -52,19 +59,34 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debugPrint("HomeController Initialized");
+    debugPrint("HomeController Initialized with V1 Dashboard Repository");
 
-    // Controllers safely injected
-    contestController = Get.put(LatestContestController(), permanent: true);
-    examController = Get.put(ExamCategoryController(), permanent: true);
-    Get.put(NotificationsController());
+    // Controllers injected on demand
+    contestController = Get.isRegistered<LatestContestController>()
+        ? Get.find<LatestContestController>()
+        : Get.put(LatestContestController());
+    examController = Get.isRegistered<ExamCategoryController>()
+        ? Get.find<ExamCategoryController>()
+        : Get.put(ExamCategoryController());
 
-    // Initial API fetch
+    if (!Get.isRegistered<NotificationsController>()) {
+      Get.put(NotificationsController());
+    }
+
+    // Initial 1-call API fetch
     _fetchInitialData();
   }
 
   Future<void> _fetchInitialData() async {
+    isOverviewLoading.value = true;
     try {
+      // 1. Fetch single-call V1 Dashboard Overview
+      final overview = await dashboardRepository.getOverview();
+      if (overview != null && overview.status) {
+        dashboardOverview.value = overview;
+      }
+
+      // 2. Fetch background sections in parallel
       await Future.wait([
         homeApiService.fetchSliders(),
         homeApiService.fetchSubjectSection(),
@@ -76,6 +98,8 @@ class HomeController extends GetxController {
       debugPrint("Initial Home data fetched successfully");
     } catch (e) {
       debugPrint("Error fetching initial Home data: $e");
+    } finally {
+      isOverviewLoading.value = false;
     }
   }
 

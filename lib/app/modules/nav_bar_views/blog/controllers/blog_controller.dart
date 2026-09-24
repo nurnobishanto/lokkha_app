@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/app/data/repositories/blog_repository.dart';
 import '../models/blog_post_model.dart';
 import '../../../../routes/app_pages.dart';
 
@@ -50,6 +51,9 @@ class BlogController extends GetxController {
     });
   }
 
+  final BlogRepository blogRepository = BlogRepository();
+  final RxBool isLoading = false.obs;
+
   @override
   void onClose() {
     scrollController.dispose();
@@ -57,8 +61,19 @@ class BlogController extends GetxController {
     super.onClose();
   }
 
-  void loadPosts() {
-    allPosts.assignAll(BlogPost.samplePosts);
+  Future<void> loadPosts() async {
+    isLoading.value = true;
+    try {
+      final posts = await blogRepository.getBlogs(
+        category: selectedCategory.value == 'সকল আর্টিকেল' ? null : selectedCategory.value,
+      );
+      allPosts.assignAll(posts);
+    } catch (e) {
+      debugPrint("Error loading blog posts: $e");
+      allPosts.assignAll(BlogPost.samplePosts);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   BlogPost? get featuredPost {
@@ -103,6 +118,7 @@ class BlogController extends GetxController {
 
   void onCategorySelected(String category) {
     selectedCategory.value = category;
+    loadPosts();
   }
 
   void onSearchSubmitted(String query) {

@@ -5,9 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/components/custom_snackbar.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
-
-import '../../../../../styles/text_style.dart';
 import '../../../../../utils/constants.dart';
 import '../../../../data/local/my_shared_pref.dart';
 import '../../../../helper/global.dart';
@@ -16,6 +13,7 @@ import '../../../../services/api_call_status.dart';
 import '../../../../views/widgets/web_exam_view.dart';
 import '../../../auth_views/auth_gateway/views/auth_gateway_view.dart';
 import '../../../drawer_pages/views/customer_support_view.dart';
+import '../../widgets/devices_management_sheet.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -397,6 +395,13 @@ class ProfileView extends GetView<ProfileController> {
                       text: 'অ্যাকাউন্ট ডিলিট করুন',
                       icon: Icons.delete_forever,
                       color: Colors.red,
+                    ),
+                    const Divider(height: 0, indent: 50),
+                    _buildListItem(
+                      onTap: () => DevicesManagementSheet.show(context),
+                      text: 'লগইন ডিভাইস সমূহ',
+                      icon: Icons.devices_rounded,
+                      color: const Color(0xFF0F6E52),
                     ),
                     const Divider(height: 0, indent: 50),
                     _buildListItem(

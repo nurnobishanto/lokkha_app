@@ -66,5 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Lokkha requires camera access to allow you to take and upload a profile picture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Lokkha requires photo library access to allow you to select and upload a profile picture.</string>
 </dict>
+
 </plist>

@@ -7,8 +7,27 @@ class AppConstants {
   static final String baseUrl =
       dotenv.env['API_BASE_URL'] ?? 'https://lokkha.com';
   static final String appUrl = '$baseUrl/api';
+  static final String apiV1BaseUrl = '$baseUrl/api/v1';
   static const String storageUrl = 'https://lokkha.com/uploads/';
   static const String sponsorAds = 'https://bdtaxation.com/api/app-ads';
+
+  /// V1 API Endpoints
+  static const String v1DashboardOverview = '/dashboard/overview';
+  static const String v1UserDevices = '/user/devices';
+  static const String v1UserDevicesLogout = '/user/devices/logout';
+  static const String v1UserAccuracy = '/user/accuracy';
+  static const String v1UserProfile = '/user/profile';
+  static const String v1UserProfileUpdate = '/user/profile/update';
+  static const String v1Blogs = '/blogs';
+  static const String v1BlogCategories = '/blogs/categories';
+  static const String v1Bookmarks = '/user/content-history/bookmarks';
+  static const String v1BookmarkToggle = '/user/content-history/bookmark';
+  static const String v1RewardPoints = '/user/reward-points';
+  static const String v1Referrals = '/user/referrals';
+  static const String v1Exams = '/exams';
+  static const String v1Contests = '/contests';
+  static const String v1SelfTests = '/self-tests';
+  static const String v1ApplePayVerify = '/apple-pay/verify';
 
   /// Auth Endpoints
   static final String checkPhoneNumber = '$appUrl/check-phone-number';

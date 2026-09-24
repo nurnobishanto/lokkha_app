@@ -28,28 +28,17 @@ class AppUpdateService {
   Timer? _timer;
 
   void startUpdateService() {
-    // Cancel previous timer if running
-    _firstTimer?.cancel();
-    _timer?.cancel();
-    //appVersionCheck();
-    // Start a new timer to show popup every 5 seconds
-    _firstTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (Get.currentRoute != Routes.MAINTENANCE_MODE_VIEW &&
-          Get.currentRoute != Routes.APP_UPDATE_VIEW) {
-        if (!firstAppUpdateCalled.value) {
-          firstAppUpdateCalled.value = true;
-          log("firstAppUpdateCalled");
-          appVersionCheck();
-        }
-      }
-    });
+    // Cancel previous timers if any
+    stopUpdateService();
+    // Run version check once on service startup
+    appVersionCheck();
+  }
 
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      if (Get.currentRoute != Routes.MAINTENANCE_MODE_VIEW &&
-          Get.currentRoute != Routes.APP_UPDATE_VIEW) {
-        appVersionCheck();
-      }
-    });
+  void stopUpdateService() {
+    _firstTimer?.cancel();
+    _firstTimer = null;
+    _timer?.cancel();
+    _timer = null;
   }
 
   Future<void> appVersionCheck() async {

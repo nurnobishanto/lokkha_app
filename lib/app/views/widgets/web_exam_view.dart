@@ -46,8 +46,6 @@ class _WebExamViewState extends State<WebExamView> {
       'Content-Type': 'application/json'
     };
 
-    log("headers : $headers , widget.body ${widget.body} url: ${widget.url}");
-
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(Colors.transparent)
@@ -93,31 +91,19 @@ class _WebExamViewState extends State<WebExamView> {
         },
       ));
 
-    /// 🔹 OLD POST LOG (for debugging)
-    log('================ OLD POST DEBUG ================');
-    log('POST URL      : ${widget.url}');
-    log('POST HEADERS  : $headers');
-    log('POST BODY    : ${widget.body}');
-    log('================================================');
-
     /// 🔹 Build GET params (token + body)
-    // Add token to body map before encoding
     final Map<String, dynamic> dataWithToken = {
-      'token': token, // 🔹 token added here
-      ...?widget.body, // spread the rest of the body if not null
+      'token': token,
+      ...?widget.body,
     };
 
     final Map<String, String> queryParams = encodeQueryParams(dataWithToken);
     final Uri finalUri =
         Uri.parse(widget.url).replace(queryParameters: queryParams);
 
-    /// 🔹 PRINT FINAL GET URL
-    log('================ FINAL GET DEBUG ================');
-    log('FINAL GET URL : $finalUri');
-    log('GET PARAMS   : $queryParams');
-    log('================================================');
     _controller.loadRequest(
       finalUri,
+      headers: headers,
     );
   }
 

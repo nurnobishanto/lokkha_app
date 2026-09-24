@@ -41,6 +41,38 @@ class BlogPost {
     this.isRecentGuide = false,
   });
 
+  factory BlogPost.fromJson(Map<String, dynamic> json) {
+    return BlogPost(
+      id: json['id']?.toString() ?? '',
+      title: json['title'] as String? ?? '',
+      category: json['category'] as String? ?? 'General',
+      publishDate: json['publish_date'] as String? ?? json['created_at'] as String? ?? '',
+      publishTime: json['publish_time'] as String?,
+      readTime: json['read_time'] as String? ?? '৩ মিনিট পড়া',
+      views: json['views'] != null ? '${json['views']} জন পড়েছেন' : '০ জন পড়েছেন',
+      excerpt: json['excerpt'] as String? ?? '',
+      mentor: json['mentor'] as String? ?? 'লক্ষ্য একাডেমি',
+      source: json['source'] as String?,
+      imageUrl: json['image_url'] as String? ??
+          json['thumbnail'] as String? ??
+          'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=800&auto=format&fit=crop',
+      isFeatured: json['is_featured'] == true || json['is_featured'] == 1,
+      isRecentGuide: json['is_recent_guide'] == true || json['is_recent_guide'] == 1,
+      sections: (json['sections'] as List<dynamic>?)
+              ?.map((s) => BlogSection(
+                    title: s['title'] as String?,
+                    content: s['content'] as String? ?? '',
+                  ))
+              .toList() ??
+          [
+            BlogSection(
+              title: json['title'] as String?,
+              content: json['content'] as String? ?? json['excerpt'] as String? ?? '',
+            ),
+          ],
+    );
+  }
+
   static List<BlogPost> get samplePosts => [
         BlogPost(
           id: '1',

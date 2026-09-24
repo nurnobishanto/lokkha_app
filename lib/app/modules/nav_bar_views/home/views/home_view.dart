@@ -28,6 +28,7 @@ import '../../../see_all_items/controllers/see_all_items_controller.dart';
 import '../../../subject_sections/views/subject_sections_view.dart';
 import '../components/social_links_widget.dart';
 import '../controllers/home_controller.dart';
+import '../widgets/accuracy_chart_widget.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -147,6 +148,20 @@ class HomeView extends StatelessWidget {
             const LatestContestWidget(),
             const LastContestResultWidget(),
             8.h.height,
+            Obx(() {
+              final overview = controller.dashboardOverview.value;
+              final points = overview?.data?.accuracyPoints;
+              if (points != null && points.isNotEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: AccuracyChartWidget(
+                    points: points,
+                    currentAccuracy: overview?.data?.accuracyRate ?? 0.0,
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
             Center(
               child: Text(
                 "জনপ্রিয় প্রশ্নব্যাংক",

@@ -46,3 +46,11 @@ app.*.map.json
 
 # Env file
 .env
+
+# Android signing secrets and keys
+key/
+*.jks
+*.keystore
+android/key.properties
+note
+/note

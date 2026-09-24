@@ -7,7 +7,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:gif/gif.dart';
 import 'package:lokkha/app/data/local/my_get_storage.dart';
 import 'package:lokkha/app/views/widgets/base_webview.dart';
 import 'package:lokkha/config/constants/app_strings.dart';
@@ -188,29 +187,15 @@ String convertDaysToHumanReadable(int days) {
 }
 
 Widget isCheckedGifImage(String imageUrl) {
-  final isGifFile = imageUrl.toLowerCase().endsWith('.giff');
-  return isGifFile
-      ? Gif(
-          image: NetworkImage(imageUrl),
-          autostart: Autostart.loop,
-          fit: BoxFit.fitWidth,
-          height: 110.0.h,
-          width: double.infinity,
-          placeholder: (context) =>
-              const Center(child: CircularProgressIndicator()),
-          onFetchCompleted: () {
-            // You can handle something here if needed
-          },
-        )
-      : CachedNetworkImage(
-          imageUrl: imageUrl,
-          height: 110.0.h,
-          width: double.infinity,
-          fit: BoxFit.fitWidth,
-          placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        );
+  return CachedNetworkImage(
+    imageUrl: imageUrl,
+    fit: BoxFit.fitWidth,
+    height: 110.0.h,
+    width: double.infinity,
+    placeholder: (context, url) =>
+        const Center(child: CircularProgressIndicator()),
+    errorWidget: (context, url, error) => Text("data")
+  );
 }
 
 User myUser = MyGetStorage.readCache(MyGetStorage.meUser) ?? User();
