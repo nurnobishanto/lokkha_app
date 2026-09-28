@@ -4,7 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../components/custom_snackbar.dart';
 import '../../../../helper/global.dart';
-import 'package:lokkha/app/data/repositories/referral_repository.dart';
+import '../repositories/referral_repository.dart';
 
 class ReferralController extends GetxController {
   final referralCode = ''.obs;

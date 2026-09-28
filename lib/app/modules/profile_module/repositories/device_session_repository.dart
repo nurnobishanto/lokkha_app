@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../utils/constants.dart';
-import '../models/device_session_model.dart';
-import '../network/api_client.dart';
+import '../../../data/models/device_session_model.dart';
+import '../../../data/network/api_client.dart';
 
 class DeviceSessionRepository {
   /// Fetch all active devices for the authenticated student (GET /api/v1/user/devices)

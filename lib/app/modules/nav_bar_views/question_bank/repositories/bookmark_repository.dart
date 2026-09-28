@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../../../../utils/constants.dart';
-import '../models/bookmarked_question_model.dart';
-import '../network/api_client.dart';
+import '../../../../../utils/constants.dart';
+import '../../../../data/models/bookmarked_question_model.dart';
+import '../../../../data/network/api_client.dart';
 
 class BookmarkRepository {
   /// Fetch all saved/bookmarked questions

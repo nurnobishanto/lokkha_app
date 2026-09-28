@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/data/models/bookmarked_question_model.dart';
-import 'package:lokkha/app/data/repositories/bookmark_repository.dart';
+import '../repositories/bookmark_repository.dart';
 
 class QuestionBankController extends GetxController {
   final BookmarkRepository _repository = BookmarkRepository();

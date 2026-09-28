@@ -11,7 +11,7 @@ import '../../../grid_views/mock_test_tab/views/mock_test_tab_view.dart';
 import '../../../latest_exam/views/latest_exam_view.dart';
 import '../../../vocabulary/views/vocabulary_view.dart';
 import 'package:lokkha/app/data/models/dashboard_overview_model.dart';
-import 'package:lokkha/app/data/repositories/dashboard_repository.dart';
+import '../repositories/dashboard_repository.dart';
 import '../models/slider_model.dart';
 import '../models/subject_sections_model.dart';
 import '../services/home_api_service.dart';

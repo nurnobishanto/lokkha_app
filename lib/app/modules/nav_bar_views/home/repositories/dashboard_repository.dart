@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../utils/constants.dart';
-import '../models/dashboard_overview_model.dart';
-import '../network/api_client.dart';
+import '../../../../../utils/constants.dart';
+import '../../../../data/models/dashboard_overview_model.dart';
+import '../../../../data/network/api_client.dart';
 
 class DashboardRepository {
   static const String _cacheKey = 'dashboard_overview_cache';

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../../config/theme/light_theme_colors.dart';
 import '../../../../styles/text_style.dart';
 import '../../../data/models/device_session_model.dart';
-import '../../../data/repositories/device_session_repository.dart';
+import '../repositories/device_session_repository.dart';
 
 class DevicesManagementSheet extends StatefulWidget {
   const DevicesManagementSheet({super.key});

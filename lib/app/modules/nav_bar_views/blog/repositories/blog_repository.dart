@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import '../../../../utils/constants.dart';
-import '../../modules/nav_bar_views/blog/models/blog_post_model.dart';
-import '../network/api_client.dart';
+import '../../../../../utils/constants.dart';
+import '../../../../data/network/api_client.dart';
+import '../models/blog_post_model.dart';
 
 class BlogRepository {
   /// Fetch list of blog articles with optional category filter

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/repositories/blog_repository.dart';
 import '../models/blog_post_model.dart';
+import '../repositories/blog_repository.dart';
 import '../../../../routes/app_pages.dart';
 
 class BlogController extends GetxController {

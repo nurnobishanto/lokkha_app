@@ -49,7 +49,8 @@ class DashboardPortalView extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.notifications_none, size: 18, color: Colors.white),
+              child: const Icon(Icons.notifications_none,
+                  size: 18, color: Colors.white),
             ),
           ),
           SizedBox(width: 4.w),
@@ -61,9 +62,10 @@ class DashboardPortalView extends StatelessWidget {
         }
 
         final user = myUser;
-        final referralCode = (user.referralCode != null && user.referralCode!.isNotEmpty)
-            ? user.referralCode!
-            : "LK${user.userId ?? 'C05189'}";
+        final referralCode =
+            (user.referralCode != null && user.referralCode!.isNotEmpty)
+                ? user.referralCode!
+                : "LK${user.userId ?? 'C05189'}";
         final referralLink = "https://lokkha.com/register?ref=$referralCode";
 
         return SingleChildScrollView(
@@ -420,28 +422,32 @@ class DashboardPortalView extends StatelessWidget {
       childAspectRatio: 2.1,
       children: [
         _buildStatCard(
-          icon: const FaIcon(FontAwesomeIcons.graduationCap, color: Color(0xFF059669), size: 18),
+          icon: const FaIcon(FontAwesomeIcons.graduationCap,
+              color: Color(0xFF059669), size: 18),
           iconBg: const Color(0xFFECFDF5),
           count: "০",
           label: "অংশগ্রহণকৃত পরীক্ষা",
           onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
         ),
         _buildStatCard(
-          icon: const Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB), size: 22),
+          icon: const Icon(Icons.edit_note_rounded,
+              color: Color(0xFF2563EB), size: 22),
           iconBg: const Color(0xFFEFF6FF),
           count: "০",
           label: "সেলফ এক্সাম",
           onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
         ),
         _buildStatCard(
-          icon: const FaIcon(FontAwesomeIcons.trophy, color: Color(0xFFD97706), size: 18),
+          icon: const FaIcon(FontAwesomeIcons.trophy,
+              color: Color(0xFFD97706), size: 18),
           iconBg: const Color(0xFFFFFBEB),
           count: "০",
           label: "লাইভ কনটেস্ট",
           onTap: () => Get.toNamed(Routes.CONTEST_HISTORY),
         ),
         _buildStatCard(
-          icon: const Icon(Icons.show_chart_rounded, color: Color(0xFF7C3AED), size: 22),
+          icon: const Icon(Icons.show_chart_rounded,
+              color: Color(0xFF7C3AED), size: 22),
           iconBg: const Color(0xFFF5F3FF),
           count: "০%",
           label: "গড় নির্ভুলতা",
@@ -742,37 +748,43 @@ class DashboardPortalView extends StatelessWidget {
             children: [
               _buildShortcutItem(
                 title: "বিষয়ভিত্তিক\nপরীক্ষা",
-                icon: const Icon(Icons.menu_book_rounded, color: Color(0xFF10B981), size: 20),
+                icon: const Icon(Icons.menu_book_rounded,
+                    color: Color(0xFF10B981), size: 20),
                 iconBg: const Color(0xFFE8F8F2),
                 onTap: () => Get.toNamed(Routes.EXAM_CATEGORY),
               ),
               _buildShortcutItem(
                 title: "লাইভ\nকনটেস্ট",
-                icon: const FaIcon(FontAwesomeIcons.trophy, color: Color(0xFFD97706), size: 18),
+                icon: const FaIcon(FontAwesomeIcons.trophy,
+                    color: Color(0xFFD97706), size: 18),
                 iconBg: const Color(0xFFFFFBEB),
                 onTap: () => Get.toNamed(Routes.ALL_CONTEST),
               ),
               _buildShortcutItem(
                 title: "অনলাইন\nকোর্স",
-                icon: const Icon(Icons.videocam_rounded, color: Color(0xFFE11D48), size: 20),
+                icon: const Icon(Icons.videocam_rounded,
+                    color: Color(0xFFE11D48), size: 20),
                 iconBg: const Color(0xFFFFF1F2),
                 onTap: () => Get.toNamed(Routes.ALL_COURSES),
               ),
               _buildShortcutItem(
                 title: "প্রিমিয়াম\nপ্যাকেজ",
-                icon: const Icon(Icons.workspace_premium_rounded, color: Color(0xFFEA580C), size: 20),
+                icon: const Icon(Icons.workspace_premium_rounded,
+                    color: Color(0xFFEA580C), size: 20),
                 iconBg: const Color(0xFFFFF7ED),
                 onTap: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
               ),
               _buildShortcutItem(
                 title: "নিয়োগ\nবিজ্ঞপ্তি",
-                icon: const Icon(Icons.business_center_rounded, color: Color(0xFF2563EB), size: 20),
+                icon: const Icon(Icons.business_center_rounded,
+                    color: Color(0xFF2563EB), size: 20),
                 iconBg: const Color(0xFFEFF6FF),
                 onTap: () => Get.toNamed(Routes.JOBS),
               ),
               _buildShortcutItem(
                 title: "সাম্প্রতিক\nতথ্য",
-                icon: const Icon(Icons.public_rounded, color: Color(0xFF0D9488), size: 20),
+                icon: const Icon(Icons.public_rounded,
+                    color: Color(0xFF0D9488), size: 20),
                 iconBg: const Color(0xFFF0FDFA),
                 onTap: () => Get.toNamed(Routes.CURRENT_AFFAIRS),
               ),
@@ -844,7 +856,8 @@ class DashboardPortalView extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: isPremium ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
+            color:
+                isPremium ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
             width: isPremium ? 1.2 : 1.0,
           ),
           boxShadow: [
@@ -889,7 +902,8 @@ class DashboardPortalView extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                   decoration: BoxDecoration(
                     color: isPremium
                         ? const Color(0xFFECFDF5)
@@ -907,13 +921,17 @@ class DashboardPortalView extends StatelessWidget {
                       Icon(
                         isPremium ? Icons.verified : Icons.lock_outline_rounded,
                         size: 12.sp,
-                        color: isPremium ? const Color(0xFF059669) : const Color(0xFF64748B),
+                        color: isPremium
+                            ? const Color(0xFF059669)
+                            : const Color(0xFF64748B),
                       ),
                       SizedBox(width: 4.w),
                       Text(
                         isPremium ? "Active Premium" : "Free Plan",
                         style: TextStyle(
-                          color: isPremium ? const Color(0xFF059669) : const Color(0xFF64748B),
+                          color: isPremium
+                              ? const Color(0xFF059669)
+                              : const Color(0xFF64748B),
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -950,7 +968,9 @@ class DashboardPortalView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: (isPremium ? const Color(0xFF10B981) : const Color(0xFFF59E0B))
+                      color: (isPremium
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFFF59E0B))
                           .withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -967,7 +987,9 @@ class DashboardPortalView extends StatelessWidget {
                     ),
                     SizedBox(width: 7.w),
                     Text(
-                      isPremium ? "প্যাকেজ রিনিউ বা আপগ্রেড করুন" : "প্রিমিয়ামে আপগ্রেড করুন",
+                      isPremium
+                          ? "প্যাকেজ রিনিউ বা আপগ্রেড করুন"
+                          : "প্রিমিয়ামে আপগ্রেড করুন",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 13.5.sp,
@@ -1061,7 +1083,8 @@ class DashboardPortalView extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const FaIcon(FontAwesomeIcons.whatsapp, size: 16, color: Color(0xFF16A34A)),
+                        const FaIcon(FontAwesomeIcons.whatsapp,
+                            size: 16, color: Color(0xFF16A34A)),
                         SizedBox(width: 8.w),
                         Text(
                           "হোয়াটসঅ্যাপ",
@@ -1179,11 +1202,13 @@ class DashboardPortalView extends StatelessWidget {
               InkWell(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: referralCode));
-                  CustomSnackBar.showCustomToast(message: "রেফার কোড কপি করা হয়েছে!");
+                  CustomSnackBar.showCustomToast(
+                      message: "রেফার কোড কপি করা হয়েছে!");
                 },
                 borderRadius: BorderRadius.circular(8.r),
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.5.h),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.5.h),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF59E0B),
                     borderRadius: BorderRadius.circular(8.r),
@@ -1208,7 +1233,8 @@ class DashboardPortalView extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 4.w),
-                      const Icon(Icons.copy_rounded, size: 10, color: Colors.black87),
+                      const Icon(Icons.copy_rounded,
+                          size: 10, color: Colors.black87),
                     ],
                   ),
                 ),
@@ -1236,7 +1262,8 @@ class DashboardPortalView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.people_alt_rounded, size: 13, color: Color(0xFFFDE68A)),
+                    const Icon(Icons.people_alt_rounded,
+                        size: 13, color: Color(0xFFFDE68A)),
                     SizedBox(width: 5.w),
                     Text(
                       "রেফার্ড: ০ জন",
@@ -1259,7 +1286,8 @@ class DashboardPortalView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.monetization_on_rounded, size: 13, color: Color(0xFFFDE68A)),
+                    const Icon(Icons.monetization_on_rounded,
+                        size: 13, color: Color(0xFFFDE68A)),
                     SizedBox(width: 5.w),
                     Text(
                       "অর্জিত: +০ Pts",
@@ -1313,11 +1341,13 @@ class DashboardPortalView extends StatelessWidget {
                 InkWell(
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: referralLink));
-                    CustomSnackBar.showCustomToast(message: "রেফারেল লিংক কপি করা হয়েছে!");
+                    CustomSnackBar.showCustomToast(
+                        message: "রেফারেল লিংক কপি করা হয়েছে!");
                   },
                   borderRadius: BorderRadius.circular(8.r),
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
                     decoration: BoxDecoration(
                       color: LightThemeColors.primaryColor,
                       borderRadius: BorderRadius.circular(8.r),
@@ -1325,7 +1355,8 @@ class DashboardPortalView extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.copy_rounded, size: 12, color: Colors.white),
+                        const Icon(Icons.copy_rounded,
+                            size: 12, color: Colors.white),
                         SizedBox(width: 4.w),
                         Text(
                           "কপি লিংক",
@@ -1357,13 +1388,16 @@ class DashboardPortalView extends StatelessWidget {
               ),
               SizedBox(width: 10.w),
               _buildShareIcon(
-                icon: const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.white, size: 15),
+                icon: const FaIcon(FontAwesomeIcons.whatsapp,
+                    color: Colors.white, size: 15),
                 bgColor: const Color(0xFF22C55E),
-                onTap: () => _launchURL("whatsapp://send?text=${Uri.encodeComponent('Join Lokkha: $referralLink')}"),
+                onTap: () => _launchURL(
+                    "whatsapp://send?text=${Uri.encodeComponent('Join Lokkha: $referralLink')}"),
               ),
               SizedBox(width: 8.w),
               _buildShareIcon(
-                icon: const FaIcon(FontAwesomeIcons.facebookF, color: Colors.white, size: 13),
+                icon: const FaIcon(FontAwesomeIcons.facebookF,
+                    color: Colors.white, size: 13),
                 bgColor: const Color(0xFF1877F2),
                 onTap: () => SharePlus.instance.share(
                   ShareParams(text: "Join Lokkha: $referralLink"),
@@ -1371,13 +1405,16 @@ class DashboardPortalView extends StatelessWidget {
               ),
               SizedBox(width: 8.w),
               _buildShareIcon(
-                icon: const FaIcon(FontAwesomeIcons.telegram, color: Colors.white, size: 13),
+                icon: const FaIcon(FontAwesomeIcons.telegram,
+                    color: Colors.white, size: 13),
                 bgColor: const Color(0xFF0284C7),
-                onTap: () => _launchURL("https://t.me/share/url?url=${Uri.encodeComponent(referralLink)}"),
+                onTap: () => _launchURL(
+                    "https://t.me/share/url?url=${Uri.encodeComponent(referralLink)}"),
               ),
               SizedBox(width: 8.w),
               _buildShareIcon(
-                icon: const Icon(Icons.share_rounded, color: Colors.white, size: 15),
+                icon: const Icon(Icons.share_rounded,
+                    color: Colors.white, size: 15),
                 bgColor: Colors.white.withValues(alpha: 0.25),
                 onTap: () => SharePlus.instance.share(
                   ShareParams(text: "Join Lokkha: $referralLink"),
@@ -1471,7 +1508,8 @@ class DashboardPortalView extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF94A3B8), size: 15),
+              const Icon(Icons.arrow_forward_ios_rounded,
+                  color: Color(0xFF94A3B8), size: 15),
             ],
           ),
         ),
@@ -1538,7 +1576,8 @@ class DashboardPortalView extends StatelessWidget {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        CustomSnackBar.showCustomErrorToast(message: "লিংকটি ওপেন করা সম্ভব হয়নি");
+        CustomSnackBar.showCustomErrorToast(
+            message: "লিংকটি ওপেন করা সম্ভব হয়নি");
       }
     } catch (e) {
       debugPrint("Error launching URL: $e");

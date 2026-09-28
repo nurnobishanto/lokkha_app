@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -38,7 +37,6 @@ class ProfileView extends GetView<ProfileController> {
         if (!isLoggedIn.value) {
           return const AuthGatewayView();
         }
-
 
         if (status == ApiCallStatus.error) {
           return const Center(child: Text("তথ্য লোড করা সম্ভব হয়নি"));
@@ -190,7 +188,8 @@ class ProfileView extends GetView<ProfileController> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8.r),
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
                                       ),
                                       child: Text(
                                         "ID: ${profileData.userId ?? '250500049'}",
@@ -216,7 +215,8 @@ class ProfileView extends GetView<ProfileController> {
                                       profileData.phone ?? "8801749784788",
                                       style: TextStyle(
                                         fontSize: 11.5.sp,
-                                        color: Colors.white.withValues(alpha: 0.85),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.85),
                                         fontWeight: FontWeight.w500,
                                       ),
                                       maxLines: 1,
@@ -408,7 +408,8 @@ class ProfileView extends GetView<ProfileController> {
                       onTap: () {
                         Get.defaultDialog(
                           title: "লগ আউট",
-                          titleStyle: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          titleStyle: TextStyle(
+                              fontSize: 18.sp, fontWeight: FontWeight.bold),
                           middleText: "আপনি কি নিশ্চিতভাবে লগ আউট করতে চান?",
                           middleTextStyle: TextStyle(fontSize: 14.sp),
                           textConfirm: "হ্যাঁ",
@@ -504,7 +505,8 @@ class ProfileView extends GetView<ProfileController> {
           style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
         ),
         trailing: const Icon(Icons.chevron_right, size: 20),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       ),
     );
   }

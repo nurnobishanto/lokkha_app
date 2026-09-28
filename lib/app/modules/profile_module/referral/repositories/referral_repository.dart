@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../../../../utils/constants.dart';
-import '../network/api_client.dart';
+import '../../../../../utils/constants.dart';
+import '../../../../data/network/api_client.dart';
 
 class ReferralStats {
   final String referralCode;
