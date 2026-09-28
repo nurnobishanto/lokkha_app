@@ -4,6 +4,7 @@ import 'package:lokkha/app/components/custom_snackbar.dart';
 import 'package:lokkha/app/modules/nav_bar_views/home/controllers/home_controller.dart';
 import 'package:lokkha/app/modules/subject_sections/views/sub_sec_set_time_view.dart';
 import '../../../../config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../models/subject.dart';
 import '../controllers/subject_section_controller.dart';
 import 'package:lokkha/app/components/custom_action_button.dart';
@@ -21,6 +22,7 @@ class SubjectSectionView extends GetView<SubjectSectionController> {
     Get.put(SubjectSectionController());
     // final setNumberController = TextEditingController(text: "20").obs;
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
@@ -211,22 +213,24 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _tile(theme, hasChildren),
-          if (hasChildren) _children(),
+          _tile(context, theme, hasChildren),
+          if (hasChildren) _children(context),
         ],
       ),
     );
   }
 
-  Widget _tile(ThemeData theme, bool hasChildren) {
+  Widget _tile(BuildContext context, ThemeData theme, bool hasChildren) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: context.isDark
+                ? Colors.transparent
+                : Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -241,9 +245,9 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             bottom: 8,
             child: Container(
               width: 4,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.transparent,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(8),
                   bottomLeft: Radius.circular(8),
                 ),
@@ -262,7 +266,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: widget.topic.parentId != null
-                    ? Obx(() => _tileContent(theme, hasChildren))
+                    ? Obx(() => _tileContent(context, theme, hasChildren))
                     : const SizedBox.shrink(),
               ),
             ),
@@ -272,7 +276,8 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
     );
   }
 
-  Widget _tileContent(ThemeData theme, bool hasChildren) {
+  Widget _tileContent(
+      BuildContext context, ThemeData theme, bool hasChildren) {
     return Row(
       children: [
         // Checkbox
@@ -290,8 +295,9 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             activeColor: theme.primaryColor,
             checkColor: Colors.white,
             side: BorderSide(
-              color:
-                  isChecked.value ? theme.primaryColor : Colors.grey.shade400,
+              color: isChecked.value
+                  ? theme.primaryColor
+                  : context.borderColor,
               width: 1.5,
             ),
           ),
@@ -308,30 +314,11 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
               fontSize: 14,
-              color: Colors.grey.shade800,
+              color: context.textPrimary,
               height: 1.2,
             ),
           ),
         ),
-
-        // Question count badge (if any)
-        // if (widget.topic.questionCount != null)
-        //   Container(
-        //     margin: const EdgeInsets.only(right: 8),
-        //     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        //     decoration: BoxDecoration(
-        //       color: theme.primaryColor.withValues(alpha: 0.1),
-        //       borderRadius: BorderRadius.circular(12),
-        //     ),
-        //     child: Text(
-        //       '${widget.topic.questionCount}',
-        //       style: theme.textTheme.bodySmall?.copyWith(
-        //         color: theme.primaryColor,
-        //         fontWeight: FontWeight.w600,
-        //         fontSize: 11,
-        //       ),
-        //     ),
-        //   ),
 
         // Expand/collapse arrow
         if (hasChildren)
@@ -342,7 +329,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
               child: Icon(
                 Icons.keyboard_arrow_down,
                 size: 18,
-                color: Colors.grey.shade600,
+                color: context.textMuted,
               ),
             ),
           ),
@@ -350,7 +337,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
     );
   }
 
-  Widget _children() {
+  Widget _children(BuildContext context) {
     return Obx(
       () => AnimatedContainer(
         duration: const Duration(milliseconds: 250),
@@ -362,7 +349,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
                 padding: const EdgeInsets.only(left: 12),
                 decoration: BoxDecoration(
                   border: Border(
-                    left: BorderSide(color: Colors.grey.shade300, width: 2),
+                    left: BorderSide(color: context.borderColor, width: 2),
                   ),
                 ),
                 child: Column(

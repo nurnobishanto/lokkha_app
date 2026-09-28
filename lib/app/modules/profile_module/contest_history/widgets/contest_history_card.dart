@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/contest_history_item_model.dart';
 
 class ContestHistoryCard extends StatelessWidget {
@@ -18,9 +19,9 @@ class ContestHistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -40,9 +41,15 @@ class ContestHistoryCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFBEB),
+                  color: context.isDark
+                      ? const Color(0xFF78350F).withValues(alpha: 0.25)
+                      : const Color(0xFFFFFBEB),
                   borderRadius: BorderRadius.circular(6.r),
-                  border: Border.all(color: const Color(0xFFFDE68A)),
+                  border: Border.all(
+                    color: context.isDark
+                        ? const Color(0xFFD97706)
+                        : const Color(0xFFFDE68A),
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -58,7 +65,9 @@ class ContestHistoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+                        color: context.isDark
+                            ? const Color(0xFFFDE68A)
+                            : const Color(0xFF0F172A),
                       ),
                     ),
                   ],
@@ -71,7 +80,7 @@ class ContestHistoryCard extends StatelessWidget {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 13.sp,
-                color: const Color(0xFF64748B),
+                color: context.textSecondary,
               ),
               SizedBox(width: 4.w),
               Expanded(
@@ -81,7 +90,7 @@ class ContestHistoryCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -93,9 +102,9 @@ class ContestHistoryCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(6.r),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: context.borderColor),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -103,14 +112,14 @@ class ContestHistoryCard extends StatelessWidget {
                       Icon(
                         Icons.access_time_rounded,
                         size: 11.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                       ),
                       SizedBox(width: 3.w),
                       Text(
                         item.duration!,
                         style: TextStyle(
                           fontSize: 10.5.sp,
-                          color: const Color(0xFF475569),
+                          color: context.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -156,7 +165,7 @@ class ContestHistoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -177,7 +186,7 @@ class ContestHistoryCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: 6.w),
-                        Text("•", style: TextStyle(color: const Color(0xFF94A3B8), fontSize: 11.sp)),
+                        Text("•", style: TextStyle(color: context.textMuted, fontSize: 11.sp)),
                         SizedBox(width: 6.w),
                         Icon(
                           Icons.cancel_rounded,
@@ -203,7 +212,7 @@ class ContestHistoryCard extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Divider(height: 1, color: context.dividerColor),
 
           SizedBox(height: 10.h),
 
@@ -218,10 +227,10 @@ class ContestHistoryCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: context.surfaceColor,
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
-                      color: const Color(0xFFE2E8F0),
+                      color: context.borderColor,
                       width: 1.2,
                     ),
                   ),
@@ -239,7 +248,7 @@ class ContestHistoryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF334155),
+                          color: context.textPrimary,
                         ),
                       ),
                     ],
@@ -256,7 +265,9 @@ class ContestHistoryCard extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
+                    color: context.isDark
+                        ? const Color(0xFF059669).withValues(alpha: 0.15)
+                        : const Color(0xFFF0FDF4),
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: const Color(0xFF059669),
@@ -268,7 +279,9 @@ class ContestHistoryCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF059669),
+                      color: context.isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669),
                     ),
                   ),
                 ),

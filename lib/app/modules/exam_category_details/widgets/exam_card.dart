@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/utils/date_formatter.dart';
 
 import '../../../models/exam.dart';
@@ -26,14 +27,16 @@ class ExamCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
       decoration: BoxDecoration(
-        color: LightThemeColors.softBg,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey,
+          color: context.borderColor,
         ),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.08),
+            color: context.isDark
+                ? Colors.transparent
+                : primaryColor.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -63,10 +66,10 @@ class ExamCard extends StatelessWidget {
                           // Title
                           Text(
                             '${exam.name}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A2E),
+                              color: context.textPrimary,
                               letterSpacing: -0.5,
                               height: 1.2,
                             ),
@@ -127,10 +130,12 @@ class ExamCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.04),
+                    color: context.isDark
+                        ? context.surfaceColor
+                        : primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: primaryColor.withOpacity(0.1),
+                      color: context.borderColor,
                       width: 1,
                     ),
                   ),
@@ -138,20 +143,23 @@ class ExamCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _modernStat(
+                        context,
                         Icons.quiz_rounded,
                         exam.questionsCount.toString(),
                         'প্রশ্ন',
                         Colors.blue,
                       ),
-                      _divider(),
+                      _divider(context),
                       _modernStat(
+                        context,
                         Icons.timer_outlined,
                         exam.duration.toString(),
                         'মিনিট',
                         Colors.purple,
                       ),
-                      _divider(),
+                      _divider(context),
                       _modernStat(
+                        context,
                         Icons.emoji_events_rounded,
                         exam.possibleMark.toString(),
                         'নম্বর',
@@ -175,7 +183,7 @@ class ExamCard extends StatelessWidget {
                           Icon(
                             Icons.schedule_rounded,
                             size: 16,
-                            color: Colors.grey.shade600,
+                            color: context.textSecondary,
                           ),
                           const SizedBox(width: 6),
                           Expanded(
@@ -185,7 +193,7 @@ class ExamCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: context.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -204,7 +212,7 @@ class ExamCard extends StatelessWidget {
                             Icon(
                               Icons.category,
                               size: 16,
-                              color: Colors.grey.shade600,
+                              color: context.textSecondary,
                             ),
                             const SizedBox(width: 6),
                             Flexible(
@@ -214,7 +222,7 @@ class ExamCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: 13,
-                                  color: Colors.grey.shade600,
+                                  color: context.textSecondary,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -315,7 +323,8 @@ class ExamCard extends StatelessWidget {
     );
   }
 
-  Widget _modernStat(IconData icon, String value, String label, Color color) {
+  Widget _modernStat(
+      BuildContext context, IconData icon, String value, String label, Color color) {
     return Column(
       children: [
         Container(
@@ -337,10 +346,10 @@ class ExamCard extends StatelessWidget {
           children: [
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF1A1A2E),
+                color: context.textPrimary,
                 height: 1,
               ),
             ),
@@ -350,7 +359,7 @@ class ExamCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade600,
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -359,7 +368,7 @@ class ExamCard extends StatelessWidget {
     );
   }
 
-  Widget _divider() {
+  Widget _divider(BuildContext context) {
     return Container(
       height: 50,
       width: 1,
@@ -369,7 +378,7 @@ class ExamCard extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             Colors.transparent,
-            Colors.grey.shade300,
+            context.borderColor,
             Colors.transparent,
           ],
         ),

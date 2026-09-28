@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/auth_views/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../helper/global.dart';
@@ -77,7 +78,7 @@ class _MessengerRedirectScreenState extends State<MessengerRedirectScreen> {
           backgroundColor: LightThemeColors.primaryColor,
           automaticallyImplyLeading: false,
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: context.scaffoldBg,
         body: Center(
           child: SafeArea(
             child: Column(
@@ -96,19 +97,19 @@ class _MessengerRedirectScreenState extends State<MessengerRedirectScreen> {
                     },
                   ),
                 ),
-                const Text(
+                Text(
                   "Redirecting To Messenger",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: context.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   "Please wait...",
                   style: TextStyle(
-                    color: Colors.grey,
+                    color: context.textMuted,
                     fontSize: 14,
                   ),
                 ),

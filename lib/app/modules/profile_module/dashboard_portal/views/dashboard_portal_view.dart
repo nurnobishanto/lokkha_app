@@ -10,7 +10,8 @@ import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/app/modules/auth_views/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/app/routes/app_pages.dart';
 import 'package:lokkha/app/views/widgets/web_exam_view.dart';
-import 'package:lokkha/comming_soon_view.dart';
+import 'package:lokkha/app/components/theme/theme_mode_selector_sheet.dart';
+import 'package:lokkha/config/theme/app_colors.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/constants.dart';
@@ -23,11 +24,23 @@ class DashboardPortalView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'শিক্ষার্থী পোর্টাল',
         centerTitle: true,
         actions: [
+          IconButton(
+            tooltip: 'থিম পরিবর্তন',
+            onPressed: () => ThemeModeSelectorSheet.show(context),
+            icon: Container(
+              padding: EdgeInsets.all(6.r),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.brightness_medium_rounded, size: 18, color: Colors.white),
+            ),
+          ),
           IconButton(
             tooltip: 'মূল প্রোফাইল',
             onPressed: () => Get.toNamed(Routes.PROFILE),
@@ -80,34 +93,35 @@ class DashboardPortalView extends StatelessWidget {
               SizedBox(height: 12.h),
 
               // 2. 4 TOP STATS (2x2 Grid)
-              _buildTopStatsGrid(),
+              _buildTopStatsGrid(context),
 
               SizedBox(height: 16.h),
 
               // 3. আমার মডিউলসমূহ (৬টি মূল মডিউল)
               _buildSectionHeader(
+                context,
                 title: "আমার মডিউলসমূহ",
                 badgeText: "৬টি মূল মডিউল",
                 icon: Icons.grid_view_rounded,
-                iconColor: LightThemeColors.primaryColor,
+                iconColor: context.primaryColor,
               ),
               SizedBox(height: 10.h),
-              _buildMyModulesGrid(),
+              _buildMyModulesGrid(context),
 
               SizedBox(height: 16.h),
 
               // 4. কুইক প্রস্তুতি ও প্র্যাকটিস শর্টকাট (Unified Container)
-              _buildQuickShortcutsCard(),
+              _buildQuickShortcutsCard(context),
 
               SizedBox(height: 16.h),
 
               // 5. সাবস্ক্রিপশন স্ট্যাটাস কার্ড (VIP Gold Style)
-              _buildSubscriptionStatusCard(),
+              _buildSubscriptionStatusCard(context),
 
               SizedBox(height: 14.h),
 
               // 6. সাহায্য ও কাস্টমার সাপোর্ট কার্ড (Clean Native Style - No harsh black!)
-              _buildSupportCard(),
+              _buildSupportCard(context),
 
               SizedBox(height: 14.h),
 
@@ -117,7 +131,7 @@ class DashboardPortalView extends StatelessWidget {
               SizedBox(height: 14.h),
 
               // 8. মূল বিস্তারিত অ্যাকাউন্ট সেটিংস
-              _buildDetailedProfileButton(),
+              _buildDetailedProfileButton(context),
             ],
           ),
         );
@@ -412,7 +426,7 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 2. 4 TOP STATS (2x2 Grid with exact Screenshot Style)
   // ---------------------------------------------------------------------------
-  Widget _buildTopStatsGrid() {
+  Widget _buildTopStatsGrid(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -422,6 +436,7 @@ class DashboardPortalView extends StatelessWidget {
       childAspectRatio: 2.1,
       children: [
         _buildStatCard(
+          context: context,
           icon: const FaIcon(FontAwesomeIcons.graduationCap,
               color: Color(0xFF059669), size: 18),
           iconBg: const Color(0xFFECFDF5),
@@ -430,6 +445,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
         ),
         _buildStatCard(
+          context: context,
           icon: const Icon(Icons.edit_note_rounded,
               color: Color(0xFF2563EB), size: 22),
           iconBg: const Color(0xFFEFF6FF),
@@ -438,6 +454,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
         ),
         _buildStatCard(
+          context: context,
           icon: const FaIcon(FontAwesomeIcons.trophy,
               color: Color(0xFFD97706), size: 18),
           iconBg: const Color(0xFFFFFBEB),
@@ -446,6 +463,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.CONTEST_HISTORY),
         ),
         _buildStatCard(
+          context: context,
           icon: const Icon(Icons.show_chart_rounded,
               color: Color(0xFF7C3AED), size: 22),
           iconBg: const Color(0xFFF5F3FF),
@@ -458,6 +476,7 @@ class DashboardPortalView extends StatelessWidget {
   }
 
   Widget _buildStatCard({
+    required BuildContext context,
     required Widget icon,
     required Color iconBg,
     required String count,
@@ -465,7 +484,7 @@ class DashboardPortalView extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: onTap,
@@ -474,10 +493,12 @@ class DashboardPortalView extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+            border: Border.all(color: context.borderColor, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: context.isDark
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -489,7 +510,9 @@ class DashboardPortalView extends StatelessWidget {
                 width: 42.r,
                 height: 42.r,
                 decoration: BoxDecoration(
-                  color: iconBg,
+                  color: context.isDark
+                      ? iconBg.withValues(alpha: 0.15)
+                      : iconBg,
                   borderRadius: BorderRadius.circular(13.r),
                 ),
                 child: Center(child: icon),
@@ -505,7 +528,7 @@ class DashboardPortalView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                         height: 1.1,
                       ),
                     ),
@@ -516,7 +539,7 @@ class DashboardPortalView extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 10.5.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textMuted,
                         fontWeight: FontWeight.w600,
                         height: 1.15,
                       ),
@@ -534,7 +557,7 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 3. আমার মডিউলসমূহ (৬টি মূল মডিউল)
   // ---------------------------------------------------------------------------
-  Widget _buildMyModulesGrid() {
+  Widget _buildMyModulesGrid(BuildContext context) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -544,6 +567,7 @@ class DashboardPortalView extends StatelessWidget {
       childAspectRatio: 0.98,
       children: [
         _buildModuleItem(
+          context: context,
           title: "My Orders",
           icon: Icons.shopping_bag_rounded,
           iconColor: const Color(0xFF2563EB),
@@ -553,6 +577,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.MY_ORDERS),
         ),
         _buildModuleItem(
+          context: context,
           title: "My Courses",
           icon: Icons.videocam_rounded,
           iconColor: const Color(0xFFE11D48),
@@ -562,6 +587,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.MY_COURSES),
         ),
         _buildModuleItem(
+          context: context,
           title: "My Packages",
           icon: Icons.workspace_premium_rounded,
           iconColor: const Color(0xFFD97706),
@@ -571,6 +597,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.MY_PACKAGES),
         ),
         _buildModuleItem(
+          context: context,
           title: "Self Academy",
           icon: Icons.assignment_turned_in_rounded,
           iconColor: const Color(0xFF0891B2),
@@ -580,6 +607,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
         ),
         _buildModuleItem(
+          context: context,
           title: "Exam History",
           icon: Icons.history_rounded,
           iconColor: const Color(0xFF7C3AED),
@@ -589,6 +617,7 @@ class DashboardPortalView extends StatelessWidget {
           onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
         ),
         _buildModuleItem(
+          context: context,
           title: "Content History",
           icon: Icons.military_tech_rounded,
           iconColor: const Color(0xFF4F46E5),
@@ -602,6 +631,7 @@ class DashboardPortalView extends StatelessWidget {
   }
 
   Widget _buildModuleItem({
+    required BuildContext context,
     required String title,
     required IconData icon,
     required Color iconColor,
@@ -611,7 +641,7 @@ class DashboardPortalView extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white,
+      color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: onTap,
@@ -619,10 +649,12 @@ class DashboardPortalView extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+            border: Border.all(color: context.borderColor, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: context.isDark
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -639,7 +671,9 @@ class DashboardPortalView extends StatelessWidget {
                     width: 46.r,
                     height: 46.r,
                     decoration: BoxDecoration(
-                      color: iconBg,
+                      color: context.isDark
+                          ? iconBg.withValues(alpha: 0.15)
+                          : iconBg,
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                     child: Center(
@@ -655,7 +689,7 @@ class DashboardPortalView extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: badgeColor,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
+                        border: Border.all(color: context.cardColor, width: 1.5),
                       ),
                       child: Center(
                         child: Text(
@@ -681,7 +715,7 @@ class DashboardPortalView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E293B),
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -694,16 +728,18 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 4. কুইক প্রস্তুতি ও প্র্যাকটিস শর্টকাট (Master Card Container)
   // ---------------------------------------------------------------------------
-  Widget _buildQuickShortcutsCard() {
+  Widget _buildQuickShortcutsCard(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: context.isDark
+                ? Colors.black.withValues(alpha: 0.2)
+                : Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -717,12 +753,12 @@ class DashboardPortalView extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(6.r),
                 decoration: BoxDecoration(
-                  color: LightThemeColors.primaryColor.withValues(alpha: 0.1),
+                  color: context.primaryColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.explore_rounded,
-                  color: LightThemeColors.primaryColor,
+                  color: context.primaryColor,
                   size: 18,
                 ),
               ),
@@ -732,7 +768,7 @@ class DashboardPortalView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.5.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0F172A),
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -747,6 +783,7 @@ class DashboardPortalView extends StatelessWidget {
             childAspectRatio: 0.95,
             children: [
               _buildShortcutItem(
+                context: context,
                 title: "বিষয়ভিত্তিক\nপরীক্ষা",
                 icon: const Icon(Icons.menu_book_rounded,
                     color: Color(0xFF10B981), size: 20),
@@ -754,6 +791,7 @@ class DashboardPortalView extends StatelessWidget {
                 onTap: () => Get.toNamed(Routes.EXAM_CATEGORY),
               ),
               _buildShortcutItem(
+                context: context,
                 title: "লাইভ\nকনটেস্ট",
                 icon: const FaIcon(FontAwesomeIcons.trophy,
                     color: Color(0xFFD97706), size: 18),
@@ -761,6 +799,7 @@ class DashboardPortalView extends StatelessWidget {
                 onTap: () => Get.toNamed(Routes.ALL_CONTEST),
               ),
               _buildShortcutItem(
+                context: context,
                 title: "অনলাইন\nকোর্স",
                 icon: const Icon(Icons.videocam_rounded,
                     color: Color(0xFFE11D48), size: 20),
@@ -768,6 +807,7 @@ class DashboardPortalView extends StatelessWidget {
                 onTap: () => Get.toNamed(Routes.ALL_COURSES),
               ),
               _buildShortcutItem(
+                context: context,
                 title: "প্রিমিয়াম\nপ্যাকেজ",
                 icon: const Icon(Icons.workspace_premium_rounded,
                     color: Color(0xFFEA580C), size: 20),
@@ -775,6 +815,7 @@ class DashboardPortalView extends StatelessWidget {
                 onTap: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
               ),
               _buildShortcutItem(
+                context: context,
                 title: "নিয়োগ\nবিজ্ঞপ্তি",
                 icon: const Icon(Icons.business_center_rounded,
                     color: Color(0xFF2563EB), size: 20),
@@ -782,6 +823,7 @@ class DashboardPortalView extends StatelessWidget {
                 onTap: () => Get.toNamed(Routes.JOBS),
               ),
               _buildShortcutItem(
+                context: context,
                 title: "সাম্প্রতিক\nতথ্য",
                 icon: const Icon(Icons.public_rounded,
                     color: Color(0xFF0D9488), size: 20),
@@ -796,13 +838,14 @@ class DashboardPortalView extends StatelessWidget {
   }
 
   Widget _buildShortcutItem({
+    required BuildContext context,
     required String title,
     required Widget icon,
     required Color iconBg,
     required VoidCallback onTap,
   }) {
     return Material(
-      color: const Color(0xFFF8FAFC),
+      color: context.isDark ? context.surfaceColor : const Color(0xFFF8FAFC),
       borderRadius: BorderRadius.circular(14.r),
       child: InkWell(
         onTap: onTap,
@@ -810,7 +853,7 @@ class DashboardPortalView extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.r),
-            border: Border.all(color: const Color(0xFFEEF2F6), width: 1),
+            border: Border.all(color: context.borderColor, width: 1),
           ),
           padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
           child: Column(
@@ -820,7 +863,9 @@ class DashboardPortalView extends StatelessWidget {
                 width: 42.r,
                 height: 42.r,
                 decoration: BoxDecoration(
-                  color: iconBg,
+                  color: context.isDark
+                      ? iconBg.withValues(alpha: 0.15)
+                      : iconBg,
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Center(child: icon),
@@ -832,7 +877,7 @@ class DashboardPortalView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11.5.sp,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1E293B),
+                  color: context.textPrimary,
                   height: 1.25,
                 ),
               ),
@@ -846,25 +891,28 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 5. সাবস্ক্রিপশন স্ট্যাটাস কার্ড (High-End VIP Champagne / Gold Style)
   // ---------------------------------------------------------------------------
-  Widget _buildSubscriptionStatusCard() {
+  Widget _buildSubscriptionStatusCard(BuildContext context) {
     return Obx(() {
       final bool isPremium = havePackage.value;
 
       return Container(
         padding: EdgeInsets.all(18.r),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color:
-                isPremium ? const Color(0xFFFDE68A) : const Color(0xFFE2E8F0),
+            color: isPremium
+                ? const Color(0xFFFDE68A)
+                : context.borderColor,
             width: isPremium ? 1.2 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
               color: isPremium
                   ? const Color(0xFFF59E0B).withValues(alpha: 0.08)
-                  : Colors.black.withValues(alpha: 0.02),
+                  : (context.isDark
+                      ? Colors.black.withValues(alpha: 0.2)
+                      : Colors.black.withValues(alpha: 0.02)),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -896,7 +944,7 @@ class DashboardPortalView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -907,12 +955,14 @@ class DashboardPortalView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isPremium
                         ? const Color(0xFFECFDF5)
-                        : const Color(0xFFF1F5F9),
+                        : (context.isDark
+                            ? context.surfaceColor
+                            : const Color(0xFFF1F5F9)),
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: isPremium
                           ? const Color(0xFFA7F3D0)
-                          : const Color(0xFFE2E8F0),
+                          : context.borderColor,
                     ),
                   ),
                   child: Row(
@@ -923,7 +973,7 @@ class DashboardPortalView extends StatelessWidget {
                         size: 12.sp,
                         color: isPremium
                             ? const Color(0xFF059669)
-                            : const Color(0xFF64748B),
+                            : context.textMuted,
                       ),
                       SizedBox(width: 4.w),
                       Text(
@@ -931,7 +981,7 @@ class DashboardPortalView extends StatelessWidget {
                         style: TextStyle(
                           color: isPremium
                               ? const Color(0xFF059669)
-                              : const Color(0xFF64748B),
+                              : context.textMuted,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -948,7 +998,7 @@ class DashboardPortalView extends StatelessWidget {
                   : "আনলিমিটেড বিষয়ভিত্তিক পরীক্ষা ও এক্সক্লুসিভ মডেল টেস্ট দিতে আজই প্রিমিয়াম সাবস্ক্রিপশন গ্রহণ করুন।",
               style: TextStyle(
                 fontSize: 12.5.sp,
-                color: const Color(0xFF64748B),
+                color: context.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -1010,16 +1060,18 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 6. যেকোনো সহায়তায় কার্ড (Friendly, Clean Native Look - No Dark Block!)
   // ---------------------------------------------------------------------------
-  Widget _buildSupportCard() {
+  Widget _buildSupportCard(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: context.isDark
+                ? Colors.black.withValues(alpha: 0.2)
+                : Colors.black.withValues(alpha: 0.02),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -1033,12 +1085,12 @@ class DashboardPortalView extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
-                  color: LightThemeColors.primaryColor.withValues(alpha: 0.1),
+                  color: context.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.support_agent_rounded,
-                  color: LightThemeColors.primaryColor,
+                  color: context.primaryColor,
                   size: 22,
                 ),
               ),
@@ -1051,7 +1103,7 @@ class DashboardPortalView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15.5.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -1059,7 +1111,7 @@ class DashboardPortalView extends StatelessWidget {
                     "যেকোনো প্রশ্ন বা সমস্যায় আমরা আপনার পাশে আছি",
                     style: TextStyle(
                       fontSize: 11.5.sp,
-                      color: const Color(0xFF64748B),
+                      color: context.textMuted,
                     ),
                   ),
                 ],
@@ -1076,9 +1128,15 @@ class DashboardPortalView extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0FDF4),
+                      color: context.isDark
+                          ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                          : const Color(0xFFF0FDF4),
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: const Color(0xFFBBF7D0)),
+                      border: Border.all(
+                        color: context.isDark
+                            ? const Color(0xFF065F46)
+                            : const Color(0xFFBBF7D0),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1091,7 +1149,9 @@ class DashboardPortalView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF15803D),
+                            color: context.isDark
+                                ? const Color(0xFF34D399)
+                                : const Color(0xFF15803D),
                           ),
                         ),
                       ],
@@ -1107,9 +1167,15 @@ class DashboardPortalView extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 10.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
+                      color: context.isDark
+                          ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                          : const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: const Color(0xFFBFDBFE)),
+                      border: Border.all(
+                        color: context.isDark
+                            ? const Color(0xFF1E40AF)
+                            : const Color(0xFFBFDBFE),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -1125,7 +1191,9 @@ class DashboardPortalView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1D4ED8),
+                            color: context.isDark
+                                ? const Color(0xFF60A5FA)
+                                : const Color(0xFF1D4ED8),
                           ),
                         ),
                       ],
@@ -1450,9 +1518,9 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 8. LINK TO OLD DETAILED PROFILE
   // ---------------------------------------------------------------------------
-  Widget _buildDetailedProfileButton() {
+  Widget _buildDetailedProfileButton(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
         onTap: () => Get.toNamed(Routes.PROFILE),
@@ -1461,10 +1529,12 @@ class DashboardPortalView extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+            border: Border.all(color: context.borderColor, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: context.isDark
+                    ? Colors.black.withValues(alpha: 0.2)
+                    : Colors.black.withValues(alpha: 0.02),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -1475,12 +1545,12 @@ class DashboardPortalView extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(9.r),
                 decoration: BoxDecoration(
-                  color: LightThemeColors.primaryColor.withValues(alpha: 0.1),
+                  color: context.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.manage_accounts_rounded,
-                  color: LightThemeColors.primaryColor,
+                  color: context.primaryColor,
                   size: 22,
                 ),
               ),
@@ -1494,7 +1564,7 @@ class DashboardPortalView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -1502,14 +1572,14 @@ class DashboardPortalView extends StatelessWidget {
                       "ব্যক্তিগত তথ্য, পাসওয়ার্ড পরিবর্তন ও সেটিংস দেখতে চাপুন",
                       style: TextStyle(
                         fontSize: 11.5.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textMuted,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded,
-                  color: Color(0xFF94A3B8), size: 15),
+              Icon(Icons.arrow_forward_ios_rounded,
+                  color: context.textMuted, size: 15),
             ],
           ),
         ),
@@ -1520,7 +1590,8 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // HELPERS
   // ---------------------------------------------------------------------------
-  Widget _buildSectionHeader({
+  Widget _buildSectionHeader(
+    BuildContext context, {
     required String title,
     String? badgeText,
     required IconData icon,
@@ -1545,7 +1616,7 @@ class DashboardPortalView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 15.5.sp,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
+                color: context.textPrimary,
               ),
             ),
           ],
@@ -1554,14 +1625,18 @@ class DashboardPortalView extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: context.isDark
+                  ? context.surfaceColor
+                  : const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Text(
               badgeText,
               style: TextStyle(
                 fontSize: 11.sp,
-                color: const Color(0xFF475569),
+                color: context.isDark
+                    ? context.textSecondary
+                    : const Color(0xFF475569),
                 fontWeight: FontWeight.w600,
               ),
             ),

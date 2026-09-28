@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../../config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../../styles/text_style.dart';
 import 'package:lokkha/app/data/models/bookmarked_question_model.dart';
 import '../controllers/question_bank_controller.dart';
@@ -12,7 +13,7 @@ class QuestionBankView extends GetView<QuestionBankController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         title: Text(
           'প্রশ্ন ব্যাংক ও বুকমার্ক',
@@ -27,18 +28,28 @@ class QuestionBankView extends GetView<QuestionBankController> {
           // 1. Search Bar
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            color: Colors.white,
+            color: context.cardColor,
             child: TextField(
               onChanged: controller.onSearchChanged,
+              style: TextStyle(color: context.textPrimary, fontSize: 14.sp),
               decoration: InputDecoration(
                 hintText: 'প্রশ্ন খুঁজুন...',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintStyle: TextStyle(color: context.textMuted, fontSize: 13.sp),
+                prefixIcon: Icon(Icons.search, color: context.textMuted),
                 contentPadding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
-                fillColor: const Color(0xFFF1F3F5),
+                fillColor: context.subtleSurfaceColor,
                 filled: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide.none,
+                  borderSide: BorderSide(color: context.borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(color: context.borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor),
                 ),
               ),
             ),
@@ -47,7 +58,7 @@ class QuestionBankView extends GetView<QuestionBankController> {
           // 2. Subject Filter Horizontal List
           Container(
             height: 48.h,
-            color: Colors.white,
+            color: context.cardColor,
             child: Obx(() {
               return ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -63,14 +74,15 @@ class QuestionBankView extends GetView<QuestionBankController> {
                         subject,
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: isSelected ? Colors.white : LightThemeColors.black,
+                          color: isSelected ? Colors.white : context.textPrimary,
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                       selected: isSelected,
                       selectedColor: LightThemeColors.primaryColor,
-                      backgroundColor: const Color(0xFFF1F3F5),
+                      backgroundColor: context.subtleSurfaceColor,
                       showCheckmark: false,
+                      side: BorderSide(color: isSelected ? Colors.transparent : context.borderColor),
                       onSelected: (_) => controller.onSubjectSelected(subject),
                     ),
                   );
@@ -78,7 +90,7 @@ class QuestionBankView extends GetView<QuestionBankController> {
               );
             }),
           ),
-          Divider(height: 1, color: Colors.grey.withValues(alpha: 0.2)),
+          Divider(height: 1, color: context.borderColor),
 
           // 3. Questions List
           Expanded(
@@ -93,12 +105,12 @@ class QuestionBankView extends GetView<QuestionBankController> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.bookmark_border, size: 64.w, color: Colors.grey.withValues(alpha: 0.5)),
+                      Icon(Icons.bookmark_border, size: 64.w, color: context.textMuted),
                       SizedBox(height: 12.h),
                       Text(
                         'কোন সেভ করা প্রশ্ন পাওয়া যায়নি',
                         style: AppTextStyles.body1.copyWith(
-                          color: Colors.grey,
+                          color: context.textSecondary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -106,7 +118,7 @@ class QuestionBankView extends GetView<QuestionBankController> {
                       Text(
                         'পরীক্ষা দেওয়ার সময় প্রশ্ন বুকমার্ক করলে এখানে দেখতে পাবেন।',
                         textAlign: TextAlign.center,
-                        style: AppTextStyles.body2.copyWith(color: Colors.grey),
+                        style: AppTextStyles.body2.copyWith(color: context.textMuted),
                       ),
                     ],
                   ),
@@ -160,15 +172,18 @@ class _QuestionCardState extends State<_QuestionCard> {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        border: Border.all(color: context.borderColor),
+        boxShadow: context.isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,14 +195,14 @@ class _QuestionCardState extends State<_QuestionCard> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: LightThemeColors.primaryColor.withValues(alpha: 0.1),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(
                   widget.question.subject,
                   style: TextStyle(
                     fontSize: 11.sp,
-                    color: LightThemeColors.primaryColor,
+                    color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -207,7 +222,7 @@ class _QuestionCardState extends State<_QuestionCard> {
             "${widget.index}. ${widget.question.questionText}",
             style: AppTextStyles.body1.copyWith(
               fontWeight: FontWeight.bold,
-              color: LightThemeColors.black,
+              color: context.textPrimary,
             ),
           ),
           SizedBox(height: 12.h),
@@ -222,18 +237,20 @@ class _QuestionCardState extends State<_QuestionCard> {
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                 decoration: BoxDecoration(
                   color: isCorrect
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : const Color(0xFFF8F9FA),
+                      ? (context.isDark ? const Color(0xFF064E3B).withValues(alpha: 0.3) : Colors.green.withValues(alpha: 0.1))
+                      : context.subtleSurfaceColor,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: isCorrect ? Colors.green : Colors.grey.withValues(alpha: 0.2),
+                    color: isCorrect ? const Color(0xFF10B981) : context.borderColor,
                   ),
                 ),
                 child: Text(
                   opt,
                   style: TextStyle(
                     fontSize: 13.sp,
-                    color: isCorrect ? Colors.green.shade800 : Colors.black87,
+                    color: isCorrect
+                        ? (context.isDark ? const Color(0xFF6EE7B7) : Colors.green.shade800)
+                        : context.textPrimary,
                     fontWeight: isCorrect ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -255,18 +272,18 @@ class _QuestionCardState extends State<_QuestionCard> {
                 icon: Icon(
                   _showAnswer ? Icons.visibility_off : Icons.visibility,
                   size: 16.sp,
-                  color: LightThemeColors.primaryColor,
+                  color: Theme.of(context).primaryColor,
                 ),
                 label: Text(
                   _showAnswer ? "উত্তর লুকান" : "সঠিক উত্তর দেখুন",
-                  style: TextStyle(color: LightThemeColors.primaryColor, fontSize: 12.sp),
+                  style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.sp),
                 ),
               ),
               if (_showAnswer && widget.question.correctAnswer.isNotEmpty)
                 Text(
                   "উত্তর: ${widget.question.correctAnswer}",
                   style: TextStyle(
-                    color: Colors.green.shade700,
+                    color: const Color(0xFF10B981),
                     fontWeight: FontWeight.bold,
                     fontSize: 13.sp,
                   ),
@@ -282,12 +299,18 @@ class _QuestionCardState extends State<_QuestionCard> {
               margin: EdgeInsets.only(top: 8.h),
               padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.08),
+                color: context.isDark ? const Color(0xFF451A03).withValues(alpha: 0.3) : Colors.amber.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: context.isDark ? const Color(0xFFB45309).withValues(alpha: 0.4) : const Color(0xFFFDE68A),
+                ),
               ),
               child: Text(
                 "ব্যাখ্যা: ${widget.question.explanation}",
-                style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: context.isDark ? const Color(0xFFFCD34D) : const Color(0xFF78350F),
+                ),
               ),
             ),
         ],

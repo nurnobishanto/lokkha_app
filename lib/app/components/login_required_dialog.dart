@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 import '../../config/theme/light_theme_colors.dart';
 import '../routes/app_pages.dart';
@@ -21,25 +22,29 @@ class LoginRequiredDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: context.cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
       title: Row(
         children: [
-          Icon(Icons.lock_outline, color: Colors.redAccent),
+          const Icon(Icons.lock_outline, color: Colors.redAccent),
           const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: context.textPrimary,
+              ),
             ),
           ),
         ],
       ),
       content: Text(
         message,
-        style: const TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16, color: context.textSecondary),
       ),
       actionsAlignment: MainAxisAlignment.end,
       actionsPadding: const EdgeInsets.fromLTRB(14, 0, 14, 18),

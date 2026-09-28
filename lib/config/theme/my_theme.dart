@@ -69,33 +69,50 @@ class MyTheme {
 
       // icon theme
       iconTheme: MyStyles.getIconTheme(isLightTheme: isLight),
-      // colorScheme: ColorScheme(
-      //   brightness: isLight ? Brightness.light : Brightness.dark,
-      //   primary: isLight ? LightThemeColors.primaryColor : DarkThemeColors.primaryColor,
-      //   secondary: isLight ? LightThemeColors.s : DarkThemeColors.secondaryColor,
-      //   background: isLight
-      //       ? LightThemeColors.backgroundColor
-      //       : DarkThemeColors.backgroundColor,
-      //   surface: isLight ? LightThemeColors.surfaceColor : DarkThemeColors.surfaceColor,
-      //   onPrimary: isLight ? LightThemeColors.onPrimaryColor : DarkThemeColors.onPrimaryColor,
-      //   onSecondary: isLight ? LightThemeColors.onSecondaryColor : DarkThemeColors.onSecondaryColor,
-      //   onBackground: isLight ? LightThemeColors.onBackgroundColor : DarkThemeColors.onBackgroundColor,
-      //   onSurface: isLight ? LightThemeColors.onSurfaceColor : DarkThemeColors.onSurfaceColor,
-      // ),
+
+      // Material 3 ColorScheme
+      colorScheme: ColorScheme(
+        brightness: isLight ? Brightness.light : Brightness.dark,
+        primary: isLight ? LightThemeColors.primaryColor : DarkThemeColors.primaryColor,
+        onPrimary: Colors.white,
+        secondary: isLight ? LightThemeColors.accentColor : DarkThemeColors.accentColor,
+        onSecondary: isLight ? Colors.black87 : Colors.white,
+        error: isLight ? LightThemeColors.red : DarkThemeColors.red,
+        onError: Colors.white,
+        surface: isLight ? LightThemeColors.scaffoldBackgroundColor : DarkThemeColors.scaffoldBackgroundColor,
+        onSurface: isLight ? LightThemeColors.bodyTextColor : DarkThemeColors.bodyTextColor,
+        surfaceContainer: isLight ? Colors.white : DarkThemeColors.cardColor,
+        outline: isLight ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+      ),
+
+      // Component themes
+      dialogTheme: DialogThemeData(
+        backgroundColor: isLight ? Colors.white : DarkThemeColors.cardColor,
+        surfaceTintColor: Colors.transparent,
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: isLight ? Colors.white : DarkThemeColors.cardColor,
+        surfaceTintColor: Colors.transparent,
+      ),
+      cardTheme: CardThemeData(
+        color: isLight ? Colors.white : DarkThemeColors.cardColor,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+      ),
     );
   }
 
   /// update app theme and save theme type to shared pref
   /// (so when the app is killed and up again theme will remain the same)
-  static changeTheme() {
-    // *) check if the current theme is light (default is light)
+  static void changeTheme() {
     bool isLightTheme = MySharedPref.getThemeIsLight();
-    // *) store the new theme mode on get storage
-    MySharedPref.setThemeIsLight(!isLightTheme);
-    // *) let GetX change theme
-    Get.changeThemeMode(!isLightTheme ? ThemeMode.light : ThemeMode.dark);
+    bool newIsLight = !isLightTheme;
+    MySharedPref.setThemeIsLight(newIsLight);
+    Get.changeTheme(getThemeData(isLight: newIsLight));
+    Get.changeThemeMode(newIsLight ? ThemeMode.light : ThemeMode.dark);
   }
 
   /// check if the theme is light or dark
+  static bool get isDark => !MySharedPref.getThemeIsLight();
   bool get getThemeIsLight => MySharedPref.getThemeIsLight();
 }

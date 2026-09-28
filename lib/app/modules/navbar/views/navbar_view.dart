@@ -9,7 +9,7 @@ class NavbarView extends GetView<NavbarController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: false,
       body: GetBuilder<NavbarController>(
         builder: (controller) {

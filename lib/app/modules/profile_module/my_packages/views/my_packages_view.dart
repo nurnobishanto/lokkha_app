@@ -6,6 +6,7 @@ import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/modules/auth_views/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/app/routes/app_pages.dart';
 import 'package:lokkha/app/services/api_call_status.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../helper/global.dart';
 import '../controllers/my_packages_controller.dart';
 
@@ -15,7 +16,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'My Packages',
         centerTitle: true,
@@ -44,7 +45,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
                   "ডেটা লোড করতে সমস্যা হয়েছে",
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -76,9 +77,9 @@ class MyPackagesView extends GetView<MyPackagesController> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.cardColor,
                 borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: context.borderColor),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
@@ -98,7 +99,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
                           style: TextStyle(
                             fontSize: 16.5.sp,
                             fontWeight: FontWeight.w800,
-                            color: const Color(0xFF0F172A),
+                            color: context.textPrimary,
                           ),
                         ),
                         SizedBox(height: 2.h),
@@ -106,7 +107,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
                           "আমার সাবস্ক্রিপশন প্যাকেজসমূহ",
                           style: TextStyle(
                             fontSize: 11.5.sp,
-                            color: const Color(0xFF64748B),
+                            color: context.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -127,12 +128,12 @@ class MyPackagesView extends GetView<MyPackagesController> {
                         color: const Color(0xFFF59E0B),
                         borderRadius: BorderRadius.circular(20.r),
                       ),
-                      child: Text(
+                      child: const Text(
                         "নতুন প্যাকেজ",
                         style: TextStyle(
-                          fontSize: 12.sp,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF0F172A),
+                          color: Color(0xFF0F172A),
                         ),
                       ),
                     ),
@@ -145,7 +146,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
 
             // 2. Packages List or Empty State
             if (packages.isEmpty)
-              _buildEmptyState()
+              _buildEmptyState(context)
             else
               ...packages.map((pkg) {
                 final name = pkg.package?.name ?? 'ফিচারসমূহ';
@@ -166,13 +167,13 @@ class MyPackagesView extends GetView<MyPackagesController> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(24.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Column(
         children: [
@@ -195,7 +196,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
             style: TextStyle(
               fontSize: 15.5.sp,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF0F172A),
+              color: context.textPrimary,
             ),
           ),
           SizedBox(height: 6.h),
@@ -204,7 +205,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.sp,
-              color: const Color(0xFF64748B),
+              color: context.textSecondary,
               height: 1.4,
             ),
           ),
@@ -219,12 +220,12 @@ class MyPackagesView extends GetView<MyPackagesController> {
                 borderRadius: BorderRadius.circular(20.r),
               ),
             ),
-            child: Text(
+            child: const Text(
               "নতুন প্যাকেজ কিনুন",
               style: TextStyle(
-                fontSize: 13.sp,
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
+                color: Color(0xFF0F172A),
               ),
             ),
           ),
@@ -258,9 +259,9 @@ class PackageCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -299,7 +300,7 @@ class PackageCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                 ],
@@ -335,16 +336,16 @@ class PackageCard extends StatelessWidget {
           ),
 
           SizedBox(height: 14.h),
-          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+          Divider(height: 1, color: context.dividerColor),
           SizedBox(height: 14.h),
 
           // 2. Dates Box
           Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: context.surfaceColor,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: context.borderColor),
             ),
             child: Column(
               children: [
@@ -364,7 +365,7 @@ class PackageCard extends StatelessWidget {
                           "শুরু:",
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: const Color(0xFF475569),
+                            color: context.textSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -375,7 +376,7 @@ class PackageCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -399,7 +400,7 @@ class PackageCard extends StatelessWidget {
                           "মেয়াদ:",
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: const Color(0xFF475569),
+                            color: context.textSecondary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -436,12 +437,12 @@ class PackageCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24.r),
                 ),
               ),
-              child: Text(
+              child: const Text(
                 "রিনিউ / আপগ্রেড",
                 style: TextStyle(
-                  fontSize: 14.5.sp,
+                  fontSize: 14.5,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF0F172A),
+                  color: Color(0xFF0F172A),
                 ),
               ),
             ),

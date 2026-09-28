@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../../../../components/custom_snackbar.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_question_result_model.dart';
 import '../widgets/result_question_card.dart';
@@ -59,7 +60,7 @@ class ExamResultSheetView extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'ফলাফল ও সমাধান',
         centerTitle: true,
@@ -213,9 +214,9 @@ class ExamResultSheetView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(16.r),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.cardColor,
               borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+              border: Border.all(color: context.borderColor, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.03),
@@ -232,9 +233,13 @@ class ExamResultSheetView extends StatelessWidget {
                   height: 86.r,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFFEFF6FF),
+                    color: context.isDark
+                        ? const Color(0xFF1E3A8A).withValues(alpha: 0.3)
+                        : const Color(0xFFEFF6FF),
                     border: Border.all(
-                      color: const Color(0xFFDBEAFE),
+                      color: context.isDark
+                          ? const Color(0xFF3B82F6)
+                          : const Color(0xFFDBEAFE),
                       width: 3.5,
                     ),
                   ),
@@ -257,7 +262,7 @@ class ExamResultSheetView extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF64748B),
+                            color: context.textSecondary,
                           ),
                         ),
                       ],
@@ -272,7 +277,7 @@ class ExamResultSheetView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -280,7 +285,7 @@ class ExamResultSheetView extends StatelessWidget {
                   "Rank: #",
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -291,7 +296,7 @@ class ExamResultSheetView extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.r),
-                    border: Border.all(color: const Color(0xFFF1F5F9)),
+                    border: Border.all(color: context.borderColor),
                   ),
                   child: Column(
                     children: [
@@ -317,7 +322,7 @@ class ExamResultSheetView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF334155),
+                                    color: context.textPrimary,
                                   ),
                                 ),
                               ],
@@ -328,7 +333,9 @@ class ExamResultSheetView extends StatelessWidget {
                                 vertical: 2.h,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFECFDF5),
+                                color: context.isDark
+                                    ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                                    : const Color(0xFFECFDF5),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               child: Text(
@@ -343,7 +350,7 @@ class ExamResultSheetView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                      Divider(height: 1, color: context.borderColor),
 
                       // 2. ভুল
                       Padding(
@@ -367,7 +374,7 @@ class ExamResultSheetView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF334155),
+                                    color: context.textPrimary,
                                   ),
                                 ),
                               ],
@@ -378,7 +385,9 @@ class ExamResultSheetView extends StatelessWidget {
                                 vertical: 2.h,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFEF2F2),
+                                color: context.isDark
+                                    ? const Color(0xFF7F1D1D).withValues(alpha: 0.3)
+                                    : const Color(0xFFFEF2F2),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               child: Text(
@@ -393,7 +402,7 @@ class ExamResultSheetView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                      Divider(height: 1, color: context.borderColor),
 
                       // 3. সময়
                       Padding(
@@ -417,7 +426,7 @@ class ExamResultSheetView extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF334155),
+                                    color: context.textPrimary,
                                   ),
                                 ),
                               ],
@@ -427,7 +436,7 @@ class ExamResultSheetView extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.5.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF0F172A),
+                                color: context.textPrimary,
                               ),
                             ),
                           ],

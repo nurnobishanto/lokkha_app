@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/utils/constants.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../../../../config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../views/widgets/image_preview.dart';
 
 class NotificationDetailsPage extends StatelessWidget {
@@ -22,7 +23,7 @@ class NotificationDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.scaffoldColor,
       appBar: AppBar(
         title: Text(
           "Notifications Details",
@@ -46,10 +47,10 @@ class NotificationDetailsPage extends StatelessWidget {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: context.isDark ? context.surfaceColor : Colors.grey.shade100,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: context.isDark ? Colors.transparent : Colors.black.withOpacity(0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -69,19 +70,19 @@ class NotificationDetailsPage extends StatelessWidget {
                     AppConstants.storageUrl + image!,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade200,
+                      color: context.isDark ? context.surfaceColor : Colors.grey.shade200,
                       child: Center(
                         child: Icon(
                           Icons.image_not_supported_outlined,
                           size: 48,
-                          color: Colors.grey.shade400,
+                          color: context.textMuted,
                         ),
                       ),
                     ),
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
                       return Container(
-                        color: Colors.grey.shade100,
+                        color: context.isDark ? context.surfaceColor : Colors.grey.shade100,
                         child: Center(
                           child: CircularProgressIndicator(
                             value: loadingProgress.expectedTotalBytes != null
@@ -107,13 +108,13 @@ class NotificationDetailsPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade900,
+                      color: context.textPrimary,
                       height: 1.3,
                     ),
                   ),
 
                   /// Divider
-                  Divider(color: Colors.grey.shade200, thickness: 1),
+                  Divider(color: context.borderColor, thickness: 1),
 
                   /// Body
                   Text(
@@ -121,7 +122,7 @@ class NotificationDetailsPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.6,
-                      color: Colors.grey.shade800,
+                      color: context.textSecondary,
                       letterSpacing: 0.2,
                     ),
                   ),
@@ -130,7 +131,7 @@ class NotificationDetailsPage extends StatelessWidget {
                   if (webLink != null && webLink!.isNotEmpty) ...[
                     const SizedBox(height: 28),
                     Material(
-                      color: Colors.blue.shade50,
+                      color: context.isDark ? context.surfaceColor : Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(12),
                       child: InkWell(
                         onTap: () async {
@@ -145,7 +146,7 @@ class NotificationDetailsPage extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Colors.blue.shade200,
+                              color: context.isDark ? context.borderColor : Colors.blue.shade200,
                               width: 1,
                             ),
                           ),
@@ -154,12 +155,12 @@ class NotificationDetailsPage extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue.shade100,
+                                  color: context.isDark ? context.primaryColor.withValues(alpha: 0.2) : Colors.blue.shade100,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
                                   Icons.open_in_new_rounded,
-                                  color: Colors.blue.shade700,
+                                  color: context.primaryColor,
                                   size: 20,
                                 ),
                               ),
@@ -173,7 +174,7 @@ class NotificationDetailsPage extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.blue.shade900,
+                                        color: context.textPrimary,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
@@ -181,7 +182,7 @@ class NotificationDetailsPage extends StatelessWidget {
                                       "View Full Details",
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: Colors.blue.shade700,
+                                        color: context.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -190,7 +191,7 @@ class NotificationDetailsPage extends StatelessWidget {
                               Icon(
                                 Icons.arrow_forward_ios_rounded,
                                 size: 16,
-                                color: Colors.blue.shade700,
+                                color: context.primaryColor,
                               ),
                             ],
                           ),

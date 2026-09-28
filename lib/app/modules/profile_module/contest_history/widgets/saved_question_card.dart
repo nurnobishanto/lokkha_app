@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/saved_question_item_model.dart';
 
 class SavedQuestionCard extends StatelessWidget {
@@ -19,9 +20,9 @@ class SavedQuestionCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+          border: Border.all(color: context.borderColor, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.02),
@@ -38,13 +39,17 @@ class SavedQuestionCard extends StatelessWidget {
               width: 36.r,
               height: 36.r,
               decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
+                color: context.isDark
+                    ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                    : const Color(0xFFECFDF5),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 Icons.bookmark_rounded,
                 size: 20.sp,
-                color: const Color(0xFF059669),
+                color: context.isDark
+                    ? const Color(0xFF34D399)
+                    : const Color(0xFF059669),
               ),
             ),
 
@@ -60,7 +65,7 @@ class SavedQuestionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14.5.sp,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                   SizedBox(height: 3.h),
@@ -69,14 +74,14 @@ class SavedQuestionCard extends StatelessWidget {
                       Icon(
                         Icons.access_time_rounded,
                         size: 12.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                       ),
                       SizedBox(width: 4.w),
                       Text(
                         "সেভ করা হয়েছে: ${item.savedDate}",
                         style: TextStyle(
                           fontSize: 11.5.sp,
-                          color: const Color(0xFF64748B),
+                          color: context.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -89,7 +94,7 @@ class SavedQuestionCard extends StatelessWidget {
             Icon(
               Icons.chevron_right_rounded,
               size: 20.sp,
-              color: const Color(0xFF94A3B8),
+              color: context.textMuted,
             ),
           ],
         ),

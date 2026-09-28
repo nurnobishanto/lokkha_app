@@ -18,9 +18,10 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      color: const Color(0xFFF8FAFC),
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: EdgeInsets.only(
         left: 14.w,
         right: 14.w,
@@ -32,13 +33,13 @@ class CustomBottomNavBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.09),
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.09),
               blurRadius: 24,
               spreadRadius: 1,
               offset: const Offset(0, 8),
             ),
             BoxShadow(
-              color: LightThemeColors.primaryColor.withValues(alpha: 0.12),
+              color: LightThemeColors.primaryColor.withValues(alpha: isDark ? 0.2 : 0.12),
               blurRadius: 16,
               spreadRadius: -2,
               offset: const Offset(0, 4),
@@ -52,10 +53,14 @@ class CustomBottomNavBar extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.88),
+                color: isDark
+                    ? const Color(0xFF1E293B).withValues(alpha: 0.92)
+                    : Colors.white.withValues(alpha: 0.88),
                 borderRadius: BorderRadius.circular(16.r),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: isDark
+                      ? const Color(0xFF334155).withValues(alpha: 0.8)
+                      : Colors.white.withValues(alpha: 0.9),
                   width: 1.5,
                 ),
               ),
@@ -66,11 +71,13 @@ class CustomBottomNavBar extends StatelessWidget {
                   _buildNavItem(
                     index: 0,
                     label: "হোম",
+                    inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => Icon(
                       isSelected ? Icons.home_rounded : Icons.home_outlined,
                       size: 20.r,
-                      color:
-                          isSelected ? Colors.white : const Color(0xFF64748B),
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     ),
                   ),
 
@@ -78,11 +85,13 @@ class CustomBottomNavBar extends StatelessWidget {
                   _buildNavItem(
                     index: 1,
                     label: "পরীক্ষা",
+                    inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => FaIcon(
                       FontAwesomeIcons.graduationCap,
                       size: 17.r,
-                      color:
-                          isSelected ? Colors.white : const Color(0xFF64748B),
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     ),
                   ),
 
@@ -191,13 +200,15 @@ class CustomBottomNavBar extends StatelessWidget {
                     return _buildNavItem(
                       index: 4,
                       label: label,
+                      inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       iconBuilder: (isSelected) => Icon(
                         isSelected
                             ? Icons.person_rounded
                             : Icons.person_outline_rounded,
                         size: 20.r,
-                        color:
-                            isSelected ? Colors.white : const Color(0xFF64748B),
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                       ),
                     );
                   }),

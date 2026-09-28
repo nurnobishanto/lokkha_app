@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../../../../utils/date_formatter.dart';
 import '../../../../routes/app_pages.dart';
@@ -12,6 +13,7 @@ class JobsView extends GetView<JobsController> {
   Widget build(BuildContext context) {
     final JobsController controller = Get.put(JobsController());
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         title: Text(
           "সর্বশেষ নিয়োগ বিজ্ঞপ্তি",
@@ -180,10 +182,16 @@ class GovJobCard extends StatelessWidget {
       child: Container(
         height: Get.height / 12,
         decoration: BoxDecoration(
-          color: isDeadlineOver ? Colors.red.shade50 : LightThemeColors.white,
+          color: isDeadlineOver
+              ? (context.isDark
+                  ? const Color(0xFF4C0519).withValues(alpha: 0.4)
+                  : Colors.red.shade50)
+              : context.cardColor,
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(
-            color: isDeadlineOver ? Colors.red : Colors.grey.shade300,
+            color: isDeadlineOver
+                ? (context.isDark ? const Color(0xFFF43F5E) : Colors.red)
+                : context.borderColor,
           ),
         ),
         child: Padding(
@@ -194,7 +202,13 @@ class GovJobCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: AppTextStyles.heading5,
+                style: AppTextStyles.heading5.copyWith(
+                  color: isDeadlineOver
+                      ? (context.isDark
+                          ? const Color(0xFFFDA4AF)
+                          : Colors.red.shade900)
+                      : context.textPrimary,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -202,7 +216,13 @@ class GovJobCard extends StatelessWidget {
               if (deadlineText.isNotEmpty)
                 Text(
                   "আবেদনের শেষ তারিখ: $deadlineText",
-                  style: AppTextStyles.heading6,
+                  style: AppTextStyles.heading6.copyWith(
+                    color: isDeadlineOver
+                        ? (context.isDark
+                            ? const Color(0xFFFECDD3)
+                            : Colors.red.shade700)
+                        : context.textSecondary,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

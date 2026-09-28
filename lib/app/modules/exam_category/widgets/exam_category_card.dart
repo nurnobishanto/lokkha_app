@@ -26,18 +26,22 @@ class ExamCategoryCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: LightThemeColors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(5.r),
           border: Border.all(
             color: borderColor ??
-                LightThemeColors.primaryColor.withValues(alpha: 0.5),
+                (context.isDark
+                    ? context.borderColor
+                    : LightThemeColors.primaryColor.withValues(alpha: 0.5)),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: context.isDark
+                  ? Colors.black.withValues(alpha: 0.2)
+                  : Colors.black.withValues(alpha: 0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -50,16 +54,15 @@ class ExamCategoryCard extends StatelessWidget {
           children: [
             isIcon == true
                 ? Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 6.5),
                     decoration: BoxDecoration(
-                      color:
-                          LightThemeColors.primaryColor.withValues(alpha: .1),
-                      borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                      color: context.primaryLight,
+                      borderRadius: const BorderRadius.all(Radius.circular(7.0)),
                     ),
                     child: Center(
                       child: Icon(
                         Icons.school,
-                        color: iconColor ?? LightThemeColors.primaryColor,
+                        color: iconColor ?? context.primaryColor,
                         size: 25.sp,
                       ),
                     ),
@@ -71,10 +74,10 @@ class ExamCategoryCard extends StatelessWidget {
                 title,
                 maxLines: 2,
                 textAlign: TextAlign.start,
-                //softWrap: true,       // allow wrapping
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.heading5.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: context.textPrimary,
                 ),
               ),
             ),

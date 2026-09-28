@@ -51,14 +51,16 @@ class AuthGatewayView extends GetView<AuthGatewayController> {
                 text: TextSpan(children: [
                   TextSpan(
                     text: 'লগ ইন করে, আপনি আমাদের সাথে সম্মত হন।',
-                    style: AppTextStyles.custom(fontSize: 11.0.sp),
+                    style: AppTextStyles.custom(fontSize: 11.0.sp).copyWith(
+                      color: context.textSecondary,
+                    ),
                   ),
                   TextSpan(
                     text: ' শর্তাবলী ও নীতিমালা',
                     style: AppTextStyles.custom(
                       fontSize: 12.0.sp,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: context.primaryColor,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {

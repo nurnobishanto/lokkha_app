@@ -2,7 +2,6 @@ import 'package:lokkha/app/components/custom_action_button.dart';
 import 'package:lokkha/app/components/custom_text_form_field.dart';
 import 'package:lokkha/config/constants/app_images.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,13 +34,13 @@ class SignInView extends GetView<SignInController> {
                       Text(
                         "এক টাকা দিয়ে লক্ষ্যে পৌঁছান",
                         style: AppTextStyles.heading4
-                            .copyWith(color: Colors.black),
+                            .copyWith(color: context.textPrimary),
                         textAlign: TextAlign.center,
                       ),
                       Text(
                         "কোনো রেজিস্ট্রেশন এর প্রয়োজন নেই সরাসরি লগইন করুন",
                         style: AppTextStyles.custom(
-                          color: LightThemeColors.primaryColor,
+                          color: context.primaryColor,
                         ),
                       ),
                       70.h.height,
@@ -50,6 +49,7 @@ class SignInView extends GetView<SignInController> {
                         style: AppTextStyles.custom(
                           fontSize: 17.00.sp,
                           fontWeight: FontWeight.w600,
+                          color: context.textPrimary,
                         ),
                       ),
                       2.0.h.height,
@@ -57,7 +57,7 @@ class SignInView extends GetView<SignInController> {
                         readOnly: true,
                         prefixIcon: const Icon(Icons.phone),
                         hintText: phoneNumber,
-                        hintStyle: AppTextStyles.heading6,
+                        hintStyle: AppTextStyles.heading6.copyWith(color: context.textPrimary),
                       ),
                       1.0.h.height,
                       CustomTextFormField(
@@ -68,7 +68,7 @@ class SignInView extends GetView<SignInController> {
                         obscureText: true,
                         hintStyle: AppTextStyles.custom(
                             fontSize: 12.00.sp,
-                            color: LightThemeColors.hintTextColor),
+                            color: context.textMuted),
                       ),
                       Align(
                         alignment: Alignment.topRight,
@@ -84,7 +84,7 @@ class SignInView extends GetView<SignInController> {
                             textAlign: TextAlign.right,
                             style: AppTextStyles.custom(
                                 fontSize: 11.5.sp,
-                                color: LightThemeColors.primaryColor),
+                                color: context.primaryColor),
                           ),
                         ),
                       ),

@@ -50,8 +50,11 @@ class HomeView extends StatelessWidget {
             SizedBox(width: 8.w),
             Text(
               "সঠিক পথে, স্বল্প সময়ে",
-              style: AppTextStyles.custom(fontSize: 16.sp)
-                  .copyWith(color: Get.theme.indicatorColor),
+              style: AppTextStyles.custom(fontSize: 16.sp).copyWith(
+                color: context.isDark
+                    ? context.textPrimary
+                    : Get.theme.indicatorColor,
+              ),
             ),
           ],
         ),
@@ -168,12 +171,12 @@ class HomeView extends StatelessWidget {
                 style: AppTextStyles.custom(
                   fontSize: 17.00.sp,
                   fontWeight: FontWeight.w600,
-                ),
+                ).copyWith(color: context.textPrimary),
               ),
             ),
             SizedBox(height: 8.h),
             _SubjectSection(controller: controller),
-            const Divider(color: LightThemeColors.primaryColor),
+            Divider(color: context.borderColor),
             SocialLinksScreen(),
             8.h.height,
           ],
@@ -186,7 +189,7 @@ class HomeView extends StatelessWidget {
 class SectionTitleWithSeeAll extends StatelessWidget {
   final String title;
   final VoidCallback? onSeeAllPressed;
-  final Color color;
+  final Color? color;
   final double fontSize;
   final double dividerHeight;
   final EdgeInsetsGeometry padding;
@@ -195,7 +198,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
     super.key,
     required this.title,
     this.onSeeAllPressed,
-    this.color = LightThemeColors.primaryColor,
+    this.color,
     this.fontSize = 18,
     this.dividerHeight = 1.5,
     this.padding = const EdgeInsets.symmetric(horizontal: 2),
@@ -203,6 +206,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = color ?? context.primaryColor;
     return InkWell(
       onTap: onSeeAllPressed,
       child: Padding(
@@ -217,7 +221,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
-                    color: color,
+                    color: effectiveColor,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -239,7 +243,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
                     'See All',
                     style: TextStyle(
                       fontSize: fontSize * 0.85,
-                      color: color,
+                      color: effectiveColor,
                     ),
                   ),
                 ),
@@ -265,7 +269,7 @@ class _SearchBar extends StatelessWidget {
       child: Container(
         height: Get.height / 20,
         decoration: BoxDecoration(
-          color: LightThemeColors.primaryColor,
+          color: context.primaryColor,
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(10.r),
             bottomRight: Radius.circular(10.r),
@@ -276,22 +280,24 @@ class _SearchBar extends StatelessWidget {
           enabled: false,
           decoration: InputDecoration(
             hintText: "অনুসন্ধান করুন",
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(
+            hintStyle: TextStyle(color: context.textMuted),
+            prefixIcon: Icon(Icons.search, color: context.textMuted),
+            border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0)),
-              borderSide: BorderSide(color: Colors.grey),
+              borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+              borderSide: BorderSide(color: context.borderColor),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12.0)),
-              borderSide: BorderSide(color: Colors.blue),
+              borderRadius: const BorderRadius.all(Radius.circular(12.0)),
+              borderSide: BorderSide(color: context.primaryColor),
             ),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
+                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 12.0),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: context.cardColor,
           ),
         ),
       ),
@@ -466,6 +472,7 @@ class _ShortcutGrid extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildItem(
+                  context,
                   controller.gridViewTitle[i],
                   controller.gridViewRoutePage[i],
                 ),
@@ -474,6 +481,7 @@ class _ShortcutGrid extends StatelessWidget {
                 SizedBox(width: 10.w),
                 Expanded(
                   child: _buildItem(
+                    context,
                     controller.gridViewTitle[i + 1],
                     controller.gridViewRoutePage[i + 1],
                   ),
@@ -486,21 +494,25 @@ class _ShortcutGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildItem(String title, Widget route) {
+  Widget _buildItem(BuildContext context, String title, Widget route) {
     return GestureDetector(
       onTap: () => Get.to(route),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
         decoration: BoxDecoration(
-          color: LightThemeColors.softBg, // soft premium look
+          color: context.isDark ? context.cardColor : LightThemeColors.softBg, // soft premium look
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(
-            color: LightThemeColors.primaryColor.withValues(alpha: 0.4),
+            color: context.isDark
+                ? context.borderColor
+                : LightThemeColors.primaryColor.withValues(alpha: 0.4),
             width: 1.2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: context.isDark
+                  ? Colors.black.withValues(alpha: 0.2)
+                  : Colors.black.withValues(alpha: 0.05),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -510,7 +522,9 @@ class _ShortcutGrid extends StatelessWidget {
           child: Text(
             title,
             style: AppTextStyles.heading5.copyWith(
-              color: LightThemeColors.primaryColor,
+              color: context.isDark
+                  ? context.textPrimary
+                  : LightThemeColors.primaryColor,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
@@ -604,8 +618,10 @@ class _FreeExamSection extends StatelessWidget {
                   });
                 }
               },
-              borderColor: LightThemeColors.primaryColor.withOpacity(0.4),
-              iconColor: LightThemeColors.primaryColor,
+              borderColor: context.isDark
+                  ? context.borderColor
+                  : LightThemeColors.primaryColor.withValues(alpha: 0.4),
+              iconColor: context.primaryColor,
             );
           },
         ),
@@ -650,9 +666,12 @@ class _SubjectSection extends StatelessWidget {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.cardColor,
                     borderRadius: BorderRadius.circular(7.0),
-                    border: Border.all(color: Colors.grey, width: 0.5.w),
+                    border: Border.all(
+                      color: context.borderColor,
+                      width: 0.8.w,
+                    ),
                   ),
                   child: Center(
                     child: Text(
@@ -660,6 +679,7 @@ class _SubjectSection extends StatelessWidget {
                       style: AppTextStyles.body2.copyWith(
                         height: 1.1.h,
                         fontSize: 12.sp,
+                        color: context.textPrimary,
                       ),
                       maxLines: 2,
                       textAlign: TextAlign.center,

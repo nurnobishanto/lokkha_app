@@ -115,7 +115,7 @@ class CurrentAffairsContentView extends StatelessWidget {
                       Center(
                         child: Text(
                           data.date ?? "",
-                          style: AppTextStyles.heading4,
+                          style: AppTextStyles.heading4.copyWith(color: context.textPrimary),
                         ),
                       ),
                       10.0.w.width,
@@ -139,12 +139,12 @@ class CurrentAffairsContentView extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(Icons.arrow_right, size: 15.0),
+                                Icon(Icons.arrow_right, size: 15.0, color: context.textSecondary),
                                 const SizedBox(width: 5.0),
                                 Expanded(
                                   child: HtmlWidget(
                                     question.title ?? "",
-                                    textStyle: AppTextStyles.heading5,
+                                    textStyle: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                                   ),
                                 ),
                               ],
@@ -165,11 +165,12 @@ class CurrentAffairsContentView extends StatelessWidget {
                                             child: Row(
                                               children: [
                                                 // Label always visible
-                                                const Text(
+                                                Text(
                                                   'উত্তর: ',
                                                   style: TextStyle(
                                                       fontWeight:
-                                                          FontWeight.bold),
+                                                          FontWeight.bold,
+                                                      color: context.textPrimary),
                                                 ),
 
                                                 // Answer value (blurred if locked)
@@ -182,7 +183,7 @@ class CurrentAffairsContentView extends StatelessWidget {
                                                                   "",
                                                               style:
                                                                   AppTextStyles
-                                                                      .body1,
+                                                                      .body1.copyWith(color: context.textSecondary),
                                                             ),
                                                             Positioned.fill(
                                                               child: ClipRRect(
@@ -207,7 +208,7 @@ class CurrentAffairsContentView extends StatelessWidget {
                                                       : Text(
                                                           option.value ?? "",
                                                           style: AppTextStyles
-                                                              .body1,
+                                                              .body1.copyWith(color: context.textSecondary),
                                                         ),
                                                 ),
                                               ],

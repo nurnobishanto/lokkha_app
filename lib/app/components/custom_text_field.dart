@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -42,28 +43,27 @@ class CustomTextField extends StatelessWidget {
       readOnly: readOnly,
       cursorColor: LightThemeColors.primaryColor,
       textAlignVertical: TextAlignVertical.center,
+      style: TextStyle(color: context.textPrimary, fontSize: 14),
       decoration: InputDecoration(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 10, vertical: 10.0),
         isDense: true,
         hintText: hintText,
-        // hintStyle: kSubtitleStyle.copyWith(
-        //   color: LightThemeColors.black.withValues(alpha: 0.4),
-        // ),
-
-        hintStyle: AppTextStyles.body1,
+        hintStyle: AppTextStyles.body1.copyWith(color: context.textMuted),
         prefixIcon: prefixIcon,
+        filled: true,
+        fillColor: context.cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(),
+          borderSide: BorderSide(color: context.borderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: Colors.grey.shade400),
+          borderSide: BorderSide(color: context.borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: LightThemeColors.black),
+          borderSide: BorderSide(color: context.primaryColor, width: 1.5),
         ),
       ),
     );

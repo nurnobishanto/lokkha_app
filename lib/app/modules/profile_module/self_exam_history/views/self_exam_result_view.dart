@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../../../../components/custom_snackbar.dart';
 import '../models/self_exam_activity_model.dart';
@@ -66,7 +67,7 @@ class SelfExamResultView extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldBg,
       appBar: const CustomAppBar(
         title: 'ফলাফল ও বিশ্লেষণ',
         centerTitle: true,
@@ -92,7 +93,7 @@ class SelfExamResultView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
               ),
@@ -102,17 +103,18 @@ class SelfExamResultView extends StatelessWidget {
           SizedBox(height: 14.h),
 
           // 2. Summary Stat Cards (Time, Total Questions, Total Mark, Positive Mark)
-          _buildSummaryBox(title: "Time", value: activity.time),
+          _buildSummaryBox(context, title: "Time", value: activity.time),
           SizedBox(height: 10.h),
-          _buildSummaryBox(title: "Total Questions", value: "${activity.totalQuestions}"),
+          _buildSummaryBox(context, title: "Total Questions", value: "${activity.totalQuestions}"),
           SizedBox(height: 10.h),
-          _buildSummaryBox(title: "Total Mark", value: activity.totalMark),
+          _buildSummaryBox(context, title: "Total Mark", value: activity.totalMark),
           SizedBox(height: 10.h),
           _buildSummaryBox(
+            context,
             title: "Positive Mark",
             value: activity.positiveMark,
-            titleColor: const Color(0xFF059669),
-            valueColor: const Color(0xFF059669),
+            titleColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+            valueColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
           ),
 
           SizedBox(height: 14.h),
@@ -121,12 +123,12 @@ class SelfExamResultView extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(14.r),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.cardColor,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: context.borderColor),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
+                  color: context.isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.02),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -140,7 +142,7 @@ class SelfExamResultView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15.5.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
                 SizedBox(height: 3.h),
@@ -149,12 +151,12 @@ class SelfExamResultView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF64748B),
+                    color: context.textMuted,
                   ),
                 ),
 
                 SizedBox(height: 12.h),
-                const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                Divider(height: 1, color: context.borderColor),
                 SizedBox(height: 12.h),
 
                 // 2x3 Grid
@@ -162,17 +164,19 @@ class SelfExamResultView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Full Mark",
                         value: activity.fullMark,
-                        valueColor: const Color(0xFF0F172A),
+                        valueColor: context.textPrimary,
                       ),
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Your Mark",
                         value: activity.yourMark,
-                        valueColor: const Color(0xFF2563EB),
+                        valueColor: context.isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
                       ),
                     ),
                   ],
@@ -182,17 +186,19 @@ class SelfExamResultView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Attempt",
                         value: activity.attempt,
-                        valueColor: const Color(0xFF059669),
+                        valueColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
                       ),
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Avoid",
                         value: activity.avoid,
-                        valueColor: const Color(0xFFD97706),
+                        valueColor: context.isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
                       ),
                     ),
                   ],
@@ -202,17 +208,19 @@ class SelfExamResultView extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Correct",
                         value: activity.correct,
-                        valueColor: const Color(0xFF0D9488),
+                        valueColor: context.isDark ? const Color(0xFF2DD4BF) : const Color(0xFF0D9488),
                       ),
                     ),
                     SizedBox(width: 8.w),
                     Expanded(
                       child: _buildMetricTile(
+                        context,
                         label: "Wrong",
                         value: activity.wrong,
-                        valueColor: const Color(0xFFDC2626),
+                        valueColor: context.isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
                       ),
                     ),
                   ],
@@ -228,10 +236,12 @@ class SelfExamResultView extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildActionButton(
+                  context,
                   icon: Icons.download_rounded,
                   label: "ফলাফল কার্ড",
-                  borderColor: const Color(0xFF334155),
-                  textColor: const Color(0xFF334155),
+                  borderColor: context.isDark ? context.borderColor : const Color(0xFF334155),
+                  textColor: context.isDark ? context.textPrimary : const Color(0xFF334155),
+                  backgroundColor: context.cardColor,
                   onTap: () {
                     CustomSnackBar.showCustomToast(message: "ফলাফল কার্ড ডাউনলোড হচ্ছে...");
                   },
@@ -240,10 +250,14 @@ class SelfExamResultView extends StatelessWidget {
               SizedBox(width: 8.w),
               Expanded(
                 child: _buildActionButton(
+                  context,
                   icon: Icons.download_rounded,
                   label: "দাখিলকৃত উত্তরপত্র",
-                  borderColor: const Color(0xFFDC2626),
-                  textColor: const Color(0xFFDC2626),
+                  borderColor: context.isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626),
+                  textColor: context.isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
+                  backgroundColor: context.isDark
+                      ? const Color(0xFF7F1D1D).withValues(alpha: 0.15)
+                      : context.cardColor,
                   onTap: () {
                     CustomSnackBar.showCustomToast(message: "দাখিলকৃত উত্তরপত্র প্রস্তুত হচ্ছে...");
                   },
@@ -256,10 +270,14 @@ class SelfExamResultView extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildActionButton(
+                  context,
                   icon: Icons.download_rounded,
                   label: "পরীক্ষার উত্তরপত্র",
-                  borderColor: const Color(0xFF0D9488),
-                  textColor: const Color(0xFF0D9488),
+                  borderColor: context.isDark ? const Color(0xFF14B8A6) : const Color(0xFF0D9488),
+                  textColor: context.isDark ? const Color(0xFF2DD4BF) : const Color(0xFF0D9488),
+                  backgroundColor: context.isDark
+                      ? const Color(0xFF134E4A).withValues(alpha: 0.15)
+                      : context.cardColor,
                   onTap: () {
                     CustomSnackBar.showCustomToast(message: "পরীক্ষার উত্তরপত্র ডাউনলোড হচ্ছে...");
                   },
@@ -268,10 +286,14 @@ class SelfExamResultView extends StatelessWidget {
               SizedBox(width: 8.w),
               Expanded(
                 child: _buildActionButton(
+                  context,
                   icon: Icons.download_rounded,
                   label: "পরীক্ষার প্রশ্নপত্র",
-                  borderColor: const Color(0xFF059669),
-                  textColor: const Color(0xFF059669),
+                  borderColor: context.isDark ? const Color(0xFF10B981) : const Color(0xFF059669),
+                  textColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                  backgroundColor: context.isDark
+                      ? const Color(0xFF064E3B).withValues(alpha: 0.15)
+                      : context.cardColor,
                   onTap: () {
                     CustomSnackBar.showCustomToast(message: "পরীক্ষার প্রশ্নপত্র ডাউনলোড হচ্ছে...");
                   },
@@ -298,7 +320,8 @@ class SelfExamResultView extends StatelessWidget {
   }
 
   // Centered Summary Stat Box (Time, Total Questions, etc.)
-  Widget _buildSummaryBox({
+  Widget _buildSummaryBox(
+    BuildContext context, {
     required String title,
     required String value,
     Color? titleColor,
@@ -308,12 +331,12 @@ class SelfExamResultView extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: context.isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -327,7 +350,7 @@ class SelfExamResultView extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5.sp,
               fontWeight: FontWeight.w800,
-              color: titleColor ?? const Color(0xFF0F172A),
+              color: titleColor ?? context.textPrimary,
             ),
           ),
           SizedBox(height: 4.h),
@@ -337,7 +360,7 @@ class SelfExamResultView extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.w600,
-              color: valueColor ?? const Color(0xFF475569),
+              color: valueColor ?? context.textSecondary,
             ),
           ),
         ],
@@ -346,7 +369,8 @@ class SelfExamResultView extends StatelessWidget {
   }
 
   // Metric Tile in 2x3 Grid
-  Widget _buildMetricTile({
+  Widget _buildMetricTile(
+    BuildContext context, {
     required String label,
     required String value,
     required Color valueColor,
@@ -354,9 +378,9 @@ class SelfExamResultView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Column(
         children: [
@@ -366,7 +390,7 @@ class SelfExamResultView extends StatelessWidget {
             style: TextStyle(
               fontSize: 11.5.sp,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF64748B),
+              color: context.textMuted,
             ),
           ),
           SizedBox(height: 4.h),
@@ -387,11 +411,13 @@ class SelfExamResultView extends StatelessWidget {
   }
 
   // 2x2 Action Button
-  Widget _buildActionButton({
+  Widget _buildActionButton(
+    BuildContext context, {
     required IconData icon,
     required String label,
     required Color borderColor,
     required Color textColor,
+    Color? backgroundColor,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -400,7 +426,7 @@ class SelfExamResultView extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 9.h, horizontal: 8.w),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: backgroundColor ?? context.cardColor,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(color: borderColor, width: 1.2),
         ),

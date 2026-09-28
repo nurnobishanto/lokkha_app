@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/accuracy_trend_point_model.dart';
 
 class AccuracyTrendChart extends StatelessWidget {
@@ -19,9 +20,9 @@ class AccuracyTrendChart extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -47,7 +48,7 @@ class AccuracyTrendChart extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFF0F172A),
+                  color: context.textPrimary,
                 ),
               ),
             ],
@@ -58,7 +59,7 @@ class AccuracyTrendChart extends StatelessWidget {
             "আপনার সর্বশেষ পরীক্ষাগুলোর নির্ভুলতার শতকরা হার (%)",
             style: TextStyle(
               fontSize: 11.5.sp,
-              color: const Color(0xFF64748B),
+              color: context.textSecondary,
             ),
           ),
 
@@ -163,7 +164,10 @@ class AccuracyTrendChart extends StatelessWidget {
                     child: SizedBox(
                       width: points.length * 48.w > 280.w ? points.length * 48.w : 280.w,
                       child: CustomPaint(
-                        painter: _TrendChartPainter(points: points),
+                        painter: _TrendChartPainter(
+                          points: points,
+                          isDarkMode: context.isDark,
+                        ),
                       ),
                     ),
                   ),
@@ -188,7 +192,7 @@ class _AxisLabel extends StatelessWidget {
       style: TextStyle(
         fontSize: 10.sp,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFF64748B),
+        color: context.textSecondary,
       ),
     );
   }
@@ -196,8 +200,9 @@ class _AxisLabel extends StatelessWidget {
 
 class _TrendChartPainter extends CustomPainter {
   final List<AccuracyTrendPointModel> points;
+  final bool isDarkMode;
 
-  _TrendChartPainter({required this.points});
+  _TrendChartPainter({required this.points, this.isDarkMode = false});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -208,7 +213,7 @@ class _TrendChartPainter extends CustomPainter {
 
     // 1. Draw dashed grid lines
     final gridPaint = Paint()
-      ..color = const Color(0xFFF1F5F9)
+      ..color = isDarkMode ? Colors.white12 : const Color(0xFFF1F5F9)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -280,7 +285,8 @@ class _TrendChartPainter extends CustomPainter {
     canvas.drawPath(linePath, linePaint);
 
     // 5. Draw point dots and badges
-    final dotBgPaint = Paint()..color = Colors.white;
+    final dotBgPaint = Paint()
+      ..color = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
     final dotBorderPaint = Paint()
       ..color = const Color(0xFF059669)
       ..strokeWidth = 2.5
@@ -360,7 +366,7 @@ class _TrendChartPainter extends CustomPainter {
       style: TextStyle(
         fontSize: 9.5.sp,
         fontWeight: FontWeight.w600,
-        color: const Color(0xFF475569),
+        color: isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF475569),
       ),
     );
 

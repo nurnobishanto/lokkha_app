@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/services/api_call_status.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../utils/constants.dart';
 import '../../../routes/app_pages.dart';
 import '../controllers/my_courses_controller.dart';
@@ -15,7 +16,7 @@ class MyCoursesView extends GetView<MyCoursesController> {
   Widget build(BuildContext context) {
     Get.put(MyCoursesController());
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FA),
+      backgroundColor: context.scaffoldColor,
       appBar: CustomAppBar(title: 'আমার কোর্স'),
       body: Obx(() {
         final status = controller.apiCallStatus.value;
@@ -30,7 +31,7 @@ class MyCoursesView extends GetView<MyCoursesController> {
         if (status == ApiCallStatus.error) return _buildErrorState();
 
         final packages = controller.model.value.packages ?? [];
-        if (packages.isEmpty) return _buildEmptyState();
+        if (packages.isEmpty) return _buildEmptyState(context);
 
         return RefreshIndicator(
           color: const Color(0xFF28a745),
@@ -55,18 +56,18 @@ class MyCoursesView extends GetView<MyCoursesController> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.school_outlined, size: 80.r, color: Colors.grey.shade400),
+          Icon(Icons.school_outlined, size: 80.r, color: context.textMuted),
           SizedBox(height: 16.h),
           Text(
             'কোনো কোর্স পাওয়া যায়নি',
             style: TextStyle(
               fontSize: 16.sp,
-              color: Colors.grey.shade600,
+              color: context.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -120,11 +121,12 @@ class _CourseCard extends StatelessWidget {
             },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(12.r),
+          border: Border.all(color: context.borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: context.isDark ? Colors.transparent : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -169,7 +171,7 @@ class _CourseCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A2E),
+                          color: context.textPrimary,
                           height: 1.3,
                         ),
                       ),

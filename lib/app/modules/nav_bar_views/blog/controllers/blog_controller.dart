@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/blog_post_model.dart';
 import '../repositories/blog_repository.dart';
 import '../../../../routes/app_pages.dart';
@@ -149,7 +150,7 @@ class BlogController extends GetxController {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: context.cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -173,17 +174,17 @@ class BlogController extends GetxController {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: Icon(Icons.close, color: context.textSecondary),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
-                const Divider(),
+                Divider(color: context.borderColor),
                 Flexible(
                   child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: categories.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, __) => Divider(height: 1, color: context.borderColor),
                     itemBuilder: (context, index) {
                       final cat = categories[index];
                       return Obx(() {
@@ -197,7 +198,7 @@ class BlogController extends GetxController {
                                   : FontWeight.normal,
                               color: isSelected
                                   ? const Color(0xFF1B6B50)
-                                  : Colors.black87,
+                                  : context.textPrimary,
                             ),
                           ),
                           trailing: isSelected

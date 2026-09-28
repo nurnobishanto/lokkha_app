@@ -52,7 +52,7 @@ class CourseBottomBar extends StatelessWidget {
                         "৳$regularPrice",
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.black,
+                          color: Colors.white70,
                           decoration: TextDecoration.lineThrough,
                         ),
                         maxLines: 1,

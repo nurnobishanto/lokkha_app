@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/contest/controller/latest_contest_controller.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../styles/text_style.dart';
 import '../../nav_bar_views/home/components/home_components.dart';
 import '../views/contest_result_view.dart';
@@ -21,7 +22,7 @@ class LastContestResultWidget extends StatelessWidget {
                   style: AppTextStyles.custom(
                     fontSize: 16.00.sp,
                     fontWeight: FontWeight.w600,
-                  ),
+                  ).copyWith(color: context.textPrimary),
                 )
               : const SizedBox(),
           controller.isResultLoading.value
@@ -36,7 +37,18 @@ class LastContestResultWidget extends StatelessWidget {
                             .toList()));
                   },
                   child: Container(
-                    color: Colors.green.shade50,
+                    decoration: BoxDecoration(
+                      color: context.isDark
+                          ? context.cardColor
+                          : Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(
+                        color: context.isDark
+                            ? context.borderColor
+                            : Colors.green.shade100,
+                        width: 0.8,
+                      ),
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(

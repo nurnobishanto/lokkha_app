@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/subject_sections/controllers/sub_sec_set_time_controller.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../config/theme/light_theme_colors.dart';
 import '../../../../styles/text_style.dart';
 import '../../../components/custom_action_button.dart';
@@ -15,6 +17,7 @@ class SubSectionsSetTimeView extends GetView {
   Widget build(BuildContext context) {
     final controller = Get.put(SubSecSetTimeController());
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
@@ -48,7 +51,7 @@ class SubSectionsSetTimeView extends GetView {
                           children: [
                             Text(
                               'সময় নির্ধারণ করুন',
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 5.00),
                             Container(
@@ -110,7 +113,7 @@ class SubSectionsSetTimeView extends GetView {
                           children: [
                             Text(
                               "নেগেটিভ মার্কিং",
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 3.00),
                             Container(
@@ -138,15 +141,20 @@ class SubSectionsSetTimeView extends GetView {
                             const Spacer(),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.4),
+                                color: context.isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(13),
+                                border: Border.all(color: context.isDark ? const Color(0xFFEF4444).withValues(alpha: 0.5) : Colors.red.withValues(alpha: 0.3)),
                               ),
-                              padding: const EdgeInsets.all(4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               child: Text(
                                 "প্রতিটি ভুলের জন্য ০.২৫ নম্বর কাটা যাবে",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.body1,
+                                style: AppTextStyles.body1.copyWith(
+                                  fontSize: 12.sp,
+                                  color: context.isDark ? const Color(0xFFFCA5A5) : Colors.red.shade800,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -154,7 +162,7 @@ class SubSectionsSetTimeView extends GetView {
                         const SizedBox(height: 15.00),
                         Text(
                           "প্রশ্নের ধরন নির্বাচন করুন",
-                          style: AppTextStyles.body1,
+                          style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                         ),
                         const SizedBox(height: 3.00),
                         GridView.builder(
@@ -191,12 +199,13 @@ class SubSectionsSetTimeView extends GetView {
                                         onChanged: (String? newValue) {
                                           if (newValue != null) {
                                             controller.selectedKey.value =
-                                                newValue;
+                                              newValue;
                                           }
                                         },
                                       ),
                                       Text(
                                         item['value'] ?? '',
+                                        style: TextStyle(color: context.textPrimary),
                                       ),
                                     ],
                                   ),
@@ -207,17 +216,17 @@ class SubSectionsSetTimeView extends GetView {
                         const SizedBox(height: 50.00),
                         Row(
                           children: [
-                            const Expanded(
-                              child: Divider(),
+                            Expanded(
+                              child: Divider(color: context.borderColor),
                             ),
                             const SizedBox(width: 10.00),
                             Text(
                               "নির্বাচিত বিষয়",
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 10.00),
-                            const Expanded(
-                              child: Divider(),
+                            Expanded(
+                              child: Divider(color: context.borderColor),
                             ),
                           ],
                         ),
@@ -234,12 +243,14 @@ class SubSectionsSetTimeView extends GetView {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: context.cardColor,
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: context.borderColor),
                                   boxShadow: [
                                     BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.05),
+                                      color: context.isDark
+                                          ? Colors.black.withValues(alpha: 0.2)
+                                          : Colors.black.withValues(alpha: 0.05),
                                       spreadRadius: 1,
                                       blurRadius: 5,
                                       offset: const Offset(0, 2),
@@ -248,6 +259,10 @@ class SubSectionsSetTimeView extends GetView {
                                 ),
                                 child: Text(
                                   subject.name.toString(),
+                                  style: TextStyle(
+                                    color: context.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               );
                             }).toList(),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 class ExamHistoryPagination extends StatelessWidget {
   final int currentPage;
@@ -26,31 +27,31 @@ class ExamHistoryPagination extends StatelessWidget {
               TextSpan(
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: const Color(0xFF64748B),
+                  color: context.textSecondary,
                 ),
                 children: [
                   const TextSpan(text: "পৃষ্ঠা "),
                   TextSpan(
                     text: "$currentPage",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                   const TextSpan(text: " / "),
                   TextSpan(
                     text: "$totalPages",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                   const TextSpan(text: " (মোট "),
                   TextSpan(
                     text: "$totalRecords",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                   const TextSpan(text: " টি রেকর্ড)"),
@@ -67,6 +68,7 @@ class ExamHistoryPagination extends StatelessWidget {
             children: [
               // Previous button
               _buildNavButton(
+                context: context,
                 icon: Icons.chevron_left_rounded,
                 enabled: currentPage > 1,
                 onTap: () {
@@ -79,13 +81,18 @@ class ExamHistoryPagination extends StatelessWidget {
 
               // Page numbers
               for (int i = 1; i <= totalPages; i++) ...[
-                _buildPageNumberButton(page: i, isSelected: currentPage == i),
+                _buildPageNumberButton(
+                  context: context,
+                  page: i,
+                  isSelected: currentPage == i,
+                ),
                 if (i < totalPages) SizedBox(width: 4.w),
               ],
               SizedBox(width: 4.w),
 
               // Next button
               _buildNavButton(
+                context: context,
                 icon: Icons.chevron_right_rounded,
                 enabled: currentPage < totalPages,
                 onTap: () {
@@ -101,6 +108,7 @@ class ExamHistoryPagination extends StatelessWidget {
   }
 
   Widget _buildNavButton({
+    required BuildContext context,
     required IconData icon,
     required bool enabled,
     required VoidCallback onTap,
@@ -112,10 +120,10 @@ class ExamHistoryPagination extends StatelessWidget {
         width: 32.r,
         height: 32.r,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
-            color: const Color(0xFFE2E8F0),
+            color: context.borderColor,
             width: 0.9,
           ),
         ),
@@ -123,7 +131,7 @@ class ExamHistoryPagination extends StatelessWidget {
           child: Icon(
             icon,
             size: 18.sp,
-            color: enabled ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+            color: enabled ? context.textPrimary : context.textMuted,
           ),
         ),
       ),
@@ -131,6 +139,7 @@ class ExamHistoryPagination extends StatelessWidget {
   }
 
   Widget _buildPageNumberButton({
+    required BuildContext context,
     required int page,
     required bool isSelected,
   }) {
@@ -142,15 +151,15 @@ class ExamHistoryPagination extends StatelessWidget {
         width: 32.r,
         height: 32.r,
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF14532D) : Colors.white,
+          color: isSelected ? context.primaryColor : context.cardColor,
           borderRadius: BorderRadius.circular(8.r),
           border: isSelected
               ? null
-              : Border.all(color: const Color(0xFFE2E8F0), width: 0.9),
+              : Border.all(color: context.borderColor, width: 0.9),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF14532D).withValues(alpha: 0.25),
+                    color: context.primaryColor.withValues(alpha: 0.25),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -163,7 +172,7 @@ class ExamHistoryPagination extends StatelessWidget {
             style: TextStyle(
               fontSize: 13.sp,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : const Color(0xFF334155),
+              color: isSelected ? Colors.white : context.textPrimary,
             ),
           ),
         ),

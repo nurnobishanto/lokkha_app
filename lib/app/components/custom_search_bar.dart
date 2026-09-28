@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final String hintText;
@@ -19,25 +20,36 @@ class CustomSearchBar extends StatelessWidget {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      style: TextStyle(color: context.textPrimary, fontSize: 14),
       decoration: InputDecoration(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         hintText: hintText,
-        prefixIcon: const Icon(Icons.search),
+        hintStyle: TextStyle(color: context.textMuted, fontSize: 14),
+        prefixIcon: Icon(Icons.search, color: context.textSecondary),
         suffixIcon: controller != null && controller!.text.isNotEmpty
             ? IconButton(
-                icon: const Icon(Icons.clear),
+                icon: Icon(Icons.clear, color: context.textSecondary),
                 onPressed: () {
                   controller!.clear();
                   if (onClear != null) onClear!();
                 },
               )
             : null,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: context.borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: context.primaryColor, width: 1.5),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: context.borderColor),
         ),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: context.cardColor,
       ),
     );
   }

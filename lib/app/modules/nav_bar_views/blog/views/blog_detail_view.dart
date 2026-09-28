@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../controllers/blog_detail_controller.dart';
 import '../models/blog_post_model.dart';
 
@@ -16,7 +17,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
       final baseBodyFontSize = 15.sp + controller.fontSizeDelta.value;
 
       return Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: context.scaffoldColor,
         appBar: AppBar(
           title: Text(post?.category ?? 'ব্লগ বিস্তারিত'),
           centerTitle: true,
@@ -38,10 +39,10 @@ class BlogDetailView extends GetView<BlogDetailController> {
                           // Main Article Card
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.cardColor,
                               borderRadius: BorderRadius.circular(16.r),
                               border: Border.all(
-                                color: const Color(0xFFE5E7EB),
+                                color: context.borderColor,
                               ),
                               boxShadow: const [
                                 BoxShadow(
@@ -82,24 +83,24 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                   style: TextStyle(
                                     fontSize: 20.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF111827),
+                                    color: context.textPrimary,
                                     height: 1.35,
                                   ),
                                 ),
                                 SizedBox(height: 12.h),
 
                                 // Metadata Row
-                                _buildMetadataRow(post),
+                                _buildMetadataRow(context, post),
                                 SizedBox(height: 14.h),
 
-                                const Divider(
-                                  color: Color(0xFFEEEEEE),
+                                Divider(
+                                  color: context.borderColor,
                                   height: 1,
                                 ),
                                 SizedBox(height: 14.h),
 
                                 // Reading & Social Controls
-                                _buildReadingAndSocialRow(),
+                                _buildReadingAndSocialRow(context),
                                 SizedBox(height: 16.h),
 
                                 // Featured Image
@@ -112,7 +113,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) => Container(
                                       height: 220.h,
-                                      color: const Color(0xFFE5E7EB),
+                                      color: context.surfaceColor,
                                       child: const Center(
                                         child: CircularProgressIndicator(),
                                       ),
@@ -120,7 +121,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                     errorWidget: (context, url, error) =>
                                         Container(
                                       height: 220.h,
-                                      color: const Color(0xFFE5E7EB),
+                                      color: context.surfaceColor,
                                       child: const Icon(
                                         Icons.image_not_supported_outlined,
                                         size: 48,
@@ -146,7 +147,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                             style: TextStyle(
                                               fontSize: 18.sp,
                                               fontWeight: FontWeight.bold,
-                                              color: const Color(0xFF1F2937),
+                                              color: context.textPrimary,
                                               height: 1.35,
                                             ),
                                           ),
@@ -156,7 +157,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                           section.content,
                                           style: TextStyle(
                                             fontSize: baseBodyFontSize,
-                                            color: const Color(0xFF374151),
+                                            color: context.textSecondary,
                                             height: 1.7,
                                           ),
                                         ),
@@ -173,7 +174,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                     'সূত্র: ${post.source}',
                                     style: TextStyle(
                                       fontSize: 13.sp,
-                                      color: const Color(0xFF6B7280),
+                                      color: context.textMuted,
                                       fontStyle: FontStyle.italic,
                                     ),
                                   ),
@@ -181,7 +182,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                                 ],
 
                                 // Author / Mentor Card
-                                _buildMentorCard(post),
+                                _buildMentorCard(context, post),
                               ],
                             ),
                           ),
@@ -213,7 +214,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
     });
   }
 
-  Widget _buildMetadataRow(BlogPost post) {
+  Widget _buildMetadataRow(BuildContext context, BlogPost post) {
     return Wrap(
       spacing: 6.w,
       runSpacing: 6.h,
@@ -234,12 +235,12 @@ class BlogDetailView extends GetView<BlogDetailController> {
               style: TextStyle(
                 fontSize: 13.sp,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF1F2937),
+                color: context.textPrimary,
               ),
             ),
           ],
         ),
-        Text('•', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
 
         // Date & Time
         Row(
@@ -248,7 +249,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
             Icon(
               Icons.calendar_today_outlined,
               size: 13.sp,
-              color: const Color(0xFF6B7280),
+              color: context.textSecondary,
             ),
             SizedBox(width: 4.w),
             Text(
@@ -257,12 +258,12 @@ class BlogDetailView extends GetView<BlogDetailController> {
                   : post.publishDate,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: const Color(0xFF6B7280),
+                color: context.textSecondary,
               ),
             ),
           ],
         ),
-        Text('•', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
 
         // Views
         Row(
@@ -284,7 +285,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
             ),
           ],
         ),
-        Text('•', style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
 
         // Read Time
         Row(
@@ -293,14 +294,14 @@ class BlogDetailView extends GetView<BlogDetailController> {
             Icon(
               Icons.access_time,
               size: 13.sp,
-              color: const Color(0xFF6B7280),
+              color: context.textSecondary,
             ),
             SizedBox(width: 4.w),
             Text(
               post.readTime,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: const Color(0xFF6B7280),
+                color: context.textSecondary,
               ),
             ),
           ],
@@ -309,7 +310,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
     );
   }
 
-  Widget _buildReadingAndSocialRow() {
+  Widget _buildReadingAndSocialRow(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -323,21 +324,21 @@ class BlogDetailView extends GetView<BlogDetailController> {
                 style: TextStyle(
                   fontSize: 12.sp,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF4B5563),
+                  color: context.textSecondary,
                 ),
               ),
               SizedBox(width: 4.w),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFD1D5DB)),
+                  border: Border.all(color: context.borderColor),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Row(
                   children: [
-                    _buildFontSizeButton('A-', -2.0),
-                    _buildFontSizeButton('A', 0.0),
-                    _buildFontSizeButton('A+', 2.0),
-                    _buildFontSizeButton('A++', 4.0),
+                    _buildFontSizeButton(context, 'A-', -2.0),
+                    _buildFontSizeButton(context, 'A', 0.0),
+                    _buildFontSizeButton(context, 'A+', 2.0),
+                    _buildFontSizeButton(context, 'A++', 4.0),
                   ],
                 ),
               ),
@@ -349,37 +350,41 @@ class BlogDetailView extends GetView<BlogDetailController> {
           Row(
             children: [
               _buildSocialIconButton(
-                child: const FaIcon(
+                context: context,
+                child: FaIcon(
                   FontAwesomeIcons.facebookF,
                   size: 14,
-                  color: Color(0xFF4B5563),
+                  color: context.textSecondary,
                 ),
                 onTap: controller.shareOnFacebook,
               ),
               SizedBox(width: 6.w),
               _buildSocialIconButton(
-                child: const FaIcon(
+                context: context,
+                child: FaIcon(
                   FontAwesomeIcons.whatsapp,
                   size: 15,
-                  color: Color(0xFF4B5563),
+                  color: context.textSecondary,
                 ),
                 onTap: controller.shareOnWhatsApp,
               ),
               SizedBox(width: 6.w),
               _buildSocialIconButton(
-                child: const FaIcon(
+                context: context,
+                child: FaIcon(
                   FontAwesomeIcons.xTwitter,
                   size: 14,
-                  color: Color(0xFF4B5563),
+                  color: context.textSecondary,
                 ),
                 onTap: controller.shareOnX,
               ),
               SizedBox(width: 6.w),
               _buildSocialIconButton(
-                child: const Icon(
+                context: context,
+                child: Icon(
                   Icons.link,
                   size: 16,
-                  color: Color(0xFF4B5563),
+                  color: context.textSecondary,
                 ),
                 onTap: controller.copyLink,
               ),
@@ -390,7 +395,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
     );
   }
 
-  Widget _buildFontSizeButton(String label, double delta) {
+  Widget _buildFontSizeButton(BuildContext context, String label, double delta) {
     return Obx(() {
       final isSelected = controller.fontSizeDelta.value == delta;
       return InkWell(
@@ -405,7 +410,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
             style: TextStyle(
               fontSize: 11.sp,
               fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : const Color(0xFF374151),
+              color: isSelected ? Colors.white : context.textSecondary,
             ),
           ),
         ),
@@ -414,6 +419,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
   }
 
   Widget _buildSocialIconButton({
+    required BuildContext context,
     required Widget child,
     required VoidCallback onTap,
   }) {
@@ -424,9 +430,9 @@ class BlogDetailView extends GetView<BlogDetailController> {
         width: 32.w,
         height: 32.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.surfaceColor,
           borderRadius: BorderRadius.circular(6.r),
-          border: Border.all(color: const Color(0xFFD1D5DB)),
+          border: Border.all(color: context.borderColor),
         ),
         alignment: Alignment.center,
         child: child,
@@ -434,13 +440,13 @@ class BlogDetailView extends GetView<BlogDetailController> {
     );
   }
 
-  Widget _buildMentorCard(BlogPost post) {
+  Widget _buildMentorCard(BuildContext context, BlogPost post) {
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
+        color: context.surfaceColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -468,7 +474,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF111827),
+                    color: context.textPrimary,
                   ),
                 ),
                 SizedBox(height: 4.h),
@@ -476,7 +482,7 @@ class BlogDetailView extends GetView<BlogDetailController> {
                   'বিসিএস, ব্যাংক ও সরকারি চাকরির পরীক্ষা প্রস্তুতি সংক্রান্ত নিয়মিত বিশ্লেষণ ও বিষয়ভিত্তিক সহায়িকা।',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: const Color(0xFF6B7280),
+                    color: context.textSecondary,
                     height: 1.4,
                   ),
                 ),

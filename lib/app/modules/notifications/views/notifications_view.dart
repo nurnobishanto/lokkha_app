@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/utils/constants.dart';
 import '../controllers/notifications_controller.dart';
 import '../widgets/notification_card.dart';
@@ -12,7 +13,7 @@ class NotificationsView extends GetView<NotificationsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: context.scaffoldColor,
       appBar: AppBar(
         title: Text(
           "Notifications",
@@ -43,13 +44,13 @@ class NotificationsView extends GetView<NotificationsController> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      color: context.isDark ? context.surfaceColor : Colors.grey.shade200,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.notifications_off_outlined,
                       size: 64,
-                      color: Colors.grey.shade400,
+                      color: context.textMuted,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -58,7 +59,7 @@ class NotificationsView extends GetView<NotificationsController> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
+                      color: context.textPrimary,
                     ),
                   ),
                 ],

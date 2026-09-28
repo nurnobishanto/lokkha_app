@@ -6,6 +6,7 @@ import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/app/modules/latest_exam/views/latest_exam_start_view.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/date_formatter.dart';
 import '../../../../config/theme/light_theme_colors.dart';
@@ -18,6 +19,7 @@ class LatestExamView extends GetView<LatestExamController> {
   Widget build(BuildContext context) {
     final controller = Get.put(LatestExamController());
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: const CustomAppBar(title: 'সর্বশেষ নিয়োগ পরীক্ষা'),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -125,9 +127,9 @@ class LatestExamCard extends StatelessWidget {
             width: constraints.maxWidth,
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: LightThemeColors.white,
+              color: context.cardColor,
               borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: context.borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +139,7 @@ class LatestExamCard extends StatelessWidget {
                   title,
                   style: AppTextStyles.heading5.copyWith(
                     fontSize: 14.sp,
+                    color: context.textPrimary,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -147,9 +150,9 @@ class LatestExamCard extends StatelessWidget {
                 /// ---- DATE + TYPE ROW ----
                 Row(
                   children: [
-                    _buildTag(DateFormatter.formatToDMY(date)),
+                    _buildTag(context, DateFormatter.formatToDMY(date)),
                     SizedBox(width: 6.w),
-                    _buildTag("MCQ"),
+                    _buildTag(context, "MCQ"),
                   ],
                 ),
               ],
@@ -161,19 +164,20 @@ class LatestExamCard extends StatelessWidget {
   }
 
   /// Small reusable chip widget
-  Widget _buildTag(String text) {
+  Widget _buildTag(BuildContext context, String text) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
+        color: context.isDark ? const Color(0xFF1E293B) : Colors.grey.shade200,
         borderRadius: BorderRadius.circular(6.r),
+        border: Border.all(color: context.borderColor),
       ),
       child: Text(
         text,
         style: AppTextStyles.body1.copyWith(
           fontSize: 12.sp,
-          fontWeight: FontWeight.w400,
-          color: Colors.black,
+          fontWeight: FontWeight.w500,
+          color: context.textSecondary,
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,

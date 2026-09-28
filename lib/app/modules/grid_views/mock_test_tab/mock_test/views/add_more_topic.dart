@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/grid_views/mock_test_tab/mock_test/views/topic_selection_view.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../../../../../config/theme/light_theme_colors.dart';
 import '../../../../../data/local/my_shared_pref.dart';
@@ -19,6 +20,7 @@ class AddMoreTopic extends StatelessWidget {
     final MockTestController mockController = Get.find<MockTestController>();
 
     return Scaffold(
+        backgroundColor: context.scaffoldBg,
         appBar: AppBar(
           automaticallyImplyLeading: true,
           title: Text(
@@ -61,11 +63,14 @@ class AddMoreTopic extends StatelessWidget {
                     padding: EdgeInsets.symmetric(
                         horizontal: 10.00.w, vertical: 8.00.h),
                     decoration: BoxDecoration(
-                      color: LightThemeColors.white,
+                      color: context.cardColor,
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: context.borderColor),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: context.isDark
+                              ? Colors.black.withValues(alpha: 0.2)
+                              : Colors.black.withValues(alpha: 0.05),
                           spreadRadius: 1,
                           blurRadius: 5,
                           offset: const Offset(0, 2),
@@ -75,7 +80,10 @@ class AddMoreTopic extends StatelessWidget {
                     child: Text(
                       subject.name.toString(),
                       textAlign: TextAlign.center,
-                      style: AppTextStyles.body2,
+                      style: AppTextStyles.body2.copyWith(
+                        color: context.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 );

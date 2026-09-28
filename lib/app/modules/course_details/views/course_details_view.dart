@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/utils/constants.dart';
 import '../../../../utils/phone_utils.dart';
 import '../../../components/custom_action_button.dart';
@@ -21,7 +22,7 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.scaffoldColor,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: GetBuilder<CourseDetailsController>(
@@ -76,7 +77,7 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
                     Text(
                       "Routine",
                       style: textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                          ?.copyWith(fontWeight: FontWeight.bold, color: context.textPrimary),
                     ),
                     const SizedBox(height: 10),
                     GestureDetector(
@@ -97,8 +98,9 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
                         padding: const EdgeInsets.symmetric(
                             vertical: 12, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: context.cardColor,
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: context.borderColor),
                         ),
                         child: Row(
                           children: [
@@ -107,7 +109,7 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
                               color: Colors.red,
                             ),
                             const SizedBox(width: 10),
-                            Text("View Routine", style: textTheme.bodyMedium),
+                            Text("View Routine", style: textTheme.bodyMedium?.copyWith(color: context.textPrimary)),
                           ],
                         ),
                       ),

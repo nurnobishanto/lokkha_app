@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/components/custom_network_image_card.dart';
+import 'package:lokkha/config/extensions/common_extension.dart';
 
 class CustomCourseCard extends StatelessWidget {
   final String imageUrl;
@@ -34,11 +35,17 @@ class CustomCourseCard extends StatelessWidget {
       child: Container(
         //width: 0.45.sw,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(
+            color: context.borderColor,
+            width: context.isDark ? 0.8 : 0.4,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: context.isDark
+                  ? Colors.black.withValues(alpha: 0.25)
+                  : Colors.black12,
               blurRadius: 10.r,
               offset: const Offset(0, 4),
             ),
@@ -69,7 +76,7 @@ class CustomCourseCard extends StatelessWidget {
                       fontSize: 12.7.sp,
                       fontWeight: FontWeight.w500,
                       height: 1.1,
-                      color: Colors.black87,
+                      color: context.textPrimary,
                     ),
                   ),
                   SizedBox(height: 2.h),
@@ -79,7 +86,7 @@ class CustomCourseCard extends StatelessWidget {
                         '৳${formatPrice(regularPrice)}',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: Colors.grey.shade500,
+                          color: context.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
@@ -89,7 +96,7 @@ class CustomCourseCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color: context.textPrimary,
                         ),
                       ),
                       const Spacer(),
@@ -101,7 +108,7 @@ class CustomCourseCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade700,
+                          color: context.textMuted,
                         ),
                       ),
                     ],

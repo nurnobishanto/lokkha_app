@@ -16,6 +16,7 @@ class MySharedPref {
   static const String _fcmTokenKey = 'fcm_token';
   static const String _currentLocalKey = 'current_local';
   static const String _lightThemeKey = 'is_theme_light';
+  static const String _themeModeKey = 'theme_mode_preference';
   static const String _subSectionKey = 'sub_section_key';
   static const String _userTokenKey = 'user_token';
   static const String _mockSubjectsKey = 'mock_subjects';
@@ -41,10 +42,30 @@ class MySharedPref {
       await _prefs.remove(_userTokenKey);
 
   // ───── Theme ─────
-  static Future<void> setThemeIsLight(bool isLight) async =>
-      await _prefs.setBool(_lightThemeKey, isLight);
+  static Future<void> setThemeIsLight(bool isLight) async {
+    await _prefs.setBool(_lightThemeKey, isLight);
+    await _prefs.setString(_themeModeKey, isLight ? 'light' : 'dark');
+  }
 
-  static bool getThemeIsLight() => _prefs.getBool(_lightThemeKey) ?? true;
+  static bool getThemeIsLight() {
+    final mode = _prefs.getString(_themeModeKey);
+    if (mode != null) {
+      if (mode == 'dark') return false;
+      if (mode == 'light') return true;
+    }
+    return _prefs.getBool(_lightThemeKey) ?? true;
+  }
+
+  static Future<void> setThemeMode(String mode) async {
+    await _prefs.setString(_themeModeKey, mode);
+    if (mode == 'light') {
+      await _prefs.setBool(_lightThemeKey, true);
+    } else if (mode == 'dark') {
+      await _prefs.setBool(_lightThemeKey, false);
+    }
+  }
+
+  static String getThemeMode() => _prefs.getString(_themeModeKey) ?? 'light';
 
   // ───── Language ─────
   static Future<void> setCurrentLanguage(String languageCode) async =>

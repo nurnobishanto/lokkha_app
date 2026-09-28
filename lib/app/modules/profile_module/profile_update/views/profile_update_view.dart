@@ -52,12 +52,13 @@ class ProfileUpdateView extends GetView<ProfileUpdateController> {
                             onTap: () {
                               controller.pickImage();
                             },
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               radius: 20.0,
-                              child: Icon(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              child: const Icon(
                                 Icons.camera_alt,
-                                color: Colors.black,
-                                size: 24.0,
+                                color: Colors.white,
+                                size: 20.0,
                               ),
                             ),
                           ),

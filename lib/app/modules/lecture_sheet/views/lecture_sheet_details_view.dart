@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/components/custom_network_image_card.dart';
 import 'package:lokkha/app/services/api_call_status.dart';
-import 'package:lokkha/config/extensions/common_extension.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/constants.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -26,11 +26,21 @@ class LectureSheetDetailsView extends GetView<SheetDetailsController> {
             return const Center(child: CircularProgressIndicator());
 
           case ApiCallStatus.error:
-            return const Center(child: Text("Something went wrong"));
+            return Center(
+              child: Text(
+                "Something went wrong",
+                style: TextStyle(color: context.textPrimary),
+              ),
+            );
 
           case ApiCallStatus.success:
             if (data == null || data.lectureSheet == null) {
-              return const Center(child: Text("No data available"));
+              return Center(
+                child: Text(
+                  "No data available",
+                  style: TextStyle(color: context.textPrimary),
+                ),
+              );
             }
             final sheet = data.lectureSheet!;
             return SafeArea(
@@ -74,23 +84,31 @@ class LectureSheetCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// Name
-            Text(name, style: AppTextStyles.heading4),
+            Text(
+              name,
+              style: AppTextStyles.heading4.copyWith(color: context.textPrimary),
+            ),
 
-            description!.isNotEmpty ? 0.h.height : 10.h.height,
+            SizedBox(height: description!.isNotEmpty ? 0 : 10.h),
 
             /// Description
             description!.isNotEmpty
                 ? Text(
                     description!,
-                    style: Get.textTheme.bodyMedium?.copyWith(height: 1.5),
+                    style: Get.textTheme.bodyMedium?.copyWith(
+                      height: 1.5,
+                      color: context.textSecondary,
+                    ),
                   )
                 : const SizedBox(),
 
             /// Label
             Text(
               "Attached File",
-              style: Get.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w600),
+              style: Get.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: context.textPrimary,
+              ),
             ),
             const SizedBox(height: 12),
 

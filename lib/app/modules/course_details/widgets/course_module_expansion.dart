@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../models/course_item.dart';
 import '../../../routes/app_pages.dart';
 
@@ -21,8 +22,8 @@ class CourseModuleExpansion extends StatelessWidget {
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox();
     final theme = Theme.of(context);
-    final borderColor = Colors.grey.shade300;
-    final bgColor = Colors.grey.shade100;
+    final borderColor = context.borderColor;
+    final bgColor = context.cardColor;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
@@ -41,6 +42,7 @@ class CourseModuleExpansion extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 14,
+              color: context.textPrimary,
             ),
           ),
           tilePadding: const EdgeInsets.symmetric(horizontal: 10),
@@ -94,11 +96,11 @@ class CourseModuleExpansion extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall
-                      ?.copyWith(fontSize: 15, color: Colors.black),
+                      ?.copyWith(fontSize: 15, color: context.textPrimary),
                 ),
                 subtitle: Text(
                   label,
-                  style: const TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12, color: context.textSecondary),
                 ),
                 trailing: isAccessible
                     ? const Icon(Icons.remove_red_eye,

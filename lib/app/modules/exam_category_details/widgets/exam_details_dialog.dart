@@ -6,6 +6,7 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_action_button.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../models/exam.dart';
 import '../../../routes/app_pages.dart';
 import '../../exam/controllers/exam_controller.dart';
@@ -22,7 +23,7 @@ class ExamDetailsDialog extends StatelessWidget {
     examController.isExamLoading.value = false;
     examController.isReadLoading.value = false;
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: context.cardColor,
       elevation: 10,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -82,12 +83,12 @@ class ExamDetailsDialog extends StatelessWidget {
                       Column(
                         children: [
                           _infoCard(
-                              Icons.timer, 'সময়', '${exam.duration} মিনিট'),
-                          _infoCard(Icons.check_circle, 'পজিটিভ মার্ক',
+                              context, Icons.timer, 'সময়', '${exam.duration} মিনিট'),
+                          _infoCard(context, Icons.check_circle, 'পজিটিভ মার্ক',
                               '${exam.positiveMark}'),
-                          _infoCard(Icons.cancel, 'নেগেটিভ মার্ক',
+                          _infoCard(context, Icons.cancel, 'নেগেটিভ মার্ক',
                               '${exam.negativeMark}'),
-                          _infoCard(Icons.help_outline, 'মোট প্রশ্ন',
+                          _infoCard(context, Icons.help_outline, 'মোট প্রশ্ন',
                               '${exam.questionsCount}'),
                         ],
                       ),
@@ -228,10 +229,11 @@ class ExamDetailsDialog extends StatelessWidget {
                         margin: const EdgeInsets.only(top: 10),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.05),
+                          color: context.isDark
+                              ? context.surfaceColor
+                              : primaryColor.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
-                          border:
-                              Border.all(color: primaryColor.withOpacity(0.2)),
+                          border: Border.all(color: context.borderColor),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,10 +246,10 @@ class ExamDetailsDialog extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     "প্রতিদিন একটি পরীক্ষা ফ্রি দিন। একাধিক পরীক্ষায় অংশ নিতে একটি প্যাকেজ গ্রহণ করুন।",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                      color: context.textPrimary,
                                     ),
                                   ),
                                 ),
@@ -279,19 +281,21 @@ class ExamDetailsDialog extends StatelessWidget {
     );
   }
 
-  Widget _infoCard(IconData icon, String label, String value) {
+  Widget _infoCard(BuildContext context, IconData icon, String label, String value) {
     final bool isNegative = label.contains('নেগেটিভ মার্ক');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.05),
+        color: context.isDark
+            ? context.surfaceColor
+            : primaryColor.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: primaryColor.withOpacity(0.2)),
+        border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: context.isDark ? Colors.transparent : Colors.black12,
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -307,19 +311,19 @@ class ExamDetailsDialog extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             '$label: ',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: context.textPrimary,
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.black54,
+                color: context.textSecondary,
               ),
               textAlign: TextAlign.right,
             ),

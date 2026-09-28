@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/modules/vocabulary/controllers/vocabulary_controller.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../config/theme/light_theme_colors.dart';
 import '../../../components/custom_search_bar.dart';
 import '../../../helper/global.dart';
@@ -62,19 +63,26 @@ class VocabularyView extends StatelessWidget {
                                         color: char ==
                                                 controller
                                                     .selectedAlphabet.value
-                                            ? LightThemeColors.primaryColor
-                                            : LightThemeColors.white,
+                                            ? context.primaryColor
+                                            : context.cardColor,
                                         borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: char ==
+                                                  controller
+                                                      .selectedAlphabet.value
+                                              ? context.primaryColor
+                                              : context.borderColor,
+                                        ),
                                       ),
                                       child: Text(
                                         char,
                                         style: TextStyle(
+                                            fontWeight: FontWeight.w600,
                                             color: char ==
                                                     controller
                                                         .selectedAlphabet.value
-                                                ? LightThemeColors.white
-                                                : LightThemeColors
-                                                    .primaryColor),
+                                                ? Colors.white
+                                                : context.textPrimary),
                                       ),
                                     ),
                                   );
@@ -160,15 +168,16 @@ class VocabularyView extends StatelessWidget {
                                     horizontal: 12, vertical: 6),
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: context.cardColor,
                                   border:
-                                      Border.all(color: Colors.grey.shade300),
+                                      Border.all(color: context.borderColor),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
                                   vocab.word ?? '',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 16,
+                                      color: context.textPrimary,
                                       fontWeight: FontWeight.w500),
                                 ),
                               ),
@@ -186,83 +195,86 @@ class VocabularyView extends StatelessWidget {
       }),
 
       bottomNavigationBar: Obx(() {
-        if (controller.totalPages.value <= 1) return SizedBox.shrink();
+        if (controller.totalPages.value <= 1) return const SizedBox.shrink();
 
         return SafeArea(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20, left: 25),
-              child: Row(
-                children: [
-                  // First Page
-                  IconButton(
-                    icon: Icon(Icons.first_page),
-                    onPressed: controller.currentPage.value > 1
-                        ? controller.firstPage
-                        : null,
-                  ),
+          child: Container(
+            color: context.cardColor,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20, left: 25),
+                child: Row(
+                  children: [
+                    // First Page
+                    IconButton(
+                      icon: Icon(Icons.first_page, color: context.textPrimary),
+                      onPressed: controller.currentPage.value > 1
+                          ? controller.firstPage
+                          : null,
+                    ),
 
-                  // Previous
-                  IconButton(
-                    icon: Icon(Icons.navigate_before),
-                    onPressed: controller.currentPage.value > 1
-                        ? controller.previousPage
-                        : null,
-                  ),
+                    // Previous
+                    IconButton(
+                      icon: Icon(Icons.navigate_before, color: context.textPrimary),
+                      onPressed: controller.currentPage.value > 1
+                          ? controller.previousPage
+                          : null,
+                    ),
 
-                  // Page Numbers
-                  ...List.generate(
-                          controller.totalPages.value, (index) => index + 1)
-                      .where((page) {
-                    int current = controller.currentPage.value;
-                    return (page >= current - 2 && page <= current + 2) ||
-                        page == 1 ||
-                        page == controller.totalPages.value;
-                  }).map((page) {
-                    bool isActive = page == controller.currentPage.value;
-                    return InkWell(
-                      onTap: () => controller.goToPage(page),
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 4),
-                        padding:
-                            EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? LightThemeColors.primaryColor
-                              : Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(color: LightThemeColors.primaryColor),
-                        ),
-                        child: Text(
-                          page.toString(),
-                          style: TextStyle(
-                            color: isActive ? Colors.white : Colors.black87,
+                    // Page Numbers
+                    ...List.generate(
+                            controller.totalPages.value, (index) => index + 1)
+                        .where((page) {
+                      int current = controller.currentPage.value;
+                      return (page >= current - 2 && page <= current + 2) ||
+                          page == 1 ||
+                          page == controller.totalPages.value;
+                    }).map((page) {
+                      bool isActive = page == controller.currentPage.value;
+                      return InkWell(
+                        onTap: () => controller.goToPage(page),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          padding:
+                              const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: isActive
+                                ? LightThemeColors.primaryColor
+                                : (context.isDark ? context.surfaceColor : Colors.grey.shade200),
+                            borderRadius: BorderRadius.circular(8),
+                            border:
+                                Border.all(color: isActive ? LightThemeColors.primaryColor : context.borderColor),
+                          ),
+                          child: Text(
+                            page.toString(),
+                            style: TextStyle(
+                              color: isActive ? Colors.white : context.textPrimary,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
 
-                  // Next
-                  IconButton(
-                    icon: Icon(Icons.navigate_next),
-                    onPressed: controller.currentPage.value <
-                            controller.totalPages.value
-                        ? controller.nextPage
-                        : null,
-                  ),
+                    // Next
+                    IconButton(
+                      icon: Icon(Icons.navigate_next, color: context.textPrimary),
+                      onPressed: controller.currentPage.value <
+                              controller.totalPages.value
+                          ? controller.nextPage
+                          : null,
+                    ),
 
-                  // Last
-                  IconButton(
-                    icon: Icon(Icons.last_page),
-                    onPressed: controller.currentPage.value <
-                            controller.totalPages.value
-                        ? controller.lastPage
-                        : null,
-                  ),
-                ],
+                    // Last
+                    IconButton(
+                      icon: Icon(Icons.last_page, color: context.textPrimary),
+                      onPressed: controller.currentPage.value <
+                              controller.totalPages.value
+                          ? controller.lastPage
+                          : null,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -293,20 +305,24 @@ class FilterRow extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey.shade300),
+                  color: context.cardColor,
+                  border: Border.all(color: context.borderColor),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: DropdownButton<Category>(
                   isExpanded: true,
                   value: safeType,
-                  hint: const Text('Select Type'),
+                  dropdownColor: context.cardColor,
+                  hint: Text('Select Type',
+                      style: TextStyle(color: context.textMuted)),
                   underline: const SizedBox(),
-                  icon: const Icon(Icons.arrow_drop_down),
+                  icon: Icon(Icons.arrow_drop_down,
+                      color: context.textSecondary),
                   items: types.map((type) {
                     return DropdownMenuItem<Category>(
                       value: type,
-                      child: Text(type.name ?? ''),
+                      child: Text(type.name ?? '',
+                          style: TextStyle(color: context.textPrimary)),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -336,20 +352,24 @@ class FilterRow extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey.shade300),
+                  color: context.cardColor,
+                  border: Border.all(color: context.borderColor),
                   borderRadius: BorderRadius.circular(8.0.r),
                 ),
                 child: DropdownButton<Category>(
                   isExpanded: true,
                   value: safeCategory,
-                  hint: const Text('Select Category'),
+                  dropdownColor: context.cardColor,
+                  hint: Text('Select Category',
+                      style: TextStyle(color: context.textMuted)),
                   underline: const SizedBox(),
-                  icon: const Icon(Icons.arrow_drop_down),
+                  icon: Icon(Icons.arrow_drop_down,
+                      color: context.textSecondary),
                   items: categories.map((category) {
                     return DropdownMenuItem<Category>(
                       value: category,
-                      child: Text(category.name ?? ''),
+                      child: Text(category.name ?? '',
+                          style: TextStyle(color: context.textPrimary)),
                     );
                   }).toList(),
                   onChanged: (value) {

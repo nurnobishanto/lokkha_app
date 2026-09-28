@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lokkha/config/extensions/common_extension.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 
 class SectionTitleWithDivider extends StatelessWidget {
   final String title;
-  final Color color;
+  final Color? color;
   final double fontSize;
   final double dividerHeight;
   final EdgeInsetsGeometry padding;
@@ -11,7 +12,7 @@ class SectionTitleWithDivider extends StatelessWidget {
   const SectionTitleWithDivider({
     super.key,
     required this.title,
-    this.color = LightThemeColors.primaryColor,
+    this.color,
     this.fontSize = 18,
     this.dividerHeight = 1.5,
     this.padding = const EdgeInsets.symmetric(horizontal: 20),
@@ -19,13 +20,17 @@ class SectionTitleWithDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = color ?? context.primaryColor;
     return Padding(
       padding: padding,
       child: Row(
         children: [
           Expanded(
             child: transparentDivider(
-                beginTransparent: true, height: dividerHeight),
+              beginTransparent: true,
+              height: dividerHeight,
+              baseColor: effectiveColor,
+            ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(
@@ -35,14 +40,17 @@ class SectionTitleWithDivider extends StatelessWidget {
               style: TextStyle(
                 fontSize: fontSize,
                 fontWeight: FontWeight.bold,
-                color: color,
+                color: effectiveColor,
                 letterSpacing: 0.5,
               ),
             ),
           ),
           Expanded(
             child: transparentDivider(
-                beginTransparent: false, height: dividerHeight),
+              beginTransparent: false,
+              height: dividerHeight,
+              baseColor: effectiveColor,
+            ),
           ),
         ],
       ),
@@ -51,16 +59,17 @@ class SectionTitleWithDivider extends StatelessWidget {
 }
 
 Widget transparentDivider(
-    {required bool beginTransparent, double height = 1.5}) {
+    {required bool beginTransparent, double height = 1.5, Color? baseColor}) {
+  final primary = baseColor ?? LightThemeColors.primaryColor;
   final colors = beginTransparent
       ? [
           Colors.transparent,
-          LightThemeColors.primaryColor.withValues(alpha: 0.3),
-          LightThemeColors.primaryColor..withValues(alpha: 0.6),
+          primary.withValues(alpha: 0.3),
+          primary.withValues(alpha: 0.6),
         ]
       : [
-          LightThemeColors.primaryColor..withValues(alpha: 0.6),
-          LightThemeColors.primaryColor..withValues(alpha: 0.3),
+          primary.withValues(alpha: 0.6),
+          primary.withValues(alpha: 0.3),
           Colors.transparent,
         ];
 

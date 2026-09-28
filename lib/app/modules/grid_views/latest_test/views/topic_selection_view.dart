@@ -11,6 +11,7 @@ import 'package:lokkha/app/modules/grid_views/latest_test/views/add_more_topic.d
 import 'package:lokkha/app/modules/grid_views/latest_test/views/set_time_view.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../../styles/text_style.dart';
 import '../../../../components/custom_text_field.dart';
 import '../../../../models/mock_subject_select_model.dart';
@@ -57,8 +58,9 @@ class TopicSelectionView extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "প্রশ্ন সংখ্যা সেট করুন",
+                  style: TextStyle(color: context.textPrimary),
                 ),
                 CustomTextField(
                   controller: setNumberController,
@@ -166,11 +168,11 @@ class CustomExpandSubject extends StatelessWidget {
         return Obx(() {
           return Container(
             margin: EdgeInsets.only(left: padding),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 left: BorderSide(
-                  color: Colors.grey,
-                  width: 0.2,
+                  color: context.borderColor,
+                  width: 0.5,
                 ),
               ),
             ),
@@ -188,14 +190,15 @@ class CustomExpandSubject extends StatelessWidget {
                 onExpansionChanged: (expanded) => isExpanded.value = expanded,
                 title: Container(
                   decoration: BoxDecoration(
-                    color: LightThemeColors.white,
+                    color: context.cardColor,
                     borderRadius: BorderRadius.circular(7.r),
-                    boxShadow: const [
+                    border: Border.all(color: context.borderColor, width: 0.8),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black12,
+                        color: context.isDark ? Colors.transparent : Colors.black12,
                         blurRadius: 10,
                         spreadRadius: 1,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -205,6 +208,12 @@ class CustomExpandSubject extends StatelessWidget {
                       Checkbox(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.r),
+                        ),
+                        side: BorderSide(
+                          color: isChecked.value
+                              ? context.primaryColor
+                              : context.borderColor,
+                          width: 1.5,
                         ),
                         value: isChecked.value,
                         onChanged: (value) {
@@ -231,13 +240,13 @@ class CustomExpandSubject extends StatelessWidget {
                           topic.name.toString(),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
-                          style: AppTextStyles.body2,
+                          style: AppTextStyles.body2.copyWith(color: context.textPrimary),
                         ),
                       ),
                       Obx(() => AnimatedRotation(
                             turns: isExpanded.value ? 0.5 : 0.0,
                             duration: const Duration(milliseconds: 200),
-                            child: const Icon(Icons.keyboard_arrow_down),
+                            child: Icon(Icons.keyboard_arrow_down, color: context.textMuted),
                           )),
                     ],
                   ),

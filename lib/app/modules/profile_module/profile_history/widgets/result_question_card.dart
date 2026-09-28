@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/exam_question_result_model.dart';
 
 class ResultQuestionCard extends StatelessWidget {
@@ -16,9 +17,9 @@ class ResultQuestionCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -55,7 +56,7 @@ class ResultQuestionCard extends StatelessWidget {
                 width: 28.r,
                 height: 28.r,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Center(
@@ -64,7 +65,7 @@ class ResultQuestionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1E293B),
+                      color: context.textPrimary,
                     ),
                   ),
                 ),
@@ -78,7 +79,7 @@ class ResultQuestionCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 14.5.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                     height: 1.3,
                   ),
                 ),
@@ -110,21 +111,29 @@ class ResultQuestionCard extends StatelessWidget {
               final isCorrect = index == item.correctOptionIndex;
               final isUserWrong = item.userSelectedOptionIndex == index && !isCorrect;
 
-              Color bgColor = Colors.white;
-              Color borderColor = const Color(0xFFE2E8F0);
-              Color letterColor = const Color(0xFF64748B);
-              Color textColor = const Color(0xFF1E293B);
+              Color bgColor = context.cardColor;
+              Color borderColor = context.borderColor;
+              Color letterColor = context.textSecondary;
+              Color textColor = context.textPrimary;
 
               if (isCorrect) {
-                bgColor = const Color(0xFFF0FDF4);
+                bgColor = context.isDark
+                    ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                    : const Color(0xFFF0FDF4);
                 borderColor = const Color(0xFF10B981);
-                letterColor = const Color(0xFF059669);
-                textColor = const Color(0xFF065F46);
+                letterColor = const Color(0xFF10B981);
+                textColor = context.isDark
+                    ? const Color(0xFF6EE7B7)
+                    : const Color(0xFF065F46);
               } else if (isUserWrong) {
-                bgColor = const Color(0xFFFEF2F2);
+                bgColor = context.isDark
+                    ? const Color(0xFF7F1D1D).withValues(alpha: 0.3)
+                    : const Color(0xFFFEF2F2);
                 borderColor = const Color(0xFFEF4444);
-                letterColor = const Color(0xFFDC2626);
-                textColor = const Color(0xFF991B1B);
+                letterColor = const Color(0xFFEF4444);
+                textColor = context.isDark
+                    ? const Color(0xFFFCA5A5)
+                    : const Color(0xFF991B1B);
               }
 
               return Container(
@@ -171,9 +180,9 @@ class ResultQuestionCard extends StatelessWidget {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(10.r),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+                border: Border.all(color: context.borderColor, width: 0.8),
               ),
               clipBehavior: Clip.antiAlias,
               child: Stack(
@@ -215,7 +224,7 @@ class ResultQuestionCard extends StatelessWidget {
                           item.explanation!,
                           style: TextStyle(
                             fontSize: 12.sp,
-                            color: const Color(0xFF334155),
+                            color: context.textPrimary,
                             height: 1.45,
                           ),
                         ),

@@ -33,7 +33,9 @@ class SignUpView extends GetView<SignUpController> {
                     ),
                     Text(
                       "কোনো রেজিস্ট্রেশন এর প্রয়োজন নেই সরাসরি লগইন করুন",
-                      style: AppTextStyles.body1,
+                      style: AppTextStyles.body1.copyWith(
+                        color: context.textSecondary,
+                      ),
                     ),
                     90.h.height,
                     Text(
@@ -41,6 +43,7 @@ class SignUpView extends GetView<SignUpController> {
                       style: AppTextStyles.custom(
                         fontSize: 17.00.sp,
                         fontWeight: FontWeight.w600,
+                        color: context.textPrimary,
                       ),
                     ),
                     2.0.h.height,

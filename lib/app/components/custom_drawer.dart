@@ -10,6 +10,8 @@ import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../config/constants/app_images.dart';
+import '../../config/theme/theme_controller.dart';
+import 'package:lokkha/app/components/theme/theme_toggle_tile.dart';
 import '../helper/global.dart';
 import '../modules/drawer_pages/views/customer_support_view.dart';
 
@@ -20,7 +22,7 @@ class CustomDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint("Build Drawer///");
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       child: Column(
         children: <Widget>[
           /// Reduced height for Drawer Header
@@ -29,7 +31,14 @@ class CustomDrawer extends StatelessWidget {
             AssetImagePaths.appIcon,
             height: 100,
           ),
-          20.h.height,
+          16.h.height,
+
+          /// Theme Mode Switch (Dark / Light / System)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+            child: const ThemeToggleTile(),
+          ),
+          8.h.height,
 
           /// Drawer Items (standard)
           ListTile(

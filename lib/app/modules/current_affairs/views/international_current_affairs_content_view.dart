@@ -118,7 +118,7 @@ class InternationalCurrentAffairsContentView extends StatelessWidget {
                       Center(
                         child: Text(
                           data.date ?? "",
-                          style: AppTextStyles.heading4,
+                          style: AppTextStyles.heading4.copyWith(color: context.textPrimary),
                         ),
                       ),
                       10.0.w.width,
@@ -140,15 +140,16 @@ class InternationalCurrentAffairsContentView extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.arrow_right,
                                   size: 15.0,
+                                  color: context.textSecondary,
                                 ),
                                 const SizedBox(width: 5.0),
                                 Expanded(
                                   child: HtmlWidget(
                                     question.title ?? "",
-                                    textStyle: AppTextStyles.heading5,
+                                    textStyle: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                                   ),
                                 ),
                               ],
@@ -170,15 +171,16 @@ class InternationalCurrentAffairsContentView extends StatelessWidget {
                                               text: TextSpan(
                                                 style: AppTextStyles.body1
                                                     .copyWith(
-                                                  color: Colors.black,
+                                                  color: context.textPrimary,
                                                 ),
                                                 children: [
                                                   // Label always visible
-                                                  const TextSpan(
+                                                  TextSpan(
                                                     text: 'উত্তর: ',
                                                     style: TextStyle(
                                                         fontWeight:
-                                                            FontWeight.bold),
+                                                            FontWeight.bold,
+                                                        color: context.textPrimary),
                                                   ),
 
                                                   // Answer text (blurred if locked)
@@ -191,7 +193,7 @@ class InternationalCurrentAffairsContentView extends StatelessWidget {
                                                                     "",
                                                                 style:
                                                                     AppTextStyles
-                                                                        .body1,
+                                                                        .body1.copyWith(color: context.textSecondary),
                                                               ),
                                                               Positioned.fill(
                                                                 child:
@@ -216,7 +218,7 @@ class InternationalCurrentAffairsContentView extends StatelessWidget {
                                                         : Text(
                                                             option.value ?? "",
                                                             style: AppTextStyles
-                                                                .body1,
+                                                                .body1.copyWith(color: context.textSecondary),
                                                           ),
                                                   ),
                                                 ],

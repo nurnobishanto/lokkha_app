@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/lecture_sheet/views/lecture_sheet_list_details_view.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 import '../../../models/category.dart';
 import '../../../services/api_call_status.dart';
@@ -68,10 +69,10 @@ class SimpleCategoryCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey.shade300, // subtle light gray border
+          color: context.borderColor,
           width: 1,
         ),
       ),
@@ -110,7 +111,7 @@ class SimpleCategoryCard extends StatelessWidget {
                         item.name ?? 'No Name',
                         style: theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade900,
+                          color: context.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -123,7 +124,7 @@ class SimpleCategoryCard extends StatelessWidget {
                         Text(
                           description,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey.shade600,
+                            color: context.textSecondary,
                             fontSize: 13,
                           ),
                           maxLines: 2,
@@ -136,7 +137,7 @@ class SimpleCategoryCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Colors.grey.shade400,
+                  color: context.textMuted,
                   size: 20,
                 ),
               ],

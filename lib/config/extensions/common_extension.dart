@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'decorations_extensions.dart';
 
+export '../theme/app_colors.dart';
+
 /// Make any variable nullable
 T? makeNullable<T>(T? value) => value;
 

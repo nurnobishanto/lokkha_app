@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 import '../../../../../styles/text_style.dart';
 import '../../../../components/custom_action_button.dart';
@@ -16,10 +18,11 @@ class SetTimeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final SetTimeController controller = Get.put(SetTimeController());
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
-          'সময় xxনির্ধারণ',
+          'সময় নির্ধারণ',
           style: AppTextStyles.heading4.copyWith(color: LightThemeColors.white),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -50,7 +53,7 @@ class SetTimeView extends StatelessWidget {
                           children: [
                             Text(
                               'সময় নির্ধারণ করুন',
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 5.00),
                             Container(
@@ -112,7 +115,7 @@ class SetTimeView extends StatelessWidget {
                           children: [
                             Text(
                               "নেগেটিভ মার্কিং",
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 3.00),
                             Container(
@@ -140,15 +143,20 @@ class SetTimeView extends StatelessWidget {
                             const Spacer(),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.red.withValues(
-                                    alpha: 0.4), // Corrected opacity usage
+                                color: context.isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: context.isDark ? const Color(0xFFEF4444).withValues(alpha: 0.5) : Colors.red.withValues(alpha: 0.3)),
                               ),
-                              padding: const EdgeInsets.all(4),
-                              child: const Text(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              child: Text(
                                 "প্রতিটি ভুলের জন্য ০.২৫ নম্বর কাটা যাবে",
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.body1.copyWith(
+                                  fontSize: 12.sp,
+                                  color: context.isDark ? const Color(0xFFFCA5A5) : Colors.red.shade800,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -156,7 +164,7 @@ class SetTimeView extends StatelessWidget {
                         const SizedBox(height: 15.00),
                         Text(
                           "প্রশ্নের ধরন নির্বাচন করুন",
-                          style: AppTextStyles.body1,
+                          style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                         ),
                         const SizedBox(height: 3.00),
 
@@ -189,6 +197,7 @@ class SetTimeView extends StatelessWidget {
                                       ),
                                       Text(
                                         item['value'] ?? '',
+                                        style: TextStyle(color: context.textPrimary),
                                       ),
                                     ],
                                   ),
@@ -199,17 +208,17 @@ class SetTimeView extends StatelessWidget {
                         const SizedBox(height: 50.00),
                         Row(
                           children: [
-                            const Expanded(
-                              child: Divider(),
+                            Expanded(
+                              child: Divider(color: context.borderColor),
                             ),
                             const SizedBox(width: 10.00),
                             Text(
                               "নির্বাচিত বিষয়",
-                              style: AppTextStyles.body1,
+                              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
                             ),
                             const SizedBox(width: 10.00),
-                            const Expanded(
-                              child: Divider(),
+                            Expanded(
+                              child: Divider(color: context.borderColor),
                             ),
                           ],
                         ),
@@ -226,12 +235,14 @@ class SetTimeView extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: context.cardColor,
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: context.borderColor),
                                   boxShadow: [
                                     BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.05),
+                                      color: context.isDark
+                                          ? Colors.black.withValues(alpha: 0.2)
+                                          : Colors.black.withValues(alpha: 0.05),
                                       spreadRadius: 1,
                                       blurRadius: 5,
                                       offset: const Offset(0, 2),
@@ -240,6 +251,10 @@ class SetTimeView extends StatelessWidget {
                                 ),
                                 child: Text(
                                   "${subject.name}${subject.quantity != null ? ' (${subject.quantity})' : ''}",
+                                  style: TextStyle(
+                                    color: context.textPrimary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               );
                             }).toList(),

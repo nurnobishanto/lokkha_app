@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/exam_history_model.dart';
 
 class ExamHistoryCard extends StatelessWidget {
@@ -19,9 +20,9 @@ class ExamHistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -41,9 +42,9 @@ class ExamHistoryCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 3.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: context.surfaceColor,
                   borderRadius: BorderRadius.circular(6.r),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+                  border: Border.all(color: context.borderColor, width: 0.8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -59,7 +60,7 @@ class ExamHistoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -74,7 +75,7 @@ class ExamHistoryCard extends StatelessWidget {
                     Icon(
                       Icons.calendar_today_outlined,
                       size: 12.sp,
-                      color: const Color(0xFF64748B),
+                      color: context.textSecondary,
                     ),
                     SizedBox(width: 4.w),
                     Flexible(
@@ -85,7 +86,7 @@ class ExamHistoryCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF64748B),
+                          color: context.textSecondary,
                         ),
                       ),
                     ),
@@ -125,8 +126,8 @@ class ExamHistoryCard extends StatelessWidget {
           // Divider
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8.h),
-            child: const Divider(
-              color: Color(0xFFF1F5F9),
+            child: Divider(
+              color: context.dividerColor,
               height: 1,
               thickness: 1,
             ),
@@ -163,7 +164,7 @@ class ExamHistoryCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.5.sp,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -173,7 +174,7 @@ class ExamHistoryCard extends StatelessWidget {
                           "মোট প্রশ্ন: ",
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: const Color(0xFF64748B),
+                            color: context.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -181,15 +182,15 @@ class ExamHistoryCard extends StatelessWidget {
                           "${item.totalQuestions}",
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: const Color(0xFF0F172A),
+                            color: context.textPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: const Text(
+                          child: Text(
                             "•",
-                            style: TextStyle(color: Color(0xFF94A3B8)),
+                            style: TextStyle(color: context.textMuted),
                           ),
                         ),
                         Icon(
@@ -208,9 +209,9 @@ class ExamHistoryCard extends StatelessWidget {
                         ),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 5.w),
-                          child: const Text(
+                          child: Text(
                             "•",
-                            style: TextStyle(color: Color(0xFF94A3B8)),
+                            style: TextStyle(color: context.textMuted),
                           ),
                         ),
                         Icon(
@@ -241,7 +242,7 @@ class ExamHistoryCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: context.surfaceColor,
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Row(
@@ -254,7 +255,7 @@ class ExamHistoryCard extends StatelessWidget {
                       "প্রাপ্ত নম্বর: ",
                       style: TextStyle(
                         fontSize: 11.5.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -287,10 +288,10 @@ class ExamHistoryCard extends StatelessWidget {
                           vertical: 4.5.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.cardColor,
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
-                            color: const Color(0xFFCBD5E1),
+                            color: context.borderColor,
                             width: 0.9,
                           ),
                           boxShadow: [
@@ -315,7 +316,7 @@ class ExamHistoryCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11.5.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF0F172A),
+                                color: context.textPrimary,
                               ),
                             ),
                           ],
@@ -334,7 +335,7 @@ class ExamHistoryCard extends StatelessWidget {
                           vertical: 4.5.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.cardColor,
                           borderRadius: BorderRadius.circular(20.r),
                           border: Border.all(
                             color: const Color(0xFF059669),

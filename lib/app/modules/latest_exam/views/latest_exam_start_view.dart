@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/latest_exam/models/latest_exam_model.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../controllers/latest_exam_controller.dart';
 
@@ -37,7 +38,11 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
     (questionCount * 0.4).toStringAsFixed(0);
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: context.cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: context.borderColor),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -48,27 +53,35 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
             Text(
               'আপনি ${widget.latestExam.title} পরীক্ষায় দিতে চলেছেন',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: context.textPrimary,
+              ),
             ),
             const SizedBox(height: 24),
             Row(
               children: [
                 _readOnlyField(
-                    label: 'প্রশ্ন', value: questionCount.toString()),
+                    context: context,
+                    label: 'প্রশ্ন',
+                    value: questionCount.toString()),
                 const SizedBox(width: 12),
                 _editableField(
-                    label: 'পরীক্ষার সময়', controller: examTimeController),
+                    context: context,
+                    label: 'পরীক্ষার সময়',
+                    controller: examTimeController),
               ],
             ),
             const SizedBox(height: 12),
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'প্রতিটি প্রশ্নের মান সমান ১',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(fontSize: 14, color: context.textMuted),
               ),
             ),
-            // const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Row(
               children: [
                 _button('পরীক্ষা শুরু', Colors.redAccent, Colors.white, () {
@@ -91,7 +104,7 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
                   );
                 }),
                 const SizedBox(width: 8),
-                _button('বাতিল', Colors.grey.shade300, Colors.black87, () {
+                _button('বাতিল', context.isDark ? context.subtleSurfaceColor : Colors.grey.shade300, context.textPrimary, () {
                   Navigator.pop(context);
                 }),
               ],
@@ -112,21 +125,26 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
     );
   }
 
-  Widget _readOnlyField({required String label, required String value}) {
+  Widget _readOnlyField({required BuildContext context, required String label, required String value}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13)),
+          Text(label, style: TextStyle(fontSize: 13, color: context.textPrimary)),
           const SizedBox(height: 6),
           TextField(
             readOnly: true,
+            style: TextStyle(color: context.textPrimary),
             controller: TextEditingController(text: value),
             decoration: InputDecoration(
+              fillColor: context.subtleSurfaceColor,
+              filled: true,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
+              enabledBorder:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
               isDense: true,
             ),
           ),
@@ -136,21 +154,26 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
   }
 
   Widget _editableField(
-      {required String label, required TextEditingController controller}) {
+      {required BuildContext context, required String label, required TextEditingController controller}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13)),
+          Text(label, style: TextStyle(fontSize: 13, color: context.textPrimary)),
           const SizedBox(height: 6),
           TextField(
             controller: controller,
+            style: TextStyle(color: context.textPrimary),
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
+              fillColor: context.subtleSurfaceColor,
+              filled: true,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
+              enabledBorder:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
               isDense: true,
             ),
           ),

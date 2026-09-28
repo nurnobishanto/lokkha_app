@@ -6,6 +6,7 @@ import 'package:lokkha/app/components/custom_snackbar.dart';
 import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/modules/grid_views/mock_test_tab/mock_test/views/add_more_topic.dart';
 import 'package:lokkha/app/modules/grid_views/mock_test_tab/mock_test/views/set_time_view.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 import '../../../../../../styles/text_style.dart';
 import '../../../../../components/custom_text_field.dart';
@@ -24,6 +25,7 @@ class TopicSelectionView extends StatelessWidget {
     final controller = AddMoreTopicController();
     controller.getSubjectTopics(parentID: id);
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
@@ -245,22 +247,22 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _tile(theme, hasChildren),
+          _tile(context, theme, hasChildren),
           if (hasChildren) _children(),
         ],
       ),
     );
   }
 
-  Widget _tile(ThemeData theme, bool hasChildren) {
+  Widget _tile(BuildContext context, ThemeData theme, bool hasChildren) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: context.isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -295,7 +297,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: widget.topic.parentId != null
-                    ? Obx(() => _tileContent(theme, hasChildren))
+                    ? Obx(() => _tileContent(context, theme, hasChildren))
                     : const SizedBox.shrink(),
               ),
             ),
@@ -305,7 +307,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
     );
   }
 
-  Widget _tileContent(ThemeData theme, bool hasChildren) {
+  Widget _tileContent(BuildContext context, ThemeData theme, bool hasChildren) {
     return Row(
       children: [
         // Checkbox
@@ -324,7 +326,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             checkColor: Colors.white,
             side: BorderSide(
               color:
-                  isChecked.value ? theme.primaryColor : Colors.grey.shade400,
+                  isChecked.value ? theme.primaryColor : context.borderColor,
               width: 1.5,
             ),
           ),
@@ -341,30 +343,11 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
               fontSize: 14,
-              color: Colors.grey.shade800,
+              color: context.textPrimary,
               height: 1.2,
             ),
           ),
         ),
-
-        // // Question count badge (if any)
-        // if (widget.topic.questionCount != null)
-        //   Container(
-        //     margin: const EdgeInsets.only(right: 8),
-        //     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        //     decoration: BoxDecoration(
-        //       color: theme.primaryColor.withValues(alpha: 0.1),
-        //       borderRadius: BorderRadius.circular(12),
-        //     ),
-        //     child: Text(
-        //       '${widget.topic.questionCount}',
-        //       style: theme.textTheme.bodySmall?.copyWith(
-        //         color: theme.primaryColor,
-        //         fontWeight: FontWeight.w600,
-        //         fontSize: 11,
-        //       ),
-        //     ),
-        //   ),
 
         // Expand/collapse arrow
         if (hasChildren)
@@ -375,7 +358,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
               child: Icon(
                 Icons.keyboard_arrow_down,
                 size: 18,
-                color: Colors.grey.shade600,
+                color: context.textMuted,
               ),
             ),
           ),

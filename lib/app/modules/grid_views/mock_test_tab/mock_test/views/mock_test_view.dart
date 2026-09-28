@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/modules/grid_views/mock_test_tab/mock_test/views/topic_selection_view.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../../../../services/api_call_status.dart';
 import '../../../../../models/mock_subject_select_model.dart';
@@ -56,14 +57,18 @@ class MockTestView extends GetView<MockTestController> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.00.w, vertical: 8.00.h),
                           decoration: BoxDecoration(
-                            color: LightThemeColors.white,
+                            color: context.cardColor,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                                color: LightThemeColors.primaryColor,
-                                width: .2),
+                                color: context.isDark
+                                    ? context.borderColor
+                                    : context.primaryColor.withValues(alpha: 0.3),
+                                width: context.isDark ? 0.8 : 0.4),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color: context.isDark
+                                    ? Colors.black.withValues(alpha: 0.2)
+                                    : Colors.black.withValues(alpha: 0.05),
                                 spreadRadius: 1,
                                 blurRadius: 5,
                                 offset: const Offset(0, 2),
@@ -73,7 +78,10 @@ class MockTestView extends GetView<MockTestController> {
                           child: Text(
                             subject.name.toString(),
                             textAlign: TextAlign.center,
-                            style: AppTextStyles.body2,
+                            style: AppTextStyles.body2.copyWith(
+                              color: context.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/accuracy_exam_item_model.dart';
 
 class AccuracyExamCard extends StatelessWidget {
@@ -18,9 +19,9 @@ class AccuracyExamCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -40,7 +41,9 @@ class AccuracyExamCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: context.isDark
+                      ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                      : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(6.r),
                   border: Border.all(color: const Color(0xFFA7F3D0)),
                 ),
@@ -58,7 +61,7 @@ class AccuracyExamCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -71,7 +74,7 @@ class AccuracyExamCard extends StatelessWidget {
               Icon(
                 Icons.calendar_today_outlined,
                 size: 13.sp,
-                color: const Color(0xFF64748B),
+                color: context.textSecondary,
               ),
               SizedBox(width: 4.w),
               Expanded(
@@ -81,7 +84,7 @@ class AccuracyExamCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -189,7 +192,7 @@ class AccuracyExamCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -199,7 +202,7 @@ class AccuracyExamCard extends StatelessWidget {
                           "মোট প্রশ্ন: ${item.totalQuestions}",
                           style: TextStyle(
                             fontSize: 11.5.sp,
-                            color: const Color(0xFF64748B),
+                            color: context.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -251,7 +254,7 @@ class AccuracyExamCard extends StatelessWidget {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
+              color: context.surfaceColor,
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
@@ -261,7 +264,7 @@ class AccuracyExamCard extends StatelessWidget {
                   "নির্ভুলতার অনুপাত:",
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: const Color(0xFF475569),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -270,7 +273,7 @@ class AccuracyExamCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12.5.sp,
                     fontWeight: FontWeight.w900,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
               ],
@@ -290,7 +293,7 @@ class AccuracyExamCard extends StatelessWidget {
                     "প্রাপ্ত নম্বর: ",
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: const Color(0xFF475569),
+                      color: context.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -317,10 +320,10 @@ class AccuracyExamCard extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: context.surfaceColor,
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
-                          color: const Color(0xFFE2E8F0),
+                          color: context.borderColor,
                           width: 1.2,
                         ),
                       ),
@@ -338,7 +341,7 @@ class AccuracyExamCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11.5.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF334155),
+                              color: context.textPrimary,
                             ),
                           ),
                         ],
@@ -355,7 +358,9 @@ class AccuracyExamCard extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF0FDF4),
+                        color: context.isDark
+                            ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                            : const Color(0xFFF0FDF4),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
                           color: const Color(0xFF059669),

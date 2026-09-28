@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
-import '../../../../../config/theme/light_theme_colors.dart';
 import '../controllers/verify_otp_controller.dart';
 
 class VerifyOtpView extends GetView<VerifyOtpController> {
@@ -26,16 +25,44 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
   Widget build(BuildContext context) {
     debugPrint('MY PHONE $phoneNumber>> ${phoneNumber.runtimeType}');
     debugPrint('OTP TYPE $type');
+
+    final defaultPinTheme = PinTheme(
+      height: 50.0,
+      width: 50.0,
+      textStyle: TextStyle(
+        fontSize: 20.0,
+        color: context.primaryColor,
+        fontWeight: FontWeight.w500,
+      ),
+      decoration: BoxDecoration(
+        color: context.cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: context.borderColor),
+      ),
+    );
+
+    final focusedPinTheme = defaultPinTheme.copyWith(
+      decoration: BoxDecoration(
+        color: context.cardColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: context.primaryColor, width: 1.5),
+      ),
+    );
+
     return Scaffold(
+      backgroundColor: context.scaffoldColor,
       body: GetBuilder<VerifyOtpController>(
           init: VerifyOtpController(),
           builder: (x) {
             return Container(
               decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(AssetImagePaths.seamlessImg),
-                  fit: BoxFit.cover,
-                ),
+                color: context.scaffoldColor,
+                image: context.isDark
+                    ? null
+                    : DecorationImage(
+                        image: AssetImage(AssetImagePaths.seamlessImg),
+                        fit: BoxFit.cover,
+                      ),
               ),
               child: Column(
                 children: [
@@ -45,14 +72,18 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                     child: Text(
                       "আপনার এই $phoneNumber ফোন নম্বর এ ৬ ডিজিটের OTP পাঠানো ভেরিফাই করুন",
                       textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: context.textPrimary,
+                        fontSize: 14.sp,
+                      ),
                     ),
                   ),
                   10.h.height,
                   Pinput(
                     autofocus: true,
                     length: 6,
-                    defaultPinTheme: _myOTPTheme,
-                    focusedPinTheme: _selectOTPTheme,
+                    defaultPinTheme: defaultPinTheme,
+                    focusedPinTheme: focusedPinTheme,
                     pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
                     showCursor: true,
                     onCompleted: (pin) {
@@ -64,7 +95,6 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                     onChanged: (pin) {
                       debugPrint('Pin Changed: $pin');
                     },
-                    // autofillHints: const [AutofillHints.oneTimeCode],
                   ),
                   10.h.height,
                   Center(
@@ -72,14 +102,14 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                       textAlign: TextAlign.center,
                       text: TextSpan(
                         text: "OTP পাচ্ছো না? ",
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: context.textPrimary,
                         ),
                         children: [
                           TextSpan(
                             text: "Resend OTP",
                             style: AppTextStyles.custom(
-                              color: LightThemeColors.primaryColor,
+                              color: context.primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                             recognizer: TapGestureRecognizer()
@@ -118,31 +148,3 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
     );
   }
 }
-
-final PinTheme _myOTPTheme = PinTheme(
-  height: 50.0,
-  width: 50.0,
-  textStyle: const TextStyle(
-    fontSize: 20.0,
-    color: LightThemeColors.primaryColor,
-    fontWeight: FontWeight.w500,
-  ),
-  decoration: BoxDecoration(
-    //color: LightThemeColors.scaffoldBackgroundColor,
-    borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: Colors.black),
-  ),
-);
-
-final PinTheme _selectOTPTheme = PinTheme(
-  height: 50.0,
-  width: 50.0,
-  textStyle: const TextStyle(
-    fontSize: 20.0,
-    fontWeight: FontWeight.w500,
-  ),
-  decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: LightThemeColors.primaryColor),
-  ),
-);

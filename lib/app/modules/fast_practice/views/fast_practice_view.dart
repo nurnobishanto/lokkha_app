@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/nav_bar_views/home/controllers/home_controller.dart';
 import 'package:lokkha/app/modules/subject_sections/views/subject_sections_view.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../styles/text_style.dart';
 import '../../../data/local/my_shared_pref.dart';
 import '../../../services/api_call_status.dart';
@@ -49,9 +50,12 @@ class FastPracticeView extends GetView<HomeController> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.cardColor,
                           borderRadius: BorderRadius.circular(7.0),
-                          border: Border.all(color: Colors.grey, width: 0.5.w),
+                          border: Border.all(
+                            color: context.borderColor,
+                            width: 0.8.w,
+                          ),
                         ),
                         child: Center(
                           child: Text(
@@ -59,6 +63,7 @@ class FastPracticeView extends GetView<HomeController> {
                             style: AppTextStyles.body2.copyWith(
                               height: 1.1.h,
                               fontSize: 12.sp,
+                              color: context.textPrimary,
                             ),
                             maxLines: 2,
                             textAlign: TextAlign.center,

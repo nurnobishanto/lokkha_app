@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../../profile_history/widgets/exam_history_pagination.dart';
 import '../controllers/self_exam_history_controller.dart';
@@ -12,7 +13,7 @@ class SelfExamHistoryView extends GetView<SelfExamHistoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'আমার সেলফ টেস্ট',
         centerTitle: true,
@@ -30,7 +31,7 @@ class SelfExamHistoryView extends GetView<SelfExamHistoryController> {
                 Icon(
                   Icons.edit_note_rounded,
                   size: 56.sp,
-                  color: const Color(0xFF94A3B8),
+                  color: context.textMuted,
                 ),
                 SizedBox(height: 12.h),
                 Text(
@@ -38,7 +39,7 @@ class SelfExamHistoryView extends GetView<SelfExamHistoryController> {
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -64,10 +65,10 @@ class SelfExamHistoryView extends GetView<SelfExamHistoryController> {
       bottomNavigationBar: Obx(
         () => Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: const Border(
+            color: context.cardColor,
+            border: Border(
               top: BorderSide(
-                color: Color(0xFFE2E8F0),
+                color: context.borderColor,
                 width: 1,
               ),
             ),

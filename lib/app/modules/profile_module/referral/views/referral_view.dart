@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../../../../helper/global.dart';
 import '../../../auth_views/auth_gateway/views/auth_gateway_view.dart';
@@ -13,7 +14,7 @@ class ReferralView extends GetView<ReferralController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'আমার রেফারেল',
         centerTitle: true,
@@ -40,9 +41,9 @@ class ReferralView extends GetView<ReferralController> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.cardColor,
                 borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: context.borderColor),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.02),
@@ -63,14 +64,14 @@ class ReferralView extends GetView<ReferralController> {
                         child: Container(
                           width: 36.r,
                           height: 36.r,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF1F5F9),
+                          decoration: BoxDecoration(
+                            color: context.surfaceColor,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.arrow_back,
                             size: 18.sp,
-                            color: const Color(0xFF0F172A),
+                            color: context.textPrimary,
                           ),
                         ),
                       ),
@@ -84,7 +85,7 @@ class ReferralView extends GetView<ReferralController> {
                               style: TextStyle(
                                 fontSize: 16.5.sp,
                                 fontWeight: FontWeight.w800,
-                                color: const Color(0xFF0F172A),
+                                color: context.textPrimary,
                               ),
                             ),
                             SizedBox(height: 2.h),
@@ -92,7 +93,7 @@ class ReferralView extends GetView<ReferralController> {
                               "বন্ধুদের আমন্ত্রণ জানান ও রিওয়ার্ড পয়েন্ট অর্জন করুন",
                               style: TextStyle(
                                 fontSize: 11.5.sp,
-                                color: const Color(0xFF64748B),
+                                color: context.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -110,7 +111,7 @@ class ReferralView extends GetView<ReferralController> {
                       vertical: 6.h,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.cardColor,
                       borderRadius: BorderRadius.circular(20.r),
                       border: Border.all(
                         color: const Color(0xFF059669),
@@ -151,6 +152,7 @@ class ReferralView extends GetView<ReferralController> {
                 // 1. সর্বমোট আমন্ত্রিত
                 Expanded(
                   child: _buildSummaryStatCard(
+                    context: context,
                     icon: Icons.person_add_alt_1_rounded,
                     iconBg: const Color(0xFFDCFCE7),
                     iconColor: const Color(0xFF16A34A),
@@ -163,6 +165,7 @@ class ReferralView extends GetView<ReferralController> {
                 // 2. অর্জিত পয়েন্ট
                 Expanded(
                   child: _buildSummaryStatCard(
+                    context: context,
                     icon: Icons.monetization_on_rounded,
                     iconBg: const Color(0xFFFEF9C3),
                     iconColor: const Color(0xFFD97706),
@@ -176,6 +179,7 @@ class ReferralView extends GetView<ReferralController> {
                 // 3. সফল রেফারেল
                 Expanded(
                   child: _buildSummaryStatCard(
+                    context: context,
                     icon: Icons.check_circle_rounded,
                     iconBg: const Color(0xFFEFF6FF),
                     iconColor: const Color(0xFF2563EB),
@@ -426,7 +430,7 @@ class ReferralView extends GetView<ReferralController> {
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -436,7 +440,7 @@ class ReferralView extends GetView<ReferralController> {
                   style: TextStyle(
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -448,9 +452,9 @@ class ReferralView extends GetView<ReferralController> {
             // 5. REFERRED USERS LIST / EMPTY STATE
             // -----------------------------------------------------------------
             if (users.isEmpty)
-              _buildEmptyState()
+              _buildEmptyState(context)
             else
-              ...users.map((u) => _buildReferredUserCard(u)),
+              ...users.map((u) => _buildReferredUserCard(u, context)),
           ],
         );
       }),
@@ -461,6 +465,7 @@ class ReferralView extends GetView<ReferralController> {
   // SUMMARY STAT CARD WIDGET
   // ---------------------------------------------------------------------------
   Widget _buildSummaryStatCard({
+    required BuildContext context,
     required IconData icon,
     required Color iconBg,
     required Color iconColor,
@@ -471,9 +476,9 @@ class ReferralView extends GetView<ReferralController> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -504,7 +509,7 @@ class ReferralView extends GetView<ReferralController> {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
-                    color: valueColor ?? const Color(0xFF0F172A),
+                    color: valueColor ?? context.textPrimary,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -515,7 +520,7 @@ class ReferralView extends GetView<ReferralController> {
                   style: TextStyle(
                     fontSize: 9.5.sp,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                   ),
                 ),
               ],
@@ -552,14 +557,14 @@ class ReferralView extends GetView<ReferralController> {
   // ---------------------------------------------------------------------------
   // EMPTY STATE WIDGET
   // ---------------------------------------------------------------------------
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 36.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -589,7 +594,7 @@ class ReferralView extends GetView<ReferralController> {
             style: TextStyle(
               fontSize: 15.5.sp,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF0F172A),
+              color: context.textPrimary,
             ),
           ),
           SizedBox(height: 8.h),
@@ -598,7 +603,7 @@ class ReferralView extends GetView<ReferralController> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12.sp,
-              color: const Color(0xFF64748B),
+              color: context.textSecondary,
               height: 1.45,
             ),
           ),
@@ -610,27 +615,27 @@ class ReferralView extends GetView<ReferralController> {
   // ---------------------------------------------------------------------------
   // REFERRED USER CARD WIDGET
   // ---------------------------------------------------------------------------
-  Widget _buildReferredUserCard(dynamic user) {
+  Widget _buildReferredUserCard(dynamic user, BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Row(
         children: [
           Container(
             width: 38.r,
             height: 38.r,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF1F5F9),
+            decoration: BoxDecoration(
+              color: context.surfaceColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.person,
-              color: const Color(0xFF64748B),
+              color: context.textSecondary,
               size: 20.sp,
             ),
           ),
@@ -644,7 +649,7 @@ class ReferralView extends GetView<ReferralController> {
                   style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -652,7 +657,7 @@ class ReferralView extends GetView<ReferralController> {
                   user['date'] ?? '',
                   style: TextStyle(
                     fontSize: 11.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                   ),
                 ),
               ],

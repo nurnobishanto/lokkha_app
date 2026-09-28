@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/exam_rank_model.dart';
 
 class ExamRankCard extends StatelessWidget {
@@ -14,9 +15,9 @@ class ExamRankCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -42,7 +43,7 @@ class ExamRankCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -50,7 +51,7 @@ class ExamRankCard extends StatelessWidget {
                       "Rank",
                       style: TextStyle(
                         fontSize: 11.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -70,7 +71,7 @@ class ExamRankCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -78,7 +79,7 @@ class ExamRankCard extends StatelessWidget {
                       item.studentId,
                       style: TextStyle(
                         fontSize: 12.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -180,7 +181,7 @@ class ExamRankCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12.5.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -188,7 +189,7 @@ class ExamRankCard extends StatelessWidget {
                       "Avoid",
                       style: TextStyle(
                         fontSize: 10.5.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -206,8 +207,8 @@ class ExamRankCard extends StatelessWidget {
                         fontSize: 12.5.sp,
                         fontWeight: FontWeight.w800,
                         color: item.isPassed
-                            ? const Color(0xFF0F172A)
-                            : const Color(0xFF0F172A),
+                            ? const Color(0xFF059669)
+                            : const Color(0xFFDC2626),
                       ),
                     ),
                     SizedBox(height: 2.h),
@@ -215,7 +216,7 @@ class ExamRankCard extends StatelessWidget {
                       "Status",
                       style: TextStyle(
                         fontSize: 10.5.sp,
-                        color: const Color(0xFF64748B),
+                        color: context.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

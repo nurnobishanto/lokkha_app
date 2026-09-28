@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/self_exam_question_model.dart';
 
 class SelfExamQuestionCard extends StatelessWidget {
@@ -13,17 +14,19 @@ class SelfExamQuestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final borderColor = item.isCorrect
-        ? const Color(0xFF86EFAC)
-        : const Color(0xFFFCA5A5);
+        ? (context.isDark ? const Color(0xFF059669) : const Color(0xFF86EFAC))
+        : (context.isDark ? const Color(0xFFDC2626) : const Color(0xFFFCA5A5));
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: borderColor, width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: context.isDark
+                ? Colors.transparent
+                : Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -39,7 +42,7 @@ class SelfExamQuestionCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 14.5.sp,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF0F172A),
+              color: context.textPrimary,
               height: 1.3,
             ),
           ),
@@ -56,10 +59,14 @@ class SelfExamQuestionCard extends StatelessWidget {
                 margin: EdgeInsets.only(bottom: 8.h),
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.isDark
+                      ? const Color(0xFF1E293B)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: const Color(0xFF99F6E4), // Mint/teal border matching screenshot
+                    color: context.isDark
+                        ? const Color(0xFF0F766E)
+                        : const Color(0xFF99F6E4), // Mint/teal border
                     width: 1.2,
                   ),
                 ),
@@ -68,7 +75,9 @@ class SelfExamQuestionCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF0F766E),
+                    color: context.isDark
+                        ? const Color(0xFF5EEAD4)
+                        : const Color(0xFF0F766E),
                   ),
                 ),
               );
@@ -85,7 +94,9 @@ class SelfExamQuestionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.5.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFFDC2626),
+                  color: context.isDark
+                      ? const Color(0xFFF87171)
+                      : const Color(0xFFDC2626),
                 ),
               ),
               Container(
@@ -117,7 +128,9 @@ class SelfExamQuestionCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12.5.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF059669),
+                  color: context.isDark
+                      ? const Color(0xFF34D399)
+                      : const Color(0xFF059669),
                 ),
               ),
               Flexible(
@@ -149,15 +162,17 @@ class SelfExamQuestionCard extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(10.r),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: context.isDark
+                    ? const Color(0xFF0F172A)
+                    : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: context.borderColor),
               ),
               child: Text(
                 "ব্যাখ্যা: ${item.explanation!}",
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: const Color(0xFF475569),
+                  color: context.textSecondary,
                   height: 1.4,
                 ),
               ),

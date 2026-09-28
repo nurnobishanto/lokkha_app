@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../services/api_call_status.dart';
 import '../../exam_category/widgets/exam_category_card.dart';
 import '../controllers/exam_category_details_controller.dart';
@@ -19,6 +20,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
     final controller = Get.put(ExamCategoryDetailsController());
     print("addd:$categoryName");
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         title: Text(
           categoryName,
@@ -111,7 +113,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
         if (controller.totalPages.value <= 1) return const SizedBox.shrink();
         return SafeArea(
           child: Container(
-            color: Colors.white,
+            color: context.cardColor,
             padding: const EdgeInsets.only(bottom: 20, left: 25),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -119,7 +121,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
                 children: [
                   // First Page
                   IconButton(
-                    icon: const Icon(Icons.first_page),
+                    icon: Icon(Icons.first_page, color: context.textPrimary),
                     onPressed: controller.currentPage.value > 1
                         ? controller.firstPage
                         : null,
@@ -127,7 +129,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
 
                   // Previous
                   IconButton(
-                    icon: const Icon(Icons.navigate_before),
+                    icon: Icon(Icons.navigate_before, color: context.textPrimary),
                     onPressed: controller.currentPage.value > 1
                         ? controller.previousPage
                         : null,
@@ -152,15 +154,15 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
                         decoration: BoxDecoration(
                           color: isActive
                               ? LightThemeColors.primaryColor
-                              : Colors.grey.shade200,
+                              : (context.isDark ? context.surfaceColor : Colors.grey.shade200),
                           borderRadius: BorderRadius.circular(8),
                           border:
-                              Border.all(color: LightThemeColors.primaryColor),
+                              Border.all(color: isActive ? LightThemeColors.primaryColor : context.borderColor),
                         ),
                         child: Text(
                           page.toString(),
                           style: TextStyle(
-                            color: isActive ? Colors.white : Colors.black87,
+                            color: isActive ? Colors.white : context.textPrimary,
                           ),
                         ),
                       ),
@@ -169,7 +171,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
 
                   // Next
                   IconButton(
-                    icon: const Icon(Icons.navigate_next),
+                    icon: Icon(Icons.navigate_next, color: context.textPrimary),
                     onPressed: controller.currentPage.value <
                             controller.totalPages.value
                         ? controller.nextPage
@@ -178,7 +180,7 @@ class ExamCategoryDetailsView extends GetView<ExamCategoryDetailsController> {
 
                   // Last
                   IconButton(
-                    icon: const Icon(Icons.last_page),
+                    icon: Icon(Icons.last_page, color: context.textPrimary),
                     onPressed: controller.currentPage.value <
                             controller.totalPages.value
                         ? controller.lastPage

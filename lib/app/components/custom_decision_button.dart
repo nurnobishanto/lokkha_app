@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../config/theme/light_theme_colors.dart';
 
@@ -14,7 +15,7 @@ class DecisionButton extends StatelessWidget {
     required this.text,
     required this.onPressed,
     this.leadingWidget, // Optional widget (icon/image/custom widget)
-    this.borderColor = LightThemeColors.primaryColor,
+    this.borderColor,
     this.height = 50.0,
   });
 
@@ -26,6 +27,7 @@ class DecisionButton extends StatelessWidget {
         height: height,
         width: double.infinity,
         decoration: BoxDecoration(
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(20.0),
           border: Border.all(
             color: borderColor ?? LightThemeColors.primaryColor,
@@ -41,7 +43,7 @@ class DecisionButton extends StatelessWidget {
             ],
             Text(
               text,
-              style: AppTextStyles.body1,
+              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
             ),
           ],
         ),

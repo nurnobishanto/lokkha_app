@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 class AccuracyStatCard extends StatelessWidget {
   final Widget icon;
@@ -20,9 +21,9 @@ class AccuracyStatCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 14.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+        border: Border.all(color: context.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -38,7 +39,9 @@ class AccuracyStatCard extends StatelessWidget {
             width: 42.r,
             height: 42.r,
             decoration: BoxDecoration(
-              color: iconBg,
+              color: context.isDark
+                  ? iconBg.withValues(alpha: 0.25)
+                  : iconBg,
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Center(child: icon),
@@ -60,7 +63,7 @@ class AccuracyStatCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 11.5.sp,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

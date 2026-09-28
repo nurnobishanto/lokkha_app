@@ -1,7 +1,6 @@
-import 'package:get/get.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lokkha/config/extensions/common_extension.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final String hintText;
@@ -50,18 +49,21 @@ class CustomTextFormField extends StatelessWidget {
           onTap: onTap,
           validator: validator,
           readOnly: readOnly,
-          cursorColor: LightThemeColors.primaryColor,
+          cursorColor: context.primaryColor,
           textAlignVertical: TextAlignVertical.center,
+          style: TextStyle(color: context.textPrimary),
           decoration: InputDecoration(
             isDense: true,
+            filled: true,
+            fillColor: context.cardColor,
             hintText: hintText,
-            hintStyle: hintStyle,
+            hintStyle: hintStyle ?? TextStyle(color: context.textMuted),
             prefixIcon: prefixIcon,
             suffixIcon: obscureText
                 ? IconButton(
                     icon: Icon(
                       value ? Icons.visibility_off : Icons.visibility,
-                      color: Colors.grey.shade600,
+                      color: context.textMuted,
                     ),
                     onPressed: () {
                       isObscured.value = !isObscured.value;
@@ -70,18 +72,15 @@ class CustomTextFormField extends StatelessWidget {
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide:
-                  BorderSide(color: Get.theme.dividerColor), // default border
+              borderSide: BorderSide(color: context.borderColor),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                  color: Get.theme.hintColor), // light/dark এ auto change
+              borderSide: BorderSide(color: context.borderColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(
-                  color: Get.theme.primaryColor), // e.g., app theme color
+              borderSide: BorderSide(color: context.primaryColor, width: 1.5),
             ),
           ),
         );

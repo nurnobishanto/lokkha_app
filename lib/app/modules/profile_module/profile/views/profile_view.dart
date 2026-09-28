@@ -10,6 +10,9 @@ import '../../../../helper/global.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../../services/api_call_status.dart';
 import '../../../../views/widgets/web_exam_view.dart';
+import 'package:lokkha/config/theme/theme_controller.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
+import 'package:lokkha/app/components/theme/theme_toggle_tile.dart';
 import '../../../auth_views/auth_gateway/views/auth_gateway_view.dart';
 import '../../../drawer_pages/views/customer_support_view.dart';
 import '../../widgets/devices_management_sheet.dart';
@@ -22,7 +25,7 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final ProfileController controller = Get.put(ProfileController());
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'প্রোফাইল',
         centerTitle: true,
@@ -376,11 +379,20 @@ class ProfileView extends GetView<ProfileController> {
 
               // --- LIST OPTIONS ---
               Material(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16.r),
                 clipBehavior: Clip.antiAlias,
                 child: Column(
                   children: [
+                    const ThemeToggleTile(),
+                    const Divider(height: 0, indent: 50),
+                    _buildListItem(
+                      onTap: () => DevicesManagementSheet.show(context),
+                      text: 'লগইন ডিভাইস সমূহ',
+                      icon: Icons.devices_rounded,
+                      color: const Color(0xFF0F6E52),
+                    ),
+                    const Divider(height: 0, indent: 50),
                     _buildListItem(
                       onTap: () {
                         Get.defaultDialog(
@@ -395,13 +407,6 @@ class ProfileView extends GetView<ProfileController> {
                       text: 'অ্যাকাউন্ট ডিলিট করুন',
                       icon: Icons.delete_forever,
                       color: Colors.red,
-                    ),
-                    const Divider(height: 0, indent: 50),
-                    _buildListItem(
-                      onTap: () => DevicesManagementSheet.show(context),
-                      text: 'লগইন ডিভাইস সমূহ',
-                      icon: Icons.devices_rounded,
-                      color: const Color(0xFF0F6E52),
                     ),
                     const Divider(height: 0, indent: 50),
                     _buildListItem(
@@ -439,16 +444,20 @@ class ProfileView extends GetView<ProfileController> {
   }
 
   Widget _buildSectionLabel(String text) {
-    return Padding(
-      padding: EdgeInsets.only(left: 4.w, bottom: 12.h),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 15.sp,
-          fontWeight: FontWeight.bold,
-          color: Colors.blueGrey[800],
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(left: 4.w, bottom: 12.h),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+              color: context.textPrimary,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -458,34 +467,38 @@ class ProfileView extends GetView<ProfileController> {
     required IconData icon,
     required Color color,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16.r),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16.r),
-        child: Container(
-          decoration: BoxDecoration(
+    return Builder(
+      builder: (context) {
+        return Material(
+          color: context.cardColor,
+          borderRadius: BorderRadius.circular(16.r),
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: color, size: 18.sp),
-              SizedBox(height: 8.h),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: context.borderColor),
               ),
-            ],
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: color, size: 18.sp),
+                  SizedBox(height: 8.h),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -495,19 +508,27 @@ class ProfileView extends GetView<ProfileController> {
     required IconData icon,
     required Color color,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: ListTile(
-        onTap: onTap,
-        leading: Icon(icon, color: color, size: 18.sp),
-        title: Text(
-          text,
-          style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
-        ),
-        trailing: const Icon(Icons.chevron_right, size: 20),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      ),
+    return Builder(
+      builder: (context) {
+        return Material(
+          color: Colors.transparent,
+          child: ListTile(
+            onTap: onTap,
+            leading: Icon(icon, color: color, size: 18.sp),
+            title: Text(
+              text,
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+                color: context.textPrimary,
+              ),
+            ),
+            trailing: Icon(Icons.chevron_right, size: 20, color: context.textMuted),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+          ),
+        );
+      },
     );
   }
 }

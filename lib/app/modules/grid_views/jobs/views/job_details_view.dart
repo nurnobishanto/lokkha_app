@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/modules/grid_views/jobs/controllers/jobs_controller.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/constants.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -22,6 +23,7 @@ class JobDetailsScreen extends StatelessWidget {
     debugPrint("govJob Id: $id ");
 
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         title: Text(
           "চাকরির বিস্তারিত",
@@ -49,13 +51,16 @@ class JobDetailsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color:
-                            isDeadlineOver ? Colors.red.shade50 : Colors.white,
+                        color: isDeadlineOver
+                            ? (context.isDark
+                                ? const Color(0xFF4C0519).withValues(alpha: 0.4)
+                                : Colors.red.shade50)
+                            : context.cardColor,
                         border: Border.all(
                           color: isDeadlineOver
-                              ? Colors.red
-                              : Colors.grey.shade300,
-                          width: 2.0,
+                              ? (context.isDark ? const Color(0xFFF43F5E) : Colors.red)
+                              : context.borderColor,
+                          width: 1.5,
                         ),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
@@ -73,7 +78,7 @@ class JobDetailsScreen extends StatelessWidget {
                                     jobData.companyName == null
                                         ? ''
                                         : jobData.companyName.toString(),
-                                    style: AppTextStyles.heading5,
+                                    style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -83,21 +88,25 @@ class JobDetailsScreen extends StatelessWidget {
                             const SizedBox(height: 2.0),
                             Text(
                               "প্রকাশিত: ${DateFormatter.formatJobDeadline(jobData.createdAt)}",
-                              style: AppTextStyles.heading5,
+                              style: AppTextStyles.heading5.copyWith(color: context.textSecondary),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 5.0),
                             Text(
                               "আবেদনের শেষ তারিখ: ${DateFormatter.formatJobDeadline(jobData.deadline)}",
-                              style: AppTextStyles.heading5,
+                              style: AppTextStyles.heading5.copyWith(
+                                color: isDeadlineOver
+                                    ? (context.isDark ? const Color(0xFFFDA4AF) : Colors.red.shade700)
+                                    : context.textPrimary,
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 5.0),
                             Text(
                               "সোর্স: ${jobData.source ?? ''}",
-                              style: AppTextStyles.heading5,
+                              style: AppTextStyles.heading5.copyWith(color: context.textSecondary),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),

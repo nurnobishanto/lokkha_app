@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../../utils/constants.dart';
 import '../../../../../utils/date_formatter.dart';
 import '../../../../services/api_call_status.dart';
@@ -22,11 +23,18 @@ class MyOrdersView extends GetView<MyOrdersController> {
             child: switch (controller.apiCallStatus.value) {
               ApiCallStatus.loading =>
                 const Center(child: CircularProgressIndicator()),
-              ApiCallStatus.error =>
-                const Center(child: Text("অর্ডার লোড করতে সমস্যা হয়েছে")),
+              ApiCallStatus.error => Center(
+                  child: Text(
+                    "অর্ডার লোড করতে সমস্যা হয়েছে",
+                    style: TextStyle(color: context.textPrimary),
+                  ),
+                ),
               ApiCallStatus.success => controller.model.value.orders!.isEmpty
                   ? Center(
-                      child: Text("কোনো অর্ডার পাওয়া যায়নি"),
+                      child: Text(
+                        "কোনো অর্ডার পাওয়া যায়নি",
+                        style: TextStyle(color: context.textPrimary),
+                      ),
                     )
                   : ListView.builder(
                       itemCount: controller.model.value.orders?.length ?? 0,
@@ -46,7 +54,12 @@ class MyOrdersView extends GetView<MyOrdersController> {
                         );
                       },
                     ),
-              _ => const Center(child: Text("কোনো অর্ডার পাওয়া যায়নি")),
+              _ => Center(
+                  child: Text(
+                    "কোনো অর্ডার পাওয়া যায়নি",
+                    style: TextStyle(color: context.textPrimary),
+                  ),
+                ),
             },
           ),
         ),
@@ -84,8 +97,10 @@ class OrderCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(orderId,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: context.textPrimary)),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -111,16 +126,16 @@ class OrderCard extends StatelessWidget {
             RichText(
               text: TextSpan(
                 children: [
-                  const TextSpan(
+                  TextSpan(
                     text: "তারিখ: ",
                     style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: context.textPrimary),
                   ),
                   TextSpan(
                     text: DateFormatter.formatToDMY(date),
-                    style: const TextStyle(fontSize: 15.0, color: Colors.black),
+                    style: TextStyle(fontSize: 15.0, color: context.textSecondary),
                   ),
                 ],
               ),
@@ -129,16 +144,16 @@ class OrderCard extends StatelessWidget {
             RichText(
               text: TextSpan(
                 children: [
-                  const TextSpan(
+                  TextSpan(
                     text: "মোট: ",
                     style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: context.textPrimary),
                   ),
                   TextSpan(
                     text: totalAmount,
-                    style: const TextStyle(fontSize: 15.0, color: Colors.black),
+                    style: TextStyle(fontSize: 15.0, color: context.textSecondary),
                   ),
                 ],
               ),
@@ -147,19 +162,19 @@ class OrderCard extends StatelessWidget {
             RichText(
               text: TextSpan(
                 children: [
-                  const TextSpan(
+                  TextSpan(
                     text: "পেমেন্ট মেথড: ",
                     style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: context.textPrimary),
                   ),
                   TextSpan(
                     text: paymentMethod.tr,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black),
+                        color: context.textSecondary),
                   ),
                 ],
               ),

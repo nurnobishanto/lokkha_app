@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_action_button.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../../utils/date_formatter.dart';
 import '../../../premium_packages/views/payment_webview.dart';
 import '../controllers/orders_details_controller.dart';
@@ -45,15 +46,17 @@ class OrderDetailsScreen extends GetView<OrdersDetailsController> {
                             children: [
                               Text(
                                 "#${model.order?.invoiceNo ?? ''}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: context.textPrimary),
                               ),
                               const SizedBox(height: 10),
                               Text(
                                 DateFormatter.formatToDMY(
                                     model.order!.createdAt!),
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 14),
+                                style: TextStyle(
+                                    color: context.textSecondary, fontSize: 14),
                               ),
                               const SizedBox(height: 10),
                               ProductItem(
@@ -80,20 +83,20 @@ class OrderDetailsScreen extends GetView<OrdersDetailsController> {
                                 amount: '৳ ${model.order!.total ?? ''}',
                               ),
                               (model.order!.status.toString() == 'paid')
-                                  ? OrderSummaryItem(
-                                      label: "পরিশোধ",
-                                      amount:
-                                          '৳ ${model.order!.total.toString()}',
-                                    )
-                                  : const SizedBox(),
+                                    ? OrderSummaryItem(
+                                        label: "পরিশোধ",
+                                        amount:
+                                            '৳ ${model.order!.total.toString()}',
+                                      )
+                                    : const SizedBox(),
                               (model.order!.status.toString() != 'paid')
-                                  ? OrderSummaryItem(
-                                      label: "বকেয়া",
-                                      amount:
-                                          '৳ ${model.order!.total.toString()}',
-                                      isNegative: true,
-                                    )
-                                  : const SizedBox(),
+                                    ? OrderSummaryItem(
+                                        label: "বকেয়া",
+                                        amount:
+                                            '৳ ${model.order!.total.toString()}',
+                                        isNegative: true,
+                                      )
+                                    : const SizedBox(),
                               const SizedBox(height: 10),
                               const Divider(),
                               const SizedBox(height: 10),
@@ -117,11 +120,9 @@ class OrderDetailsScreen extends GetView<OrdersDetailsController> {
                                             : Colors.white,
                                   ),
                                   OrderStatusLabel(
-                                    // status:
-                                    //     order!.paymentMethod!.toUpperCase().toString(),
                                     status:
                                         model.order!.paymentMethod!.toString(),
-                                    color: Colors.black,
+                                    color: context.isDark ? Colors.grey.shade800 : Colors.black,
                                     fontColor: Colors.white,
                                   ),
                                 ],
@@ -134,12 +135,12 @@ class OrderDetailsScreen extends GetView<OrdersDetailsController> {
                         height: 20.0,
                       ),
                       //
-                      const Text(
+                      Text(
                         "পেমেন্ট হিস্ট্রি",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: context.textPrimary,
                         ),
                       ),
                       SizedBox(
@@ -161,15 +162,20 @@ class OrderDetailsScreen extends GetView<OrdersDetailsController> {
                                           children: [
                                             Text(
                                               "#${model.order!.payments![index].transactionId.toString()}",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.w500,
+                                                color: context.textPrimary,
                                               ),
                                             ),
                                             const SizedBox(width: 10.0),
                                             Text(
-                                                "৳ ${model.order!.payments![index].amount.toString()}"),
+                                              "৳ ${model.order!.payments![index].amount.toString()}",
+                                              style: TextStyle(color: context.textPrimary),
+                                            ),
                                             Text(
-                                                " ${model.order!.payments![index].paymentMethod!.toString()}"),
+                                              " ${model.order!.payments![index].paymentMethod!.toString()}",
+                                              style: TextStyle(color: context.textSecondary),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -270,12 +276,12 @@ class ProductItem extends StatelessWidget {
           Expanded(
             child: Text(
               name,
-              style: const TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14, color: context.textPrimary),
             ),
           ),
           Text(
             price,
-            style: const TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, color: context.textPrimary),
           ),
         ],
       ),
@@ -309,6 +315,7 @@ class OrderSummaryItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: context.textPrimary,
             ),
           ),
           Text(
@@ -316,7 +323,7 @@ class OrderSummaryItem extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: isNegative ? Colors.red : Colors.black,
+              color: isNegative ? Colors.red : context.textPrimary,
             ),
           ),
         ],

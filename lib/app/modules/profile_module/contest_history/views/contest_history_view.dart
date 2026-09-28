@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../controllers/contest_history_controller.dart';
 import '../widgets/contest_history_card.dart';
@@ -12,7 +13,7 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'আমার কনটেস্ট ও সেভড প্রশ্ন',
         centerTitle: true,
@@ -39,7 +40,7 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                     style: TextStyle(
                       fontSize: 15.5.sp,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                 ],
@@ -52,7 +53,9 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBEB),
+                    color: context.isDark
+                        ? const Color(0xFF78350F).withValues(alpha: 0.25)
+                        : const Color(0xFFFFFBEB),
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(
                       color: const Color(0xFFD97706),
@@ -64,7 +67,9 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                     style: TextStyle(
                       fontSize: 11.5.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFFB45309),
+                      color: context.isDark
+                          ? const Color(0xFFFDE68A)
+                          : const Color(0xFFB45309),
                     ),
                   ),
                 ),
@@ -80,16 +85,16 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
               return Container(
                 padding: EdgeInsets.all(16.r),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.cardColor,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: context.borderColor),
                 ),
                 child: Center(
                   child: Text(
                     "কোনো কনটেস্ট হিস্ট্রি পাওয়া যায়নি",
                     style: TextStyle(
                       fontSize: 13.sp,
-                      color: const Color(0xFF64748B),
+                      color: context.textSecondary,
                     ),
                   ),
                 ),
@@ -133,7 +138,7 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                     style: TextStyle(
                       fontSize: 15.5.sp,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF0F172A),
+                      color: context.textPrimary,
                     ),
                   ),
                 ],
@@ -143,7 +148,9 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                 () => Container(
                   padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECFDF5),
+                    color: context.isDark
+                        ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                        : const Color(0xFFECFDF5),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
@@ -151,7 +158,9 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                     style: TextStyle(
                       fontSize: 11.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF059669),
+                      color: context.isDark
+                          ? const Color(0xFF34D399)
+                          : const Color(0xFF059669),
                     ),
                   ),
                 ),
@@ -167,16 +176,16 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
               return Container(
                 padding: EdgeInsets.all(16.r),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.cardColor,
                   borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: context.borderColor),
                 ),
                 child: Center(
                   child: Text(
                     "কোনো সংরক্ষিত প্রশ্ন পাওয়া যায়নি",
                     style: TextStyle(
                       fontSize: 13.sp,
-                      color: const Color(0xFF64748B),
+                      color: context.textSecondary,
                     ),
                   ),
                 ),

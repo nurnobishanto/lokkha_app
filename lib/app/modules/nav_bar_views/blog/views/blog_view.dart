@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../controllers/blog_controller.dart';
 
 class BlogView extends StatelessWidget {
@@ -14,7 +15,7 @@ class BlogView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: AppBar(
         title: const Text('ব্লগ ও ক্যারিয়ার গাইড'),
         centerTitle: true,
@@ -29,15 +30,15 @@ class BlogView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 1. Hero Headline Section
-                  _buildHeroSection(),
+                  _buildHeroSection(context),
                   SizedBox(height: 14.h),
 
                   // 2. Search Bar
-                  _buildSearchBar(),
+                  _buildSearchBar(context),
                   SizedBox(height: 14.h),
 
                   // 3. Horizontal Category Filter Tabs
-                  _buildCategoryChips(),
+                  _buildCategoryChips(context),
                   SizedBox(height: 14.h),
 
                   // 4. Categories & Most Read Bar with Menu Button
@@ -45,19 +46,19 @@ class BlogView extends StatelessWidget {
                   SizedBox(height: 12.h),
 
                   // 5. Article Count & Sort Row
-                  _buildCountAndSortRow(),
+                  _buildCountAndSortRow(context),
                   SizedBox(height: 14.h),
 
                   // 6. Featured Article Card
-                  _buildFeaturedCard(),
+                  _buildFeaturedCard(context),
                   SizedBox(height: 20.h),
 
                   // 7. Recent Study Guides Section
-                  _buildRecentGuidesSection(),
+                  _buildRecentGuidesSection(context),
                   SizedBox(height: 18.h),
 
                   // 8. General Articles List
-                  _buildGeneralArticlesList(),
+                  _buildGeneralArticlesList(context),
                   SizedBox(height: 60.h),
                 ],
               ),
@@ -90,7 +91,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 1. Hero Section
-  Widget _buildHeroSection() {
+  Widget _buildHeroSection(BuildContext context) {
     return Center(
       child: Column(
         children: [
@@ -133,7 +134,7 @@ class BlogView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22.sp,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF111827),
+                    color: context.textPrimary,
                   ),
                 ),
                 TextSpan(
@@ -157,7 +158,7 @@ class BlogView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.sp,
-                color: const Color(0xFF6B7280),
+                color: context.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -168,12 +169,12 @@ class BlogView extends StatelessWidget {
   }
 
   // 2. Search Bar
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xFFD1D5DB)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Row(
         children: [
@@ -181,7 +182,7 @@ class BlogView extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 12.w),
             child: Icon(
               Icons.search,
-              color: const Color(0xFF6B7280),
+              color: context.textSecondary,
               size: 20.sp,
             ),
           ),
@@ -189,10 +190,14 @@ class BlogView extends StatelessWidget {
             child: TextField(
               controller: controller.searchController,
               onSubmitted: controller.onSearchSubmitted,
+              style: TextStyle(
+                color: context.textPrimary,
+                fontSize: 13.sp,
+              ),
               decoration: InputDecoration(
                 hintText: 'স্টাডি আর্টিকেল বা বিষয় খুঁজুন...',
                 hintStyle: TextStyle(
-                  color: const Color(0xFF9CA3AF),
+                  color: context.textMuted,
                   fontSize: 13.sp,
                 ),
                 border: InputBorder.none,
@@ -229,7 +234,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 3. Horizontal Category Chips
-  Widget _buildCategoryChips() {
+  Widget _buildCategoryChips(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Obx(() {
@@ -249,12 +254,12 @@ class BlogView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? const Color(0xFF1B6B50)
-                        : Colors.white,
+                        : context.cardColor,
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF1B6B50)
-                          : const Color(0xFFD1D5DB),
+                          : context.borderColor,
                     ),
                   ),
                   child: Text(
@@ -262,7 +267,7 @@ class BlogView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.white : const Color(0xFF374151),
+                      color: isSelected ? Colors.white : context.textPrimary,
                     ),
                   ),
                 ),
@@ -279,9 +284,9 @@ class BlogView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(10.r),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: context.borderColor),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -303,7 +308,7 @@ class BlogView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1F2937),
+                      color: context.textPrimary,
                     ),
                   ),
                 ),
@@ -336,7 +341,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 5. Article Count & Sort Row
-  Widget _buildCountAndSortRow() {
+  Widget _buildCountAndSortRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -373,21 +378,22 @@ class BlogView extends StatelessWidget {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.cardColor,
               borderRadius: BorderRadius.circular(8.r),
-              border: Border.all(color: const Color(0xFFD1D5DB)),
+              border: Border.all(color: context.borderColor),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: controller.selectedSort.value,
-                icon: const Icon(
+                dropdownColor: context.cardColor,
+                icon: Icon(
                   Icons.keyboard_arrow_down,
-                  color: Color(0xFF4B5563),
+                  color: context.textSecondary,
                   size: 18,
                 ),
                 style: TextStyle(
                   fontSize: 11.sp,
-                  color: const Color(0xFF374151),
+                  color: context.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
                 onChanged: controller.onSortChanged,
@@ -406,7 +412,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 6. Featured Article Card
-  Widget _buildFeaturedCard() {
+  Widget _buildFeaturedCard(BuildContext context) {
     final featured = controller.featuredPost;
     if (featured == null) return const SizedBox.shrink();
 
@@ -415,9 +421,9 @@ class BlogView extends StatelessWidget {
       borderRadius: BorderRadius.circular(16.r),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.cardColor,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(color: const Color(0xFFE5E7EB)),
+          border: Border.all(color: context.borderColor),
           boxShadow: const [
             BoxShadow(
               color: Color(0x08000000),
@@ -443,14 +449,14 @@ class BlogView extends StatelessWidget {
                     fit: BoxFit.cover,
                     placeholder: (context, url) => Container(
                       height: 180.h,
-                      color: const Color(0xFFE5E7EB),
+                      color: context.surfaceColor,
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
                       height: 180.h,
-                      color: const Color(0xFFE5E7EB),
+                      color: context.surfaceColor,
                       child: const Icon(
                         Icons.image_not_supported_outlined,
                         size: 40,
@@ -546,7 +552,7 @@ class BlogView extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
 
-                  // Row 2: Date & Read Time (responsive Wrap - zero overflow)
+                  // Row 2: Date & Read Time
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: 6.w,
@@ -557,35 +563,35 @@ class BlogView extends StatelessWidget {
                           Icon(
                             Icons.calendar_today_outlined,
                             size: 12.sp,
-                            color: const Color(0xFF6B7280),
+                            color: context.textSecondary,
                           ),
                           SizedBox(width: 4.w),
                           Text(
                             featured.publishDate,
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: const Color(0xFF6B7280),
+                              color: context.textSecondary,
                             ),
                           ),
                         ],
                       ),
                       Text('•',
                           style: TextStyle(
-                              color: Colors.grey, fontSize: 12.sp)),
+                              color: context.textMuted, fontSize: 12.sp)),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.access_time,
                             size: 12.sp,
-                            color: const Color(0xFF6B7280),
+                            color: context.textSecondary,
                           ),
                           SizedBox(width: 4.w),
                           Text(
                             featured.readTime,
                             style: TextStyle(
                               fontSize: 11.sp,
-                              color: const Color(0xFF6B7280),
+                              color: context.textSecondary,
                             ),
                           ),
                         ],
@@ -600,7 +606,7 @@ class BlogView extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF111827),
+                      color: context.textPrimary,
                       height: 1.3,
                     ),
                   ),
@@ -613,7 +619,7 @@ class BlogView extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12.sp,
-                      color: const Color(0xFF6B7280),
+                      color: context.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -630,7 +636,7 @@ class BlogView extends StatelessWidget {
                               text: 'মেন্টর: ',
                               style: TextStyle(
                                 fontSize: 12.sp,
-                                color: const Color(0xFF4B5563),
+                                color: context.textSecondary,
                               ),
                             ),
                             TextSpan(
@@ -638,7 +644,7 @@ class BlogView extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF111827),
+                                color: context.textPrimary,
                               ),
                             ),
                           ],
@@ -650,7 +656,7 @@ class BlogView extends StatelessWidget {
                           vertical: 6.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.surfaceColor,
                           borderRadius: BorderRadius.circular(6.r),
                           border: Border.all(color: const Color(0xFF1B6B50)),
                         ),
@@ -685,7 +691,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 7. Recent Study Guides Section
-  Widget _buildRecentGuidesSection() {
+  Widget _buildRecentGuidesSection(BuildContext context) {
     final recentGuides = controller.recentGuides;
     if (recentGuides.isEmpty) return const SizedBox.shrink();
 
@@ -737,7 +743,7 @@ class BlogView extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF111827),
+                        color: context.textPrimary,
                       ),
                     ),
                   ),
@@ -748,16 +754,16 @@ class BlogView extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3F4F6),
+                color: context.surfaceColor,
                 borderRadius: BorderRadius.circular(6.r),
-                border: Border.all(color: const Color(0xFFE5E7EB)),
+                border: Border.all(color: context.borderColor),
               ),
               child: Text(
                 '${recentGuides.length} টি',
                 style: TextStyle(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF4B5563),
+                  color: context.textPrimary,
                 ),
               ),
             ),
@@ -775,9 +781,9 @@ class BlogView extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.cardColor,
                   borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: context.borderColor),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -793,12 +799,12 @@ class BlogView extends StatelessWidget {
                         placeholder: (context, url) => Container(
                           width: 85.w,
                           height: 70.h,
-                          color: const Color(0xFFE5E7EB),
+                          color: context.surfaceColor,
                         ),
                         errorWidget: (context, url, error) => Container(
                           width: 85.w,
                           height: 70.h,
-                          color: const Color(0xFFE5E7EB),
+                          color: context.surfaceColor,
                           child: const Icon(
                             Icons.image_not_supported_outlined,
                             size: 24,
@@ -830,7 +836,7 @@ class BlogView extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1F2937),
+                              color: context.textPrimary,
                               height: 1.3,
                             ),
                           ),
@@ -867,7 +873,7 @@ class BlogView extends StatelessWidget {
   }
 
   // 8. General Articles List
-  Widget _buildGeneralArticlesList() {
+  Widget _buildGeneralArticlesList(BuildContext context) {
     return Obx(() {
       final posts = controller.generalPosts;
       if (posts.isEmpty) {
@@ -883,9 +889,9 @@ class BlogView extends StatelessWidget {
               borderRadius: BorderRadius.circular(14.r),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: context.cardColor,
                   borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  border: Border.all(color: context.borderColor),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x05000000),
@@ -909,11 +915,11 @@ class BlogView extends StatelessWidget {
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Container(
                           height: 160.h,
-                          color: const Color(0xFFE5E7EB),
+                          color: context.surfaceColor,
                         ),
                         errorWidget: (context, url, error) => Container(
                           height: 160.h,
-                          color: const Color(0xFFE5E7EB),
+                          color: context.surfaceColor,
                           child: const Icon(
                             Icons.image_not_supported_outlined,
                             size: 36,
@@ -938,14 +944,14 @@ class BlogView extends StatelessWidget {
                                   Icon(
                                     Icons.calendar_today_outlined,
                                     size: 12.sp,
-                                    color: const Color(0xFF6B7280),
+                                    color: context.textSecondary,
                                   ),
                                   SizedBox(width: 4.w),
                                   Text(
                                     post.publishDate,
                                     style: TextStyle(
                                       fontSize: 11.sp,
-                                      color: const Color(0xFF6B7280),
+                                      color: context.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -978,7 +984,7 @@ class BlogView extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF111827),
+                              color: context.textPrimary,
                               height: 1.3,
                             ),
                           ),
@@ -991,7 +997,7 @@ class BlogView extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: const Color(0xFF6B7280),
+                              color: context.textSecondary,
                               height: 1.5,
                             ),
                           ),
@@ -1008,7 +1014,7 @@ class BlogView extends StatelessWidget {
                                       text: 'মেন্টর: ',
                                       style: TextStyle(
                                         fontSize: 12.sp,
-                                        color: const Color(0xFF4B5563),
+                                        color: context.textSecondary,
                                       ),
                                     ),
                                     TextSpan(
@@ -1016,7 +1022,7 @@ class BlogView extends StatelessWidget {
                                       style: TextStyle(
                                         fontSize: 12.sp,
                                         fontWeight: FontWeight.bold,
-                                        color: const Color(0xFF111827),
+                                        color: context.textPrimary,
                                       ),
                                     ),
                                   ],

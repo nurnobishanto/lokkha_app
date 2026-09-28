@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../components/custom_app_bar.dart';
 import '../../../../components/custom_snackbar.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_rank_model.dart';
 import '../widgets/exam_rank_card.dart';
@@ -61,7 +62,7 @@ class ExamRankView extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'পরীক্ষার র‍্যাঙ্ক তালিকা',
         centerTitle: true,
@@ -89,7 +90,7 @@ class ExamRankView extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A),
+                    color: context.textPrimary,
                   ),
                 ),
               ),

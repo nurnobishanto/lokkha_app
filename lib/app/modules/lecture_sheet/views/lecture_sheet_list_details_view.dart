@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/modules/lecture_sheet/controllers/lecture_sheet_list_details_controller.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../../models/lecture_sheet.dart';
 import '../../../routes/app_pages.dart';
@@ -26,7 +27,12 @@ class LectureSheetListDetailsView extends StatelessWidget {
           case ApiCallStatus.success:
             final model = controller.detailsModel.value;
             if (model == null) {
-              return const Center(child: Text("No Data Found"));
+              return Center(
+                child: Text(
+                  "No Data Found",
+                  style: TextStyle(color: context.textPrimary),
+                ),
+              );
             }
 
             return SafeArea(
@@ -37,15 +43,20 @@ class LectureSheetListDetailsView extends StatelessWidget {
                     /// Name
                     Text(
                       model.category?.name ?? '',
-                      style: Get.textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: Get.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: context.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 12),
 
                     /// Description
                     Text(
                       model.category?.description ?? '',
-                      style: Get.textTheme.bodyMedium?.copyWith(height: 1.5),
+                      style: Get.textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        color: context.textSecondary,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -54,11 +65,14 @@ class LectureSheetListDetailsView extends StatelessWidget {
                     /// Sheet Count
                     Row(
                       children: [
-                        const Icon(Icons.insert_drive_file_rounded, size: 20),
+                        Icon(Icons.insert_drive_file_rounded,
+                            size: 20, color: context.primaryColor),
                         const SizedBox(width: 8),
                         Text(
                           "Total Sheets: ${model.category?.lecturesheetsCount ?? 0}",
-                          style: Get.textTheme.bodyMedium,
+                          style: Get.textTheme.bodyMedium?.copyWith(
+                            color: context.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -76,8 +90,9 @@ class LectureSheetListDetailsView extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 13),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: context.cardColor,
                               borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: context.borderColor),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.04),
@@ -94,10 +109,11 @@ class LectureSheetListDetailsView extends StatelessWidget {
                                 const SizedBox(width: 10.0),
                                 Expanded(
                                   child: Text(sheet.name ?? 'No title',
-                                      style: AppTextStyles.heading5),
+                                      style: AppTextStyles.heading5
+                                          .copyWith(color: context.textPrimary)),
                                 ),
-                                const Icon(Icons.chevron_right,
-                                    size: 14),
+                                Icon(Icons.chevron_right,
+                                    size: 14, color: context.textMuted),
                               ],
                             ),
                           )),
@@ -107,7 +123,12 @@ class LectureSheetListDetailsView extends StatelessWidget {
               ),
             );
           case ApiCallStatus.error:
-            return const Center(child: Text("Something went wrong"));
+            return Center(
+              child: Text(
+                "Something went wrong",
+                style: TextStyle(color: context.textPrimary),
+              ),
+            );
           case ApiCallStatus.holding:
           default:
             return const SizedBox();
@@ -117,7 +138,7 @@ class LectureSheetListDetailsView extends StatelessWidget {
   }
 }
 
-Widget buildSheetTile(LectureSheet sheet) {
+Widget buildSheetTile(LectureSheet sheet, BuildContext context) {
   return GestureDetector(
     onTap: () {
       Get.toNamed(Routes.SHEET_DETAILS, arguments: sheet.id);
@@ -126,8 +147,9 @@ Widget buildSheetTile(LectureSheet sheet) {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.cardColor,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -145,10 +167,12 @@ Widget buildSheetTile(LectureSheet sheet) {
               sheet.name ?? 'No title',
               style: Get.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: context.textPrimary,
               ),
             ),
           ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          Icon(Icons.arrow_forward_ios_rounded,
+              size: 16, color: context.textMuted),
         ],
       ),
     ),

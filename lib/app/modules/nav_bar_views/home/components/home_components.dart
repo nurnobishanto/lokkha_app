@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 
 import '../../../../models/user.dart';
 
@@ -45,12 +46,14 @@ Widget topRankedUser({
         ],
       ),
       5.0.h.height,
-      Text(
-        "ID: $id",
-        style: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.w500,
-          fontSize: 12.sp,
+      Builder(
+        builder: (ctx) => Text(
+          "ID: $id",
+          style: TextStyle(
+            color: ctx.textPrimary,
+            fontWeight: FontWeight.w500,
+            fontSize: 12.sp,
+          ),
         ),
       ),
     ],

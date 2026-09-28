@@ -38,11 +38,16 @@ class RandomQuestionSelector extends StatelessWidget {
           SectionTitleWithDivider(title: 'এখনি উত্তর দিন'),
           10.h.height,
           Container(
-              padding: EdgeInsets.all(7),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
-                  // border: Border.all(color: Colors.amber, width: 3),
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                  color: LightThemeColors.softBg),
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  border: Border.all(
+                    color: context.borderColor,
+                    width: 0.8,
+                  ),
+                  color: context.isDark
+                      ? context.cardColor
+                      : LightThemeColors.softBg),
               child: Column(
                 children: [
                   HtmlWidget(
@@ -50,6 +55,7 @@ class RandomQuestionSelector extends StatelessWidget {
                     textStyle: AppTextStyles.heading4.copyWith(
                       fontWeight: FontWeight.w500,
                       fontSize: 13.sp,
+                      color: context.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 7),
@@ -70,13 +76,22 @@ class RandomQuestionSelector extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: selectedOptionIndex.value == index
                                         ? (option.isCorrect == true
-                                            ? Colors.greenAccent.shade100
-                                            : Colors.red)
-                                        : Colors.white,
+                                            ? (context.isDark
+                                                ? const Color(0xFF064E3B)
+                                                : Colors.greenAccent.shade100)
+                                            : (context.isDark
+                                                ? const Color(0xFF7F1D1D)
+                                                : Colors.red))
+                                        : context.cardColor,
+                                    border: Border.all(
+                                      color: context.borderColor,
+                                      width: 0.8,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.1),
+                                        color: context.isDark
+                                            ? Colors.black.withValues(alpha: 0.2)
+                                            : Colors.grey.withValues(alpha: 0.1),
                                         spreadRadius: 0,
                                         blurRadius: 1,
                                         offset: const Offset(0, 4),
@@ -94,9 +109,11 @@ class RandomQuestionSelector extends StatelessWidget {
                                             color: selectedOptionIndex.value ==
                                                     index
                                                 ? (option.isCorrect == true
-                                                    ? Colors.black
+                                                    ? (context.isDark
+                                                        ? Colors.white
+                                                        : Colors.black)
                                                     : Colors.white)
-                                                : Colors.black,
+                                                : context.textPrimary,
                                           ),
                                         ),
                                       ),

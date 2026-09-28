@@ -11,6 +11,7 @@ import 'package:lokkha/app/modules/premium_packages/controllers/premium_package_
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/constants.dart';
 import '../../../../config/theme/light_theme_colors.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../components/custom_action_button.dart';
 import '../../../components/custom_text_field.dart';
 import '../../../helper/global.dart';
@@ -26,6 +27,7 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
     final controller = Get.put(CourseCheckoutController());
 
     return Scaffold(
+      backgroundColor: context.scaffoldBg,
       appBar: AppBar(
         title: Text(
           "চেকআউট",
@@ -64,7 +66,7 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                     const SizedBox(height: 5.0),
                     Text(
                       "পূর্ণ নাম",
-                      style: AppTextStyles.heading5,
+                      style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                     ),
                     const SizedBox(height: 5.0),
                     CustomTextField(
@@ -75,7 +77,7 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                     const SizedBox(height: 10.0),
                     Text(
                       "ফোন নম্বর",
-                      style: AppTextStyles.heading5,
+                      style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                     ),
                     const SizedBox(height: 5.0),
                     CustomTextField(
@@ -86,7 +88,7 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                     SizedBox(height: 10.0.h),
                     Text(
                       'ইমেইল',
-                      style: AppTextStyles.heading5,
+                      style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                     ),
                     const SizedBox(height: 5.0),
                     CustomTextField(
@@ -95,39 +97,49 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                     ),
                     const SizedBox(height: 10.0),
                     Card(
+                      color: context.cardColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: BorderSide(color: context.borderColor),
+                      ),
+                      elevation: context.isDark ? 0 : 2,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(12.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "অর্ডার",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: context.textPrimary),
                             ),
-                            const Divider(),
+                            Divider(color: context.borderColor),
                             const SizedBox(height: 8.0),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: Text(
-                                      "${course.title ?? ''}\n${course.duration ?? ""}"),
+                                    "${course.title ?? ''}\n${course.duration ?? ""}",
+                                    style: TextStyle(color: context.textPrimary),
+                                  ),
                                 ),
                                 Text(
                                   '৳${course.regularPrice.toString()}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: context.textPrimary,
+                                  ),
                                 ),
                               ],
                             ),
-                            const Divider(),
+                            Divider(color: context.borderColor),
 
                             /// coupon
                             Row(
                               children: [
-                                const Text(
+                                Text(
                                   "কুপন কোড",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: context.textPrimary),
                                 ),
                                 Checkbox.adaptive(
                                   activeColor: LightThemeColors.primaryColor,
@@ -188,22 +200,26 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                                   )
                                 : const SizedBox.shrink(),
 
-                            const Divider(),
+                            Divider(color: context.borderColor),
                             const SizedBox(height: 8.00),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   "সাব টোটাল",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.0),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                    color: context.textPrimary,
+                                  ),
                                 ),
                                 Text(
                                   "৳${course.regularPrice.toString()}",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16.0),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                    color: context.textPrimary,
+                                  ),
                                 ),
                               ],
                             ),
@@ -232,24 +248,28 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "মোট",
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.0),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: context.textPrimary,
+                                      ),
                                     ),
                                     Text(
                                       "৳${controller.totalAmount > -1 ? controller.totalAmount.toString() : course.salePrice.toString()}",
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.0),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16.0,
+                                        color: context.textPrimary,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
 
-                            const Divider(),
+                            Divider(color: context.borderColor),
                             const SizedBox(height: 8.0),
                             const CustomPaymentCardButton(
                                 'https://lokkha.com/uploads/files/shares/app/bkash.png',
@@ -278,7 +298,7 @@ class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
                                   child: RichText(
                                     text: TextSpan(
                                       style:
-                                          const TextStyle(color: Colors.black),
+                                          TextStyle(color: context.textPrimary),
                                       children: [
                                         const TextSpan(
                                             text:
@@ -396,6 +416,7 @@ class CustomPaymentCardButton extends StatelessWidget {
           paymentSelectionController.setSelectedPayment(index);
         },
         style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),

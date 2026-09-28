@@ -7,6 +7,7 @@ import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/app/modules/auth_views/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/app/modules/premium_packages/views/premium_package_checkout_view.dart';
+import 'package:lokkha/config/extensions/common_extension.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 import '../../../../styles/text_style.dart';
 import '../controllers/premium_packages_controller.dart';
@@ -17,8 +18,8 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(PremiumPackagesController());
-    //   final packages=controller.model.value.packages;
     return Scaffold(
+      backgroundColor: context.scaffoldColor,
       appBar:
           const CustomAppBar(title: 'প্রিমিয়াম প্যাকেজ', centerTitle: true),
       body: Obx(() {
@@ -29,13 +30,13 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
             : Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.cardColor,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey)),
+                    border: Border.all(color: context.borderColor)),
                 child: Column(
                   children: [
-                    _buildHeaderRow(),
-                    const Divider(height: 0, color: Colors.grey),
+                    _buildHeaderRow(context),
+                    Divider(height: 0, color: context.borderColor),
                     Flexible(
                       child: ListView.builder(
                         itemCount: controller.model.value.packages?.length ?? 0,
@@ -44,6 +45,7 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                           return Column(
                             children: [
                               _buildPackageTable(
+                                context: context,
                                 onTapCheckout: () {
                                   if (isLoggedIn.value) {
                                     Get.to(
@@ -75,7 +77,7 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                                         : [],
                                 isFemale: (pkg.isFemale == true) ? 1 : 0,
                               ),
-                              const Divider(height: 0),
+                              Divider(height: 0, color: context.borderColor),
                             ],
                           );
                         },
@@ -88,22 +90,35 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
     );
   }
 
-  Widget _buildHeaderRow() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  Widget _buildHeaderRow(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('📦 প্যাকেজ',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          Text('💰 মূল্য',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(
+            '📦 প্যাকেজ',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: context.textPrimary,
+            ),
+          ),
+          Text(
+            '💰 মূল্য',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: context.textPrimary,
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildPackageTable({
+    required BuildContext context,
     required String title,
     required String price,
     required String oldPrice,
@@ -117,8 +132,10 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
       onTap: onTapCheckout,
       child: Container(
         color: isFemale == 1
-            ? LightThemeColors.red.withValues(alpha: .2)
-            : Colors.white,
+            ? (context.isDark
+                ? const Color(0xFF4C0519).withValues(alpha: 0.5)
+                : LightThemeColors.red.withValues(alpha: .2))
+            : context.cardColor,
         child: Padding(
           padding: const EdgeInsets.only(top: 3, bottom: 1, left: 8, right: 8),
           child: Table(
@@ -136,21 +153,31 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
+                          color: context.textPrimary,
                         ),
                       ),
                       Text(
                         duration,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: context.primaryColor,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       ...features.map(
                         (f) => Padding(
                           padding: const EdgeInsets.only(bottom: 2),
-                          child: Text(f, style: const TextStyle(fontSize: 12)),
+                          child: Text(
+                            f,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: context.textSecondary,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -161,7 +188,7 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                     child: Container(
                       height: 90,
                       width: 1,
-                      color: Colors.green,
+                      color: context.borderColor,
                     ),
                   ),
 
@@ -169,21 +196,30 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(price,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14)),
+                      Text(
+                        price,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: context.textPrimary,
+                        ),
+                      ),
                       Text(
                         oldPrice,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: context.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
                       Text(
                         discount,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.green),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: context.isDark
+                              ? const Color(0xFF34D399)
+                              : Colors.green,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       ElevatedButton(
@@ -191,7 +227,7 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isFemale == 1
                               ? LightThemeColors.red
-                              : Colors.blueAccent,
+                              : context.primaryColor,
                           minimumSize: const Size(90, 30),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),

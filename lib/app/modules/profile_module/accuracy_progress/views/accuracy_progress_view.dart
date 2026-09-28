@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../components/custom_app_bar.dart';
+import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../controllers/accuracy_progress_controller.dart';
 import '../widgets/accuracy_exam_card.dart';
 import '../widgets/accuracy_stat_card.dart';
@@ -13,7 +14,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'গড় নির্ভুলতা ও অগ্রগতি',
         centerTitle: true,
@@ -43,7 +44,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w900,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     label: "গড় নির্ভুলতা",
@@ -66,7 +67,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w900,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     label: "সর্বোচ্চ নির্ভুলতা",
@@ -93,7 +94,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.w900,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                     label: "মোট প্রশ্ন উত্তর",
@@ -127,7 +128,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                             style: TextStyle(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF64748B),
+                              color: context.textSecondary,
                             ),
                           ),
                         ],
@@ -173,7 +174,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
-                        color: const Color(0xFF0F172A),
+                        color: context.textPrimary,
                       ),
                     ),
                   ],
@@ -183,7 +184,7 @@ class AccuracyProgressView extends GetView<AccuracyProgressController> {
                   style: TextStyle(
                     fontSize: 11.5.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF64748B),
+                    color: context.textSecondary,
                   ),
                 ),
               ],
