@@ -6,7 +6,6 @@ import 'package:get/get_utils/get_utils.dart';
 import 'package:get/state_manager.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../config/translations/strings_enum.dart';
-import '../../utils/constants.dart';
 import '../components/custom_snackbar.dart';
 import 'api_exceptions.dart';
 import 'auth_service.dart';
@@ -180,9 +179,10 @@ class BaseClient {
     final errorMessage = error.message?.toLowerCase() ?? '';
 
     if (statusCode == 401) {
-      final isAuthEndpoint = url.contains(AppConstants.login) ||
-          url.contains(AppConstants.sendOtp) ||
-          url.contains(AppConstants.checkPhoneNumber);
+      final isAuthEndpoint = url.contains('/auth/') ||
+          url.contains('login') ||
+          url.contains('send-otp') ||
+          url.contains('check-phone');
 
       if (!isAuthEndpoint) {
         String? serverMsg;

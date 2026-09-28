@@ -21,11 +21,23 @@ class ProfileDataModel {
     this.user,
   });
 
-  factory ProfileDataModel.fromJson(Map<String, dynamic> json) =>
-      ProfileDataModel(
-        status: json["status"],
-        user: json["data"] == null ? null : User.fromJson(json["data"]),
-      );
+  factory ProfileDataModel.fromJson(Map<String, dynamic> json) {
+    User? parsedUser;
+    if (json["data"] != null && json["data"] is Map) {
+      final dataMap = json["data"] as Map<String, dynamic>;
+      if (dataMap["user"] != null && dataMap["user"] is Map) {
+        parsedUser = User.fromJson(dataMap["user"] as Map<String, dynamic>);
+      } else {
+        parsedUser = User.fromJson(dataMap);
+      }
+    } else if (json["user"] != null && json["user"] is Map) {
+      parsedUser = User.fromJson(json["user"] as Map<String, dynamic>);
+    }
+    return ProfileDataModel(
+      status: json["status"] == true || json["status"] == 1,
+      user: parsedUser,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "status": status,

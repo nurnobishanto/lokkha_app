@@ -3,15 +3,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/data/local/my_get_storage.dart';
 import 'package:lokkha/app/data/local/my_shared_pref.dart';
+import 'package:lokkha/app/data/local/secure_storage_service.dart';
+import 'package:lokkha/app/data/repositories/auth_repository.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 
 import '../helper/global.dart';
-import '../../utils/constants.dart';
 import '../models/user.dart';
 import '../modules/navbar/controllers/navbar_controller.dart';
 import '../routes/app_pages.dart';
 import 'api_call_status.dart';
-import 'base_client.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -22,9 +22,10 @@ class AuthService {
   static bool _isSessionDialogShowing = false;
 
   /// Handle session expiration with a dialog
-  void handleSessionExpired({String? message}) {
-    final token = MySharedPref.getUserToken();
-    if (token.isEmpty && !isLoggedIn.value) {
+  void handleSessionExpired({String? message}) async {
+    final token = await SecureStorageService.getToken();
+    final prefToken = MySharedPref.getUserToken();
+    if ((token == null || token.isEmpty) && prefToken.isEmpty && !isLoggedIn.value) {
       return;
     }
 
@@ -34,7 +35,8 @@ class AuthService {
     // Clear user session state
     isLoggedIn.value = false;
     havePackage.value = false;
-    MySharedPref.removeUserToken();
+    await SecureStorageService.clearAuthData();
+    await MySharedPref.removeUserToken();
     MyGetStorage.removeCache(MyGetStorage.meUser);
     myUser = User();
 
@@ -176,59 +178,60 @@ class AuthService {
     });
   }
 
-  /// Auth Check method
+  /// Auth Check method (Pure V1 with offline session preservation)
   Future<void> authCheck() async {
     debugPrint("Auth Check Called..");
-    String? token = MySharedPref.getUserToken();
-    if (token == '' || token.isEmpty) {
+    var token = await SecureStorageService.getToken();
+
+    // Fallback: If SecureStorage is empty but MySharedPref has token, sync to SecureStorage
+    if ((token == null || token.isEmpty) && MySharedPref.getUserToken().isNotEmpty) {
+      token = MySharedPref.getUserToken();
+      await SecureStorageService.saveToken(token);
+    }
+
+    if (token == null || token.isEmpty) {
       isLoggedIn.value = false;
-      Get.offAllNamed(Routes.AUTH_GATEWAY);
+      await MySharedPref.removeUserToken();
+      if (Get.currentRoute != Routes.AUTH_GATEWAY &&
+          Get.currentRoute != Routes.SPLASH) {
+        Get.offAllNamed(Routes.AUTH_GATEWAY);
+      }
       return;
     }
-    await BaseClient.safeApiCall(
-      AppConstants.authCheck,
-      RequestType.post,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-      onSuccess: (response) {
-        apiCallStatus = ApiCallStatus.success;
-        if (response.data['status']) {
-          isLoggedIn.value = true;
-          havePackage.value = false;
-          if (response.data["havePackage"]) {
-            havePackage.value = true;
-          }
-          if (response.data["update_profile_required"]) {
-            Get.toNamed(Routes.PROFILE_UPDATE_REQUIRED, arguments: {
-              "phoneNumber": response.data["data"]["phone"] ?? "",
-            });
-            isLoggedIn.value = true;
 
-            Get.find<NavbarController>().getMeProfileInfo();
-          }
-        } else {
-          handleSessionExpired(
-            message: response.data["message"]?.toString(),
-          );
+    // Ensure MySharedPref has token synced
+    if (MySharedPref.getUserToken().isEmpty) {
+      await MySharedPref.setUserToken(token);
+    }
+
+    final authRepo = AuthRepository();
+    final res = await authRepo.getCurrentUser();
+
+    if (res != null) {
+      if (res.status) {
+        apiCallStatus = ApiCallStatus.success;
+        isLoggedIn.value = true;
+        havePackage.value = res.havePackage;
+
+        // Check profile completion requirement
+        if (!res.profileCompleted || res.rawData?['update_profile_required'] == true) {
+          Get.toNamed(Routes.PROFILE_UPDATE_REQUIRED, arguments: {
+            "phoneNumber": res.user?.phone ?? res.rawData?["data"]?["phone"] ?? "",
+          });
         }
-        debugPrint("Auth Check successfully: ${response.data["message"]}");
-      },
-      onError: (error) {
+
+        if (Get.isRegistered<NavbarController>()) {
+          Get.find<NavbarController>().getMeProfileInfo();
+        }
+      } else {
+        // Explicit invalid session response from server
         apiCallStatus = ApiCallStatus.error;
-        if (error.statusCode == 401) {
-          handleSessionExpired();
-        } else {
-          isLoggedIn.value = false;
-          MySharedPref.removeUserToken();
-          MyGetStorage.removeCache(MyGetStorage.meUser);
-          myUser = User();
-          if (Get.isRegistered<NavbarController>()) {
-            Get.find<NavbarController>().clearProfileState();
-          }
-        }
-        debugPrint("Error Auth Check: ${error.message}");
-      },
-    );
+        handleSessionExpired(message: res.message);
+      }
+    } else {
+      // Network timeout / offline: keep offline cached session
+      debugPrint("Auth Check: Network unavailable, keeping cached session");
+      isLoggedIn.value = true;
+    }
   }
 }

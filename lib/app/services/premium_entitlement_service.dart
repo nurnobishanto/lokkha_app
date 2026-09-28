@@ -2,12 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/my_shared_pref.dart';
-import 'package:lokkha/utils/constants.dart';
+import 'package:lokkha/app/data/local/secure_storage_service.dart';
+import 'package:lokkha/app/data/repositories/auth_repository.dart';
 
 import '../helper/global.dart';
 import 'api_call_status.dart';
-import 'base_client.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
 /// PremiumEntitlementService
@@ -91,8 +90,8 @@ class PremiumEntitlementService extends GetxService {
   }
 
   Future<void> _fetchEntitlement() async {
-    final token = MySharedPref.getUserToken();
-    if (token.isEmpty) {
+    final token = await SecureStorageService.getToken();
+    if (token == null || token.isEmpty) {
       // Not logged in → no entitlement
       _updateState(hasPremium: false);
       return;
@@ -100,29 +99,24 @@ class PremiumEntitlementService extends GetxService {
 
     validationStatus.value = ApiCallStatus.loading;
 
-    await BaseClient.safeApiCall(
-      AppConstants.authCheck,
-      RequestType.post,
-      headers: {'Authorization': 'Bearer $token'},
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final bool serverSaysPremium =
-              response.data['havePackage'] == true;
-          _updateState(hasPremium: serverSaysPremium);
-          log('✅ Entitlement validated: isPremium=$serverSaysPremium');
-        } else {
-          _updateState(hasPremium: false);
-          log('⚠️ Entitlement check returned status=false');
-        }
+    try {
+      final authRepo = AuthRepository();
+      final res = await authRepo.getCurrentUser();
+      if (res != null && res.status) {
+        _updateState(hasPremium: res.havePackage);
+        log('✅ Entitlement validated: isPremium=${res.havePackage}');
         validationStatus.value = ApiCallStatus.success;
-      },
-      onError: (error) {
-        // On network error: keep the CURRENT cached value — do not revoke
-        // access on transient failures to avoid locking out paying users.
+      } else {
+        _updateState(hasPremium: false);
+        log('⚠️ Entitlement check returned status=false');
         validationStatus.value = ApiCallStatus.error;
-        log('❌ Entitlement network error: ${error.message} — keeping cached state');
-      },
-    );
+      }
+    } catch (e) {
+      // On network error: keep the CURRENT cached value — do not revoke
+      // access on transient failures to avoid locking out paying users.
+      validationStatus.value = ApiCallStatus.error;
+      log('❌ Entitlement network error: $e — keeping cached state');
+    }
   }
 
   void _updateState({required bool hasPremium}) {

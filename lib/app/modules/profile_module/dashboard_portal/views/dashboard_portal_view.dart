@@ -56,7 +56,7 @@ class DashboardPortalView extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        if (!isLoggedIn.value || MySharedPref.getUserToken().isEmpty) {
+        if (!isLoggedIn.value) {
           return const AuthGatewayView();
         }
 

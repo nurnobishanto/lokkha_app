@@ -1,7 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/my_shared_pref.dart';
-import 'package:lokkha/app/services/base_client.dart';
+import 'package:lokkha/app/data/network/api_client.dart';
 import 'package:lokkha/utils/constants.dart';
 
 import '../../../helper/global.dart';
@@ -68,8 +68,7 @@ class ProfileUpdateRequiredController extends GetxController {
       return;
     }
 
-    String? token = MySharedPref.getUserToken();
-    String url = AppConstants.updateProfileRequired;
+    _setLoadingState(true);
 
     final Map<String, dynamic> data = {
       "name": nameController.text.trim(),
@@ -80,52 +79,60 @@ class ProfileUpdateRequiredController extends GetxController {
       "password": pwdController.text.trim(),
       "password_confirmation": confirmPwdController.text.trim(),
     };
-    Map<String, String> headers = {
-      'Authorization': 'Bearer $token',
-    };
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.post,
-      data: data,
-      headers: headers,
-      onSuccess: (response) {
-        _setLoadingState(true);
-        apiCallStatus = ApiCallStatus.success;
-        if (response.data['status']) {
-          CustomSnackBar.showCustomToast(
-            message: response.data["message"],
-          );
-          isLoggedIn.value = true;
+
+    try {
+      final response = await ApiClient.post(
+        AppConstants.v1UserProfileUpdate,
+        data: data,
+      );
+
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.success;
+
+      final isSuccess = response.data['status'] == true ||
+          response.data['status'] == 1 ||
+          response.data['success'] == true;
+
+      if (isSuccess) {
+        CustomSnackBar.showCustomToast(
+          message: response.data["message"] ?? "প্রোফাইল সফলভাবে আপডেট হয়েছে!",
+        );
+        isLoggedIn.value = true;
+        if (Get.isRegistered<NavbarController>()) {
           Get.find<NavbarController>().getMeProfileInfo();
-          Get.offAllNamed(Routes.NAVBAR);
         }
-        update();
-        debugPrint("Update Profile Required successful: ${response.data}");
-      },
-      onError: (error) {
-        _setLoadingState(false);
-        apiCallStatus = ApiCallStatus.error;
-        if (error.response?.data["errors"] != null) {
-          final errors = error.response!.data['errors'];
+        Get.offAllNamed(Routes.NAVBAR);
+      } else {
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: "Update Failed",
+          message: response.data["message"] ?? "প্রোফাইল আপডেট করা যায়নি।",
+        );
+      }
+    } on DioException catch (error) {
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.error;
+      if (error.response?.data is Map && error.response?.data["errors"] != null) {
+        final errors = error.response!.data['errors'];
+        if (errors is Map) {
           errors.forEach((key, value) {
             CustomSnackBar.showCustomErrorToast(
-              message: value[0],
+              message: value is List ? value.first.toString() : value.toString(),
             );
           });
-        } else {
-          CustomSnackBar.showCustomToast(
-            message: error.message,
-          );
         }
-        update();
-        debugPrint("Error update Profile Info Required: ${error.message}");
-      },
-      onLoading: () {
-        apiCallStatus = ApiCallStatus.loading;
-        update();
-        debugPrint("Logging...");
-      },
-    );
+      } else {
+        CustomSnackBar.showCustomToast(
+          message: error.message ?? "সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।",
+        );
+      }
+    } catch (e) {
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.error;
+      debugPrint("Error update Profile Info Required: $e");
+      CustomSnackBar.showCustomErrorToast(message: "অপ্রত্যাশিত সমস্যা হয়েছে।");
+    } finally {
+      update();
+    }
   }
 
   /// Submit Function

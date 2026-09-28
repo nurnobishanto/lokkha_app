@@ -35,7 +35,7 @@ class ProfileView extends GetView<ProfileController> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (!isLoggedIn.value || MySharedPref.getUserToken().isEmpty) {
+        if (!isLoggedIn.value) {
           return const AuthGatewayView();
         }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/services/base_client.dart';
-import 'package:lokkha/utils/constants.dart';
+import 'package:lokkha/app/data/repositories/auth_repository.dart';
 
 import '../../../../components/custom_snackbar.dart';
 import '../../../../routes/app_pages.dart';
@@ -9,41 +8,56 @@ import '../../../../services/api_call_status.dart';
 
 class SignUpController extends GetxController {
   final TextEditingController phoneController = TextEditingController();
+  final AuthRepository _authRepository = AuthRepository();
   ApiCallStatus apiCallStatus = ApiCallStatus.holding;
   bool isLoading = false;
 
   Future<void> checkPhoneNumber() async {
+    final phone = phoneController.text.trim();
+    if (phone.isEmpty || phone.length < 11) {
+      _showErrorSnackBar("সঠিক ১১ ডিজিটের ফোন নম্বর প্রদান করুন।");
+      return;
+    }
+
     _setLoadingState(true);
 
-    await BaseClient.safeApiCall(
-      AppConstants.checkPhoneNumber,
-      RequestType.post,
-      data: {"phone": phoneController.text},
-      onSuccess: _onSuccess,
-      onError: _onError,
-      onLoading: _onLoading,
-    );
-  }
+    try {
+      final res = await _authRepository.checkPhone(phone);
+      _setLoadingState(false);
 
-  void _onSuccess(response) {
-    _setLoadingState(false);
-    if (response.data['status']) {
-      _handleSuccessResponse(response);
-    } else {
-      _showErrorSnackBar(response.data["message"]);
+      if (res.status) {
+        apiCallStatus = ApiCallStatus.success;
+        final raw = res.rawData;
+        final page = raw?["page"]?.toString().toLowerCase();
+        
+        final isOtp = page == "otp" || !res.isRegistered;
+
+        if (isOtp) {
+          Get.toNamed(Routes.VERIFY_OTP, arguments: {
+            'phoneNumber': phone,
+            'type': raw?["type"] ?? 'Registration',
+          });
+        } else {
+          Get.toNamed(
+            Routes.SIGNIN,
+            arguments: {
+              'phoneNumber': raw?['phone'] ?? raw?['data']?['phone'] ?? phone,
+              'type': raw?['method'] ?? 'password',
+            },
+          );
+        }
+      } else {
+        apiCallStatus = ApiCallStatus.error;
+        _showErrorSnackBar(res.message ?? "ফোন নম্বরটি যাচাই করা সম্ভব হয়নি।");
+      }
+    } catch (e) {
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.error;
+      debugPrint("Error checking phone number: $e");
+      _showErrorSnackBar("সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।");
+    } finally {
+      update();
     }
-  }
-
-  void _onError(error) {
-    _setLoadingState(false);
-    apiCallStatus = ApiCallStatus.error;
-    debugPrint("Error checking phone number: ${error.message}");
-  }
-
-  void _onLoading() {
-    apiCallStatus = ApiCallStatus.loading;
-    update();
-    debugPrint("Checking phone number...");
   }
 
   void _setLoadingState(bool loading) {
@@ -52,29 +66,16 @@ class SignUpController extends GetxController {
     update();
   }
 
-  void _handleSuccessResponse(response) {
-    debugPrint(response.data["message"]);
-    final page = response.data["page"];
-    if (page == "otp") {
-      Get.toNamed(Routes.VERIFY_OTP, arguments: {
-        'phoneNumber': phoneController.text,
-        'type': response.data["type"],
-      });
-    } else if (page == "password") {
-      Get.toNamed(
-        Routes.SIGNIN,
-        arguments: {
-          'phoneNumber': response.data['phone'],
-          'type': response.data['method'],
-        },
-      );
-    }
-  }
-
   void _showErrorSnackBar(String message) {
     CustomSnackBar.showCustomErrorSnackBar(
-      title: message,
-      message: "Please provide your phone number",
+      title: "সতর্কতা",
+      message: message,
     );
+  }
+
+  @override
+  void onClose() {
+    phoneController.dispose();
+    super.onClose();
   }
 }

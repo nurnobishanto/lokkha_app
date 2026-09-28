@@ -1,25 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/my_shared_pref.dart';
-import '../../../../../utils/constants.dart';
+import 'package:lokkha/app/data/repositories/auth_repository.dart';
+
 import '../../../../components/custom_snackbar.dart';
-import '../../../../helper/global.dart';
 import '../../../../routes/app_pages.dart';
 import '../../../../services/api_call_status.dart';
-import '../../../../services/base_client.dart';
 import '../../../navbar/controllers/navbar_controller.dart';
 
 class VerifyOtpController extends GetxController {
   String? otp;
   ApiCallStatus apiCallStatus = ApiCallStatus.holding;
   bool isLoading = false;
+  final AuthRepository _authRepository = AuthRepository();
 
   @override
   void onInit() {
     super.onInit();
-    final phoneNumber = Get.arguments['phoneNumber'];
-    final type = Get.arguments['type'];
-    sendOtp(phoneNumber, type);
+    final phoneNumber = Get.arguments?['phoneNumber']?.toString() ?? '';
+    final type = Get.arguments?['type']?.toString();
+    if (phoneNumber.isNotEmpty) {
+      sendOtp(phoneNumber, type);
+    }
   }
 
   void setOtp(String value) {
@@ -27,49 +28,56 @@ class VerifyOtpController extends GetxController {
     update();
   }
 
-  /// register method
+  /// Register method via OTP
   Future<void> register(String phone) async {
+    if (otp == null || otp!.trim().length < 6) {
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Please Fill the pin',
+        message: 'OTP must be 6 digits.',
+      );
+      return;
+    }
+
     _setLoadingState(true);
-    await BaseClient.safeApiCall(
-      AppConstants.register,
-      RequestType.post,
-      data: {
-        "phone": phone,
-        "otp": otp,
-      },
-      onSuccess: (response) {
-        _setLoadingState(false);
+
+    try {
+      final res = await _authRepository.register(
+        phone: phone,
+        otp: otp!.trim(),
+      );
+
+      _setLoadingState(false);
+
+      if (res.status) {
         apiCallStatus = ApiCallStatus.success;
-        if (response.data['status']) {
-          MySharedPref.setUserToken(response.data["token"]);
-          isLoggedIn.value = true;
-          CustomSnackBar.showCustomToast(
-            message: response.data["message"].toString(),
-          );
+        CustomSnackBar.showCustomToast(
+          message: res.message ?? "রেজিস্ট্রেশন সফল হয়েছে!",
+        );
+        if (Get.isRegistered<NavbarController>()) {
           Get.find<NavbarController>().getMeProfileInfo();
-          Get.offAllNamed(Routes.PROFILE_UPDATE_REQUIRED,
-              arguments: {'phoneNumber': phone.toString()});
-        } else {
-          CustomSnackBar.showCustomErrorSnackBar(
-            title: 'Invalid Credential',
-            message: response.data["message"],
-          );
         }
-        update();
-        debugPrint("Registration successfully: ${response.data}");
-      },
-      onError: (error) {
-        _setLoadingState(false);
+        Get.offAllNamed(
+          Routes.PROFILE_UPDATE_REQUIRED,
+          arguments: {'phoneNumber': phone.toString()},
+        );
+      } else {
         apiCallStatus = ApiCallStatus.error;
-        update();
-        debugPrint("Error Register: ${error.message}");
-      },
-      onLoading: () {
-        apiCallStatus = ApiCallStatus.loading;
-        update();
-        debugPrint("Logging...");
-      },
-    );
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: 'Invalid Credential',
+          message: res.message ?? 'রেজিস্ট্রেশন সম্পন্ন করা সম্ভব হয়নি।',
+        );
+      }
+    } catch (e) {
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.error;
+      debugPrint("Error Register: $e");
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Error',
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+      );
+    } finally {
+      update();
+    }
   }
 
   void _setLoadingState(bool loading) {
@@ -78,34 +86,34 @@ class VerifyOtpController extends GetxController {
     update();
   }
 
-  /// send otp
-  Future<void> sendOtp(String phone, String type) async {
-    await BaseClient.safeApiCall(
-      AppConstants.sendOtp,
-      RequestType.post,
-      data: {
-        "phone": phone,
-        "type": type,
-      },
-      onSuccess: (response) {
-        apiCallStatus = ApiCallStatus.success;
+  /// Send OTP
+  Future<void> sendOtp(String phone, [String? type]) async {
+    apiCallStatus = ApiCallStatus.loading;
+    update();
 
+    try {
+      final res = await _authRepository.sendOtp(phone);
+      if (res.status) {
+        apiCallStatus = ApiCallStatus.success;
         CustomSnackBar.showCustomToast(
-          message: response.data["message"],
+          message: res.message ?? "ওটিপি সফলভাবে পাঠানো হয়েছে।",
         );
-        update();
-        debugPrint("OTP sent successfully: ${response.data}");
-      },
-      onError: (error) {
+      } else {
         apiCallStatus = ApiCallStatus.error;
-        update();
-        debugPrint("Error send otp: ${error.message}");
-      },
-      onLoading: () {
-        apiCallStatus = ApiCallStatus.loading;
-        update();
-        debugPrint("Otp Sending...");
-      },
-    );
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: 'OTP Error',
+          message: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে।',
+        );
+      }
+    } catch (e) {
+      apiCallStatus = ApiCallStatus.error;
+      debugPrint("Error send otp: $e");
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'OTP Error',
+        message: 'ওটিপি পাঠাতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+      );
+    } finally {
+      update();
+    }
   }
 }

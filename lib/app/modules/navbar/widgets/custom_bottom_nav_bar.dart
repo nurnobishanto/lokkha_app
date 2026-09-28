@@ -201,19 +201,6 @@ class CustomBottomNavBar extends StatelessWidget {
                       ),
                     );
                   }),
-
-                  _buildNavItem(
-                    index: 5,
-                    label: "ব্লগ",
-                    iconBuilder: (isSelected) => Icon(
-                      isSelected
-                          ? Icons.article_rounded
-                          : Icons.article_outlined,
-                      size: 20.r,
-                      color:
-                          isSelected ? Colors.white : const Color(0xFF64748B),
-                    ),
-                  ),
                 ],
               ),
             ),
