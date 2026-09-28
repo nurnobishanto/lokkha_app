@@ -6,7 +6,6 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_action_button.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../models/exam.dart';
 import '../../../routes/app_pages.dart';
 import '../../exam/controllers/exam_controller.dart';

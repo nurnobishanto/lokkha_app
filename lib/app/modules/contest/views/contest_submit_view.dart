@@ -17,8 +17,7 @@ class ContestSubmitView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final questionList = model.results;
-    final ContestSubmitController controller =
-        Get.put(ContestSubmitController());
+    Get.put(ContestSubmitController());
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,

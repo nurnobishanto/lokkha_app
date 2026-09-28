@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/models/start_exam_model.dart';
@@ -55,8 +53,6 @@ class SetTimeController extends GetxController {
           .map((subject) => subject.toMap())
           .toList(), // Convert each subject to map
     };
-    final Uint8List bodyBytes =
-        Uint8List.fromList(utf8.encode(jsonEncode(data)));
 
     Get.to(() => WebExamView(
         title: "Exam", url: AppConstants.webTestExamStart, body: data));

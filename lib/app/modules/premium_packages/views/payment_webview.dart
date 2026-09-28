@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/modules/nav_bar_views/home/views/home_view.dart';
-import 'package:lokkha/app/modules/navbar/views/navbar_view.dart';
-import 'package:lokkha/app/modules/profile_module/my_orders/views/order_details_view.dart';
 import 'package:lokkha/app/modules/splash/views/splash_view.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:webview_flutter/webview_flutter.dart';

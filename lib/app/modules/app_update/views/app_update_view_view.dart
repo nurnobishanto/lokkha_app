@@ -2,14 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_action_button.dart';
 import 'package:lokkha/config/constants/app_images.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../controllers/app_update_view_controller.dart';
-
-class AppUpdateView extends GetView<AppUpdateController> {
+class AppUpdateView extends StatelessWidget {
   final Uri url;
   const AppUpdateView({required this.url, super.key});
   @override

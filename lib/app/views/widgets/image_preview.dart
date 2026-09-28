@@ -18,7 +18,7 @@ class ImagePreviewPage extends StatelessWidget {
       }
 
       // Step 2: Download file as bytes
-      var response = await Dio().get(
+      await Dio().get(
         url,
         options: Options(responseType: ResponseType.bytes),
       );

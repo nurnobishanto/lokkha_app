@@ -262,16 +262,6 @@ class AppPages {
       page: () => const PremiumPackagesView(),
       binding: PremiumPackagesBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.MY_APP,
-    //   page: () =>  MyApp(navigatorKey: null,),
-    //   binding: MyAppBinding(),
-    // ),
-    // GetPage(
-    //   name: _Paths.SUBJECT_SECTION,
-    //   page: () => const SubjectSectionView(subject: null,),
-    //   binding: SubjectSectionBinding(),
-    // ),
     GetPage(
       name: _Paths.MY_PACKAGES,
       page: () => const MyPackagesView(),
@@ -302,11 +292,6 @@ class AppPages {
       page: () => const VocabularyView(),
       binding: VocabularyBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.MODEL_TEST,
-    //   page: () => const ModelTestView(),
-    //   binding: ModelTestBinding(),
-    // ),
     GetPage(
       name: _Paths.LECTURE_SHEET,
       page: () => const LectureSheetListView(),
@@ -343,11 +328,6 @@ class AppPages {
       page: () => const CourseLearnView(),
       binding: CourseLearnBinding(),
     ),
-    // GetPage(
-    //   name: _Paths.COURSE_CHECKOUT,
-    //   page: () => const CourseCheckoutView(course: null,),
-    //   binding: CourseCheckoutBinding(),
-    // ),
     GetPage(
       name: _Paths.ALL_COURSES,
       page: () => const AllCourseView(),

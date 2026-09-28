@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/modules/vocabulary/controllers/vocabulary_controller.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
 import '../../../../config/theme/light_theme_colors.dart';
 import '../../../components/custom_search_bar.dart';
 import '../../../helper/global.dart';

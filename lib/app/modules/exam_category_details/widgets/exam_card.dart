@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/utils/date_formatter.dart';
 

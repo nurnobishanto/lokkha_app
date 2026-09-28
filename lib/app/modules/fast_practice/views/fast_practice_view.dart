@@ -85,69 +85,6 @@ class FastPracticeView extends GetView<HomeController> {
           }
         },
       ),
-      // body: Obx(() {
-      //   switch (controller.apiCallStatus.value) {
-      //     case ApiCallStatus.loading:
-      //       return const Center(child: CircularProgressIndicator());
-      //     case ApiCallStatus.success:
-      //       return SingleChildScrollView(
-      //         child: Padding(
-      //           padding: EdgeInsets.only(
-      //             top: 16.0,
-      //             bottom: 8.0.h,
-      //             left: 8.0.h,
-      //             right: 8.0.h,
-      //           ),
-      //           child: Center(
-      //             child: Wrap(
-      //               spacing: 10,
-      //               runSpacing: 8,
-      //               alignment: WrapAlignment.center,
-      //               children: List.generate(
-      //                   controller.model.value.subjects?.length ?? 0, (index) {
-      //                 final subject = controller.model.value.subjects![index];
-      //                 return InkWell(
-      //                   onTap: () async {
-      //                     MySharedPref.clearSubjectSection();
-      //                     Get.to(SubjectSectionView(subject: subject));
-      //                   },
-      //                   child: Container(
-      //                     padding: EdgeInsets.symmetric(
-      //                         horizontal: 10.00.w, vertical: 8.00.h),
-      //                     decoration: BoxDecoration(
-      //                       color: LightThemeColors.white,
-      //                       borderRadius: BorderRadius.circular(8),
-      //                       border: Border.all(
-      //                           color: LightThemeColors.primaryColor,
-      //                           width: .2),
-      //                       boxShadow: [
-      //                         BoxShadow(
-      //                           color: Colors.black.withValues(alpha: 0.05),
-      //                           spreadRadius: 1,
-      //                           blurRadius: 5,
-      //                           offset: const Offset(0, 2),
-      //                         ),
-      //                       ],
-      //                     ),
-      //                     child: Text(
-      //                       subject.name.toString(),
-      //                       textAlign: TextAlign.center,
-      //                       style: AppTextStyles.body2,
-      //                     ),
-      //                   ),
-      //                 );
-      //               }),
-      //             ),
-      //           ),
-      //         ),
-      //       );
-      //     case ApiCallStatus.error:
-      //       return const Center(child: Text("Failed to load data. Try again."));
-      //     case ApiCallStatus.holding:
-      //     default:
-      //       return const SizedBox.shrink();
-      //   }
-      // }),
     );
   }
 }

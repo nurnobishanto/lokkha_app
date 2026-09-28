@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../app/data/local/my_shared_pref.dart';
 import '../translations/localization_service.dart';
 
-// todo configure text family and size
 class MyFonts {
   // return the right font depending on app language
   static TextStyle get getAppFontType =>

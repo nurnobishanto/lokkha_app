@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:developer';
-import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
@@ -62,9 +60,6 @@ class LatestExamController extends GetxController {
       'is_exam': isStartExam
     };
     log('xaa: $data');
-
-    final Uint8List bodyBytes =
-        Uint8List.fromList(utf8.encode(jsonEncode(data)));
 
     Get.to(() => WebExamView(
         title: tag.name.toString(),

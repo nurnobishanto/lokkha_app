@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/modules/grid_views/mock_test_tab/mock_test/views/topic_selection_view.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
 import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import '../../../../../services/api_call_status.dart';

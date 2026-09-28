@@ -6,7 +6,6 @@ import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/app/modules/latest_exam/views/latest_exam_start_view.dart';
 import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
 import 'package:lokkha/styles/text_style.dart';
 import 'package:lokkha/utils/date_formatter.dart';
 import '../../../../config/theme/light_theme_colors.dart';

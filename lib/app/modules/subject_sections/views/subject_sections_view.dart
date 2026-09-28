@@ -69,53 +69,6 @@ class SubjectSectionView extends GetView<SubjectSectionController> {
                   }
                 },
               ),
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: CustomTextField(
-              //         controller: setNumberController,
-              //         hintText: "প্রশ্ন সংখ্যা সেট করুন",
-              //         validator: (val) {
-              //           if (val == null || val.isEmpty) {
-              //             return "This field is required";
-              //           }
-              //           final parsedValue = int.tryParse(val);
-              //           if (parsedValue == null) {
-              //             return "please enter valid number";
-              //           } else if (parsedValue < 5) {
-              //             return "Must be at least 10";
-              //           }
-              //           return null;
-              //         },
-              //       ),
-              //     ),
-              //     const SizedBox(width: 8.00),
-              //     Expanded(
-              //       child: CustomActionButton(
-              //         text: "এগিয়ে যান",
-              //         onPressed: () async {
-              //           if (setNumberController.text.isNotEmpty) {
-              //             SubjectSectionSelect newSubject = SubjectSectionSelect(
-              //               id: subject?.id ?? 0,
-              //               name: subject?.name ?? '',
-              //               quantity: min(
-              //                 int.tryParse(setNumberController.text)!.toInt(),
-              //                 subject!.questionCount!.toInt(),
-              //               ),
-              //             );
-              //             await MySharedPref.addOrUpdateSubjectSectionSelect(
-              //                 newSubject);
-              //             controller.getSubjects();
-              //             Get.to(const SubSectionsSetTimeView());
-              //           } else {
-              //             CustomSnackBar.showCustomErrorToast(
-              //                 message: "please enter number of question!");
-              //           }
-              //         },
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
         ),

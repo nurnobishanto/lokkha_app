@@ -5,16 +5,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/app/components/custom_app_bar.dart';
 import 'package:lokkha/app/components/custom_snackbar.dart';
-import 'package:lokkha/app/data/local/my_shared_pref.dart';
 import 'package:lokkha/app/helper/global.dart';
 import 'package:lokkha/app/modules/auth_views/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/app/routes/app_pages.dart';
-import 'package:lokkha/app/views/widgets/web_exam_view.dart';
 import 'package:lokkha/app/components/theme/theme_mode_selector_sheet.dart';
 import 'package:lokkha/config/theme/app_colors.dart';
 import 'package:lokkha/config/theme/light_theme_colors.dart';
-import 'package:lokkha/styles/text_style.dart';
-import 'package:lokkha/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 

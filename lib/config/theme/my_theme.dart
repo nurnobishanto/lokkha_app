@@ -1,4 +1,3 @@
-// ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,15 +6,7 @@ import '../../app/data/local/my_shared_pref.dart';
 import 'dark_theme_colors.dart';
 import 'light_theme_colors.dart';
 import 'my_styles.dart';
-//
-// ├── theme/
-// │   ├── my_theme.dart              🔁 Main controller: switch + ThemeData
-// │   ├── light_theme_colors.dart    🎨 Light theme color palette
-// │   ├── dark_theme_colors.dart     🌙 Dark theme color palette
-// │   └── my_styles.dart             🖋️ Shared text/button/icon styles
-// ├── utils/
-// │   └── my_shared_pref.dart        💾 SharedPreferences helper (theme save/load)
-// ├── main.dart                      🚀 Entry point (Set theme here)
+
 
 class MyTheme {
   static ThemeData getThemeData({required bool isLight}) {
@@ -23,11 +14,11 @@ class MyTheme {
       // primarySwatch: Colors.green,
 
       useMaterial3: true,
-      // main color (app bar,tabs..etc)
+      // main color
       primaryColor: isLight
           ? LightThemeColors.primaryColor
           : DarkThemeColors.primaryColor,
-      // secondary color (for checkbox,float button, radio..etc)
+      // secondary color
       canvasColor:
           isLight ? LightThemeColors.accentColor : DarkThemeColors.accentColor,
       // color contrast (if the theme is dark text should be white for example)
@@ -102,8 +93,6 @@ class MyTheme {
     );
   }
 
-  /// update app theme and save theme type to shared pref
-  /// (so when the app is killed and up again theme will remain the same)
   static void changeTheme() {
     bool isLightTheme = MySharedPref.getThemeIsLight();
     bool newIsLight = !isLightTheme;
