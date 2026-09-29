@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/models/subject.dart';
-import 'package:lokkha/app/modules/nav_bar_views/home/controllers/home_controller.dart';
-import 'package:lokkha/app/modules/nav_bar_views/home/models/subject_sections_model.dart';
-import 'package:lokkha/app/services/api_call_status.dart';
+import 'package:lokkha/shared/shared.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/features/home/home.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
@@ -59,8 +59,13 @@ void main() {
   }
 
   setUp(() {
+    Get.reset();
     controller = HomeController();
     Get.put(controller);
+  });
+
+  tearDown(() {
+    Get.reset();
   });
 
   group('SubjectSection Grid Widget', () {

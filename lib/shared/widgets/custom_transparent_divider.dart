@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/core/core.dart';
 
 class SectionTitleWithDivider extends StatelessWidget {
   final String title;

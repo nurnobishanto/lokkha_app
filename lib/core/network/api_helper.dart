@@ -1,4 +1,4 @@
-import 'package:lokkha/app/services/api_call_status.dart';
+import 'package:lokkha/core/network/api_call_status.dart';
 
 
 ApiCallStatus apiCallStatus = ApiCallStatus.holding;

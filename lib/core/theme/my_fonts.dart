@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/config/translations/localization_service.dart';
+import 'package:lokkha/core/translations/localization_service.dart';
 
 class MyFonts {
   // return the right font depending on app language

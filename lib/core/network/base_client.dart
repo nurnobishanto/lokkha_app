@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart'; // kDebugMode
 import 'package:get/get_utils/get_utils.dart';
 import 'package:get/state_manager.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import 'package:lokkha/config/translations/strings_enum.dart';
+import 'package:lokkha/core/translations/strings_enum.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/errors/api_exceptions.dart';
 import 'package:lokkha/core/services/auth_service.dart';

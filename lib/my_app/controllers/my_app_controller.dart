@@ -1,8 +1,8 @@
 import 'package:app_links/app_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import '../../app/helper/global.dart';
-import '../../app/routes/app_pages.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/routes/routes.dart';
 
 class MyAppController extends GetxController {
   // final AuthService _authService = AuthService();

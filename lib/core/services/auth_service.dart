@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/my_get_storage.dart';
-import 'package:lokkha/app/data/local/my_shared_pref.dart';
-import 'package:lokkha/app/data/local/secure_storage_service.dart';
-import 'package:lokkha/app/data/repositories/auth_repository.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/core/services/storage/my_get_storage.dart';
+import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/core/services/storage/secure_storage_service.dart';
+import 'package:lokkha/features/auth/auth.dart';
+import 'package:lokkha/core/theme/light_theme_colors.dart';
 
 import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/app/models/user.dart';
-import 'package:lokkha/app/modules/navbar/controllers/navbar_controller.dart';
-import 'package:lokkha/app/routes/app_pages.dart';
+import 'package:lokkha/shared/models/user.dart';
+import 'package:lokkha/features/navigation/navigation.dart';
+import 'package:lokkha/routes/routes.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 
 class AuthService {

@@ -2,16 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/views/widgets/base_webview.dart';
-import 'package:lokkha/config/extensions/common_extension.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
+import 'package:lokkha/shared/shared.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/styles/text_style.dart';
-import 'package:lokkha/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/app/modules/drawer_pages/views/customer_support_view.dart';
+import 'package:lokkha/features/app_system/app_system.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});

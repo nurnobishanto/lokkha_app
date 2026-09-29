@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/secure_storage_service.dart';
-import 'package:lokkha/app/data/repositories/auth_repository.dart';
+import 'package:lokkha/core/services/storage/secure_storage_service.dart';
+import 'package:lokkha/features/auth/auth.dart';
 
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/core/network/api_call_status.dart';

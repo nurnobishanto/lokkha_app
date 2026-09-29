@@ -7,15 +7,15 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/data/local/my_get_storage.dart';
-import 'package:lokkha/app/views/widgets/base_webview.dart';
-import 'package:lokkha/config/constants/app_strings.dart';
-import 'package:lokkha/utils/constants.dart';
+import 'package:lokkha/core/services/storage/my_get_storage.dart';
+import 'package:lokkha/shared/shared.dart';
+import 'package:lokkha/core/constants/app_strings.dart';
+import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:lokkha/app/models/user.dart';
-import 'package:lokkha/app/routes/app_pages.dart';
+import 'package:lokkha/shared/models/user.dart';
+import 'package:lokkha/routes/routes.dart';
 
 ///GLOBAL CONFIG: shared across the entire app.
 

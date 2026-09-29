@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:lokkha/config/translations/localization_service.dart';
-import 'package:lokkha/app/models/mock_subject_select_model.dart';
-import 'package:lokkha/app/modules/subject_sections/models/sub_sec_select_model.dart';
+import 'package:lokkha/core/translations/localization_service.dart';
+import 'package:lokkha/shared/models/mock_subject_select_model.dart';
+import 'package:lokkha/features/study_material/study_material.dart';
 
 class MySharedPref {
   // prevent making instance

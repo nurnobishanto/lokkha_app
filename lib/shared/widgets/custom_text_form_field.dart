@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lokkha/config/extensions/common_extension.dart';
+import 'package:lokkha/core/core.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final String hintText;

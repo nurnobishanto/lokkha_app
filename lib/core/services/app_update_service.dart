@@ -3,16 +3,15 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/app/modules/navbar/views/navbar_view.dart';
-import 'package:lokkha/app/services/base_client.dart';
-import 'package:lokkha/config/constants/app_images.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
-import 'package:lokkha/utils/constants.dart';
+import 'package:lokkha/features/navigation/navigation.dart';
+import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/constants/app_images.dart';
+import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/app/modules/app_update/views/app_update_view_view.dart';
-import 'package:lokkha/app/modules/maintenance_mode/views/maintenance_mode_view_view.dart';
-import 'package:lokkha/app/routes/app_pages.dart';
+import 'package:lokkha/features/app_system/app_system.dart';
+import 'package:lokkha/routes/routes.dart';
 
 class AppUpdateService {
   static final AppUpdateService _instance = AppUpdateService._internal();

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
+import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/core/theme/light_theme_colors.dart';
-import 'package:lokkha/app/routes/app_pages.dart';
+import 'package:lokkha/routes/routes.dart';
 
 class LoginRequiredDialog extends StatelessWidget {
   final String title;

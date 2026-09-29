@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
-import 'package:lokkha/styles/text_style.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/theme/light_theme_colors.dart';
 
 class DecisionButton extends StatelessWidget {

@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'app/data/local/my_shared_pref.dart';
-import 'app/data/network/api_client.dart';
-import 'app/helper/global.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/network/api_client.dart';
 import 'my_app/views/my_app_view.dart';
 
 Future<void> main() async {

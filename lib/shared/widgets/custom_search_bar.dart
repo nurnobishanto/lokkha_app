@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
+import 'package:lokkha/core/core.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final String hintText;

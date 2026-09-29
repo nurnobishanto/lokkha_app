@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lokkha/config/theme/light_theme_colors.dart';
-import 'package:lokkha/config/theme/theme_extensions.dart';
-import 'package:lokkha/styles/text_style.dart';
+import 'package:lokkha/core/core.dart';
 
 class CustomTextField extends StatelessWidget {
   final String hintText;
