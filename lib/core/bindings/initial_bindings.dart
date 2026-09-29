@@ -3,7 +3,7 @@ import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/core/services/app_lifecycle_service.dart';
 import 'package:lokkha/core/services/premium_entitlement_service.dart';
 import 'package:lokkha/core/theme/theme_controller.dart';
-import 'package:lokkha/my_app/controllers/my_app_controller.dart';
+import 'package:lokkha/core/services/deep_link_service.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 
 class InitialBindings extends Bindings {

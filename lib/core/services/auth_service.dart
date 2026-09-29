@@ -12,6 +12,9 @@ import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 import 'package:lokkha/routes/routes.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -233,5 +236,55 @@ class AuthService {
       debugPrint("Auth Check: Network unavailable, keeping cached session");
       isLoggedIn.value = true;
     }
+  }
+
+  /// Logout the current user completely and reset state
+  Future<void> logout() async {
+    try {
+      final token = await SecureStorageService.getToken();
+      if (token != null && token.isNotEmpty) {
+        try {
+          await ApiClient.post(AppConstants.v1AuthLogout);
+        } catch (e) {
+          debugPrint('[AuthService.logout] Remote API logout warning: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('[AuthService.logout] Pre-cleanup error: $e');
+    } finally {
+      // Always wipe local credentials regardless of API response
+      await SecureStorageService.clearAuthData();
+      await MySharedPref.removeUserToken();
+      MyGetStorage.removeCache(MyGetStorage.meUser);
+      isLoggedIn.value = false;
+      havePackage.value = false;
+      myUser = User();
+
+      if (Get.isRegistered<NavbarController>()) {
+        Get.find<NavbarController>().clearProfileState();
+      }
+
+      CustomSnackBar.showCustomToast(message: "লগআউট সফল হয়েছে");
+      Get.offAllNamed(Routes.AUTH_GATEWAY);
+    }
+  }
+
+  /// Show a standardized logout confirmation modal
+  static void confirmAndLogout() {
+    Get.defaultDialog(
+      title: "লগ আউট",
+      titleStyle: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+      middleText: "আপনি কি নিশ্চিতভাবে আপনার অ্যাকাউন্ট থেকে লগ আউট করতে চান?",
+      middleTextStyle: TextStyle(fontSize: 14.sp),
+      textConfirm: "হ্যাঁ, লগ আউট",
+      textCancel: "বাতিল",
+      confirmTextColor: Colors.white,
+      cancelTextColor: Colors.black87,
+      buttonColor: Colors.redAccent,
+      onConfirm: () {
+        Get.back();
+        AuthService().logout();
+      },
+    );
   }
 }

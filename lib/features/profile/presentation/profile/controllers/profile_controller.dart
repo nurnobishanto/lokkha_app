@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/routes/routes.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
@@ -46,16 +43,6 @@ class ProfileController extends GetxController {
   }
 
   Future<void> logout() async {
-    try {
-      await AuthRepository().logout();
-      CustomSnackBar.showCustomToast(message: "লগআউট সফল হয়েছে");
-    } catch (e) {
-      debugPrint("Logout Error: $e");
-    } finally {
-      if (Get.isRegistered<ProfileController>()) {
-        Get.delete<ProfileController>(force: true);
-      }
-      Get.offAllNamed(Routes.NAVBAR);
-    }
+    await AuthService().logout();
   }
 }

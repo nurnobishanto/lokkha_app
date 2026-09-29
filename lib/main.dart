@@ -4,8 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/network/api_client.dart';
-import 'my_app/views/my_app_view.dart';
+import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

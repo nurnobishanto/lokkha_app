@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/bindings/initial_bindings.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/routes/routes.dart';
-import 'package:lokkha/core/constants/app_strings.dart';
-import 'package:lokkha/core/theme/my_theme.dart';
-import 'package:lokkha/core/translations/localization_service.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

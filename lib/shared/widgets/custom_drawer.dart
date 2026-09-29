@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
+import 'package:lokkha/routes/routes.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -129,6 +130,55 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
           const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+          Obx(() {
+            if (isLoggedIn.value) {
+              return Column(
+                children: [
+                  ListTile(
+                    visualDensity: VisualDensity.standard,
+                    leading: const Icon(Icons.logout_rounded,
+                        color: Colors.redAccent, size: 20),
+                    title: const Text(
+                      'লগ আউট',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Get.back();
+                      AuthService.confirmAndLogout();
+                    },
+                  ),
+                  const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+                ],
+              );
+            } else {
+              return Column(
+                children: [
+                  ListTile(
+                    visualDensity: VisualDensity.standard,
+                    leading: const Icon(Icons.login_rounded,
+                        color: LightThemeColors.primaryColor, size: 20),
+                    title: const Text(
+                      'লগইন / রেজিস্ট্রেশন',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: LightThemeColors.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed(Routes.AUTH_GATEWAY);
+                    },
+                  ),
+                  const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+                ],
+              );
+            }
+          }),
           15.h.height,
           const Spacer(),
 

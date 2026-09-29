@@ -13,6 +13,7 @@ import 'package:lokkha/core/theme/theme_extensions.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
+import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
 import '../controllers/profile_controller.dart';
 
@@ -408,27 +409,10 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                     const Divider(height: 0, indent: 50),
                     _buildListItem(
-                      onTap: () {
-                        Get.defaultDialog(
-                          title: "লগ আউট",
-                          titleStyle: TextStyle(
-                              fontSize: 18.sp, fontWeight: FontWeight.bold),
-                          middleText: "আপনি কি নিশ্চিতভাবে লগ আউট করতে চান?",
-                          middleTextStyle: TextStyle(fontSize: 14.sp),
-                          textConfirm: "হ্যাঁ",
-                          textCancel: "না",
-                          confirmTextColor: Colors.white,
-                          cancelTextColor: Colors.black,
-                          buttonColor: Colors.redAccent,
-                          onConfirm: () {
-                            Get.back();
-                            controller.logout();
-                          },
-                        );
-                      },
+                      onTap: () => AuthService.confirmAndLogout(),
                       text: 'লগ আউট',
                       icon: Icons.logout,
-                      color: Colors.blueGrey,
+                      color: Colors.redAccent,
                     ),
                   ],
                 ),

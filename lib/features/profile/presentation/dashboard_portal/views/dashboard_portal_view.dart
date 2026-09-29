@@ -128,6 +128,11 @@ class DashboardPortalView extends StatelessWidget {
 
               // 8. মূল বিস্তারিত অ্যাকাউন্ট সেটিংস
               _buildDetailedProfileButton(context),
+
+              SizedBox(height: 12.h),
+
+              // 9. লগ আউট বাটন
+              _buildLogoutButton(context),
             ],
           ),
         );
@@ -1576,6 +1581,75 @@ class DashboardPortalView extends StatelessWidget {
               ),
               Icon(Icons.arrow_forward_ios_rounded,
                   color: context.textMuted, size: 15),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 9. LOGOUT BUTTON
+  // ---------------------------------------------------------------------------
+  Widget _buildLogoutButton(BuildContext context) {
+    return Material(
+      color: Colors.red.withValues(alpha: 0.06),
+      borderRadius: BorderRadius.circular(16.r),
+      child: InkWell(
+        onTap: () => AuthService.confirmAndLogout(),
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.r),
+            border: Border.all(
+              color: Colors.red.withValues(alpha: 0.25),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(9.r),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Colors.redAccent,
+                  size: 22,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "লগ আউট",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.redAccent,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      "বর্তমান সেশন থেকে বের হতে চাপুন",
+                      style: TextStyle(
+                        fontSize: 11.5.sp,
+                        color: context.textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.redAccent,
+                size: 15,
+              ),
             ],
           ),
         ),

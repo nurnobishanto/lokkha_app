@@ -1,51 +1,50 @@
 import 'package:app_links/app_links.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/routes/routes.dart';
 
-class MyAppController extends GetxController {
-  // final AuthService _authService = AuthService();
+class DeepLinkService extends GetxController {
   RxString appVersion = ''.obs;
 
   @override
   void onReady() {
     super.onReady();
-    debugPrint("MyApp Controller Called");
+    debugPrint("DeepLinkService / MyAppController Called");
     _initializeApp();
   }
 
   void _initializeApp() async {
     await fetchAppVersion();
 
-    final AppLinks _appLinks = AppLinks();
+    final AppLinks appLinks = AppLinks();
 
     // Cold start
     try {
-      final initialUri = await _appLinks.getInitialLink();
+      final initialUri = await appLinks.getInitialLink();
       if (initialUri != null) {
         handleDeepLink(initialUri);
       }
     } catch (e) {
-      print("Failed to get initial app link: $e");
+      debugPrint("Failed to get initial app link: $e");
     }
 
     // Foreground listener
-    _appLinks.uriLinkStream.listen((Uri? uri) {
+    appLinks.uriLinkStream.listen((Uri? uri) {
       if (uri != null) {
         handleDeepLink(uri);
       }
     }, onError: (err) {
-      print("Deep link stream error: $err");
+      debugPrint("Deep link stream error: $err");
     });
   }
 }
 
-
-
+/// Backward compatibility alias
+typedef MyAppController = DeepLinkService;
 
 void handleDeepLink(Uri uri) {
-  print("Deep link received: $uri");
+  debugPrint("Deep link received: $uri");
 
   // Path segments এবং query parameters
   if (uri.pathSegments.isNotEmpty) {
@@ -63,7 +62,7 @@ void handleDeepLink(Uri uri) {
         break;
 
       case 'course':
-      // slug/id support
+        // slug/id support
         final idOrSlug = secondSegment.isNotEmpty ? secondSegment : queryParams['id'] ?? '';
         if (idOrSlug.isNotEmpty) {
           Get.toNamed('/course/$idOrSlug');
@@ -71,7 +70,7 @@ void handleDeepLink(Uri uri) {
         break;
 
       case 'exam':
-      // slug/id support
+        // slug/id support
         final idOrSlug = secondSegment.isNotEmpty ? secondSegment : queryParams['id'] ?? '';
         if (idOrSlug.isNotEmpty) {
           Get.toNamed('/exam/$idOrSlug');
@@ -79,9 +78,7 @@ void handleDeepLink(Uri uri) {
         break;
 
       default:
-        print("Unknown deep link path: $firstSegment");
-    // Optional: fallback route
-    // Get.toNamed(Routes.HOME);
+        debugPrint("Unknown deep link path: $firstSegment");
     }
   }
 }

@@ -39,6 +39,7 @@ export 'services/premium_entitlement_service.dart';
 export 'services/storage/my_get_storage.dart';
 export 'services/storage/my_shared_pref.dart';
 export 'services/storage/secure_storage_service.dart';
+export 'services/deep_link_service.dart';
 
 // Utils
 export 'utils/utils.dart';
