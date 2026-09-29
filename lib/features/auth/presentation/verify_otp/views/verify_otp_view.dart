@@ -17,9 +17,8 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
 
   // Constructor accepting both type and phoneNumber as arguments
   VerifyOtpView({super.key})
-      : phoneNumber =
-            Get.arguments['phoneNumber'], // Get the phone number from arguments
-        type = Get.arguments['type']; // Get the type from arguments
+      : phoneNumber = Get.arguments?['phoneNumber']?.toString() ?? '',
+        type = Get.arguments?['type']?.toString() ?? 'Registration';
 
   @override
   Widget build(BuildContext context) {
@@ -125,19 +124,13 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
                   50.h.height,
                   CustomActionButton(
                     text: "Verify",
+                    isLoading: controller.isLoading,
                     onPressed: () {
                       if (type == 'Registration') {
                         debugPrint("Tapped Registration");
                         controller.register(phoneNumber);
                       } else {
-                        if (controller.otp?.length == 6) {
-                          Get.find<SignInController>().login(
-                              phoneNumber, 'otp', controller.otp.toString());
-                        } else {
-                          CustomSnackBar.showCustomErrorSnackBar(
-                              title: 'Please Fill the pin',
-                              message: 'OTP must be 6 digits.');
-                        }
+                        controller.loginWithOtp(phoneNumber);
                       }
                     },
                   ),

@@ -14,8 +14,8 @@ class SignUpController extends GetxController {
 
   Future<void> checkPhoneNumber() async {
     final phone = phoneController.text.trim();
-    if (phone.isEmpty || phone.length < 11) {
-      _showErrorSnackBar("সঠিক ১১ ডিজিটের ফোন নম্বর প্রদান করুন।");
+    if (phone.isEmpty || phone.length < 10) {
+      _showErrorSnackBar("সঠিক ফোন নম্বর প্রদান করুন।");
       return;
     }
 
@@ -27,24 +27,29 @@ class SignUpController extends GetxController {
 
       if (res.status) {
         apiCallStatus = ApiCallStatus.success;
-        final raw = res.rawData;
-        final page = raw?["page"]?.toString().toLowerCase();
-        
-        final isOtp = page == "otp" || !res.isRegistered;
+        final targetPhone = res.canonicalPhone ?? phone;
+        final isRegistration = !res.isRegistered || res.suggestedStep == 'register';
 
-        if (isOtp) {
+        if (isRegistration) {
           Get.toNamed(Routes.VERIFY_OTP, arguments: {
-            'phoneNumber': phone,
-            'type': raw?["type"] ?? 'Registration',
+            'phoneNumber': targetPhone,
+            'type': 'Registration',
           });
         } else {
-          Get.toNamed(
-            Routes.SIGNIN,
-            arguments: {
-              'phoneNumber': raw?['phone'] ?? raw?['data']?['phone'] ?? phone,
-              'type': raw?['method'] ?? 'password',
-            },
-          );
+          if (res.authMethod == 'otp' || res.suggestedStep == 'otp') {
+            Get.toNamed(Routes.VERIFY_OTP, arguments: {
+              'phoneNumber': targetPhone,
+              'type': 'Login',
+            });
+          } else {
+            Get.toNamed(
+              Routes.SIGNIN,
+              arguments: {
+                'phoneNumber': targetPhone,
+                'type': res.authMethod ?? 'password',
+              },
+            );
+          }
         }
       } else {
         apiCallStatus = ApiCallStatus.error;

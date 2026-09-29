@@ -80,6 +80,55 @@ class VerifyOtpController extends GetxController {
     }
   }
 
+  /// Login method via OTP
+  Future<void> loginWithOtp(String phone) async {
+    if (otp == null || otp!.trim().length < 6) {
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Please Fill the pin',
+        message: 'OTP must be 6 digits.',
+      );
+      return;
+    }
+
+    _setLoadingState(true);
+
+    try {
+      final res = await _authRepository.login(
+        phone: phone,
+        otp: otp!.trim(),
+      );
+
+      _setLoadingState(false);
+
+      if (res.status) {
+        apiCallStatus = ApiCallStatus.success;
+        CustomSnackBar.showCustomToast(
+          message: res.message ?? "লগইন সফল হয়েছে!",
+        );
+        if (Get.isRegistered<NavbarController>()) {
+          Get.find<NavbarController>().getMeProfileInfo();
+        }
+        Get.offAllNamed(Routes.NAVBAR);
+      } else {
+        apiCallStatus = ApiCallStatus.error;
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: 'Login Failed',
+          message: res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+        );
+      }
+    } catch (e) {
+      _setLoadingState(false);
+      apiCallStatus = ApiCallStatus.error;
+      debugPrint("Error login with OTP: $e");
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Login Failed',
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। দয়া করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।',
+      );
+    } finally {
+      update();
+    }
+  }
+
   void _setLoadingState(bool loading) {
     isLoading = loading;
     apiCallStatus = loading ? ApiCallStatus.loading : ApiCallStatus.holding;
@@ -92,7 +141,8 @@ class VerifyOtpController extends GetxController {
     update();
 
     try {
-      final res = await _authRepository.sendOtp(phone);
+      final otpType = type ?? (Get.arguments?['type']?.toString() ?? 'Registration');
+      final res = await _authRepository.sendOtp(phone, type: otpType);
       if (res.status) {
         apiCallStatus = ApiCallStatus.success;
         CustomSnackBar.showCustomToast(

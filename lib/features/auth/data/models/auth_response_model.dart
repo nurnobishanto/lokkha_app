@@ -9,6 +9,9 @@ class AuthResponseModel {
   final bool havePackage;
   final bool profileCompleted;
   final bool isRegistered;
+  final String? suggestedStep;
+  final String? authMethod;
+  final String? canonicalPhone;
   final Map<String, dynamic>? rawData;
 
   AuthResponseModel({
@@ -20,6 +23,9 @@ class AuthResponseModel {
     this.havePackage = false,
     this.profileCompleted = true,
     this.isRegistered = true,
+    this.suggestedStep,
+    this.authMethod,
+    this.canonicalPhone,
     this.rawData,
   });
 
@@ -109,6 +115,22 @@ class AuthResponseModel {
       isRegistered = json['data']['is_registered'] == true || json['data']['is_registered'] == 1;
     }
 
+    // Flexible extraction for suggestedStep & authMethod (from check-phone endpoint)
+    final suggestedStep = json['data'] is Map
+        ? json['data']['suggested_step']?.toString()
+        : json['suggested_step']?.toString();
+    final authMethod = json['data'] is Map
+        ? json['data']['auth_method']?.toString()
+        : json['auth_method']?.toString();
+    final canonicalPhone = json['data'] is Map
+        ? json['data']['phone']?.toString()
+        : json['phone']?.toString();
+
+    // If suggested_step is explicitly register, isRegistered is false
+    if (suggestedStep == 'register') {
+      isRegistered = false;
+    }
+
     return AuthResponseModel(
       status: status,
       message: message,
@@ -118,6 +140,9 @@ class AuthResponseModel {
       havePackage: havePackage,
       profileCompleted: profileCompleted,
       isRegistered: isRegistered,
+      suggestedStep: suggestedStep,
+      authMethod: authMethod,
+      canonicalPhone: canonicalPhone,
       rawData: json,
     );
   }
