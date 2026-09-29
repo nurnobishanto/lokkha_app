@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
+import 'interceptors/logging_interceptor.dart';
 
 class ApiClient {
   ApiClient._();
@@ -31,15 +31,7 @@ class ApiClient {
       AuthInterceptor(),
       ErrorInterceptor(),
       if (kDebugMode)
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseBody: false,
-          responseHeader: false,
-          error: true,
-          compact: true,
-          maxWidth: 90,
-        ),
+        LoggingInterceptor(maxBodyLength: 1500),
     ]);
   }
 

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart'; // kDebugMode
 import 'package:get/get_utils/get_utils.dart';
 import 'package:get/state_manager.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:lokkha/core/network/interceptors/logging_interceptor.dart';
 import 'package:lokkha/core/translations/strings_enum.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/errors/api_exceptions.dart';
@@ -20,16 +20,8 @@ enum RequestType {
 class BaseClient {
   static final Dio _dio = Dio()
     ..interceptors.addIf(
-      kDebugMode, // Only add logger in debug mode
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: false,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
-      ),
+      kDebugMode,
+      LoggingInterceptor(maxBodyLength: 1500),
     );
 
   /// dio getter (used for testing)
