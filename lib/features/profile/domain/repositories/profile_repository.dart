@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/shared/models/user.dart';
 import '../../data/models/device_session_model.dart';
+import '../../data/models/exam_history_model.dart';
+import '../../data/models/exam_review_detail_model.dart';
 import '../../data/datasources/profile_remote_data_source.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 
@@ -40,4 +42,11 @@ abstract class ProfileRepository {
   Future<Map<String, dynamic>> logoutOtherDevices();
 
   Future<DashboardOverviewModel?> getDashboardOverview();
+
+  Future<ExamHistoryResponseModel> getExamHistory({int page = 1});
+
+  Future<ExamReviewDetailModel> getExamHistoryDetail(
+    dynamic id, {
+    ExamHistoryModel? summaryExam,
+  });
 }

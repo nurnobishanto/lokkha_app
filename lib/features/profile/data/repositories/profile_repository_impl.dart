@@ -4,6 +4,8 @@ import 'package:lokkha/shared/models/user.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../datasources/profile_remote_data_source.dart';
 import '../models/device_session_model.dart';
+import '../models/exam_history_model.dart';
+import '../models/exam_review_detail_model.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -79,5 +81,18 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<DashboardOverviewModel?> getDashboardOverview() {
     return remoteDataSource.getDashboardOverview();
+  }
+
+  @override
+  Future<ExamHistoryResponseModel> getExamHistory({int page = 1}) {
+    return remoteDataSource.getExamHistory(page: page);
+  }
+
+  @override
+  Future<ExamReviewDetailModel> getExamHistoryDetail(
+    dynamic id, {
+    ExamHistoryModel? summaryExam,
+  }) {
+    return remoteDataSource.getExamHistoryDetail(id, summaryExam: summaryExam);
   }
 }

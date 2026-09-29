@@ -12,6 +12,7 @@ export 'data/models/orders_details_model.dart';
 export 'data/models/exam_history_model.dart';
 export 'data/models/exam_rank_model.dart';
 export 'data/models/exam_question_result_model.dart';
+export 'data/models/exam_review_detail_model.dart';
 export 'data/models/accuracy_metric_model.dart';
 export 'data/models/accuracy_exam_item_model.dart';
 export 'data/models/accuracy_trend_point_model.dart';
@@ -27,6 +28,8 @@ export 'domain/usecases/get_devices_usecase.dart';
 export 'domain/usecases/terminate_device_usecase.dart';
 export 'domain/usecases/logout_other_devices_usecase.dart';
 export 'domain/usecases/get_dashboard_overview_usecase.dart';
+export 'domain/usecases/get_exam_history_usecase.dart';
+export 'domain/usecases/get_exam_history_detail_usecase.dart';
 export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 
@@ -43,6 +46,7 @@ export 'presentation/profile_update/views/profile_update_view.dart';
 // Presentation - History
 export 'presentation/profile_history/bindings/profile_history_binding.dart';
 export 'presentation/profile_history/controllers/profile_history_controller.dart';
+export 'presentation/profile_history/controllers/exam_result_sheet_controller.dart';
 export 'presentation/profile_history/views/profile_history_view.dart';
 export 'presentation/profile_history/views/exam_result_sheet_view.dart';
 export 'presentation/profile_history/views/exam_rank_view.dart';

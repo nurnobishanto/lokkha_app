@@ -6,6 +6,8 @@ import 'package:lokkha/core/network/api_client.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/home/home.dart';
 import '../models/device_session_model.dart';
+import '../models/exam_history_model.dart';
+import '../models/exam_review_detail_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<User?> getProfile();
@@ -33,6 +35,11 @@ abstract class ProfileRemoteDataSource {
   Future<Map<String, dynamic>> terminateDevice(int deviceId);
   Future<Map<String, dynamic>> logoutOtherDevices();
   Future<DashboardOverviewModel?> getDashboardOverview();
+  Future<ExamHistoryResponseModel> getExamHistory({int page = 1});
+  Future<ExamReviewDetailModel> getExamHistoryDetail(
+    dynamic id, {
+    ExamHistoryModel? summaryExam,
+  });
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -206,5 +213,43 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       debugPrint('[ProfileRemoteDataSource] getDashboardOverview error: $e');
     }
     return null;
+  }
+
+  @override
+  Future<ExamHistoryResponseModel> getExamHistory({int page = 1}) async {
+    try {
+      final response = await ApiClient.get(
+        '${AppConstants.v1UserExamHistory}?page=$page',
+      );
+      if (response.data is Map<String, dynamic>) {
+        return ExamHistoryResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      return const ExamHistoryResponseModel(items: []);
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getExamHistory error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ExamReviewDetailModel> getExamHistoryDetail(
+    dynamic id, {
+    ExamHistoryModel? summaryExam,
+  }) async {
+    try {
+      final cleanId = id.toString().replaceAll('#', '');
+      final response = await ApiClient.get(
+        '${AppConstants.v1UserExamHistory}/$cleanId',
+      );
+      return ExamReviewDetailModel.fromJson(
+        response.data,
+        summaryExam: summaryExam,
+      );
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getExamHistoryDetail error: $e');
+      rethrow;
+    }
   }
 }
