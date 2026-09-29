@@ -111,11 +111,13 @@ class JobsView extends GetView<JobsController> {
 
                                       var data = controller
                                           .model.value.jobs!.data![index];
+                                      final jobTitle = (data.title != null && data.title!.trim().isNotEmpty)
+                                          ? data.title!.trim()
+                                          : (data.companyName?.trim().isNotEmpty == true
+                                              ? data.companyName!.trim()
+                                              : "");
                                       return GovJobCard(
-                                        title:
-                                            data.companyName?.isNotEmpty == true
-                                                ? data.companyName!
-                                                : "",
+                                        title: jobTitle,
                                         onTap: () {
                                           debugPrint("1x. ${data.id}");
                                           Get.toNamed(
@@ -178,7 +180,7 @@ class GovJobCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: Get.height / 12,
+        constraints: BoxConstraints(minHeight: Get.height / 12),
         decoration: BoxDecoration(
           color: isDeadlineOver
               ? (context.isDark
@@ -192,24 +194,23 @@ class GovJobCard extends StatelessWidget {
                 : context.borderColor,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 10.00),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.heading5.copyWith(
-                  color: isDeadlineOver
-                      ? (context.isDark
-                          ? const Color(0xFFFDA4AF)
-                          : Colors.red.shade900)
-                      : context.textPrimary,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: AppTextStyles.heading5.copyWith(
+                color: isDeadlineOver
+                    ? (context.isDark
+                        ? const Color(0xFFFDA4AF)
+                        : Colors.red.shade900)
+                    : context.textPrimary,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
               const SizedBox(height: 4.00),
               if (deadlineText.isNotEmpty)
                 Text(
@@ -227,7 +228,6 @@ class GovJobCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    }
   }
-}

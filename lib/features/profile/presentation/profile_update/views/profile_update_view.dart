@@ -155,6 +155,17 @@ class ProfileUpdateView extends GetView<ProfileUpdateController> {
                   ),
                   5.h.height,
                   Text(
+                    'বর্তমান পাসওয়ার্ড',
+                    style: AppTextStyles.body1,
+                  ),
+                  3.h.height,
+                  CustomTextFormField(
+                    controller: controller.currentPwdController,
+                    hintText: 'আপনার বর্তমান পাসওয়ার্ড লিখুন',
+                    obscureText: true,
+                  ),
+                  5.h.height,
+                  Text(
                     'নতুন পাসওয়ার্ড',
                     style: AppTextStyles.body1,
                   ),
@@ -178,6 +189,7 @@ class ProfileUpdateView extends GetView<ProfileUpdateController> {
                   20.h.height,
                   CustomActionButton(
                     text: "আপডেট করুন",
+                    isLoading: controller.isLoading,
                     onPressed: () {
                       controller.updateProfileInfo(context);
                     },

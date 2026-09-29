@@ -16,7 +16,17 @@ export 'data/models/accuracy_metric_model.dart';
 export 'data/models/accuracy_exam_item_model.dart';
 export 'data/models/accuracy_trend_point_model.dart';
 
-// Repositories
+// Data & Repositories
+export 'data/datasources/profile_remote_data_source.dart';
+export 'domain/repositories/profile_repository.dart';
+export 'data/repositories/profile_repository_impl.dart';
+export 'domain/usecases/get_profile_usecase.dart';
+export 'domain/usecases/update_profile_usecase.dart';
+export 'domain/usecases/change_password_usecase.dart';
+export 'domain/usecases/get_devices_usecase.dart';
+export 'domain/usecases/terminate_device_usecase.dart';
+export 'domain/usecases/logout_other_devices_usecase.dart';
+export 'domain/usecases/get_dashboard_overview_usecase.dart';
 export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 
@@ -70,6 +80,7 @@ export 'presentation/referral/controllers/referral_controller.dart';
 export 'presentation/referral/views/referral_view.dart';
 
 // Presentation - Dashboard Portal & Update Required
+export 'presentation/dashboard_portal/controllers/dashboard_portal_controller.dart';
 export 'presentation/dashboard_portal/views/dashboard_portal_view.dart';
 export 'presentation/profile_update_required/bindings/profile_update_required_binding.dart';
 export 'presentation/profile_update_required/controllers/profile_update_required_controller.dart';

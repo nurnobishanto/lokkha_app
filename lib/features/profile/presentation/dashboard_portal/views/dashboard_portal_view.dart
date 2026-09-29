@@ -13,12 +13,15 @@ import 'package:lokkha/core/theme/app_colors.dart';
 import 'package:lokkha/core/theme/light_theme_colors.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../controllers/dashboard_portal_controller.dart';
 
 class DashboardPortalView extends StatelessWidget {
   const DashboardPortalView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final DashboardPortalController controller = Get.put(DashboardPortalController());
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
@@ -71,25 +74,33 @@ class DashboardPortalView extends StatelessWidget {
         }
 
         final user = myUser;
+        final refData = controller.referral;
         final referralCode =
-            (user.referralCode != null && user.referralCode!.isNotEmpty)
-                ? user.referralCode!
-                : "LK${user.userId ?? 'C05189'}";
-        final referralLink = "https://lokkha.com/register?ref=$referralCode";
+            (refData?.referralCode != null && refData!.referralCode!.isNotEmpty)
+                ? refData.referralCode!
+                : ((user.referralCode != null && user.referralCode!.isNotEmpty)
+                    ? user.referralCode!
+                    : "LK${user.userId ?? 'C05189'}");
+        final referralLink = refData?.referralLink ??
+            "https://lokkha.com/register?ref=$referralCode";
 
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. TOP STUDENT PROFILE HEADER
-              _buildStudentHeader(user, referralCode),
+        return RefreshIndicator(
+          onRefresh: controller.refreshDashboard,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 16.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. TOP STUDENT PROFILE HEADER
+                _buildStudentHeader(user, referralCode, controller),
 
               SizedBox(height: 12.h),
 
               // 2. 4 TOP STATS (2x2 Grid)
-              _buildTopStatsGrid(context),
+              _buildTopStatsGrid(context, controller),
 
               SizedBox(height: 16.h),
 
@@ -102,7 +113,7 @@ class DashboardPortalView extends StatelessWidget {
                 iconColor: context.primaryColor,
               ),
               SizedBox(height: 10.h),
-              _buildMyModulesGrid(context),
+              _buildMyModulesGrid(context, controller),
 
               SizedBox(height: 16.h),
 
@@ -112,7 +123,7 @@ class DashboardPortalView extends StatelessWidget {
               SizedBox(height: 16.h),
 
               // 5. সাবস্ক্রিপশন স্ট্যাটাস কার্ড (VIP Gold Style)
-              _buildSubscriptionStatusCard(context),
+              _buildSubscriptionStatusCard(context, controller),
 
               SizedBox(height: 14.h),
 
@@ -122,7 +133,7 @@ class DashboardPortalView extends StatelessWidget {
               SizedBox(height: 14.h),
 
               // 7. রেফার ও রিওয়ার্ড কার্ড (Sleek Emerald Brand Card)
-              _buildReferAndEarnCard(referralCode, referralLink),
+              _buildReferAndEarnCard(referralCode, referralLink, controller),
 
               SizedBox(height: 14.h),
 
@@ -135,15 +146,20 @@ class DashboardPortalView extends StatelessWidget {
               _buildLogoutButton(context),
             ],
           ),
-        );
-      }),
+        ),
+      );
+    }),
     );
   }
 
   // ---------------------------------------------------------------------------
   // 1. STUDENT HEADER CARD (Lokkha Brand Styled)
   // ---------------------------------------------------------------------------
-  Widget _buildStudentHeader(dynamic user, String referralCode) {
+  Widget _buildStudentHeader(
+    dynamic user,
+    String referralCode,
+    DashboardPortalController controller,
+  ) {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -248,7 +264,9 @@ class DashboardPortalView extends StatelessWidget {
                               ),
                               SizedBox(width: 4.w),
                               Text(
-                                "ফিচারসমূহ",
+                                controller.subscription != null && controller.subscription!.packageName != null
+                                    ? controller.subscription!.packageName!
+                                    : "ফিচারসমূহ",
                                 style: TextStyle(
                                   fontSize: 11.sp,
                                   fontWeight: FontWeight.w800,
@@ -356,7 +374,7 @@ class DashboardPortalView extends StatelessWidget {
                       ),
                       SizedBox(width: 6.w),
                       Text(
-                        "${user.points ?? 90} পয়েন্ট",
+                        "${controller.rewards?.balance ?? user.rewardPoints ?? user.points ?? 0} পয়েন্ট",
                         style: TextStyle(
                           color: const Color(0xFFFDE68A),
                           fontSize: 12.sp,
@@ -427,7 +445,10 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 2. 4 TOP STATS (2x2 Grid with exact Screenshot Style)
   // ---------------------------------------------------------------------------
-  Widget _buildTopStatsGrid(BuildContext context) {
+  Widget _buildTopStatsGrid(BuildContext context, DashboardPortalController controller) {
+    final counts = controller.counts;
+    final perf = controller.performance;
+
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -441,7 +462,7 @@ class DashboardPortalView extends StatelessWidget {
           icon: const FaIcon(FontAwesomeIcons.graduationCap,
               color: Color(0xFF059669), size: 18),
           iconBg: const Color(0xFFECFDF5),
-          count: "০",
+          count: "${counts?.totalExams ?? 0}",
           label: "অংশগ্রহণকৃত পরীক্ষা",
           onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
         ),
@@ -450,7 +471,7 @@ class DashboardPortalView extends StatelessWidget {
           icon: const Icon(Icons.edit_note_rounded,
               color: Color(0xFF2563EB), size: 22),
           iconBg: const Color(0xFFEFF6FF),
-          count: "০",
+          count: "${counts?.totalSelfExams ?? 0}",
           label: "সেলফ এক্সাম",
           onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
         ),
@@ -459,16 +480,16 @@ class DashboardPortalView extends StatelessWidget {
           icon: const FaIcon(FontAwesomeIcons.trophy,
               color: Color(0xFFD97706), size: 18),
           iconBg: const Color(0xFFFFFBEB),
-          count: "০",
+          count: "${counts?.totalContests ?? 0}",
           label: "লাইভ কনটেস্ট",
-          onTap: () => Get.toNamed(Routes.CONTEST_HISTORY),
+          onTap: () => Get.toNamed(Routes.ALL_CONTEST),
         ),
         _buildStatCard(
           context: context,
           icon: const Icon(Icons.show_chart_rounded,
               color: Color(0xFF7C3AED), size: 22),
           iconBg: const Color(0xFFF5F3FF),
-          count: "০%",
+          count: "${(perf?.accuracyRate ?? 0).toStringAsFixed(1)}%",
           label: "গড় নির্ভুলতা",
           onTap: () => Get.toNamed(Routes.ACCURACY_PROGRESS),
         ),
@@ -558,7 +579,9 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 3. আমার মডিউলসমূহ (৬টি মূল মডিউল)
   // ---------------------------------------------------------------------------
-  Widget _buildMyModulesGrid(BuildContext context) {
+  Widget _buildMyModulesGrid(BuildContext context, DashboardPortalController controller) {
+    final counts = controller.counts;
+
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -574,7 +597,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFF2563EB),
           iconBg: const Color(0xFFEFF6FF),
           badgeColor: const Color(0xFF15803D),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalOrders ?? 0}",
           onTap: () => Get.toNamed(Routes.MY_ORDERS),
         ),
         _buildModuleItem(
@@ -584,7 +607,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFFE11D48),
           iconBg: const Color(0xFFFFF1F2),
           badgeColor: const Color(0xFFDC2626),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalCourses ?? 0}",
           onTap: () => Get.toNamed(Routes.MY_COURSES),
         ),
         _buildModuleItem(
@@ -594,7 +617,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFFD97706),
           iconBg: const Color(0xFFFFFBEB),
           badgeColor: const Color(0xFFD97706),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalPackages ?? 0}",
           onTap: () => Get.toNamed(Routes.MY_PACKAGES),
         ),
         _buildModuleItem(
@@ -604,7 +627,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFF0891B2),
           iconBg: const Color(0xFFECFEFF),
           badgeColor: const Color(0xFF0284C7),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalSelfExams ?? 0}",
           onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
         ),
         _buildModuleItem(
@@ -614,7 +637,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFF7C3AED),
           iconBg: const Color(0xFFF5F3FF),
           badgeColor: const Color(0xFF16A34A),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalExams ?? 0}",
           onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
         ),
         _buildModuleItem(
@@ -624,7 +647,7 @@ class DashboardPortalView extends StatelessWidget {
           iconColor: const Color(0xFF4F46E5),
           iconBg: const Color(0xFFEEF2FF),
           badgeColor: const Color(0xFF6366F1),
-          badgeCount: "0",
+          badgeCount: "${counts?.totalContests ?? 0}",
           onTap: () => Get.toNamed(Routes.CONTEST_HISTORY),
         ),
       ],
@@ -892,9 +915,15 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 5. সাবস্ক্রিপশন স্ট্যাটাস কার্ড (High-End VIP Champagne / Gold Style)
   // ---------------------------------------------------------------------------
-  Widget _buildSubscriptionStatusCard(BuildContext context) {
+  Widget _buildSubscriptionStatusCard(
+    BuildContext context,
+    DashboardPortalController controller,
+  ) {
     return Obx(() {
-      final bool isPremium = havePackage.value;
+      final sub = controller.subscription;
+      final bool isPremium =
+          (sub != null && sub.status == 'active' && sub.daysLeft > 0) ||
+              havePackage.value;
 
       return Container(
         padding: EdgeInsets.all(18.r),
@@ -978,7 +1007,11 @@ class DashboardPortalView extends StatelessWidget {
                       ),
                       SizedBox(width: 4.w),
                       Text(
-                        isPremium ? "Active Premium" : "Free Plan",
+                        isPremium
+                            ? (sub?.packageName != null
+                                ? sub!.packageName!
+                                : "Active Premium")
+                            : "Free Plan",
                         style: TextStyle(
                           color: isPremium
                               ? const Color(0xFF059669)
@@ -995,7 +1028,9 @@ class DashboardPortalView extends StatelessWidget {
             SizedBox(height: 12.h),
             Text(
               isPremium
-                  ? "আপনার প্রিমিয়াম সাবস্ক্রিপশন সক্রিয় রয়েছে। সকল লাইভ পরীক্ষা, কোর্স ও এক্সক্লুসিভ ফিচার আনলকড।"
+                  ? (sub != null
+                      ? "প্যাকেজ: ${sub.packageName ?? 'প্রিমিয়াম'} • মেয়াদ বাকি: ${sub.daysLeft} দিন (মেয়াদ: ${sub.expiresAt ?? ''})"
+                      : "আপনার প্রিমিয়াম সাবস্ক্রিপশন সক্রিয় রয়েছে। সকল লাইভ পরীক্ষা, কোর্স ও এক্সক্লুসিভ ফিচার আনলকড।")
                   : "আনলিমিটেড বিষয়ভিত্তিক পরীক্ষা ও এক্সক্লুসিভ মডেল টেস্ট দিতে আজই প্রিমিয়াম সাবস্ক্রিপশন গ্রহণ করুন।",
               style: TextStyle(
                 fontSize: 12.5.sp,
@@ -1212,7 +1247,11 @@ class DashboardPortalView extends StatelessWidget {
   // ---------------------------------------------------------------------------
   // 7. REFER & EARN CARD (Sleek Lokkha Emerald Brand Card)
   // ---------------------------------------------------------------------------
-  Widget _buildReferAndEarnCard(String referralCode, String referralLink) {
+  Widget _buildReferAndEarnCard(
+    String referralCode,
+    String referralLink,
+    DashboardPortalController controller,
+  ) {
     return Container(
       padding: EdgeInsets.all(18.r),
       decoration: BoxDecoration(
@@ -1335,7 +1374,7 @@ class DashboardPortalView extends StatelessWidget {
                         size: 13, color: Color(0xFFFDE68A)),
                     SizedBox(width: 5.w),
                     Text(
-                      "রেফার্ড: ০ জন",
+                      "রেফার্ড: ${controller.referral?.totalReferrals ?? 0} জন",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 11.sp,
@@ -1359,7 +1398,7 @@ class DashboardPortalView extends StatelessWidget {
                         size: 13, color: Color(0xFFFDE68A)),
                     SizedBox(width: 5.w),
                     Text(
-                      "অর্জিত: +০ Pts",
+                      "অর্জিত: +${controller.referral?.totalPoints ?? 0} Pts",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 11.sp,
@@ -1524,7 +1563,7 @@ class DashboardPortalView extends StatelessWidget {
       color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
-        onTap: () => Get.toNamed(Routes.PROFILE),
+        onTap: () => Get.toNamed(Routes.SETTINGS),
         borderRadius: BorderRadius.circular(16.r),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
@@ -1550,9 +1589,9 @@ class DashboardPortalView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Icon(
-                  Icons.manage_accounts_rounded,
+                  Icons.settings_suggest_rounded,
                   color: context.primaryColor,
-                  size: 22,
+                  size: 22.sp,
                 ),
               ),
               SizedBox(width: 14.w),
@@ -1561,7 +1600,7 @@ class DashboardPortalView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "বিস্তারিত অ্যাকাউন্ট সেটিংস",
+                      "অ্যাকাউন্ট সেটিংস",
                       style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
@@ -1570,7 +1609,7 @@ class DashboardPortalView extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      "ব্যক্তিগত তথ্য, পাসওয়ার্ড পরিবর্তন ও সেটিংস দেখতে চাপুন",
+                      "ডিভাইস ও সেশন, পাসওয়ার্ড পরিবর্তন ও সেটিংস",
                       style: TextStyle(
                         fontSize: 11.5.sp,
                         color: context.textMuted,

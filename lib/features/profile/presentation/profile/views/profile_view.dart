@@ -15,6 +15,7 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
+import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -390,6 +391,13 @@ class ProfileView extends GetView<ProfileController> {
                       text: 'লগইন ডিভাইস সমূহ',
                       icon: Icons.devices_rounded,
                       color: const Color(0xFF0F6E52),
+                    ),
+                    const Divider(height: 0, indent: 50),
+                    _buildListItem(
+                      onTap: () => ChangePasswordSheet.show(context),
+                      text: 'পাসওয়ার্ড পরিবর্তন করুন',
+                      icon: Icons.lock_reset_rounded,
+                      color: Colors.blueAccent,
                     ),
                     const Divider(height: 0, indent: 50),
                     _buildListItem(

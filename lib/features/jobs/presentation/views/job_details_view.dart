@@ -73,9 +73,9 @@ class JobDetailsScreen extends StatelessWidget {
                                 Expanded(
                                   flex: 5,
                                   child: Text(
-                                    jobData.companyName == null
-                                        ? ''
-                                        : jobData.companyName.toString(),
+                                    (jobData.title != null && jobData.title!.trim().isNotEmpty)
+                                        ? jobData.title!.trim()
+                                        : (jobData.companyName ?? ''),
                                     style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
@@ -83,6 +83,17 @@ class JobDetailsScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            if (jobData.companyName != null &&
+                                jobData.companyName!.trim().isNotEmpty &&
+                                jobData.companyName!.trim() != jobData.title?.trim()) ...[
+                              const SizedBox(height: 2.0),
+                              Text(
+                                "প্রতিষ্ঠান: ${jobData.companyName!.trim()}",
+                                style: AppTextStyles.heading6.copyWith(color: context.primaryColor),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                             const SizedBox(height: 2.0),
                             Text(
                               "প্রকাশিত: ${DateFormatter.formatJobDeadline(jobData.createdAt)}",

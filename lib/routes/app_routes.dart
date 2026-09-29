@@ -63,6 +63,7 @@ abstract class Routes {
   static const CONTEST_HISTORY = _Paths.CONTEST_HISTORY;
   static const ACCURACY_PROGRESS = _Paths.ACCURACY_PROGRESS;
   static const REFERRAL = _Paths.REFERRAL;
+  static const SETTINGS = _Paths.SETTINGS;
 }
 
 abstract class _Paths {
@@ -127,4 +128,5 @@ abstract class _Paths {
   static const CONTEST_HISTORY = '/contest-history';
   static const ACCURACY_PROGRESS = '/accuracy-progress';
   static const REFERRAL = '/referral';
+  static const SETTINGS = '/settings';
 }

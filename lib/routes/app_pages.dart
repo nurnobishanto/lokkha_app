@@ -15,6 +15,7 @@ import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/notifications/notifications.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/features/profile/profile.dart';
+import 'package:lokkha/features/settings/settings.dart';
 
 part 'app_routes.dart';
 
@@ -46,15 +47,13 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.CONTEST,
-      page: () => const ContestView(),
-      binding: ContestBinding(),
-      children: [
-        GetPage(
-          name: _Paths.ALL_CONTEST,
-          page: () => const AllContestView(),
-          binding: AllContestBinding(),
-        ),
-      ],
+      page: () => const ContestTabView(),
+      binding: AllContestBinding(),
+    ),
+    GetPage(
+      name: _Paths.ALL_CONTEST,
+      page: () => const ContestTabView(initialIndex: 1),
+      binding: AllContestBinding(),
     ),
     GetPage(
       name: _Paths.BLOG,
@@ -268,6 +267,11 @@ class AppPages {
     GetPage(
       name: _Paths.DASHBOARD_PORTAL,
       page: () => const DashboardPortalView(),
+    ),
+    GetPage(
+      name: _Paths.SETTINGS,
+      page: () => const SettingsView(),
+      binding: SettingsBinding(),
     ),
   ];
 }

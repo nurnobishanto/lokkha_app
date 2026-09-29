@@ -5,6 +5,7 @@ class User {
   final String? phone;
   final String? emailVerifiedAt;
   final String? dateOfBirth;
+  final String? formattedDob;
   final String? gender;
   final String? occupation;
   final String? organization;
@@ -33,6 +34,7 @@ class User {
   final String? referralLink;
   final int? rewardPoints;
   final bool? isSubscribed;
+  final bool? hasActiveSubscription;
   final Map<String, dynamic>? activePackage;
 
   User({
@@ -42,6 +44,7 @@ class User {
     this.phone,
     this.emailVerifiedAt,
     this.dateOfBirth,
+    this.formattedDob,
     this.gender,
     this.occupation,
     this.organization,
@@ -70,51 +73,61 @@ class User {
     this.referralLink,
     this.rewardPoints,
     this.isSubscribed,
+    this.hasActiveSubscription,
     this.activePackage,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
-        name: json["name"],
-        email: json["email"],
-        phone: json["phone"],
-        emailVerifiedAt: json["email_verified_at"],
-        dateOfBirth: json["date_of_birth"],
-        gender: json["gender"],
-        occupation: json["occupation"],
-        organization: json["organization"],
-        referralCode: json["referral_code"],
-        userId: json["user_id"],
-        image: json["image"] ?? json["photo_url"] ?? json["avatar"],
-        addressLine1: json["address_line_1"],
-        addressLine2: json["address_line_2"],
-        city: json["city"],
-        state: json["state"],
-        zipCode: json["zip_code"],
-        country: json["country"],
-        points: json["points"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.tryParse(json["created_at"].toString()),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.tryParse(json["updated_at"].toString()),
-        deletedAt: json["deleted_at"],
-        jwtToken: json["jwt_token"],
-        googleId: json["google_id"],
-        facebookId: json["facebook_id"],
-        githubId: json["github_id"],
-        linkedinId: json["linkedin_id"],
-        avatar: json["avatar"],
-        photoUrl: json["photo_url"] ?? json["image"] ?? json["avatar"],
-        provider: json["provider"],
-        referralLink: json["referral_link"],
-        rewardPoints: json["reward_points"] ?? json["points"],
-        isSubscribed: json["is_subscribed"] == true || json["is_subscribed"] == 1,
-        activePackage: json["active_package"] is Map<String, dynamic>
-            ? json["active_package"] as Map<String, dynamic>
-            : null,
-      );
+  factory User.fromJson(Map<String, dynamic> json) {
+    final sub = json["has_active_subscription"] == true ||
+        json["has_active_subscription"] == 1 ||
+        json["is_subscribed"] == true ||
+        json["is_subscribed"] == 1;
+
+    return User(
+      id: json["id"],
+      name: json["name"],
+      email: json["email"],
+      phone: json["phone"],
+      emailVerifiedAt: json["email_verified_at"],
+      dateOfBirth: json["date_of_birth"],
+      formattedDob: json["formatted_dob"],
+      gender: json["gender"],
+      occupation: json["occupation"],
+      organization: json["organization"],
+      referralCode: json["referral_code"],
+      userId: json["user_id"],
+      image: json["image"] ?? json["photo_url"] ?? json["avatar"],
+      addressLine1: json["address_line_1"],
+      addressLine2: json["address_line_2"],
+      city: json["city"],
+      state: json["state"],
+      zipCode: json["zip_code"],
+      country: json["country"],
+      points: json["points"] ?? json["reward_points"],
+      createdAt: json["created_at"] == null
+          ? null
+          : DateTime.tryParse(json["created_at"].toString()),
+      updatedAt: json["updated_at"] == null
+          ? null
+          : DateTime.tryParse(json["updated_at"].toString()),
+      deletedAt: json["deleted_at"],
+      jwtToken: json["jwt_token"],
+      googleId: json["google_id"],
+      facebookId: json["facebook_id"],
+      githubId: json["github_id"],
+      linkedinId: json["linkedin_id"],
+      avatar: json["avatar"],
+      photoUrl: json["photo_url"] ?? json["image"] ?? json["avatar"],
+      provider: json["provider"],
+      referralLink: json["referral_link"],
+      rewardPoints: json["reward_points"] ?? json["points"],
+      isSubscribed: sub,
+      hasActiveSubscription: sub,
+      activePackage: json["active_package"] is Map<String, dynamic>
+          ? json["active_package"] as Map<String, dynamic>
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -123,6 +136,7 @@ class User {
         "phone": phone,
         "email_verified_at": emailVerifiedAt,
         "date_of_birth": dateOfBirth,
+        "formatted_dob": formattedDob,
         "gender": gender,
         "occupation": occupation,
         "organization": organization,
@@ -151,6 +165,7 @@ class User {
         "referral_link": referralLink,
         "reward_points": rewardPoints ?? points,
         "is_subscribed": isSubscribed,
+        "has_active_subscription": hasActiveSubscription,
         "active_package": activePackage,
       };
 }

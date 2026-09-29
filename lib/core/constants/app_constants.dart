@@ -4,12 +4,40 @@ class AppConstants {
   AppConstants._(); // Prevent instantiation
 
   /// Base URLs
-  static final String baseUrl =
-      dotenv.env['API_BASE_URL'] ?? 'https://lokkha.com';
-  static final String appUrl = '$baseUrl/api';
-  static final String apiV1BaseUrl = '$baseUrl/api/v1';
+  static String get baseUrl {
+    try {
+      if (dotenv.isInitialized) {
+        return dotenv.env['API_BASE_URL'] ?? 'https://lokkha.com';
+      }
+    } catch (_) {}
+    return 'https://lokkha.com';
+  }
+  static String get appUrl => '$baseUrl/api';
+  static String get apiV1BaseUrl => '$baseUrl/api/v1';
   static const String storageUrl = 'https://lokkha.com/uploads/';
   static const String sponsorAds = 'https://bdtaxation.com/api/app-ads';
+
+  /// Safely resolves any relative or absolute image/file URL.
+  /// If the URL already begins with http:// or https://, returns as-is.
+  /// If it starts with / or uploads/, formats with the domain/storage appropriately.
+  static String resolveUrl(String? path) {
+    if (path == null) return '';
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return '';
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('/uploads/')) {
+      return '$baseUrl$trimmed';
+    }
+    if (trimmed.startsWith('uploads/')) {
+      return '$baseUrl/$trimmed';
+    }
+    if (trimmed.startsWith('/')) {
+      return '$baseUrl$trimmed';
+    }
+    return '$storageUrl$trimmed';
+  }
 
   /// V1 Auth Endpoints
   static const String v1AuthCheckPhone = '/auth/check-phone';

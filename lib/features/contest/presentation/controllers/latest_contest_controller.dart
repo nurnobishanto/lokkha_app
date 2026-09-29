@@ -215,13 +215,9 @@ class LatestContestController extends GetxController {
               RankCardUser(
                   userId: result.user!.userId.toString(),
                   rank: i + 1,
-                  image: (result.user!.image != null &&
-                          result.user!.image != '')
-                      ? AppConstants.storageUrl + result.user!.image.toString()
-                      : (result.user!.avatar != null &&
-                              result.user!.avatar != '')
-                          ? result.user!.avatar
-                          : 'https://lokkha.com/uploads/files/shares/app/avatar.png',
+                  image: AppConstants.resolveUrl(result.user!.image ?? result.user!.avatar).isNotEmpty
+                      ? AppConstants.resolveUrl(result.user!.image ?? result.user!.avatar)
+                      : 'https://lokkha.com/uploads/files/shares/app/avatar.png',
                   sl: sl,
                   resultId: result.id!.toInt(),
                   user: result.user!),

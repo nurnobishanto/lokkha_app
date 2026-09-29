@@ -34,7 +34,7 @@ class ProfileDataModel {
       parsedUser = User.fromJson(json["user"] as Map<String, dynamic>);
     }
     return ProfileDataModel(
-      status: json["status"] == true || json["status"] == 1,
+      status: json["status"] == true || json["status"] == 1 || json["success"] == true,
       user: parsedUser,
     );
   }

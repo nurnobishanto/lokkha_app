@@ -7,12 +7,14 @@ import 'all_contest_view.dart';
 import 'latest_contest_view.dart';
 
 class ContestTabView extends StatelessWidget {
-  const ContestTabView({super.key});
+  final int initialIndex;
+  const ContestTabView({super.key, this.initialIndex = 0});
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: initialIndex,
       child: Scaffold(
         appBar: const CustomAppBar(title: 'কনটেস্ট'),
         backgroundColor: LightThemeColors.primaryColor,

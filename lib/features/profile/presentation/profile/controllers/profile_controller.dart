@@ -2,10 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
+import 'package:lokkha/features/profile/profile.dart';
 
 class ProfileController extends GetxController {
+  final GetProfileUseCase _getProfileUseCase =
+      GetProfileUseCase(repository: ProfileRepository());
+
   RxBool isLoading = true.obs;
   Rxn<ProfileDataModel> profileDataModel = Rxn<ProfileDataModel>();
   Rx<ApiCallStatus> profileApiStatus = ApiCallStatus.holding.obs;
@@ -26,18 +29,19 @@ class ProfileController extends GetxController {
 
     profileApiStatus.value = ApiCallStatus.loading;
     try {
-      final response = await ApiClient.get(AppConstants.v1AuthMe);
-      if (response.statusCode == 200 && response.data is Map) {
-        final profile = ProfileDataModel.fromJson(response.data as Map<String, dynamic>);
-        if (profile.status == true) {
-          profileDataModel.value = profile;
-          isLoggedIn.value = true;
-          profileApiStatus.value = ApiCallStatus.success;
-          return;
-        }
+      final user = await _getProfileUseCase();
+      if (user != null) {
+        myUser = user;
+        MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
+        profileDataModel.value = ProfileDataModel(status: true, user: user);
+        isLoggedIn.value = true;
+        profileApiStatus.value = ApiCallStatus.success;
+        update();
+        return;
       }
       profileApiStatus.value = ApiCallStatus.error;
     } catch (e) {
+      debugPrint("Error fetching profile data: $e");
       profileApiStatus.value = ApiCallStatus.error;
     }
   }

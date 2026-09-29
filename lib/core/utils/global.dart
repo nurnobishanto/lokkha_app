@@ -208,14 +208,21 @@ class NameAvatar extends StatelessWidget {
 
   // Function to get initials (e.g. "Safi Sadman" → "SS")
   String getInitials(String name) {
-    List<String> parts = name.trim().split(' ');
-    if (parts.length == 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return 'U';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length == 1) {
+      return parts[0].isNotEmpty ? parts[0][0].toUpperCase() : 'U';
+    }
+    final first = parts[0].isNotEmpty ? parts[0][0].toUpperCase() : '';
+    final second = parts[1].isNotEmpty ? parts[1][0].toUpperCase() : '';
+    final res = '$first$second';
+    return res.isNotEmpty ? res : 'U';
   }
 
-  // Function to generate random background color
+  // Function to generate deterministic background color
   Color generateAvatarColor() {
-    final random = Random();
+    final random = Random(name.hashCode);
     return Color.fromARGB(
       255,
       70 + random.nextInt(110), // R: 70–180
@@ -230,12 +237,12 @@ class NameAvatar extends StatelessWidget {
     final bgColor = generateAvatarColor();
 
     return CircleAvatar(
-      radius: 26,
+      radius: radius,
       backgroundColor: bgColor,
       child: Text(
         initials,
-        style: const TextStyle(
-          fontSize: 20,
+        style: TextStyle(
+          fontSize: radius * 0.7,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
@@ -245,18 +252,32 @@ class NameAvatar extends StatelessWidget {
 }
 
 Widget buildAvatar(User user, {double radius = 26.0}) {
-  if (user.image != null && user.image!.isNotEmpty) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundImage: NetworkImage(AppConstants.storageUrl + user.image!),
-    );
-  } else if (user.avatar != null && user.avatar!.isNotEmpty) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundImage: NetworkImage(user.avatar!),
+  final rawPath = user.photoUrl ?? user.avatar ?? user.image;
+  final fullUrl = AppConstants.resolveUrl(rawPath);
+
+  if (fullUrl.isNotEmpty) {
+    return CachedNetworkImage(
+      imageUrl: fullUrl,
+      imageBuilder: (context, imageProvider) => CircleAvatar(
+        radius: radius,
+        backgroundImage: imageProvider,
+      ),
+      placeholder: (context, url) => CircleAvatar(
+        radius: radius,
+        backgroundColor: Colors.grey.shade200,
+        child: SizedBox(
+          width: radius * 0.7,
+          height: radius * 0.7,
+          child: const CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+      errorWidget: (context, url, error) => NameAvatar(
+        name: user.name ?? '',
+        radius: radius,
+      ),
     );
   } else {
-    return NameAvatar(name: user.name.toString(), radius: radius);
+    return NameAvatar(name: user.name ?? '', radius: radius);
   }
 }
 

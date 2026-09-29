@@ -43,7 +43,7 @@ class NavbarController extends GetxController {
     getProfileApiStatus.value = ApiCallStatus.loading;
 
     try {
-      final response = await ApiClient.get(AppConstants.v1AuthMe);
+      final response = await ApiClient.get(AppConstants.v1UserProfile);
       if (response.statusCode == 200 && response.data is Map) {
         final profile = ProfileDataModel.fromJson(response.data as Map<String, dynamic>);
         if (profile.status == true && profile.user != null) {
