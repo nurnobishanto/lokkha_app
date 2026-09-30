@@ -589,7 +589,10 @@ class PromoBarAnnouncementModel {
 
   factory PromoBarAnnouncementModel.fromJson(Map<String, dynamic> json) =>
       PromoBarAnnouncementModel(
-        enabled: json['enabled'] == true,
+        enabled: json['enabled'] == true ||
+            json['enabled'] == 1 ||
+            json['enabled'] == '1' ||
+            json['enabled'] == 'true',
         text: json['text']?.toString() ?? '',
         highlight: json['highlight']?.toString() ?? '',
         buttonText: json['button_text']?.toString() ?? '',
@@ -634,7 +637,10 @@ class InAppPopupModel {
       );
 
   factory InAppPopupModel.fromJson(Map<String, dynamic> json) => InAppPopupModel(
-        enabled: json['enabled'] == true,
+        enabled: json['enabled'] == true ||
+            json['enabled'] == 1 ||
+            json['enabled'] == '1' ||
+            json['enabled'] == 'true',
         heading: json['heading']?.toString() ?? '',
         details: json['details']?.toString(),
         imageUrl: json['image_url']?.toString() ?? '',

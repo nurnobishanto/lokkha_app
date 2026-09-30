@@ -16,6 +16,7 @@ class InAppPopupDialog extends StatelessWidget {
     Get.dialog(
       InAppPopupDialog(popup: popup),
       barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.65),
     );
   }
 
@@ -25,7 +26,6 @@ class InAppPopupDialog extends StatelessWidget {
     if (url.isEmpty) return;
 
     if (url.startsWith('/')) {
-      // Internal GetX route
       try {
         Get.toNamed(url);
       } catch (e) {
@@ -44,143 +44,130 @@ class InAppPopupDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.topRight,
-        children: [
-          Container(
-            width: double.infinity,
-            constraints: BoxConstraints(maxWidth: 360.w),
-            decoration: BoxDecoration(
-              color: context.cardColor,
-              borderRadius: BorderRadius.circular(20.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.25),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.r),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Popup Banner Image
-                    if (popup.imageUrl.isNotEmpty)
-                      CachedNetworkImage(
-                        imageUrl: popup.imageUrl,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          height: 180.h,
-                          color: context.dividerColor.withValues(alpha: 0.1),
-                          child: const Center(
-                            child: CircularProgressIndicator.adaptive(),
+      elevation: 0,
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
+      child: Center(
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(maxWidth: 350.w),
+          decoration: BoxDecoration(
+            color: context.cardColor,
+            borderRadius: BorderRadius.circular(20.r),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 28,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20.r),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Poster Image Area with Floating Close Button
+                  Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      // Tappable Banner Image
+                      if (popup.imageUrl.isNotEmpty)
+                        GestureDetector(
+                          onTap: _handleAction,
+                          child: CachedNetworkImage(
+                            imageUrl: AppConstants.resolveUrl(popup.imageUrl),
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                            placeholder: (context, url) => Container(
+                              height: 320.h,
+                              color: context.dividerColor.withValues(alpha: 0.1),
+                              child: const Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) {
+                              debugPrint(
+                                  '[InAppPopupDialog] Image failed to load: $url, error: $error');
+                              return Container(
+                                height: 180.h,
+                                color: context.cardColor,
+                                padding: EdgeInsets.all(16.r),
+                                child: Center(
+                                  child: Text(
+                                    popup.heading,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        errorWidget: (context, url, error) => const SizedBox(),
-                      ),
 
-                    // Content Padding
+                      // Close Button (Dark translucent circle with white outline & white 'X')
+                      Positioned(
+                        top: 10.h,
+                        right: 10.w,
+                        child: GestureDetector(
+                          onTap: () => Get.back(),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.7),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.85),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18.sp,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Optional CTA Button below image if buttonText is present
+                  if (popup.buttonText.isNotEmpty && popup.targetUrl.isNotEmpty) ...[
                     Padding(
-                      padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 20.h),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (popup.heading.isNotEmpty) ...[
-                            Text(
-                              popup.heading,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18.sp,
-                                fontWeight: FontWeight.bold,
-                                color: context.textPrimary,
-                                height: 1.3,
-                              ),
+                      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 14.h),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 46.h,
+                        child: ElevatedButton(
+                          onPressed: _handleAction,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: context.primaryColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
-                            SizedBox(height: 8.h),
-                          ],
-                          if (popup.details != null &&
-                              popup.details!.trim().isNotEmpty) ...[
-                            Text(
-                              popup.details!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 13.sp,
-                                color: context.textSecondary,
-                                height: 1.5,
-                              ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            popup.buttonText,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
                             ),
-                            SizedBox(height: 16.h),
-                          ],
-                          if (popup.buttonText.isNotEmpty &&
-                              popup.targetUrl.isNotEmpty) ...[
-                            SizedBox(height: 8.h),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _handleAction,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: context.primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: 12.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  popup.buttonText,
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
           ),
-
-          // Close button (X)
-          Positioned(
-            top: -12.h,
-            right: -12.w,
-            child: GestureDetector(
-              onTap: () => Get.back(),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 20.sp,
-                  color: context.textPrimary,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

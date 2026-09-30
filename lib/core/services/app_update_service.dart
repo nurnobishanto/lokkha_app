@@ -84,6 +84,10 @@ class AppUpdateService {
 
       updateRequiredCheck.value = updateRequired;
       isChecking.value = false;
+
+      if (!maintenanceMode && !updateRequired) {
+        showInAppAnnouncementIfAvailable();
+      }
       return result;
     } catch (e) {
       debugPrint('[AppUpdateService] Failed to fetch v1 app-info: $e');
@@ -195,13 +199,21 @@ class AppUpdateService {
   }
 
   /// Displays the dynamic In-App Announcement popup if enabled and not yet shown
-  void showInAppAnnouncementIfAvailable() {
-    if (hasShownInAppPopup) return;
+  void showInAppAnnouncementIfAvailable({bool force = false}) {
+    if (hasShownInAppPopup && !force) return;
     final popup = appInfo.value?.data.announcements.inAppPopup;
+    debugPrint(
+        '[AppUpdateService] showInAppAnnouncementIfAvailable: popup=$popup, enabled=${popup?.enabled}, hasShown=$hasShownInAppPopup, force=$force');
     if (popup != null && popup.enabled) {
-      hasShownInAppPopup = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        InAppPopupDialog.show(popup);
+        Future.delayed(const Duration(milliseconds: 400), () {
+          if (Get.context != null) {
+            hasShownInAppPopup = true;
+            debugPrint(
+                '[AppUpdateService] Displaying InAppPopupDialog: ${popup.heading}');
+            InAppPopupDialog.show(popup);
+          }
+        });
       });
     }
   }

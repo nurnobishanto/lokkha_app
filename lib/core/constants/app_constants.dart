@@ -14,30 +14,55 @@ class AppConstants {
   }
   static String get appUrl => '$baseUrl/api';
   static String get apiV1BaseUrl => '$baseUrl/api/v1';
-  static const String storageUrl = 'https://lokkha.com/uploads/';
+  /// Image & File Storage Base URL: https://lokkha.com/uploads
+  static String get imageBaseUrl {
+    try {
+      if (dotenv.isInitialized) {
+        final envUrl = dotenv.env['IMAGE_BASE_URL'];
+        if (envUrl != null && envUrl.isNotEmpty) {
+          return envUrl.endsWith('/') ? envUrl : '$envUrl/';
+        }
+      }
+    } catch (_) {}
+    return 'https://lokkha.com/uploads/';
+  }
+
+  /// Backward-compatible storage URL
+  static String get storageUrl => imageBaseUrl;
   static const String sponsorAds = 'https://bdtaxation.com/api/app-ads';
 
   /// Safely resolves any relative or absolute image/file URL.
-  /// If the URL already begins with http:// or https://, returns as-is.
-  /// If it starts with / or uploads/, formats with the domain/storage appropriately.
+  /// Automatically ensures images from lokkha.com include the /uploads/ storage path.
   static String resolveUrl(String? path) {
     if (path == null) return '';
     final trimmed = path.trim();
     if (trimmed.isEmpty) return '';
+
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      final uri = Uri.tryParse(trimmed);
+      if (uri != null &&
+          (uri.host == 'lokkha.com' || uri.host == 'www.lokkha.com')) {
+        // If pointing to lokkha.com without /uploads/ and not an API call
+        if (!uri.path.startsWith('/uploads/') &&
+            !uri.path.startsWith('/api/') &&
+            uri.path.isNotEmpty) {
+          final cleanPath = uri.path.startsWith('/') ? uri.path : '/${uri.path}';
+          return 'https://${uri.host}/uploads$cleanPath';
+        }
+      }
       return trimmed;
     }
-    if (trimmed.startsWith('/uploads/')) {
-      return '$baseUrl$trimmed';
+
+    final base = imageBaseUrl.endsWith('/') ? imageBaseUrl : '$imageBaseUrl/';
+    final cleanPath = trimmed.startsWith('/') ? trimmed.substring(1) : trimmed;
+    if (cleanPath.startsWith('uploads/')) {
+      return '$baseUrl/$cleanPath';
     }
-    if (trimmed.startsWith('uploads/')) {
-      return '$baseUrl/$trimmed';
-    }
-    if (trimmed.startsWith('/')) {
-      return '$baseUrl$trimmed';
-    }
-    return '$storageUrl$trimmed';
+    return '$base$cleanPath';
   }
+
+  /// Alias for resolving image URLs
+  static String resolveImageUrl(String? path) => resolveUrl(path);
 
   /// V1 Auth Endpoints
   static const String v1AuthCheckPhone = '/auth/check-phone';

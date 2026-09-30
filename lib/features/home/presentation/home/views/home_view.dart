@@ -10,13 +10,11 @@ import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/routes/routes.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import '../controllers/home_controller.dart';
-import '../widgets/accuracy_chart_widget.dart';
+import 'package:lokkha/features/app_system/app_system.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -25,7 +23,16 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final HomeController controller = Get.find();
     final ExamCategoryController examController = Get.find();
-    Future<void> onRefresh() => controller.refreshHomeViewData();
+    Future<void> onRefresh() async {
+      await controller.refreshHomeViewData();
+      await AppUpdateService().fetchAppInfoAndCheckVersion();
+      AppUpdateService().showInAppAnnouncementIfAvailable(force: true);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppUpdateService().showInAppAnnouncementIfAvailable();
+    });
+
     return Scaffold(
       drawer: const CustomDrawer(),
       appBar: AppBar(
@@ -108,6 +115,7 @@ class HomeView extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.fromLTRB(8.r, 2.h, 8.r, 16.h),
           children: [
+            const PromoBarWidget(),
             3.h.height,
             _SliderSection(
               controller: controller,

@@ -41,6 +41,9 @@ class SplashController extends GetxController {
     final canProceed = appUpdateService.handleStartupFlow();
     if (canProceed) {
       Get.offAllNamed(Routes.NAVBAR);
+      Future.delayed(const Duration(milliseconds: 700), () {
+        appUpdateService.showInAppAnnouncementIfAvailable();
+      });
     }
   }
 }

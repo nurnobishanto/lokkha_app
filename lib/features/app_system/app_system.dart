@@ -32,3 +32,4 @@ export 'presentation/onboarding/views/onboarding_view.dart';
 
 // Presentation - Widgets
 export 'presentation/widgets/in_app_popup_dialog.dart';
+export 'presentation/widgets/promo_bar_widget.dart';
