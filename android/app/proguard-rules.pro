@@ -28,3 +28,9 @@
 
 # Keep In-App Purchase / Billing
 -keep class com.android.vending.billing.** { *; }
+
+# Google Play Core & Deferred Components (R8 suppress warnings)
+-dontwarn com.google.android.play.core.**
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**

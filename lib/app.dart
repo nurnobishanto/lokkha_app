@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
           translations: LocalizationService.getInstance(),
           theme: MyTheme.getThemeData(isLight: true),
           darkTheme: MyTheme.getThemeData(isLight: false),
+          // themeMode: ThemeMode.light,
           themeMode: MySharedPref.getThemeMode() == 'dark'
               ? ThemeMode.dark
               : (MySharedPref.getThemeMode() == 'system' ? ThemeMode.system : ThemeMode.light),

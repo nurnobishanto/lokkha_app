@@ -20,7 +20,8 @@ class NavbarController extends GetxController {
     const ExamCategoryView(),
     const MessengerRedirectScreen(),
     const PremiumPackagesView(),
-    const DashboardPortalView(),
+    const ProfileView(),
+    // const DashboardPortalView(),
   ];
 
   void changeIndex(int index) {

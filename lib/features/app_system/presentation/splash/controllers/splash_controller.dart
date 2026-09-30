@@ -13,16 +13,34 @@ class SplashController extends GetxController {
   }
 
   Future<void> _initAppAndNavigate() async {
-    try {
-      await Get.find<PremiumEntitlementService>().validateEntitlement();
-    } catch (e) {
-      debugPrint("Error validating premium entitlement: $e");
-    }
+    final appUpdateService = AppUpdateService();
 
-    Future.delayed(const Duration(seconds: 2), () {
-      final AppUpdateService appUpdateService = AppUpdateService();
-      appUpdateService.startUpdateService();
+    // Run parallel initializations with timeout protection
+    await Future.wait([
+      // 1. Validate entitlement
+      () async {
+        try {
+          await Get.find<PremiumEntitlementService>().validateEntitlement();
+        } catch (e) {
+          debugPrint("Error validating premium entitlement: $e");
+        }
+      }(),
+      // 2. Fetch v1 dynamic app-info and evaluate version/maintenance
+      () async {
+        try {
+          await appUpdateService.fetchAppInfoAndCheckVersion();
+        } catch (e) {
+          debugPrint("Error fetching v1 app-info: $e");
+        }
+      }(),
+      // 3. Minimum 1.8 seconds splash branding duration
+      Future.delayed(const Duration(milliseconds: 1800)),
+    ]);
+
+    // Handle maintenance and force update blocking
+    final canProceed = appUpdateService.handleStartupFlow();
+    if (canProceed) {
       Get.offAllNamed(Routes.NAVBAR);
-    });
+    }
   }
 }

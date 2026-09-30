@@ -8,7 +8,7 @@ import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
 import 'package:lokkha/features/home/home.dart';
-import '../services/home_api_service.dart';
+import 'package:lokkha/core/services/app_update_service.dart';
 
 class HomeController extends GetxController {
   int dotsCount = 0;
@@ -77,6 +77,12 @@ class HomeController extends GetxController {
 
     // Initial 1-call API fetch
     _fetchInitialData();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    AppUpdateService().showInAppAnnouncementIfAvailable();
   }
 
   Future<void> _fetchInitialData() async {

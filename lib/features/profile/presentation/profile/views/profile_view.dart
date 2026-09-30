@@ -126,7 +126,7 @@ class ProfileView extends GetView<ProfileController> {
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      profileData.name ?? "sadman",
+                                      profileData.name ?? "",
                                       style: TextStyle(
                                         fontSize: 18.sp,
                                         fontWeight: FontWeight.w800,
@@ -215,7 +215,7 @@ class ProfileView extends GetView<ProfileController> {
                                   SizedBox(width: 4.w),
                                   Flexible(
                                     child: Text(
-                                      profileData.phone ?? "8801749784788",
+                                      profileData.phone ?? "",
                                       style: TextStyle(
                                         fontSize: 11.5.sp,
                                         color: Colors.white
@@ -240,49 +240,49 @@ class ProfileView extends GetView<ProfileController> {
                     Row(
                       children: [
                         // Left: 90 পয়েন্ট >
-                        InkWell(
-                          onTap: () => Get.toNamed(Routes.REFERRAL),
-                          borderRadius: BorderRadius.circular(20.r),
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 14.w,
-                              vertical: 7.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(20.r),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.monetization_on_rounded,
-                                  size: 16.sp,
-                                  color: const Color(0xFFF59E0B),
-                                ),
-                                SizedBox(width: 6.w),
-                                Text(
-                                  "${profileData.points ?? 90} পয়েন্ট",
-                                  style: TextStyle(
-                                    color: const Color(0xFFFDE68A),
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                SizedBox(width: 4.w),
-                                Icon(
-                                  Icons.chevron_right_rounded,
-                                  size: 16.sp,
-                                  color: Colors.white.withValues(alpha: 0.7),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // InkWell(
+                        //   onTap: () => Get.toNamed(Routes.REFERRAL),
+                        //   borderRadius: BorderRadius.circular(20.r),
+                        //   child: Container(
+                        //     padding: EdgeInsets.symmetric(
+                        //       horizontal: 14.w,
+                        //       vertical: 7.h,
+                        //     ),
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.black.withValues(alpha: 0.25),
+                        //       borderRadius: BorderRadius.circular(20.r),
+                        //       border: Border.all(
+                        //         color: Colors.white.withValues(alpha: 0.15),
+                        //         width: 1,
+                        //       ),
+                        //     ),
+                        //     child: Row(
+                        //       mainAxisSize: MainAxisSize.min,
+                        //       children: [
+                        //         Icon(
+                        //           Icons.monetization_on_rounded,
+                        //           size: 16.sp,
+                        //           color: const Color(0xFFF59E0B),
+                        //         ),
+                        //         SizedBox(width: 6.w),
+                        //         Text(
+                        //           "${profileData.points ?? 90} পয়েন্ট",
+                        //           style: TextStyle(
+                        //             color: const Color(0xFFFDE68A),
+                        //             fontSize: 12.sp,
+                        //             fontWeight: FontWeight.w800,
+                        //           ),
+                        //         ),
+                        //         SizedBox(width: 4.w),
+                        //         Icon(
+                        //           Icons.chevron_right_rounded,
+                        //           size: 16.sp,
+                        //           color: Colors.white.withValues(alpha: 0.7),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
 
                         SizedBox(width: 10.w),
 
@@ -513,9 +513,10 @@ class ProfileView extends GetView<ProfileController> {
                 color: context.textPrimary,
               ),
             ),
-            trailing: Icon(Icons.chevron_right, size: 20, color: context.textMuted),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+            trailing:
+                Icon(Icons.chevron_right, size: 20, color: context.textMuted),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r)),
           ),
         );
       },
