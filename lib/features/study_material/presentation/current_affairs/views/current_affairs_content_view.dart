@@ -47,8 +47,17 @@ class CurrentAffairsContentView extends StatelessWidget {
 
         final items = controller.model.value.currentAffairs?.data;
 
-        if (items!.isEmpty) {
-          return const Center(child: Text('No Data Found'));
+        if (items == null || items.isEmpty) {
+          return Center(
+            child: Text(
+              'কোনো তথ্য পাওয়া যায়নি',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w500,
+                color: context.textSecondary,
+              ),
+            ),
+          );
         }
 
         return ListView.builder(
@@ -98,6 +107,17 @@ class CurrentAffairsContentView extends StatelessWidget {
 
             final data = items[index];
             final bool isLocked = !havePackage.value && index > 0;
+            String displayDate = data.date ?? "";
+            try {
+              if (displayDate.isNotEmpty) {
+                final dt = DateTime.parse(displayDate).toLocal();
+                displayDate =
+                    "${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}";
+              }
+            } catch (_) {}
+
+            final questions = data.questions ?? [];
+
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8),
               child: Column(
@@ -110,8 +130,9 @@ class CurrentAffairsContentView extends StatelessWidget {
                       10.0.w.width,
                       Center(
                         child: Text(
-                          data.date ?? "",
-                          style: AppTextStyles.heading4.copyWith(color: context.textPrimary),
+                          displayDate,
+                          style: AppTextStyles.heading4
+                              .copyWith(color: context.textPrimary),
                         ),
                       ),
                       10.0.w.width,
@@ -123,8 +144,8 @@ class CurrentAffairsContentView extends StatelessWidget {
                   // Questions
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(data.questions?.length ?? 0, (i) {
-                      var question = data.questions![i];
+                    children: List.generate(questions.length, (i) {
+                      var question = questions[i];
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
@@ -222,7 +243,6 @@ class CurrentAffairsContentView extends StatelessWidget {
                                 alignment: Alignment.topRight,
                                 child: InkWell(
                                   onTap: () {
-                                    print("PACKAGE XX: ${havePackage.value}");
                                     if (havePackage.value) {
                                       ExplanationDialog.show(question);
                                     } else {

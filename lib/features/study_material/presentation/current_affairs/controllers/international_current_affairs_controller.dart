@@ -13,8 +13,9 @@ class InternationalCurrentAffairsController extends GetxController {
   Future<void> fetchCurrentAffairs(String search,
       {int page = 1, bool refresh = false, String? date}) async {
     isLoading.value = true;
+    final dateParam = (date != null && date.isNotEmpty) ? '&date=$date' : '';
     String url =
-        "${AppConstants.internationalCA}?search=$search&page=$page&date=$date";
+        "${AppConstants.internationalCA}?search=$search&page=$page$dateParam";
 
     BaseClient.safeApiCall(
       url,

@@ -35,6 +35,14 @@ class CurrentAffairsModel {
       };
 }
 
+int? _safeInt(dynamic val) {
+  if (val == null) return null;
+  if (val is int) return val;
+  if (val is num) return val.toInt();
+  if (val is String) return int.tryParse(val);
+  return null;
+}
+
 class CurrentAffairs {
   final List<Datum>? data;
   final int? currentPage;
@@ -57,13 +65,15 @@ class CurrentAffairs {
   factory CurrentAffairs.fromJson(Map<String, dynamic> json) => CurrentAffairs(
         data: json["data"] == null
             ? []
-            : List<Datum>.from(json["data"]!.map((x) => Datum.fromJson(x))),
-        currentPage: json["current_page"],
-        perPage: json["per_page"],
-        total: json["total"],
-        lastPage: json["last_page"],
-        from: json["from"],
-        to: json["to"],
+            : List<Datum>.from((json["data"] as List).map((x) =>
+                Datum.fromJson(
+                    x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x)))),
+        currentPage: _safeInt(json["current_page"]),
+        perPage: _safeInt(json["per_page"]),
+        total: _safeInt(json["total"]),
+        lastPage: _safeInt(json["last_page"]),
+        from: _safeInt(json["from"]),
+        to: _safeInt(json["to"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,11 +99,12 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        date: json["date"],
+        date: json["date"]?.toString(),
         questions: json["questions"] == null
             ? []
-            : List<Question>.from(
-                json["questions"]!.map((x) => Question.fromJson(x))),
+            : List<Question>.from((json["questions"] as List).map((x) =>
+                Question.fromJson(
+                    x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x)))),
       );
 
   Map<String, dynamic> toJson() => {

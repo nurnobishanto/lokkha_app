@@ -14,8 +14,9 @@ class CurrentAffairsController extends GetxController {
       {int page = 1, bool refresh = false, String? date}) async {
     final token = MySharedPref.getUserToken();
     isLoading.value = true;
+    final dateParam = (date != null && date.isNotEmpty) ? '&date=$date' : '';
     String url =
-        "${AppConstants.nationalCA}?search=$search&page=$page&date=$date";
+        "${AppConstants.nationalCA}?search=$search&page=$page$dateParam";
     Map<String, String> headers = {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json'

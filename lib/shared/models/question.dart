@@ -40,23 +40,29 @@ class Question {
   });
 
   factory Question.fromJson(Map<String, dynamic> json) => Question(
-        id: json["id"],
-        questionType: questionTypeValues.map[json["question_type"]]!,
-        title: json["title"],
-        description: json["description"],
+        id: json["id"] is int
+            ? json["id"]
+            : int.tryParse(json["id"]?.toString() ?? ''),
+        questionType: json["question_type"] != null
+            ? (questionTypeValues.map[json["question_type"]] ??
+                QuestionType.SINGLE_CHOICE)
+            : QuestionType.SINGLE_CHOICE,
+        title: json["title"]?.toString(),
+        description: json["description"]?.toString(),
         options: json["options"] == null
             ? []
-            : List<Option>.from(
-                json["options"]!.map((x) => Option.fromJson(x))),
-        explanation: json["explanation"],
-        questionImage: json["question_image"],
-        explanationImage: json["explanation_image"],
-        note: json["note"],
-        reference: json["reference"],
-        date: json["date"],
-        status: json["status"],
-        customId: json["custom_id"],
-        comment: json["comment"],
+            : List<Option>.from((json["options"] as List).map((x) =>
+                Option.fromJson(
+                    x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x)))),
+        explanation: json["explanation"]?.toString(),
+        questionImage: json["question_image"]?.toString(),
+        explanationImage: json["explanation_image"]?.toString(),
+        note: json["note"]?.toString(),
+        reference: json["reference"]?.toString(),
+        date: json["date"]?.toString(),
+        status: json["status"]?.toString(),
+        customId: json["custom_id"]?.toString(),
+        comment: json["comment"]?.toString(),
         //tags: json["tags"] == null ? [] : List<Tag>.from(json["tags"]!.map((x) => Tag.fromJson(x))),
         //subjects: json["subjects"] == null ? [] : List<Subject>.from(json["subjects"]!.map((x) => Subject.fromJson(x))),
       );
@@ -88,7 +94,7 @@ class Question {
 }
 
 class Option {
-  final int? key;
+  final dynamic key;
   final String? value;
   final bool? isCorrect;
 
@@ -98,10 +104,16 @@ class Option {
     this.isCorrect,
   });
 
+  int? get keyAsInt => key is int ? key : int.tryParse(key?.toString() ?? '');
+  String get keyAsString => key?.toString() ?? '';
+
   factory Option.fromJson(Map<String, dynamic> json) => Option(
         key: json["key"],
-        value: json["value"],
-        isCorrect: json["is_correct"],
+        value: json["value"]?.toString(),
+        isCorrect: json["is_correct"] == true ||
+            json["is_correct"] == 1 ||
+            json["is_correct"] == "1" ||
+            json["is_correct"] == "true",
       );
 
   Map<String, dynamic> toJson() => {
