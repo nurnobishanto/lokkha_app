@@ -5,6 +5,8 @@ import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class PromoBarWidget extends StatefulWidget {
+  static bool isSessionDismissed = false;
+
   const PromoBarWidget({super.key});
 
   @override
@@ -12,7 +14,6 @@ class PromoBarWidget extends StatefulWidget {
 }
 
 class _PromoBarWidgetState extends State<PromoBarWidget> {
-  bool _isDismissed = false;
   Timer? _timer;
   Duration _remaining = Duration.zero;
 
@@ -110,7 +111,7 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isDismissed) return const SizedBox.shrink();
+    if (PromoBarWidget.isSessionDismissed) return const SizedBox.shrink();
 
     return Obx(() {
       final promoBar =
@@ -275,24 +276,29 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
 
             // Close ('X') Button
             Positioned(
-              top: 8,
-              right: 8,
+              top: 4,
+              right: 4,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                   setState(() {
-                    _isDismissed = true;
+                    PromoBarWidget.isSessionDismissed = true;
                   });
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.close,
-                    size: 14,
-                    color: Colors.white,
+                  padding: const EdgeInsets.all(8),
+                  color: Colors.transparent,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 15,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

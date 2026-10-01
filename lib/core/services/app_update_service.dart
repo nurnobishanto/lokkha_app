@@ -202,20 +202,23 @@ class AppUpdateService {
   void showInAppAnnouncementIfAvailable({bool force = false}) {
     if (hasShownInAppPopup && !force) return;
     final popup = appInfo.value?.data.announcements.inAppPopup;
+    if (popup == null || !popup.enabled) return;
+    if (InAppPopupDialog.isShowing) return;
+
+    // Immediately mark as shown to prevent race condition when multiple callers trigger simultaneously
+    hasShownInAppPopup = true;
     debugPrint(
-        '[AppUpdateService] showInAppAnnouncementIfAvailable: popup=$popup, enabled=${popup?.enabled}, hasShown=$hasShownInAppPopup, force=$force');
-    if (popup != null && popup.enabled) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 400), () {
-          if (Get.context != null) {
-            hasShownInAppPopup = true;
-            debugPrint(
-                '[AppUpdateService] Displaying InAppPopupDialog: ${popup.heading}');
-            InAppPopupDialog.show(popup);
-          }
-        });
+        '[AppUpdateService] showInAppAnnouncementIfAvailable: popup=${popup.heading}, enabled=${popup.enabled}, force=$force');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (Get.context != null && !InAppPopupDialog.isShowing) {
+          debugPrint(
+              '[AppUpdateService] Displaying InAppPopupDialog: ${popup.heading}');
+          InAppPopupDialog.show(popup);
+        }
       });
-    }
+    });
   }
 
   /// Backward compatibility for legacy calls
