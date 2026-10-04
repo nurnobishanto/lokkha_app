@@ -1,11 +1,21 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/home.dart';
+import 'package:lokkha/shared/models/exam.dart';
 
 class SeeAllItemsController extends GetxController {
-  final RxString? selectedFilter = "all".obs;
+  final GetUserExamsUseCase _getUserExamsUseCase;
+
+  SeeAllItemsController({GetUserExamsUseCase? getUserExamsUseCase})
+      : _getUserExamsUseCase = getUserExamsUseCase ??
+            (Get.isRegistered<GetUserExamsUseCase>()
+                ? Get.find<GetUserExamsUseCase>()
+                : GetUserExamsUseCase());
+
+  final RxString selectedFilter = "all".obs;
 
   // Common States
   RxBool isLoading = true.obs;
@@ -16,41 +26,63 @@ class SeeAllItemsController extends GetxController {
 
   // Exams
   Rx<AllExamModel> allExamModel = AllExamModel().obs;
+  RxList<Exam> examsList = <Exam>[].obs;
+  RxList<UserExamV1Item> v1ExamsList = <UserExamV1Item>[].obs;
+  Rx<UserExamV1Meta?> examMeta = Rx<UserExamV1Meta?>(null);
   Rx<ApiCallStatus> examApiCallStatus = ApiCallStatus.holding.obs;
 
   // Courses
   Rx<AllCourseModel> allCourseModel = AllCourseModel().obs;
   Rx<ApiCallStatus> courseApiCallStatus = ApiCallStatus.holding.obs;
 
-  // Fetch All Exams
+  void setFilter(String filter) {
+    if (selectedFilter.value == filter && filter != 'all') {
+      selectedFilter.value = 'all';
+    } else {
+      selectedFilter.value = filter;
+    }
+    fetchAllExams(page: 1);
+  }
+
+  // Fetch All Exams via Clean Architecture V1 API UseCase
   Future<void> fetchAllExams({int page = 1}) async {
-    final token = MySharedPref.getUserToken();
     examApiCallStatus.value = ApiCallStatus.loading;
 
-    final url = AppConstants.examList;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      headers: {'Authorization': 'Bearer $token'},
-      queryParameters: {
-        'page': page,
-        "type": selectedFilter!.value,
-      },
-      onSuccess: (response) {
-        if (response.data["status"] == true) {
-          final modelData = AllExamModel.fromJson(response.data);
-          allExamModel.value = modelData;
-          currentExamPage.value = page;
-          totalExamPages.value = modelData.exams?.lastPage ?? 1;
-          examApiCallStatus.value = ApiCallStatus.success;
-        } else {
-          examApiCallStatus.value = ApiCallStatus.error;
-        }
-      },
-      onError: (err) {
-        examApiCallStatus.value = ApiCallStatus.error;
-      },
-    );
+    try {
+      final filterParam =
+          selectedFilter.value == 'all' ? null : selectedFilter.value;
+      final response = await _getUserExamsUseCase(
+        page: page,
+        perPage: 10,
+        filter: filterParam,
+      );
+
+      v1ExamsList.assignAll(response.items);
+      final convertedExams =
+          response.items.map((item) => item.toExam()).toList();
+      examsList.assignAll(convertedExams);
+      examMeta.value = response.meta;
+
+      // Keep allExamModel updated for backward compatibility
+      allExamModel.value = AllExamModel(
+        status: response.success,
+        exams: Exams(
+          currentPage: response.meta.currentPage,
+          lastPage: response.meta.lastPage,
+          perPage: response.meta.perPage,
+          total: response.meta.total,
+          data: convertedExams,
+        ),
+      );
+
+      currentExamPage.value = response.meta.currentPage;
+      totalExamPages.value =
+          response.meta.lastPage > 0 ? response.meta.lastPage : 1;
+      examApiCallStatus.value = ApiCallStatus.success;
+    } catch (e) {
+      debugPrint('[SeeAllItemsController] fetchAllExams error: $e');
+      examApiCallStatus.value = ApiCallStatus.error;
+    }
   }
 
   // Fetch All Courses

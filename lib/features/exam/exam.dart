@@ -5,6 +5,13 @@ export 'data/models/course_categories_model.dart';
 export 'data/models/exam_category_details_model.dart';
 export 'data/models/latest_exam_model.dart' hide Link;
 export 'data/models/random_question_model.dart';
+export 'data/models/user_exam_v1_model.dart';
+
+// Data & Repositories
+export 'data/datasources/exam_remote_data_source.dart';
+export 'domain/repositories/exam_repository.dart';
+export 'data/repositories/exam_repository_impl.dart';
+export 'domain/usecases/get_user_exams_usecase.dart';
 
 // Presentation - Exam
 export 'presentation/exam/bindings/exam_binding.dart';

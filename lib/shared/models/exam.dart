@@ -49,36 +49,51 @@ class Exam {
     this.examCategory,
   });
 
-  factory Exam.fromJson(Map<String, dynamic> json) => Exam(
-        id: json["id"],
-        publishedAt: json["published_at"] == null
-            ? null
-            : DateTime.parse(json["published_at"]),
-        isPaid: json["is_paid"],
-        name: json["name"],
-        image: json["image"],
-        slug: json["slug"],
-        description: json["description"],
-        duration: json["duration"],
-        positiveMark: json["positive_mark"],
-        negativeMark: json["negative_mark"]?.toDouble(),
-        examPolicy: json["exam_policy"],
-        status: json["status"],
-        createdBy: json["created_by"],
-        updatedBy: json["updated_by"],
-        examCategoryId: json["exam_category_id"],
-        questionsCount: json["questions_count"],
-        attempted: json["attempted"],
-        questions: json["questions"] == null
-            ? []
-            : List<Question>.from(
-                json["questions"]!.map((x) => Question.fromJson(x))),
-        possibleMark: json["possible_mark"],
-        examResultsCount: json["exam_results_count"],
-        examCategory: json["category"] == null
-            ? null
-            : ExamCategory.fromJson(json["category"]),
-      );
+  factory Exam.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(dynamic val) {
+      if (val == null) return null;
+      try {
+        return DateTime.parse(val.toString());
+      } catch (_) {
+        return null;
+      }
+    }
+
+    return Exam(
+      id: json["id"],
+      publishedAt: parseDate(json["published_at"] ?? json["created_at"]),
+      isPaid: json["is_paid"],
+      name: json["name"],
+      image: json["image"] ?? json["image_url"],
+      slug: json["slug"],
+      description: json["description"],
+      duration: json["duration"] ?? json["duration_minutes"],
+      positiveMark: json["positive_mark"],
+      negativeMark: json["negative_mark"] != null
+          ? double.tryParse(json["negative_mark"].toString())
+          : null,
+      examPolicy: json["exam_policy"],
+      status: json["status"],
+      createdBy: json["created_by"],
+      updatedBy: json["updated_by"],
+      examCategoryId: json["exam_category_id"],
+      questionsCount: json["questions_count"] ?? json["total_questions"],
+      attempted: json["attempted"] ?? json["user_attempted"],
+      questions: json["questions"] == null
+          ? []
+          : List<Question>.from(
+              json["questions"]!.map((x) => Question.fromJson(x))),
+      possibleMark: json["possible_mark"] != null
+          ? int.tryParse(json["possible_mark"].toString())
+          : (json["total_marks"] != null
+              ? (double.tryParse(json["total_marks"].toString())?.toInt())
+              : null),
+      examResultsCount: json["exam_results_count"] ?? json["user_attempts_count"],
+      examCategory: json["category"] == null
+          ? null
+          : ExamCategory.fromJson(json["category"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
