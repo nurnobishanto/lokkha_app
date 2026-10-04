@@ -1,20 +1,46 @@
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/features/course/course.dart';
 
 class CourseDetailsController extends GetxController {
-  late final int courseId;
+  int? courseId;
   CourseDetailsModel model = CourseDetailsModel();
   bool isLoading = true;
 
   @override
   void onInit() {
     super.onInit();
-    courseId = Get.arguments['course_id'] as int;
-    fetchCourseDetails(courseId);
+    courseId = _extractCourseId();
+    if (courseId != null) {
+      fetchCourseDetails(courseId!);
+    } else {
+      apiCallStatus = ApiCallStatus.error;
+      isLoading = false;
+      update();
+    }
+  }
+
+  int? _extractCourseId() {
+    if (Get.parameters.isNotEmpty) {
+      final param = Get.parameters['course_id'] ?? Get.parameters['id'];
+      if (param != null && param.isNotEmpty) {
+        final parsed = int.tryParse(param);
+        if (parsed != null) return parsed;
+      }
+    }
+    final args = Get.arguments;
+    if (args != null) {
+      if (args is int) return args;
+      if (args is String) return int.tryParse(args);
+      if (args is Map) {
+        final rawId = args['course_id'] ?? args['id'];
+        if (rawId is int) return rawId;
+        if (rawId != null) return int.tryParse(rawId.toString());
+      }
+    }
+    return null;
   }
 
   RxBool showFullDetails = false.obs;

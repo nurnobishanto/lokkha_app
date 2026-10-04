@@ -7,13 +7,36 @@ import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/network/base_client.dart';
 
 class ExamCategoryDetailsController extends GetxController {
-  late final int categoryId;
+  int? categoryId;
   @override
   void onInit() {
     super.onInit();
-    categoryId = Get.arguments["category_id"] as int;
-    fetchExamCategoryDetails(categoryId);
-    fetchExamCategoriesWithParentID(categoryId);
+    categoryId = _extractCategoryId();
+    if (categoryId != null) {
+      fetchExamCategoryDetails(categoryId!);
+      fetchExamCategoriesWithParentID(categoryId!);
+    }
+  }
+
+  int? _extractCategoryId() {
+    if (Get.parameters.isNotEmpty) {
+      final param = Get.parameters['category_id'] ?? Get.parameters['id'];
+      if (param != null && param.isNotEmpty) {
+        final parsed = int.tryParse(param);
+        if (parsed != null) return parsed;
+      }
+    }
+    final args = Get.arguments;
+    if (args != null) {
+      if (args is int) return args;
+      if (args is String) return int.tryParse(args);
+      if (args is Map) {
+        final rawId = args['category_id'] ?? args['id'];
+        if (rawId is int) return rawId;
+        if (rawId != null) return int.tryParse(rawId.toString());
+      }
+    }
+    return null;
   }
 
   // Pagination
@@ -25,23 +48,23 @@ class ExamCategoryDetailsController extends GetxController {
 
   // Pagination helpers
   void goToPage(int page) {
-    if (page >= 1 && page <= totalPages.value) {
+    if (page >= 1 && page <= totalPages.value && categoryId != null) {
       currentPage.value = page;
-      fetchExamCategoryDetails(categoryId);
+      fetchExamCategoryDetails(categoryId!);
     }
   }
 
   void nextPage() {
-    if (currentPage.value < totalPages.value) {
+    if (currentPage.value < totalPages.value && categoryId != null) {
       currentPage.value++;
-      fetchExamCategoryDetails(categoryId);
+      fetchExamCategoryDetails(categoryId!);
     }
   }
 
   void previousPage() {
-    if (currentPage.value > 1) {
+    if (currentPage.value > 1 && categoryId != null) {
       currentPage.value--;
-      fetchExamCategoryDetails(categoryId);
+      fetchExamCategoryDetails(categoryId!);
     }
   }
 

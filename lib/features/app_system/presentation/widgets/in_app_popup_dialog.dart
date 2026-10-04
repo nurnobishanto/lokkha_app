@@ -37,6 +37,18 @@ class InAppPopupDialog extends StatelessWidget {
         debugPrint('[InAppPopupDialog] Route navigation failed for $url: $e');
       }
     } else if (url.startsWith('http://') || url.startsWith('https://')) {
+      final uri = Uri.tryParse(url);
+      if (uri != null && uri.host.contains('lokkha.com')) {
+        final pathWithQuery = uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
+        if (pathWithQuery.isNotEmpty && pathWithQuery.startsWith('/')) {
+          try {
+            Get.toNamed(pathWithQuery);
+            return;
+          } catch (e) {
+            debugPrint('[InAppPopupDialog] Internal route navigation failed: $e');
+          }
+        }
+      }
       try {
         await launchUrlString(url, mode: LaunchMode.externalApplication);
       } catch (e) {

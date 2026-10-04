@@ -101,6 +101,18 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
         debugPrint('[PromoBarWidget] Failed to navigate to $trimmed: $e');
       }
     } else if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      final uri = Uri.tryParse(trimmed);
+      if (uri != null && uri.host.contains('lokkha.com')) {
+        final pathWithQuery = uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
+        if (pathWithQuery.isNotEmpty && pathWithQuery.startsWith('/')) {
+          try {
+            Get.toNamed(pathWithQuery);
+            return;
+          } catch (e) {
+            debugPrint('[PromoBarWidget] Internal route navigation failed: $e');
+          }
+        }
+      }
       try {
         await launchUrlString(trimmed, mode: LaunchMode.externalApplication);
       } catch (e) {
