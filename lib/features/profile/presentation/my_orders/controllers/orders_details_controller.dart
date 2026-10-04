@@ -1,53 +1,56 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
-import 'package:lokkha/core/network/base_client.dart';
-import 'package:lokkha/features/profile/profile.dart';
+import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
+import 'package:lokkha/features/profile/domain/usecases/get_order_details_usecase.dart';
+import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class OrdersDetailsController extends GetxController {
-  RxBool isLoading = true.obs;
-  // Data Model
-  Rx<OrderDetailsModel> model = OrderDetailsModel().obs;
+  final GetOrderDetailsUseCase getOrderDetailsUseCase;
 
-  // API Call Status
-  var apiCallStatus = ApiCallStatus.holding.obs;
+  OrdersDetailsController({GetOrderDetailsUseCase? getOrderDetailsUseCase})
+      : getOrderDetailsUseCase =
+            getOrderDetailsUseCase ?? GetOrderDetailsUseCase();
 
-  // Fetch Order from API
-  Future<void> fetchOrdersDetails({required String url}) async {
+  final RxBool isLoading = true.obs;
+  final Rx<OrderDetailV1Data?> orderDetail = Rx<OrderDetailV1Data?>(null);
+  final Rx<ApiCallStatus> apiCallStatus = ApiCallStatus.holding.obs;
+
+  /// Fetch order details by ID or URL
+  Future<void> fetchOrdersDetails({dynamic id, String? url}) async {
     isLoading.value = true;
     apiCallStatus.value = ApiCallStatus.loading;
-    String? token = MySharedPref.getUserToken();
 
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-
-    await BaseClient.safeApiCall(
-      url,
-      headers: headers,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          model.value = OrderDetailsModel.fromJson(response.data);
-          apiCallStatus.value = ApiCallStatus.success;
+    try {
+      dynamic orderId = id;
+      if (orderId == null && url != null && url.isNotEmpty) {
+        // Extract numeric ID from URL if provided (e.g. ".../105")
+        final uri = Uri.tryParse(url);
+        if (uri != null && uri.pathSegments.isNotEmpty) {
+          orderId = uri.pathSegments.last;
         } else {
-          apiCallStatus.value = ApiCallStatus.error;
-          CustomSnackBar.showCustomErrorToast(
-              message:
-                  response.data['message'] ?? "অর্ডার তথ্য লোড করতে ব্যর্থ");
+          final match = RegExp(r'\d+').allMatches(url).lastOrNull;
+          if (match != null) {
+            orderId = match.group(0);
+          }
         }
-        isLoading.value = false;
-      },
-      onError: (error) {
-        isLoading.value = false;
-        apiCallStatus.value = ApiCallStatus.error;
-        debugPrint("MyOrdersDetails API Error: $error");
-        CustomSnackBar.showCustomErrorToast(
-            message: "সার্ভার সংযোগে সমস্যা হয়েছে");
-      },
-    );
+      }
+
+      if (orderId == null) {
+        throw Exception('Order ID not provided');
+      }
+
+      final data = await getOrderDetailsUseCase(orderId);
+      orderDetail.value = data;
+      apiCallStatus.value = ApiCallStatus.success;
+    } catch (e) {
+      debugPrint('[OrdersDetailsController] fetchOrdersDetails error: $e');
+      apiCallStatus.value = ApiCallStatus.error;
+      CustomSnackBar.showCustomErrorToast(
+        message: "অর্ডার তথ্য লোড করতে সমস্যা হয়েছে",
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

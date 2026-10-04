@@ -8,6 +8,7 @@ import 'package:lokkha/features/home/home.dart';
 import '../models/device_session_model.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_review_detail_model.dart';
+import '../models/order_v1_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<User?> getProfile();
@@ -40,6 +41,15 @@ abstract class ProfileRemoteDataSource {
     dynamic id, {
     ExamHistoryModel? summaryExam,
   });
+  Future<OrderV1ListResponse> getUserOrders({
+    String status = 'all',
+    String modelType = 'all',
+    String paymentMethod = 'all',
+    String? search,
+    int page = 1,
+    int perPage = 10,
+  });
+  Future<OrderDetailV1Data> getOrderDetails(dynamic id);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -249,6 +259,70 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       );
     } catch (e) {
       debugPrint('[ProfileRemoteDataSource] getExamHistoryDetail error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<OrderV1ListResponse> getUserOrders({
+    String status = 'all',
+    String modelType = 'all',
+    String paymentMethod = 'all',
+    String? search,
+    int page = 1,
+    int perPage = 10,
+  }) async {
+    try {
+      final Map<String, dynamic> queryParams = {
+        'page': page,
+        'per_page': perPage,
+      };
+      if (status.isNotEmpty && status.toLowerCase() != 'all') {
+        queryParams['status'] = status.toLowerCase();
+      }
+      if (modelType.isNotEmpty && modelType.toLowerCase() != 'all') {
+        queryParams['model_type'] = modelType;
+      }
+      if (paymentMethod.isNotEmpty && paymentMethod.toLowerCase() != 'all') {
+        queryParams['payment_method'] = paymentMethod;
+      }
+      if (search != null && search.trim().isNotEmpty) {
+        queryParams['search'] = search.trim();
+      }
+
+      final response = await ApiClient.get(
+        AppConstants.v1UserOrders,
+        queryParameters: queryParams,
+      );
+
+      if (response.data is Map<String, dynamic>) {
+        return OrderV1ListResponse.fromJson(response.data as Map<String, dynamic>);
+      }
+      throw Exception('Invalid orders response format');
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getUserOrders error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<OrderDetailV1Data> getOrderDetails(dynamic id) async {
+    try {
+      final cleanId = id.toString().replaceAll('#', '');
+      final response = await ApiClient.get(
+        '${AppConstants.v1UserOrders}/$cleanId',
+      );
+
+      if (response.data is Map<String, dynamic>) {
+        final parsed = OrderDetailV1Response.fromJson(
+            response.data as Map<String, dynamic>);
+        if (parsed.data != null) {
+          return parsed.data!;
+        }
+      }
+      throw Exception('Order details not found');
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getOrderDetails error: $e');
       rethrow;
     }
   }

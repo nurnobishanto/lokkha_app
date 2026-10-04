@@ -4,6 +4,7 @@ import 'package:lokkha/shared/models/user.dart';
 import '../../data/models/device_session_model.dart';
 import '../../data/models/exam_history_model.dart';
 import '../../data/models/exam_review_detail_model.dart';
+import '../../data/models/order_v1_model.dart';
 import '../../data/datasources/profile_remote_data_source.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 
@@ -49,4 +50,15 @@ abstract class ProfileRepository {
     dynamic id, {
     ExamHistoryModel? summaryExam,
   });
+
+  Future<OrderV1ListResponse> getUserOrders({
+    String status = 'all',
+    String modelType = 'all',
+    String paymentMethod = 'all',
+    String? search,
+    int page = 1,
+    int perPage = 10,
+  });
+
+  Future<OrderDetailV1Data> getOrderDetails(dynamic id);
 }

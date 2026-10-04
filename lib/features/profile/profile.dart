@@ -9,6 +9,7 @@ export 'data/models/update_profile_model.dart';
 export 'data/models/my_packages_model.dart';
 export 'data/models/my_orders_model.dart';
 export 'data/models/orders_details_model.dart';
+export 'data/models/order_v1_model.dart';
 export 'data/models/exam_history_model.dart';
 export 'data/models/exam_rank_model.dart';
 export 'data/models/exam_question_result_model.dart';
@@ -30,6 +31,8 @@ export 'domain/usecases/logout_other_devices_usecase.dart';
 export 'domain/usecases/get_dashboard_overview_usecase.dart';
 export 'domain/usecases/get_exam_history_usecase.dart';
 export 'domain/usecases/get_exam_history_detail_usecase.dart';
+export 'domain/usecases/get_user_orders_usecase.dart';
+export 'domain/usecases/get_order_details_usecase.dart';
 export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 

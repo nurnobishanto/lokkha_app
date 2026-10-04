@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
+import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 
 class AuthInterceptor extends Interceptor {
   @override
@@ -8,8 +9,14 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Read JWT token directly from encrypted storage
-    final token = await SecureStorageService.getToken();
+    // Read JWT token directly from encrypted storage (with shared pref fallback)
+    var token = await SecureStorageService.getToken();
+    if (token == null || token.isEmpty) {
+      final prefToken = MySharedPref.getUserToken();
+      if (prefToken.isNotEmpty) {
+        token = prefToken;
+      }
+    }
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }

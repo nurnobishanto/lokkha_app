@@ -6,6 +6,7 @@ import '../datasources/profile_remote_data_source.dart';
 import '../models/device_session_model.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_review_detail_model.dart';
+import '../models/order_v1_model.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -94,5 +95,29 @@ class ProfileRepositoryImpl implements ProfileRepository {
     ExamHistoryModel? summaryExam,
   }) {
     return remoteDataSource.getExamHistoryDetail(id, summaryExam: summaryExam);
+  }
+
+  @override
+  Future<OrderV1ListResponse> getUserOrders({
+    String status = 'all',
+    String modelType = 'all',
+    String paymentMethod = 'all',
+    String? search,
+    int page = 1,
+    int perPage = 10,
+  }) {
+    return remoteDataSource.getUserOrders(
+      status: status,
+      modelType: modelType,
+      paymentMethod: paymentMethod,
+      search: search,
+      page: page,
+      perPage: perPage,
+    );
+  }
+
+  @override
+  Future<OrderDetailV1Data> getOrderDetails(dynamic id) {
+    return remoteDataSource.getOrderDetails(id);
   }
 }
