@@ -1,1 +1,1 @@
-export 'package:lokkha/core/theme/app_colors.dart';
+export 'package:lokkha/app/theme/theme.dart';

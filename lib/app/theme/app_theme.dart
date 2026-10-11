@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/theme/my_theme.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'my_theme.dart';
 
-export 'package:lokkha/core/theme/app_colors.dart';
-export 'package:lokkha/core/theme/light_theme_colors.dart';
-export 'package:lokkha/core/theme/dark_theme_colors.dart';
-export 'package:lokkha/core/theme/my_theme.dart';
-export 'package:lokkha/core/theme/text_style.dart';
+export 'app_colors.dart';
+export 'light_theme_colors.dart';
+export 'dark_theme_colors.dart';
+export 'my_theme.dart';
+export 'text_style.dart';
+export 'my_fonts.dart';
+export 'my_styles.dart';
 
 class AppTheme {
   static ThemeData get lightTheme => MyTheme.getThemeData(isLight: true);
   static ThemeData get darkTheme => MyTheme.getThemeData(isLight: false);
+
+  static ThemeData getThemeData({required bool isLight}) =>
+      MyTheme.getThemeData(isLight: isLight);
 }
 
 /// Riverpod ThemeMode Notifier

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 class CustomActionButton extends StatelessWidget {
   final String text;

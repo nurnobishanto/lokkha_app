@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/theme/app_colors.dart';
-import 'package:lokkha/core/theme/theme_controller.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'theme_mode_selector_sheet.dart';
 
 /// Reusable Theme Toggle Tile for Drawer, Profile, Settings, etc.

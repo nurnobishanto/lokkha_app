@@ -5,7 +5,7 @@ import 'package:lokkha/core/services/storage/my_get_storage.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';

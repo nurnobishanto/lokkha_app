@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/theme/theme_extensions.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 class AccuracyStatCard extends StatelessWidget {
   final Widget icon;

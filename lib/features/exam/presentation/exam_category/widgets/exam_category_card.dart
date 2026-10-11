@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 
-import 'package:lokkha/core/theme/light_theme_colors.dart';
-import 'package:lokkha/core/theme/text_style.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 class ExamCategoryCard extends StatelessWidget {
   final String title;

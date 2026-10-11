@@ -5,8 +5,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/exam/presentation/random_question/controllers/random_question_controller.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/theme/light_theme_colors.dart';
-import 'package:lokkha/core/theme/text_style.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_transparent_divider.dart';

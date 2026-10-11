@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/theme/my_fonts.dart';
+import 'my_fonts.dart';
 
 class AppTextStyles {
   /// ✅ Heading 1 - Use for main screen title (e.g. Dashboard Title, Home Title)

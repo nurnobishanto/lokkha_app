@@ -2,7 +2,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/core/services/app_lifecycle_service.dart';
 import 'package:lokkha/core/services/premium_entitlement_service.dart';
-import 'package:lokkha/core/theme/theme_controller.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/core/services/deep_link_service.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 

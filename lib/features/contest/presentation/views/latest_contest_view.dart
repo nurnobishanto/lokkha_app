@@ -6,7 +6,7 @@ import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/presentation/widgets/latest_contest_widget.dart';
-import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

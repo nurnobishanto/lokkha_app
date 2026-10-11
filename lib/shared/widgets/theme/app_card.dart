@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/theme/app_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
 /// Reusable Theme-Aware Container / Card Component
 /// Eliminates hardcoded white backgrounds and static border colors.

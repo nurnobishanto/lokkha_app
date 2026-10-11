@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 
-import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/app/router/router.dart';
 
 class LoginRequiredDialog extends StatelessWidget {

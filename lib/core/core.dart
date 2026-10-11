@@ -21,15 +21,7 @@ export 'extensions/decorations_extensions.dart';
 export 'extensions/theme_extensions.dart';
 
 // Theme
-export 'theme/app_colors.dart';
-export 'theme/dark_theme_colors.dart';
-export 'theme/light_theme_colors.dart';
-export 'theme/my_fonts.dart';
-export 'theme/my_styles.dart';
-export 'theme/my_theme.dart';
-export 'theme/text_style.dart';
-export 'theme/theme_controller.dart';
-export 'theme/theme_extensions.dart';
+export 'package:lokkha/app/theme/theme.dart';
 
 // Services
 export 'services/auth_service.dart';

@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/theme/text_style.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:pinput/pinput.dart';
 import '../controllers/verify_otp_notifier.dart';

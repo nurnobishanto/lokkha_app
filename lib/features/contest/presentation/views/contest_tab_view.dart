@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import 'package:lokkha/core/theme/text_style.dart';
+import 'package:lokkha/app/theme/theme.dart';
 
-import 'package:lokkha/core/theme/light_theme_colors.dart';
 import 'all_contest_view.dart';
 import 'latest_contest_view.dart';
 

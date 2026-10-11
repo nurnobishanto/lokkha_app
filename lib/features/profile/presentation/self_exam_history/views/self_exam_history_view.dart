@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/theme/theme_extensions.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import '../../profile_history/widgets/exam_history_pagination.dart';
 import '../controllers/self_exam_history_controller.dart';

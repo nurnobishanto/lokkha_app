@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/theme/theme_extensions.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/shared/models/exam.dart';

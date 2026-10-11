@@ -5,8 +5,7 @@ import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/exam/presentation/latest_exam/views/latest_exam_start_view.dart';
-import 'package:lokkha/core/theme/text_style.dart';
-import 'package:lokkha/core/theme/light_theme_colors.dart';
+import 'package:lokkha/app/theme/theme.dart';
 import 'package:lokkha/shared/widgets/login_required_dialog.dart';
 import '../controllers/latest_exam_controller.dart';
 
