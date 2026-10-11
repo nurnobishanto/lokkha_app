@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import '../../data/datasources/notification_remote_data_source.dart';
 import '../../data/repositories/notification_repository_impl.dart';
 import '../../domain/repositories/notification_repository.dart';

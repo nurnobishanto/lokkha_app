@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import '../controllers/referral_controller.dart';
 
 class ReferralBinding extends Bindings {

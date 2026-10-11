@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 
 import 'premium_entitlement_service.dart';
 

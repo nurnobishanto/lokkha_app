@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/exam/exam.dart';
 
 import '../controllers/see_all_items_controller.dart';

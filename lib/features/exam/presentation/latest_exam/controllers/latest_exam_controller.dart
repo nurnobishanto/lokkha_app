@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/shared/models/tag.dart';
 import 'package:lokkha/core/network/base_client.dart';

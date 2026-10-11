@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import '../controllers/accuracy_progress_controller.dart';
 
 class AccuracyProgressBinding extends Bindings {

@@ -5,7 +5,7 @@ import 'package:lokkha/features/question_bank/question_bank.dart';
 import 'package:lokkha/features/blog/blog.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/course/course.dart';
@@ -28,7 +28,6 @@ class AppPages {
     GetPage(
       name: _Paths.SPLASH,
       page: () => const SplashView(),
-      binding: SplashBinding(),
     ),
     GetPage(
       name: _Paths.NAVBAR,
@@ -79,7 +78,6 @@ class AppPages {
     GetPage(
       name: _Paths.SIGNIN,
       page: () => SignInView(),
-      binding: SignInBinding(),
     ),
     GetPage(
       name: _Paths.TERMS_CONDITION,
@@ -93,7 +91,6 @@ class AppPages {
     GetPage(
       name: _Paths.VERIFY_OTP,
       page: () => VerifyOtpView(),
-      binding: VerifyOtpBinding(),
     ),
     GetPage(
       name: _Paths.FORGET_PASSWORD,
@@ -103,7 +100,6 @@ class AppPages {
     GetPage(
       name: _Paths.SIGN_UP,
       page: () => const SignUpView(),
-      binding: SignUpBinding(),
     ),
     GetPage(
       name: _Paths.AUTH_GATEWAY,

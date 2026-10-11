@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/get_subjects.dart';
 import 'package:lokkha/shared/models/mock_subject_select_model.dart';

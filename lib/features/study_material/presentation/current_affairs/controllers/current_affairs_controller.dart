@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 

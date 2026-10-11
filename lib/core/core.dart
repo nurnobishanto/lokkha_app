@@ -53,3 +53,6 @@ export 'translations/strings_enum.dart';
 
 // Bindings
 export 'bindings/initial_bindings.dart';
+
+// Pure Flutter Get Compatibility Layer
+export 'compat/get_compat.dart';

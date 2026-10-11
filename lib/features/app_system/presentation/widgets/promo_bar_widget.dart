@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

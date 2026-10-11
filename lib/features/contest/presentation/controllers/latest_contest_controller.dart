@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/contest/presentation/views/contest_exam_view.dart';

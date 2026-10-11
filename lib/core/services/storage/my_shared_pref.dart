@@ -11,6 +11,7 @@ class MySharedPref {
 
   // internal shared preferences instance
   static late SharedPreferences _prefs;
+  static SharedPreferences get prefs => _prefs;
 
   // Keys
   static const String _fcmTokenKey = 'fcm_token';

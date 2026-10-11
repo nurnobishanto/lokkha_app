@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 
 class MaintenanceModeController extends GetxController {
   //TODO: Implement MaintenanceModeViewController

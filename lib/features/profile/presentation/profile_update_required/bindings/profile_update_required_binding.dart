@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 
 import '../controllers/profile_update_required_controller.dart';
 

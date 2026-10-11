@@ -9,8 +9,7 @@ export 'domain/usecases/get_app_info_usecase.dart';
 export 'domain/usecases/check_app_update_usecase.dart';
 
 // Presentation - Splash
-export 'presentation/splash/bindings/splash_binding.dart';
-export 'presentation/splash/controllers/splash_controller.dart';
+export 'presentation/splash/controllers/splash_notifier.dart';
 export 'presentation/splash/views/splash_view.dart';
 
 // Presentation - App Update

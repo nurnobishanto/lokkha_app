@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/routes/routes.dart';
 import 'app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Init GetStorage
-  await GetStorage.init();
 
   // Load environment variables
   try {
@@ -50,5 +49,17 @@ Future<void> main() async {
     debugPrint("Fetch app version failed: $e");
   }
 
-  runApp(const MyApp());
+  // Initialize core app bindings & pages
+  try {
+    Get.addPages(AppPages.routes);
+    InitialBindings().dependencies();
+  } catch (e) {
+    debugPrint("Bindings setup failed: $e");
+  }
+
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }

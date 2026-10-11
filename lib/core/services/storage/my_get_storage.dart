@@ -1,9 +1,20 @@
-import 'package:get_storage/get_storage.dart';
+import 'dart:convert';
+import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+
+class _StorageWrapper {
+  const _StorageWrapper();
+
+  bool hasData(String key) => MyGetStorage.hasData(key);
+  dynamic read(String key) => MyGetStorage.readCache(key);
+  Future<void> write(String key, dynamic val) => MyGetStorage.writeCacheData(key, val);
+  Future<void> remove(String key) => MyGetStorage.removeCache(key);
+}
 
 class MyGetStorage {
-  static final GetStorage getStorage = GetStorage();
+  static const _StorageWrapper getStorage = _StorageWrapper();
+  static final Map<String, dynamic> _memoryCache = {};
 
-  // Cache key
+  // Cache keys
   static const String randomQuestionKey = 'randomQuestionKey';
   static const String favQuestionsKey = 'favQuestionsKey';
   static const String jobKey = 'jobKey';
@@ -11,18 +22,63 @@ class MyGetStorage {
   static const String bdAffairs = 'bdAffairs';
   static const String meUser = 'meUser';
 
+  static bool hasData(String key) {
+    if (_memoryCache.containsKey(key)) return true;
+    try {
+      return MySharedPref.prefs.containsKey(key);
+    } catch (_) {
+      return false;
+    }
+  }
+
   // Remove cache
   static Future<void> removeCache(String key) async {
-    await getStorage.remove(key);
+    _memoryCache.remove(key);
+    try {
+      await MySharedPref.prefs.remove(key);
+    } catch (_) {}
   }
 
   // Write Data
   static Future<void> writeCacheData(String key, dynamic value) async {
-    await getStorage.write(key, value);
+    _memoryCache[key] = value;
+    try {
+      if (value is String) {
+        await MySharedPref.prefs.setString(key, value);
+      } else if (value is bool) {
+        await MySharedPref.prefs.setBool(key, value);
+      } else if (value is int) {
+        await MySharedPref.prefs.setInt(key, value);
+      } else if (value is double) {
+        await MySharedPref.prefs.setDouble(key, value);
+      } else if (value is List<String>) {
+        await MySharedPref.prefs.setStringList(key, value);
+      } else {
+        final jsonStr = jsonEncode(value);
+        await MySharedPref.prefs.setString(key, jsonStr);
+      }
+    } catch (_) {}
   }
 
   // READ DATA
   static dynamic readCache(String key) {
-    return getStorage.read(key);
+    if (_memoryCache.containsKey(key)) {
+      return _memoryCache[key];
+    }
+    try {
+      final raw = MySharedPref.prefs.get(key);
+      if (raw is String) {
+        try {
+          final decoded = jsonDecode(raw);
+          _memoryCache[key] = decoded;
+          return decoded;
+        } catch (_) {
+          return raw;
+        }
+      }
+      return raw;
+    } catch (_) {
+      return null;
+    }
   }
 }

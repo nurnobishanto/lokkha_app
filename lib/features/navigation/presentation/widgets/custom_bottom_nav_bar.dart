@@ -1,23 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
 import 'package:lokkha/core/core.dart';
-import '../controllers/navbar_controller.dart';
+import 'package:lokkha/core/utils/global.dart';
+import '../controllers/navbar_notifier.dart';
 
-class CustomBottomNavBar extends StatelessWidget {
-  final NavbarController controller;
-
-  const CustomBottomNavBar({
-    super.key,
-    required this.controller,
-  });
+class CustomBottomNavBar extends ConsumerWidget {
+  const CustomBottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final navState = ref.watch(navbarNotifierProvider);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final userLoggedIn = navState.isLoggedIn || isLoggedIn.value;
 
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -68,7 +66,9 @@ class CustomBottomNavBar extends StatelessWidget {
                 children: [
                   // 1. হোম (Home)
                   _buildNavItem(
+                    ref: ref,
                     index: 0,
+                    currentIndex: navState.currentIndex,
                     label: "হোম",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => Icon(
@@ -82,7 +82,9 @@ class CustomBottomNavBar extends StatelessWidget {
 
                   // 2. পরীক্ষা (Exam)
                   _buildNavItem(
+                    ref: ref,
                     index: 1,
+                    currentIndex: navState.currentIndex,
                     label: "পরীক্ষা",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => FaIcon(
@@ -96,7 +98,9 @@ class CustomBottomNavBar extends StatelessWidget {
 
                   // 3. মেসেঞ্জার (Messenger)
                   _buildNavItem(
+                    ref: ref,
                     index: 2,
+                    currentIndex: navState.currentIndex,
                     label: "মেসেঞ্জার",
                     activeGradient: const LinearGradient(
                       colors: [Color(0xFF00C6FF), Color(0xFF0078FF)],
@@ -134,7 +138,9 @@ class CustomBottomNavBar extends StatelessWidget {
 
                   // 4. প্রিমিয়াম (Premium)
                   _buildNavItem(
+                    ref: ref,
                     index: 3,
+                    currentIndex: navState.currentIndex,
                     label: "প্রিমিয়াম",
                     activeGradient: const LinearGradient(
                       colors: [Color(0xFFFFA000), Color(0xFFFF6F00)],
@@ -194,23 +200,22 @@ class CustomBottomNavBar extends StatelessWidget {
                   ),
 
                   // 5. প্রোফাইল / লগইন (Profile / Login)
-                  Obx(() {
-                    final label = !isLoggedIn.value ? "লগইন" : "প্রোফাইল";
-                    return _buildNavItem(
-                      index: 4,
-                      label: label,
-                      inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
-                      iconBuilder: (isSelected) => Icon(
-                        isSelected
-                            ? Icons.person_rounded
-                            : Icons.person_outline_rounded,
-                        size: 20.r,
-                        color: isSelected
-                            ? Colors.white
-                            : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
-                      ),
-                    );
-                  }),
+                  _buildNavItem(
+                    ref: ref,
+                    index: 4,
+                    currentIndex: navState.currentIndex,
+                    label: !userLoggedIn ? "লগইন" : "প্রোফাইল",
+                    inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                    iconBuilder: (isSelected) => Icon(
+                      isSelected
+                          ? Icons.person_rounded
+                          : Icons.person_outline_rounded,
+                      size: 20.r,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -221,19 +226,21 @@ class CustomBottomNavBar extends StatelessWidget {
   }
 
   Widget _buildNavItem({
+    required WidgetRef ref,
     required int index,
+    required int currentIndex,
     required String label,
     required Widget Function(bool isSelected) iconBuilder,
     Gradient? activeGradient,
     Color? activeColor,
     Color? inactiveLabelColor,
   }) {
-    final bool isSelected = controller.currentIndex == index;
+    final bool isSelected = currentIndex == index;
 
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => controller.changeIndex(index),
+        onTap: () => ref.read(navbarNotifierProvider.notifier).changeIndex(index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeInOut,

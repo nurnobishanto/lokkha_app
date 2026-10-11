@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import '../controllers/all_contest_controller.dart';
 import '../controllers/latest_contest_controller.dart';
 

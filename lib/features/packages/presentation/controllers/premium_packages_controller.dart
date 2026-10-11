@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/core.dart';

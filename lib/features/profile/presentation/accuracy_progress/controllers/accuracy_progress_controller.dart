@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/profile/profile.dart';
 
 class AccuracyProgressController extends GetxController {

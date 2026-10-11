@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/theme/theme_extensions.dart';
 import 'package:lokkha/core/utils/global.dart';

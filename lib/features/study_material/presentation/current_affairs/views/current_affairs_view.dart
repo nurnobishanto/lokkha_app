@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 import '../controllers/current_affairs_controller.dart';
 import 'international_current_affairs_content_view.dart';

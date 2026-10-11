@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:flutter/material.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/shared/models/user.dart';

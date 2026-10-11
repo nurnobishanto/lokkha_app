@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:webview_flutter/webview_flutter.dart';

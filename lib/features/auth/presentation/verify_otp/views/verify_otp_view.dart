@@ -1,29 +1,48 @@
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:lokkha/features/auth/auth.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/theme/text_style.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:pinput/pinput.dart';
-import '../controllers/verify_otp_controller.dart';
+import '../controllers/verify_otp_notifier.dart';
 
-class VerifyOtpView extends GetView<VerifyOtpController> {
+class VerifyOtpView extends ConsumerStatefulWidget {
   final String phoneNumber;
   final String type;
 
-  // Constructor accepting both type and phoneNumber as arguments
-  VerifyOtpView({super.key})
-      : phoneNumber = Get.arguments?['phoneNumber']?.toString() ?? '',
-        type = Get.arguments?['type']?.toString() ?? 'Registration';
+  VerifyOtpView({
+    super.key,
+    String? phoneNumber,
+    String? type,
+  })  : phoneNumber = phoneNumber ??
+            Get.arguments?['phoneNumber']?.toString() ??
+            '',
+        type = type ?? Get.arguments?['type']?.toString() ?? 'Registration';
+
+  @override
+  ConsumerState<VerifyOtpView> createState() => _VerifyOtpViewState();
+}
+
+class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.phoneNumber.isNotEmpty) {
+        ref
+            .read(verifyOtpNotifierProvider.notifier)
+            .sendOtp(widget.phoneNumber, widget.type);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('MY PHONE $phoneNumber>> ${phoneNumber.runtimeType}');
-    debugPrint('OTP TYPE $type');
+    final verifyOtpState = ref.watch(verifyOtpNotifierProvider);
 
     final defaultPinTheme = PinTheme(
       height: 50.0,
@@ -50,94 +69,91 @@ class VerifyOtpView extends GetView<VerifyOtpController> {
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
-      body: GetBuilder<VerifyOtpController>(
-          init: VerifyOtpController(),
-          builder: (x) {
-            return Container(
-              decoration: BoxDecoration(
-                color: context.scaffoldColor,
-                image: context.isDark
-                    ? null
-                    : DecorationImage(
-                        image: AssetImage(AssetImagePaths.seamlessImg),
-                        fit: BoxFit.cover,
-                      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: context.scaffoldColor,
+          image: context.isDark
+              ? null
+              : DecorationImage(
+                  image: AssetImage(AssetImagePaths.seamlessImg),
+                  fit: BoxFit.cover,
+                ),
+        ),
+        child: Column(
+          children: [
+            120.h.height,
+            Image.asset(AssetImagePaths.otpImg, scale: 1.9),
+            Center(
+              child: Text(
+                "আপনার এই ${widget.phoneNumber} ফোন নম্বর এ ৬ ডিজিটের OTP পাঠানো হয়েছে ভেরিফাই করুন",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.textPrimary,
+                  fontSize: 14.sp,
+                ),
               ),
-              child: Column(
-                children: [
-                  120.h.height,
-                  Image.asset(AssetImagePaths.otpImg, scale: 1.9),
-                  Center(
-                    child: Text(
-                      "আপনার এই $phoneNumber ফোন নম্বর এ ৬ ডিজিটের OTP পাঠানো ভেরিফাই করুন",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: context.textPrimary,
-                        fontSize: 14.sp,
+            ),
+            10.h.height,
+            Pinput(
+              autofocus: true,
+              length: 6,
+              defaultPinTheme: defaultPinTheme,
+              focusedPinTheme: focusedPinTheme,
+              pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
+              showCursor: true,
+              onCompleted: (pin) {
+                ref.read(verifyOtpNotifierProvider.notifier).setOtp(pin);
+              },
+              onChanged: (pin) {
+                ref.read(verifyOtpNotifierProvider.notifier).setOtp(pin);
+              },
+            ),
+            10.h.height,
+            Center(
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: "OTP পাচ্ছো না? ",
+                  style: TextStyle(
+                    color: context.textPrimary,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: "Resend OTP",
+                      style: AppTextStyles.custom(
+                        color: context.primaryColor,
+                        fontWeight: FontWeight.bold,
                       ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          ref
+                              .read(verifyOtpNotifierProvider.notifier)
+                              .sendOtp(widget.phoneNumber, widget.type);
+                        },
                     ),
-                  ),
-                  10.h.height,
-                  Pinput(
-                    autofocus: true,
-                    length: 6,
-                    defaultPinTheme: defaultPinTheme,
-                    focusedPinTheme: focusedPinTheme,
-                    pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
-                    showCursor: true,
-                    onCompleted: (pin) {
-                      debugPrint("Otp pin $pin");
-                      if (controller.otp != pin) {
-                        controller.otp = pin;
-                      }
-                    },
-                    onChanged: (pin) {
-                      debugPrint('Pin Changed: $pin');
-                    },
-                  ),
-                  10.h.height,
-                  Center(
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        text: "OTP পাচ্ছো না? ",
-                        style: TextStyle(
-                          color: context.textPrimary,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Resend OTP",
-                            style: AppTextStyles.custom(
-                              color: context.primaryColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                controller.sendOtp(phoneNumber, type);
-                                debugPrint("Resend OTP tapped!");
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  50.h.height,
-                  CustomActionButton(
-                    text: "Verify",
-                    isLoading: controller.isLoading,
-                    onPressed: () {
-                      if (type == 'Registration') {
-                        debugPrint("Tapped Registration");
-                        controller.register(phoneNumber);
-                      } else {
-                        controller.loginWithOtp(phoneNumber);
-                      }
-                    },
-                  ),
-                ],
-              ).paddingAll(8.00.r),
-            );
-          }),
+                  ],
+                ),
+              ),
+            ),
+            50.h.height,
+            CustomActionButton(
+              text: "Verify",
+              isLoading: verifyOtpState.isLoading,
+              onPressed: () {
+                if (widget.type == 'Registration') {
+                  ref
+                      .read(verifyOtpNotifierProvider.notifier)
+                      .register(widget.phoneNumber, context);
+                } else {
+                  ref
+                      .read(verifyOtpNotifierProvider.notifier)
+                      .loginWithOtp(widget.phoneNumber, context);
+                }
+              },
+            ),
+          ],
+        ).paddingAll(8.00.r),
+      ),
     );
   }
 }

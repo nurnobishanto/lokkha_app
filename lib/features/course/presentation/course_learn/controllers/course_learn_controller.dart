@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';

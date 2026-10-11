@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import '../../data/models/notification_model.dart';

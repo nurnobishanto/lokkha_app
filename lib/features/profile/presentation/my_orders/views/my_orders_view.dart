@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/theme/theme_extensions.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';

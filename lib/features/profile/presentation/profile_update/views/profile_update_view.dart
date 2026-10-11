@@ -9,7 +9,7 @@ import 'package:lokkha/core/theme/light_theme_colors.dart';
 import 'package:lokkha/core/theme/text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 import '../controllers/profile_update_controller.dart';

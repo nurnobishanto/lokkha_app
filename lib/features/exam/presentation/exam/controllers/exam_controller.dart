@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/shared/models/exam.dart';
 import 'package:lokkha/core/network/api_call_status.dart';

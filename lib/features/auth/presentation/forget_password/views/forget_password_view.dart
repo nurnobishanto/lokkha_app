@@ -1,26 +1,26 @@
-import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lokkha/app/router/app_route_paths.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/theme/light_theme_colors.dart';
 import 'package:lokkha/core/theme/text_style.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:get/get.dart';
-
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/routes/routes.dart';
-import '../controllers/forget_password_controller.dart';
+import 'package:lokkha/shared/widgets/custom_action_button.dart';
+import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 
-class ForgetPasswordView extends GetView<ForgetPasswordController> {
+class ForgetPasswordView extends ConsumerWidget {
   const ForgetPasswordView({super.key});
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.0.h,
           children: [
             20.0.h.height,
             Center(
@@ -30,19 +30,26 @@ class ForgetPasswordView extends GetView<ForgetPasswordController> {
                     .copyWith(color: LightThemeColors.primaryColor),
               ),
             ),
+            SizedBox(height: 10.h),
             const Text(
               "আপনার ফোন নম্বর এ ৬ ডিজিটের OTP পাঠানো ভেরিফাই করুন",
               textAlign: TextAlign.center,
             ),
+            SizedBox(height: 10.h),
             const CustomTextFormField(
               controller: null,
               prefixIcon: Icon(Icons.phone),
               hintText: "আপনার ১১ সংখ্যার ফোন নম্বর লিখুন",
             ),
+            SizedBox(height: 10.h),
             CustomActionButton(
               text: "Verify",
               onPressed: () {
-                Get.toNamed(Routes.HOME);
+                try {
+                  context.go(AppRoutePaths.home);
+                } catch (_) {
+                  Get.toNamed(Routes.HOME);
+                }
               },
             ),
           ],

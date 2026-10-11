@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import '../controllers/course_learn_controller.dart';
 import '../widgets/course_learn_app_bar.dart';
 import '../widgets/course_learn_body.dart';

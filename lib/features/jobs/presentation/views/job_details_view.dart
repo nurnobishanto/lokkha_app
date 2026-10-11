@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
