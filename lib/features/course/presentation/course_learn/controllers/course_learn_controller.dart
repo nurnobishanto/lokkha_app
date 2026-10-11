@@ -35,14 +35,6 @@ class CourseLearnController extends GetxController {
       return;
     }
 
-    if (!PremiumEntitlementService.to.isPremiumValid) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.back();
-        PremiumEntitlementService.to.assertPremiumAccess();
-      });
-      return;
-    }
-
     fetchCourseItem(id, itemID: itemID);
   }
 
