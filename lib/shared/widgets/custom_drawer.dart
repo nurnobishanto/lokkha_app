@@ -9,7 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});

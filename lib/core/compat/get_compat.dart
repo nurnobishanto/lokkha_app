@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Zero-dependency GetX compatibility adapter for pure Flutter & Riverpod.
 /// This allows removing `package:get` entirely from `pubspec.yaml` while existing
@@ -42,6 +43,11 @@ class Get {
     currentRoute = page;
     Get.arguments = arguments;
     if (parameters != null) Get.parameters = parameters;
+    if (context != null) {
+      try {
+        return GoRouter.of(context!).push<T>(page, extra: arguments);
+      } catch (_) {}
+    }
     return key.currentState?.pushNamed<T>(page, arguments: arguments);
   }
 
@@ -54,6 +60,14 @@ class Get {
   }
 
   static void back<T>({T? result, bool closeOverlays = false}) {
+    if (context != null) {
+      try {
+        if (GoRouter.of(context!).canPop()) {
+          GoRouter.of(context!).pop<T>(result);
+          return;
+        }
+      } catch (_) {}
+    }
     key.currentState?.pop<T>(result);
   }
 
@@ -69,6 +83,12 @@ class Get {
     currentRoute = page;
     Get.arguments = arguments;
     if (parameters != null) Get.parameters = parameters;
+    if (context != null) {
+      try {
+        GoRouter.of(context!).pushReplacement(page, extra: arguments);
+        return Future.value(null);
+      } catch (_) {}
+    }
     return key.currentState?.pushReplacementNamed(page, arguments: arguments);
   }
 
@@ -84,6 +104,12 @@ class Get {
     currentRoute = newRouteName;
     Get.arguments = arguments;
     if (parameters != null) Get.parameters = parameters;
+    if (context != null) {
+      try {
+        GoRouter.of(context!).go(newRouteName, extra: arguments);
+        return Future.value(null);
+      } catch (_) {}
+    }
     return key.currentState?.pushNamedAndRemoveUntil<T>(newRouteName, (route) => false, arguments: arguments);
   }
 

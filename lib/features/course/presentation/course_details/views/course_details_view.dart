@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import '../controllers/course_details_controller.dart';
 import '../widgets/course_button_bar.dart';
 import '../widgets/course_image_viewer.dart';

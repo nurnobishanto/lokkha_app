@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/features/course/course.dart';
 

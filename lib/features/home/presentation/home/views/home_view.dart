@@ -10,7 +10,7 @@ import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/study_material/study_material.dart';

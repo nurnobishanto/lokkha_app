@@ -7,7 +7,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class WebExamView extends StatefulWidget {
   final String title;

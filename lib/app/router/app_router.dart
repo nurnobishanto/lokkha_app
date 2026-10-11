@@ -19,13 +19,23 @@ import 'package:lokkha/features/notifications/notifications.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/settings/settings.dart';
+import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
+import 'app_route_paths.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: Get.key,
-    initialLocation: '/splash',
+    initialLocation: AppRoutePaths.splash,
     routes: [
+      GoRoute(
+        path: '/',
+        redirect: (_, __) => AppRoutePaths.splash,
+      ),
+      GoRoute(
+        path: '/onboarding',
+        redirect: (_, __) => AppRoutePaths.onBoarding,
+      ),
       GoRoute(
         path: '/splash',
         name: 'splash',
@@ -409,6 +419,36 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           SettingsBinding().dependencies();
           return const SettingsView();
+        },
+      ),
+      GoRoute(
+        path: '/subject-section',
+        name: 'subject-section',
+        builder: (context, state) {
+          final subject = state.extra as Subject? ?? (Get.arguments as Subject?);
+          return SubjectSectionView(subject: subject);
+        },
+      ),
+      GoRoute(
+        path: '/topic-selection',
+        name: 'topic-selection',
+        builder: (context, state) {
+          final subject = (state.extra as Subject?) ?? (Get.arguments as Subject?);
+          return TopicSelectionView(subject: subject ?? Subject());
+        },
+      ),
+      GoRoute(
+        path: '/app-update-view',
+        name: 'app-update-view',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return AppUpdateView(
+            url: extra['url'] as Uri? ?? Uri.parse(''),
+            title: extra['title'] as String?,
+            message: extra['message'] as String?,
+            currentVersion: extra['currentVersion'] as String?,
+            latestVersion: extra['latestVersion'] as String?,
+          );
         },
       ),
     ],

@@ -4,7 +4,7 @@ import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/lecture_sheet.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 
 class LectureSheetListDetailsView extends StatelessWidget {

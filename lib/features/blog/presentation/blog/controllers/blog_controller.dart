@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/blog/blog.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class BlogController extends GetxController {
   final ScrollController scrollController = ScrollController();

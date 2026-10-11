@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import '../controllers/my_courses_controller.dart';
 
 class MyCoursesView extends GetView<MyCoursesController> {

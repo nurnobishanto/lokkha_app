@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:intl/intl.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/theme/theme_extensions.dart';
 import 'package:lokkha/core/utils/global.dart';

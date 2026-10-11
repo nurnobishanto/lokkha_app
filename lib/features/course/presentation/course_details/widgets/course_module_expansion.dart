@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/course_item.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class CourseModuleExpansion extends StatelessWidget {
   final String title;

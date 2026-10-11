@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/utils/date_formatter.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import '../controllers/jobs_controller.dart';
 
 class JobsView extends GetView<JobsController> {

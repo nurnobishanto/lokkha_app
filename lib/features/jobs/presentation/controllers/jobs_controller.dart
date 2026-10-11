@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
 
 class JobsController extends GetxController {

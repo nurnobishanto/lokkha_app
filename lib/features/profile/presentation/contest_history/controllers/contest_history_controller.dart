@@ -1,6 +1,6 @@
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/profile/profile.dart';
 
 class ContestHistoryController extends GetxController {

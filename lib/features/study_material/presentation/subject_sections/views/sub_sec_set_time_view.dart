@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class SubSectionsSetTimeView extends GetView {
   const SubSectionsSetTimeView({super.key});

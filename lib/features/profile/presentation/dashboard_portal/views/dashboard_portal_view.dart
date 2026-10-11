@@ -7,7 +7,7 @@ import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/theme/theme_mode_selector_sheet.dart';
 import 'package:lokkha/core/theme/app_colors.dart';
 import 'package:lokkha/core/theme/light_theme_colors.dart';

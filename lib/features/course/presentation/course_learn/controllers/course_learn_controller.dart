@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/course/course.dart';
 
 

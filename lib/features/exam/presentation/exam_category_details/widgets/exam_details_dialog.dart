@@ -7,7 +7,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/exam.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import '../../exam/controllers/exam_controller.dart';
 
 const Color primaryColor = Color(0xFF006A4E);

@@ -10,7 +10,7 @@ import 'package:lokkha/core/theme/light_theme_colors.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/network/api_client.dart';

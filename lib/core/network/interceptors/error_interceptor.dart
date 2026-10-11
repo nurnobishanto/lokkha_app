@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 
 class ErrorInterceptor extends Interceptor {
   @override

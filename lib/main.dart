@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/routes/routes.dart';
-import 'app.dart';
+import 'package:lokkha/app/app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,9 +47,8 @@ Future<void> main() async {
     debugPrint("Fetch app version failed: $e");
   }
 
-  // Initialize core app bindings & pages
+  // Initialize core app bindings
   try {
-    Get.addPages(AppPages.routes);
     InitialBindings().dependencies();
   } catch (e) {
     debugPrint("Bindings setup failed: $e");

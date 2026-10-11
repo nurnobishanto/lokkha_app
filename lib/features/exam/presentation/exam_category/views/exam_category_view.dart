@@ -5,7 +5,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/home/home.dart';
 import '../controllers/exam_category_controller.dart';
 import '../widgets/exam_category_card.dart';

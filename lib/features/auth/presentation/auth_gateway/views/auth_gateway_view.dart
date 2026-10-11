@@ -9,7 +9,7 @@ import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/theme/text_style.dart';
-import 'package:lokkha/routes/routes.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/shared/widgets/custom_decision_button.dart';
 
