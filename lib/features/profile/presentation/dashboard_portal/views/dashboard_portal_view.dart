@@ -9,7 +9,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/theme/theme_mode_selector_sheet.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/dashboard_portal_controller.dart';

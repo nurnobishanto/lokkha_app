@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/profile/profile.dart';
 
 class ContestHistoryCard extends StatelessWidget {

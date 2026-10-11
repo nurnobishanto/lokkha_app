@@ -18,10 +18,9 @@ export 'enums/question_type.dart';
 // Extensions
 export 'extensions/common_extension.dart';
 export 'extensions/decorations_extensions.dart';
-export 'extensions/theme_extensions.dart';
 
 // Theme
-export 'package:lokkha/app/theme/theme.dart';
+export 'package:lokkha/app/theme/app_theme.dart';
 
 // Services
 export 'services/auth_service.dart';

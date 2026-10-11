@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';

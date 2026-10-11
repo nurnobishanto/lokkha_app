@@ -9,7 +9,7 @@ import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/app_system/app_system.dart';

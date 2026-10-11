@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/auth_service.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/shared/models/user.dart';

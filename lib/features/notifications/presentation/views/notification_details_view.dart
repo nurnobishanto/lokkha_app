@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/app/theme/theme.dart';
-import 'package:lokkha/core/extensions/theme_extensions.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

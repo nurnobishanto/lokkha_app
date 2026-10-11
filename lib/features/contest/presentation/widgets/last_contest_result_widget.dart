@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/contest/presentation/controllers/latest_contest_controller.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/home/home.dart';
 import '../views/contest_result_view.dart';
 

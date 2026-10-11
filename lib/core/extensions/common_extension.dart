@@ -5,8 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'decorations_extensions.dart';
 
-export 'package:lokkha/app/theme/theme.dart';
-
 /// Make any variable nullable
 T? makeNullable<T>(T? value) => value;
 

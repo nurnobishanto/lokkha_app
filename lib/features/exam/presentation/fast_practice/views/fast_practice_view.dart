@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/network/api_call_status.dart';
 

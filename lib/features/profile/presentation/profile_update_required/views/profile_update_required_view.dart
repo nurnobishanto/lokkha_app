@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import '../controllers/profile_update_required_controller.dart';
 
 class ProfileUpdateRequiredView

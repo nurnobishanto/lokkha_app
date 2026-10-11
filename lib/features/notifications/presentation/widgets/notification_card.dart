@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/app/theme/theme.dart';
-import 'package:lokkha/core/extensions/theme_extensions.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 
 class NotificationCard extends StatelessWidget {
   final String title;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import '../controllers/latest_exam_controller.dart';
 
 class LatestExamStartDialog extends StatefulWidget {

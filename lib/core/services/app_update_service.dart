@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_images.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/data/datasources/app_system_remote_data_source.dart';
 import 'package:lokkha/features/app_system/data/models/app_info_model.dart';

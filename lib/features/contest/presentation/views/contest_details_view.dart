@@ -7,7 +7,7 @@ import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/features/contest/presentation/controllers/latest_contest_controller.dart';
 import 'package:lokkha/features/contest/presentation/views/contest_result_view.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:lokkha/app/theme/theme.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/shared/models/contest.dart';
