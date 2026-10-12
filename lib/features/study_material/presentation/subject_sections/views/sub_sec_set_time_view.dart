@@ -279,7 +279,7 @@ class SubSectionsSetTimeView extends GetView {
                                 if (isLoggedIn.value) {
                                   await controller.testExamStart(isExam: false);
                                 } else {
-                                  Get.toNamed(Routes.AUTH_GATEWAY);
+                                  Get.toNamed(Routes.authGateway);
                                 }
                               },
                             ),
@@ -292,7 +292,7 @@ class SubSectionsSetTimeView extends GetView {
                                 if (isLoggedIn.value) {
                                   controller.testExamStart(isExam: true);
                                 } else {
-                                  Get.toNamed(Routes.AUTH_GATEWAY);
+                                  Get.toNamed(Routes.authGateway);
                                 }
                               },
                             ),

@@ -1,0 +1,75 @@
+{
+  "@@locale": "en",
+  "appName": "Lokkha",
+  "@appName": {
+    "description": "The title of the application"
+  },
+  "hello": "Hello!",
+  "@hello": {
+    "description": "Greeting text"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading state label"
+  },
+  "changeTheme": "Change Theme",
+  "@changeTheme": {
+    "description": "Label for changing application theme"
+  },
+  "changeLanguage": "Change Language",
+  "@changeLanguage": {
+    "description": "Label for changing application language"
+  },
+  "noInternetConnection": "No internet connection. Please check your network.",
+  "@noInternetConnection": {
+    "description": "Error message when device has no internet connection"
+  },
+  "serverNotResponding": "Server is not responding. Please try again later.",
+  "@serverNotResponding": {
+    "description": "Error message when server timeouts or fails to respond"
+  },
+  "urlNotFound": "Requested resource not found.",
+  "@urlNotFound": {
+    "description": "Error message when 404 endpoint is accessed"
+  },
+  "serverError": "Server error. Please try again later.",
+  "@serverError": {
+    "description": "Generic 500 error message"
+  },
+  "somethingWentWrong": "Something went wrong. Please try again.",
+  "@somethingWentWrong": {
+    "description": "Generic unexpected error message"
+  },
+  "sessionExpired": "Your session has expired. Please login again.",
+  "@sessionExpired": {
+    "description": "Message shown when authentication token expires"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button label"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Register button label"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button label"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel action label"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm action label"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK action label"
+  }
+}

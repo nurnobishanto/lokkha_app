@@ -82,7 +82,7 @@ lib/
 
 ### ⚠️ Route Issue Found:
 ```dart
-// In app_routes.dart — bug: double concatenation
+// In routes.dart — bug: double concatenation
 static const MY_PACKAGES = _Paths.MY_PACKAGES + _Paths.MY_PACKAGES;
 static const MY_ORDERS   = _Paths.MY_ORDERS + _Paths.MY_ORDERS;
 // Results in: '/my-packages/my-packages' and '/my-orders/my-orders'

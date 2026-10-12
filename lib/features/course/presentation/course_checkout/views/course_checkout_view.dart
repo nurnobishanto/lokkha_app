@@ -9,7 +9,7 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/course.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 
 class CourseCheckoutView extends GetView<PremiumPackageCheckoutController> {
   final Course course;

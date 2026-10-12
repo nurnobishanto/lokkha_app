@@ -60,7 +60,7 @@ class PackageRequiredPopup extends StatelessWidget {
               text: "প্যাকেজ নিন",
               onPressed: () {
                 Get.back();
-                Get.toNamed(Routes.PREMIUM_PACKAGES);
+                Get.toNamed(Routes.packages);
               },
             ),
           ],

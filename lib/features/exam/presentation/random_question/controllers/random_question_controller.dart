@@ -4,7 +4,7 @@ import 'package:lokkha/core/constants/app_constants.dart';
 
 import 'package:lokkha/core/services/storage/my_get_storage.dart';
 import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/exam/exam.dart';
 
 class RandomQuestionController extends GetxController {

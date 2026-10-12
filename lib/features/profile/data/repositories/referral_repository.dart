@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 
 class ReferralStats {
   final String referralCode;

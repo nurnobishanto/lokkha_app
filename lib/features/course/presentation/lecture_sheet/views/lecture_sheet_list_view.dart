@@ -5,7 +5,7 @@ import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/shared/models/category.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import '../controllers/lecture_sheet_list_controller.dart';
 
 class LectureSheetListView extends GetView<LectureSheetListController> {

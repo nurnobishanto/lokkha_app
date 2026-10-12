@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import '../../exam_category/widgets/exam_category_card.dart';
 import '../controllers/exam_category_details_controller.dart';
 import '../widgets/exam_card.dart';

@@ -5,7 +5,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:flutter/material.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/shared/models/user.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/profile/profile.dart';

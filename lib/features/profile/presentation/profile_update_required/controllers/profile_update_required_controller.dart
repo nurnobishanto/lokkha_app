@@ -7,7 +7,7 @@ import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 
 class ProfileUpdateRequiredController extends GetxController {
@@ -101,7 +101,7 @@ class ProfileUpdateRequiredController extends GetxController {
         if (Get.isRegistered<NavbarController>()) {
           Get.find<NavbarController>().getMeProfileInfo();
         }
-        Get.offAllNamed(Routes.NAVBAR);
+        Get.offAllNamed(Routes.navbar);
       } else {
         CustomSnackBar.showCustomErrorSnackBar(
           title: "Update Failed",

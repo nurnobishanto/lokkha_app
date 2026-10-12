@@ -1,34 +1,67 @@
 import 'package:dio/dio.dart';
 
-class ApiException implements Exception {
-  final String url;
+/// Base domain-friendly application exception
+class AppException implements Exception {
   final String message;
   final int? statusCode;
+  final dynamic details;
+
+  const AppException(
+    this.message, {
+    this.statusCode,
+    this.details,
+  });
+
+  @override
+  String toString() => message;
+}
+
+/// Network connectivity / timeout exception
+class NetworkException extends AppException {
+  const NetworkException(
+    super.message, {
+    super.statusCode,
+    super.details,
+  });
+}
+
+/// Unauthorized / Session expired exception (401, 403)
+class UnauthorizedException extends AppException {
+  const UnauthorizedException(
+    super.message, {
+    super.statusCode,
+    super.details,
+  });
+}
+
+/// Remote server error (500, bad response)
+class ServerException extends AppException {
+  const ServerException(
+    super.message, {
+    super.statusCode,
+    super.details,
+  });
+}
+
+/// Legacy ApiException for backward compatibility
+class ApiException extends AppException {
+  final String url;
   final Response? response;
 
   ApiException({
     required this.url,
-    required this.message,
+    required String message,
     this.response,
-    this.statusCode,
-  });
+    int? statusCode,
+  }) : super(message, statusCode: statusCode, details: response?.data);
 
-  /// IMPORTANT NOTE
-  /// here you can take advantage of toString() method to display the error for user
-  /// lets make an example
-  /// so in onError method when you make api you can just user apiExceptionInstance.toString() to get the error message from api
   @override
-  toString() {
+  String toString() {
     String result = '';
-
-    // TODO add error message field which is coming from api for you (For ex: response.data['error']['message']
     result += response?.data?['error'] ?? '';
-
     if (result.isEmpty) {
-      result +=
-          message; // message is the (dio error message) so usualy its not user friendly
+      result += message;
     }
-
     return result;
   }
 }

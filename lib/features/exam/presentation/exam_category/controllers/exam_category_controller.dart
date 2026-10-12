@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
-import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 
 class ExamCategoryController extends GetxController {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/notifications/notifications.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/features/exam/exam.dart';

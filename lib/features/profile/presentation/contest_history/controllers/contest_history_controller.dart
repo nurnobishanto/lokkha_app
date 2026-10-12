@@ -52,7 +52,7 @@ class ContestHistoryController extends GetxController {
   }
 
   void openLiveContests() {
-    Get.toNamed(Routes.ALL_CONTEST);
+    Get.toNamed(Routes.allContest);
   }
 
   void viewRanking(ContestHistoryItemModel item) {

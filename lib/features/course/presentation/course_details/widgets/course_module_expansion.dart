@@ -112,7 +112,7 @@ class CourseModuleExpansion extends StatelessWidget {
                     final itemId = item.id;
                     debugPrint("Course id:$courseId $itemId ");
                     //
-                    Get.toNamed(Routes.COURSE_LEARN,
+                    Get.toNamed(Routes.courseLearn,
                         arguments: {'id': courseId, 'item_id': itemId});
                   }
                 });

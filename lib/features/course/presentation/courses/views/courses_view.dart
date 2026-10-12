@@ -75,7 +75,7 @@ class CoursesView extends GetView<CoursesController> {
                       rating: '5',
                       onPressed: () {
                         Get.toNamed(
-                          Routes.COURSE_DETAILS,
+                          Routes.courseDetails,
                           arguments: {'course_id': course.id},
                         );
                       },

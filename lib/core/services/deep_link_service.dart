@@ -54,11 +54,11 @@ void handleDeepLink(Uri uri) {
 
     switch (firstSegment) {
       case 'profile':
-        Get.toNamed(Routes.PROFILE);
+        Get.toNamed(Routes.profile);
         break;
 
       case 'login':
-        Get.toNamed(Routes.AUTH_GATEWAY);
+        Get.toNamed(Routes.authGateway);
         break;
 
       case 'course':

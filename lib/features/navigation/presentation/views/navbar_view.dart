@@ -9,7 +9,8 @@ import 'package:lokkha/features/profile/profile.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 
 class NavbarView extends ConsumerStatefulWidget {
-  const NavbarView({super.key});
+  final Widget? child;
+  const NavbarView({super.key, this.child});
 
   @override
   ConsumerState<NavbarView> createState() => _NavbarViewState();
@@ -39,7 +40,7 @@ class _NavbarViewState extends ConsumerState<NavbarView> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       extendBody: false,
-      body: _navBarBody[navState.currentIndex],
+      body: widget.child ?? _navBarBody[navState.currentIndex],
       bottomNavigationBar: const CustomBottomNavBar(),
     );
   }

@@ -81,7 +81,7 @@ class MaintenanceModeView extends GetView<MaintenanceModeController> {
                       child: CustomActionButton(
                         text: "Refresh",
                         onPressed: () {
-                          Get.offAllNamed(Routes.SPLASH);
+                          Get.offAllNamed(Routes.splash);
                         },
                       ),
                     ),

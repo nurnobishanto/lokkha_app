@@ -5,7 +5,7 @@ import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 
 class FastPracticeView extends GetView<HomeController> {
   const FastPracticeView({super.key});

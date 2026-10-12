@@ -83,8 +83,8 @@ class JobsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    if (Get.currentRoute == Routes.JOB_DETAILS) {
-      print("Called... Get.currentRoute == Routes.JOB_DETAILS");
+    if (Get.currentRoute == Routes.jobDetails) {
+      print("Called... Get.currentRoute == Routes.jobDetails");
       final args = Get.arguments as int;
       id = args;
     }

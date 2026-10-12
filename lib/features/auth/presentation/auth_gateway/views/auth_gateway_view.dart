@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
@@ -41,9 +41,9 @@ class AuthGatewayView extends ConsumerWidget {
                 leadingWidget: const Icon(Icons.phone, size: 20),
                 onPressed: () {
                   try {
-                    context.push(AppRoutePaths.signUp);
+                    context.push(Routes.signUp);
                   } catch (_) {
-                    Get.toNamed(Routes.SIGN_UP);
+                    Get.toNamed(Routes.signUp);
                   }
                 },
               ),

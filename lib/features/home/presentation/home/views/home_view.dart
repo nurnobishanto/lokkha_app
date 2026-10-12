@@ -62,7 +62,7 @@ class HomeView extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  Get.toNamed(Routes.NOTIFICATIONS);
+                  Get.toNamed(Routes.notifications);
                 },
                 icon: const Icon(Icons.notifications, size: 28),
               ),
@@ -131,7 +131,7 @@ class HomeView extends StatelessWidget {
             SectionTitleWithSeeAll(
                 title: "প্রিমিয়াম পরীক্ষা সমূহ",
                 onSeeAllPressed: () {
-                  Get.toNamed(Routes.ALL_COURSES);
+                  Get.toNamed(Routes.allCourses);
                 }),
             SizedBox(height: 8.h),
             _PremiumExamSection(),
@@ -139,7 +139,7 @@ class HomeView extends StatelessWidget {
             SectionTitleWithSeeAll(
                 title: "ফ্রি পরীক্ষা সমূহ",
                 onSeeAllPressed: () {
-                  Get.toNamed(Routes.ALL_EXAM);
+                  Get.toNamed(Routes.allExam);
                 }),
             SizedBox(height: 8.h),
             _FreeExamSection(examController: examController),
@@ -573,7 +573,7 @@ class _PremiumExamSection extends StatelessWidget {
                 rating: '5',
                 onPressed: () {
                   Get.toNamed(
-                    Routes.COURSE_DETAILS,
+                    Routes.courseDetails,
                     arguments: {'course_id': course.id},
                   );
                 },
@@ -608,7 +608,7 @@ class _FreeExamSection extends StatelessWidget {
               title: exam.name ?? '',
               onTap: () {
                 if (exam.id != null) {
-                  Get.toNamed(Routes.EXAM_CATEGORY_DETAILS, arguments: {
+                  Get.toNamed(Routes.examCategoryDetails, arguments: {
                     "category_id": exam.id,
                     "category_name": exam.name,
                   });

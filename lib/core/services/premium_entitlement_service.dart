@@ -6,7 +6,7 @@ import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/features/auth/auth.dart';
 
 import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
 /// PremiumEntitlementService
@@ -68,7 +68,7 @@ class PremiumEntitlementService extends GetxService {
   /// ```dart
   /// PremiumEntitlementService.to.assertPremiumAccess(onDenied: () {
   ///   Get.back();
-  ///   Get.toNamed(Routes.PREMIUM_PACKAGES);
+  ///   Get.toNamed(Routes.packages);
   /// });
   /// ```
   void assertPremiumAccess({VoidCallback? onDenied}) {

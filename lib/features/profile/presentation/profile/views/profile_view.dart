@@ -7,7 +7,7 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
@@ -241,7 +241,7 @@ class ProfileView extends GetView<ProfileController> {
                       children: [
                         // Left: 90 পয়েন্ট >
                         // InkWell(
-                        //   onTap: () => Get.toNamed(Routes.REFERRAL),
+                        //   onTap: () => Get.toNamed(Routes.referral),
                         //   borderRadius: BorderRadius.circular(20.r),
                         //   child: Container(
                         //     padding: EdgeInsets.symmetric(
@@ -288,7 +288,7 @@ class ProfileView extends GetView<ProfileController> {
 
                         // Right: প্রোফাইল এডিট
                         InkWell(
-                          onTap: () => Get.toNamed(Routes.PROFILE_UPDATE),
+                          onTap: () => Get.toNamed(Routes.profileUpdate),
                           borderRadius: BorderRadius.circular(20.r),
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -346,13 +346,13 @@ class ProfileView extends GetView<ProfileController> {
                 childAspectRatio: 2,
                 children: [
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.MY_PACKAGES),
+                    onTap: () => Get.toNamed(Routes.myPackages),
                     text: 'আমার প্যাকেজ',
                     icon: Icons.inventory_2,
                     color: Colors.orange,
                   ),
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.MY_COURSES),
+                    onTap: () => Get.toNamed(Routes.myCourses),
                     text: 'আমার কোর্স',
                     icon: Icons.school,
                     color: Colors.purple,
@@ -366,7 +366,7 @@ class ProfileView extends GetView<ProfileController> {
                     color: Colors.redAccent,
                   ),
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.MY_ORDERS),
+                    onTap: () => Get.toNamed(Routes.myOrders),
                     text: 'আমার অর্ডারস',
                     icon: Icons.receipt_long,
                     color: Colors.teal,

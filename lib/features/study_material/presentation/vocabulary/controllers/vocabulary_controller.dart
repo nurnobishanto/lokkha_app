@@ -5,7 +5,7 @@ import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/shared/models/vocabulary.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 
 class VocabularyController extends GetxController {
   RxBool isLoading = true.obs;

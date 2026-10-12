@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import '../models/user_exam_v1_model.dart';
 
 abstract class ExamRemoteDataSource {

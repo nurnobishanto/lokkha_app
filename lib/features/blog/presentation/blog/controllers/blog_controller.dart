@@ -142,7 +142,7 @@ class BlogController extends GetxController {
   }
 
   void openPostDetails(BlogPost post) {
-    Get.toNamed(Routes.BLOG_DETAILS, arguments: post);
+    Get.toNamed(Routes.blogDetails, arguments: post);
   }
 
   void openCategoryBottomSheet(BuildContext context) {

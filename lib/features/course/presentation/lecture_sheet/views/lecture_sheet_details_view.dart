@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../controllers/sheet_details_controller.dart';

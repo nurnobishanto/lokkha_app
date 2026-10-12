@@ -136,7 +136,7 @@ class ExamDetailsDialog extends StatelessWidget {
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
                                             Get.toNamed(
-                                                Routes.PREMIUM_PACKAGES);
+                                                Routes.packages);
                                           },
                                       ),
                                     ],
@@ -260,7 +260,7 @@ class ExamDetailsDialog extends StatelessWidget {
                               child: CustomActionButton(
                                 text: "প্যাকেজ কিনুন",
                                 onPressed: () {
-                                  Get.toNamed(Routes.PREMIUM_PACKAGES);
+                                  Get.toNamed(Routes.packages);
                                 },
                               ),
                             ),

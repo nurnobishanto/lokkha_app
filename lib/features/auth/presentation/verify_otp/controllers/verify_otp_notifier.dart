@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 import 'package:lokkha/app/router/router.dart';
@@ -110,12 +110,12 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
         if (context.mounted) {
           try {
             context.go(
-              AppRoutePaths.profileUpdateRequired,
+              Routes.profileUpdateRequired,
               extra: {'phoneNumber': phone},
             );
           } catch (_) {
             Get.offAllNamed(
-              Routes.PROFILE_UPDATE_REQUIRED,
+              Routes.profileUpdateRequired,
               arguments: {'phoneNumber': phone.toString()},
             );
           }
@@ -174,9 +174,9 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
 
         if (context.mounted) {
           try {
-            context.go(AppRoutePaths.navBar);
+            context.go(Routes.navbar);
           } catch (_) {
-            Get.offAllNamed(Routes.NAVBAR);
+            Get.offAllNamed(Routes.navbar);
           }
         }
       } else {

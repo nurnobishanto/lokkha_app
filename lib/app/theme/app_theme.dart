@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/translations/localization_service.dart';
+import 'package:lokkha/core/localization/app_localizations.dart';
 import 'app_colors.dart';
 
 export 'app_colors.dart';

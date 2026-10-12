@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/features/profile/profile.dart';
-import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 
 class DeviceSessionRepository {
   /// Fetch all active devices for the authenticated student (GET /api/v1/user/devices)

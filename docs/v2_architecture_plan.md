@@ -210,7 +210,7 @@ lib/app/router/
 ### 2.4 Guard Architecture
 
 ```dart
-// app_router.dart
+// router.dart
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
   refreshListenable: GoRouterRefreshStream(

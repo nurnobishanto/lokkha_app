@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/packages/presentation/views/payment_webview.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';

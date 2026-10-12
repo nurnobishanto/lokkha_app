@@ -89,7 +89,7 @@ void showLoginPopup(BuildContext context) {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        Get.toNamed(Routes.AUTH_GATEWAY);
+                        Get.toNamed(Routes.authGateway);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),

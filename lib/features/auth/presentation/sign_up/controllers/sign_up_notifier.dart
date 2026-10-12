@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -92,14 +92,14 @@ class SignUpNotifier extends Notifier<SignUpState> {
 
   void _navigateToOtp(BuildContext context, String phone, String type) {
     context.push(
-      AppRoutePaths.verifyOtp,
+      Routes.verifyOtp,
       extra: {'phoneNumber': phone, 'type': type},
     );
   }
 
   void _navigateToSignIn(BuildContext context, String phone, String authMethod) {
     context.push(
-      AppRoutePaths.signIn,
+      Routes.signIn,
       extra: {'phoneNumber': phone, 'type': authMethod},
     );
   }

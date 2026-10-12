@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/shared/models/mock_subject_select_model.dart';
 import '../controllers/mock_test_controller.dart';
 

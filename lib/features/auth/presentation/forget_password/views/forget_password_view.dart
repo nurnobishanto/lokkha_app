@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/app/router/router.dart';
@@ -45,9 +45,9 @@ class ForgetPasswordView extends ConsumerWidget {
               text: "Verify",
               onPressed: () {
                 try {
-                  context.go(AppRoutePaths.home);
+                  context.go(Routes.home);
                 } catch (_) {
-                  Get.toNamed(Routes.HOME);
+                  Get.toNamed(Routes.home);
                 }
               },
             ),

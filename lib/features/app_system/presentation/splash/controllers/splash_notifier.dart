@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/core/services/premium_entitlement_service.dart';
 
@@ -42,7 +42,7 @@ class SplashNotifier extends Notifier<SplashState> {
 
     final canProceed = appUpdateService.handleStartupFlow();
     if (canProceed && context.mounted) {
-      context.go(AppRoutePaths.navBar);
+      context.go(Routes.navbar);
       Future.delayed(const Duration(milliseconds: 700), () {
         appUpdateService.showInAppAnnouncementIfAvailable();
       });

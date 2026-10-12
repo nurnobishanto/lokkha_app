@@ -121,7 +121,7 @@ class JobsView extends GetView<JobsController> {
                                         onTap: () {
                                           debugPrint("1x. ${data.id}");
                                           Get.toNamed(
-                                            Routes.JOB_DETAILS,
+                                            Routes.jobDetails,
                                             arguments: data.id,
                                           );
                                         },

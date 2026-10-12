@@ -41,7 +41,7 @@ class DashboardPortalView extends StatelessWidget {
           ),
           IconButton(
             tooltip: 'মূল প্রোফাইল',
-            onPressed: () => Get.toNamed(Routes.PROFILE),
+            onPressed: () => Get.toNamed(Routes.profile),
             icon: Container(
               padding: EdgeInsets.all(6.r),
               decoration: BoxDecoration(
@@ -53,7 +53,7 @@ class DashboardPortalView extends StatelessWidget {
           ),
           IconButton(
             tooltip: 'নোটিফিকেশন',
-            onPressed: () => Get.toNamed(Routes.NOTIFICATIONS),
+            onPressed: () => Get.toNamed(Routes.notifications),
             icon: Container(
               padding: EdgeInsets.all(6.r),
               decoration: BoxDecoration(
@@ -348,7 +348,7 @@ class DashboardPortalView extends StatelessWidget {
             children: [
               // Left: 90 পয়েন্ট >
               InkWell(
-                onTap: () => Get.toNamed(Routes.REFERRAL),
+                onTap: () => Get.toNamed(Routes.referral),
                 borderRadius: BorderRadius.circular(20.r),
                 child: Container(
                   padding: EdgeInsets.symmetric(
@@ -395,7 +395,7 @@ class DashboardPortalView extends StatelessWidget {
 
               // Right: প্রোফাইল এডিট
               InkWell(
-                onTap: () => Get.toNamed(Routes.PROFILE_UPDATE),
+                onTap: () => Get.toNamed(Routes.profileUpdate),
                 borderRadius: BorderRadius.circular(20.r),
                 child: Container(
                   padding: EdgeInsets.symmetric(
@@ -463,7 +463,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFECFDF5),
           count: "${counts?.totalExams ?? 0}",
           label: "অংশগ্রহণকৃত পরীক্ষা",
-          onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
+          onTap: () => Get.toNamed(Routes.profileHistory),
         ),
         _buildStatCard(
           context: context,
@@ -472,7 +472,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFEFF6FF),
           count: "${counts?.totalSelfExams ?? 0}",
           label: "সেলফ এক্সাম",
-          onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
+          onTap: () => Get.toNamed(Routes.selfExamHistory),
         ),
         _buildStatCard(
           context: context,
@@ -481,7 +481,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFFFFBEB),
           count: "${counts?.totalContests ?? 0}",
           label: "লাইভ কনটেস্ট",
-          onTap: () => Get.toNamed(Routes.ALL_CONTEST),
+          onTap: () => Get.toNamed(Routes.allContest),
         ),
         _buildStatCard(
           context: context,
@@ -490,7 +490,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFF5F3FF),
           count: "${(perf?.accuracyRate ?? 0).toStringAsFixed(1)}%",
           label: "গড় নির্ভুলতা",
-          onTap: () => Get.toNamed(Routes.ACCURACY_PROGRESS),
+          onTap: () => Get.toNamed(Routes.accuracyProgress),
         ),
       ],
     );
@@ -597,7 +597,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFEFF6FF),
           badgeColor: const Color(0xFF15803D),
           badgeCount: "${counts?.totalOrders ?? 0}",
-          onTap: () => Get.toNamed(Routes.MY_ORDERS),
+          onTap: () => Get.toNamed(Routes.myOrders),
         ),
         _buildModuleItem(
           context: context,
@@ -607,7 +607,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFFFF1F2),
           badgeColor: const Color(0xFFDC2626),
           badgeCount: "${counts?.totalCourses ?? 0}",
-          onTap: () => Get.toNamed(Routes.MY_COURSES),
+          onTap: () => Get.toNamed(Routes.myCourses),
         ),
         _buildModuleItem(
           context: context,
@@ -617,7 +617,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFFFFBEB),
           badgeColor: const Color(0xFFD97706),
           badgeCount: "${counts?.totalPackages ?? 0}",
-          onTap: () => Get.toNamed(Routes.MY_PACKAGES),
+          onTap: () => Get.toNamed(Routes.myPackages),
         ),
         _buildModuleItem(
           context: context,
@@ -627,7 +627,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFECFEFF),
           badgeColor: const Color(0xFF0284C7),
           badgeCount: "${counts?.totalSelfExams ?? 0}",
-          onTap: () => Get.toNamed(Routes.SELF_EXAM_HISTORY),
+          onTap: () => Get.toNamed(Routes.selfExamHistory),
         ),
         _buildModuleItem(
           context: context,
@@ -637,7 +637,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFF5F3FF),
           badgeColor: const Color(0xFF16A34A),
           badgeCount: "${counts?.totalExams ?? 0}",
-          onTap: () => Get.toNamed(Routes.PROFILE_HISTORY),
+          onTap: () => Get.toNamed(Routes.profileHistory),
         ),
         _buildModuleItem(
           context: context,
@@ -647,7 +647,7 @@ class DashboardPortalView extends StatelessWidget {
           iconBg: const Color(0xFFEEF2FF),
           badgeColor: const Color(0xFF6366F1),
           badgeCount: "${counts?.totalContests ?? 0}",
-          onTap: () => Get.toNamed(Routes.CONTEST_HISTORY),
+          onTap: () => Get.toNamed(Routes.contestHistory),
         ),
       ],
     );
@@ -811,7 +811,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const Icon(Icons.menu_book_rounded,
                     color: Color(0xFF10B981), size: 20),
                 iconBg: const Color(0xFFE8F8F2),
-                onTap: () => Get.toNamed(Routes.EXAM_CATEGORY),
+                onTap: () => Get.toNamed(Routes.examCategory),
               ),
               _buildShortcutItem(
                 context: context,
@@ -819,7 +819,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const FaIcon(FontAwesomeIcons.trophy,
                     color: Color(0xFFD97706), size: 18),
                 iconBg: const Color(0xFFFFFBEB),
-                onTap: () => Get.toNamed(Routes.ALL_CONTEST),
+                onTap: () => Get.toNamed(Routes.allContest),
               ),
               _buildShortcutItem(
                 context: context,
@@ -827,7 +827,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const Icon(Icons.videocam_rounded,
                     color: Color(0xFFE11D48), size: 20),
                 iconBg: const Color(0xFFFFF1F2),
-                onTap: () => Get.toNamed(Routes.ALL_COURSES),
+                onTap: () => Get.toNamed(Routes.allCourses),
               ),
               _buildShortcutItem(
                 context: context,
@@ -835,7 +835,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const Icon(Icons.workspace_premium_rounded,
                     color: Color(0xFFEA580C), size: 20),
                 iconBg: const Color(0xFFFFF7ED),
-                onTap: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
+                onTap: () => Get.toNamed(Routes.packages),
               ),
               _buildShortcutItem(
                 context: context,
@@ -843,7 +843,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const Icon(Icons.business_center_rounded,
                     color: Color(0xFF2563EB), size: 20),
                 iconBg: const Color(0xFFEFF6FF),
-                onTap: () => Get.toNamed(Routes.JOBS),
+                onTap: () => Get.toNamed(Routes.jobs),
               ),
               _buildShortcutItem(
                 context: context,
@@ -851,7 +851,7 @@ class DashboardPortalView extends StatelessWidget {
                 icon: const Icon(Icons.public_rounded,
                     color: Color(0xFF0D9488), size: 20),
                 iconBg: const Color(0xFFF0FDFA),
-                onTap: () => Get.toNamed(Routes.CURRENT_AFFAIRS),
+                onTap: () => Get.toNamed(Routes.currentAffairs),
               ),
             ],
           ),
@@ -1039,7 +1039,7 @@ class DashboardPortalView extends StatelessWidget {
             ),
             SizedBox(height: 14.h),
             InkWell(
-              onTap: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
+              onTap: () => Get.toNamed(Routes.packages),
               borderRadius: BorderRadius.circular(12.r),
               child: Container(
                 width: double.infinity,
@@ -1279,7 +1279,7 @@ class DashboardPortalView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: () => Get.toNamed(Routes.REFERRAL),
+                onTap: () => Get.toNamed(Routes.referral),
                 child: Row(
                   children: [
                     Container(
@@ -1409,7 +1409,7 @@ class DashboardPortalView extends StatelessWidget {
               ),
               const Spacer(),
               InkWell(
-                onTap: () => Get.toNamed(Routes.REFERRAL),
+                onTap: () => Get.toNamed(Routes.referral),
                 child: Text(
                   "লিস্ট দেখুন →",
                   style: TextStyle(
@@ -1562,7 +1562,7 @@ class DashboardPortalView extends StatelessWidget {
       color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
       child: InkWell(
-        onTap: () => Get.toNamed(Routes.SETTINGS),
+        onTap: () => Get.toNamed(Routes.settings),
         borderRadius: BorderRadius.circular(16.r),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),

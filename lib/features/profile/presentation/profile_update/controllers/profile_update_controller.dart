@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/navigation/navigation.dart';

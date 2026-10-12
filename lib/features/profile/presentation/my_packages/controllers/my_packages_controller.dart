@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/profile/profile.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';

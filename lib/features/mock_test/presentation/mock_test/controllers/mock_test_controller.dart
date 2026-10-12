@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/models/get_subjects.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 
 class MockTestController extends GetxController {

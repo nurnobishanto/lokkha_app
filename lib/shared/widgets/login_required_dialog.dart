@@ -78,7 +78,7 @@ class LoginRequiredDialog extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.of(context).pop();
-            Get.toNamed(Routes.AUTH_GATEWAY);
+            Get.toNamed(Routes.authGateway);
           },
         ),
       ],

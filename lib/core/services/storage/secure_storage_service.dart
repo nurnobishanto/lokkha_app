@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
-  SecureStorageService._();
+  const SecureStorageService();
+
+  Future<String?> getAuthToken() async => getToken();
+  Future<void> saveAuthToken(String token) async => saveToken(token);
 
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -19,53 +23,93 @@ class SecureStorageService {
 
   /// Save Auth Token
   static Future<void> saveToken(String token) async {
-    await _storage.write(key: _keyToken, value: token);
+    try {
+      await _storage.write(key: _keyToken, value: token);
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error saving token: $e');
+    }
   }
 
   /// Get Auth Token
   static Future<String?> getToken() async {
-    return await _storage.read(key: _keyToken);
+    try {
+      return await _storage.read(key: _keyToken);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Save Refresh Token
   static Future<void> saveRefreshToken(String refreshToken) async {
-    await _storage.write(key: _keyRefreshToken, value: refreshToken);
+    try {
+      await _storage.write(key: _keyRefreshToken, value: refreshToken);
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error saving refresh token: $e');
+    }
   }
 
   /// Get Refresh Token
   static Future<String?> getRefreshToken() async {
-    return await _storage.read(key: _keyRefreshToken);
+    try {
+      return await _storage.read(key: _keyRefreshToken);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Save Device ID
   static Future<void> saveDeviceId(String deviceId) async {
-    await _storage.write(key: _keyDeviceId, value: deviceId);
+    try {
+      await _storage.write(key: _keyDeviceId, value: deviceId);
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error saving device id: $e');
+    }
   }
 
   /// Get Device ID
   static Future<String?> getDeviceId() async {
-    return await _storage.read(key: _keyDeviceId);
+    try {
+      return await _storage.read(key: _keyDeviceId);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Save User ID
   static Future<void> saveUserId(String userId) async {
-    await _storage.write(key: _keyUserId, value: userId);
+    try {
+      await _storage.write(key: _keyUserId, value: userId);
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error saving user id: $e');
+    }
   }
 
   /// Get User ID
   static Future<String?> getUserId() async {
-    return await _storage.read(key: _keyUserId);
+    try {
+      return await _storage.read(key: _keyUserId);
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Delete All Auth Credentials (Logout)
   static Future<void> clearAuthData() async {
-    await _storage.delete(key: _keyToken);
-    await _storage.delete(key: _keyRefreshToken);
-    await _storage.delete(key: _keyUserId);
+    try {
+      await _storage.delete(key: _keyToken);
+      await _storage.delete(key: _keyRefreshToken);
+      await _storage.delete(key: _keyUserId);
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error clearing auth data: $e');
+    }
   }
 
   /// Clear everything in secure storage
   static Future<void> clearAll() async {
-    await _storage.deleteAll();
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      debugPrint('[SecureStorageService] Error clearing all secure storage: $e');
+    }
   }
 }

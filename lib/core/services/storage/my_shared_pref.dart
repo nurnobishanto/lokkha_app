@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:lokkha/core/translations/localization_service.dart';
+import 'package:lokkha/core/localization/app_localizations.dart';
 import 'package:lokkha/shared/models/mock_subject_select_model.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 
@@ -37,7 +37,13 @@ class MySharedPref {
   static Future<void> setUserToken(String token) async =>
       await _prefs.setString(_userTokenKey, token);
 
-  static String getUserToken() => _prefs.getString(_userTokenKey) ?? "";
+  static String getUserToken() {
+    try {
+      return _prefs.getString(_userTokenKey) ?? "";
+    } catch (_) {
+      return "";
+    }
+  }
 
   static Future<void> removeUserToken() async =>
       await _prefs.remove(_userTokenKey);

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/auth/auth.dart';
 
 abstract class AuthRemoteDataSource {

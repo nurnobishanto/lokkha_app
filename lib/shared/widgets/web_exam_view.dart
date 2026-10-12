@@ -36,7 +36,7 @@ class _WebExamViewState extends State<WebExamView> {
     String? token = MySharedPref.getUserToken();
 
     if (token == '' || token.isEmpty) {
-      Get.toNamed(Routes.AUTH_GATEWAY);
+      Get.toNamed(Routes.authGateway);
     }
 
     Map<String, String> headers = {
@@ -57,11 +57,11 @@ class _WebExamViewState extends State<WebExamView> {
             currentUrl = url;
           });
           if (url.contains('packages')) {
-            Get.toNamed(Routes.PREMIUM_PACKAGES);
+            Get.toNamed(Routes.packages);
           } else if (url.contains('goback')) {
             Get.back();
           } else if (url.contains('goback')) {
-            Get.toNamed(Routes.AUTH_GATEWAY);
+            Get.toNamed(Routes.authGateway);
           }
         },
         onPageFinished: (String url) {

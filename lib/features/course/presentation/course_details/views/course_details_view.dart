@@ -249,7 +249,7 @@ class CourseDetailsView extends GetView<CourseDetailsController> {
                   height: 50,
                   text: "Start Learning",
                   onPressed: () {
-                    Get.toNamed(Routes.COURSE_LEARN,
+                    Get.toNamed(Routes.courseLearn,
                         arguments: {'id': controller.model.course!.id, 'item_id': controller.model.course?.modules?.first.items?.first.id});
                   },
                 ),

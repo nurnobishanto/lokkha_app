@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/app/router/router.dart';
@@ -43,7 +43,7 @@ class ExamCategoryView extends GetView<ExamCategoryController> {
                   child: SectionTitleWithSeeAll(
                       title: "প্রিমিয়াম পরীক্ষা সমূহ",
                       onSeeAllPressed: () {
-                        Get.toNamed(Routes.ALL_COURSES);
+                        Get.toNamed(Routes.allCourses);
                       }),
                 ),
 
@@ -75,7 +75,7 @@ class ExamCategoryView extends GetView<ExamCategoryController> {
                         title: course.title ?? "",
                         onTap: () {
                           Get.toNamed(
-                            Routes.COURSES,
+                            Routes.courses,
                             arguments: {
                               "course_category_id": course.id,
                               'category_name': course.title,
@@ -95,7 +95,7 @@ class ExamCategoryView extends GetView<ExamCategoryController> {
                   child: SectionTitleWithSeeAll(
                       title: "ফ্রি পরীক্ষা সমূহ",
                       onSeeAllPressed: () {
-                        Get.toNamed(Routes.ALL_EXAM);
+                        Get.toNamed(Routes.allExam);
                       }),
                 ),
                 Obx(() {
@@ -120,7 +120,7 @@ class ExamCategoryView extends GetView<ExamCategoryController> {
                         title: exam.name ?? "",
                         onTap: () {
                           if (exam.id != null) {
-                            Get.toNamed(Routes.EXAM_CATEGORY_DETAILS,
+                            Get.toNamed(Routes.examCategoryDetails,
                                 arguments: {
                                   "category_id": exam.id,
                                   "category_name": exam.name

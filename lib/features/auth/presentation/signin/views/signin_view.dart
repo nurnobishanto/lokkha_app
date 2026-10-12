@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/app/router/app_route_paths.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
@@ -102,14 +102,14 @@ class _SignInViewState extends ConsumerState<SignInView> {
                   onTap: () {
                     try {
                       context.push(
-                        AppRoutePaths.verifyOtp,
+                        Routes.verifyOtp,
                         extra: {
                           'phoneNumber': widget.phoneNumber,
                           'type': 'Login',
                         },
                       );
                     } catch (_) {
-                      Get.toNamed(Routes.VERIFY_OTP, arguments: {
+                      Get.toNamed(Routes.verifyOtp, arguments: {
                         'phoneNumber': widget.phoneNumber,
                         'type': 'Login',
                       });

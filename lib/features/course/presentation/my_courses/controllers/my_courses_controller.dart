@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/course/course.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/shared/shared.dart';
 
 class MyCoursesController extends GetxController {

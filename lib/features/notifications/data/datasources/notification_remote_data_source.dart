@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import '../models/notification_model.dart';
 

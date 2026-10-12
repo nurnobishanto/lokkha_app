@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/exam/data/models/user_exam_v1_model.dart';
 import 'package:lokkha/features/exam/domain/repositories/exam_repository.dart';
 import 'package:lokkha/features/exam/domain/usecases/get_user_exams_usecase.dart';

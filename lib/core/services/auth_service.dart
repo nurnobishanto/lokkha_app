@@ -11,9 +11,9 @@ import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/network/api_client.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class AuthService {
@@ -48,9 +48,9 @@ class AuthService {
     }
 
     // Do not show dialog if already on authentication screens
-    if (Get.currentRoute == Routes.AUTH_GATEWAY ||
-        Get.currentRoute == Routes.SIGNIN ||
-        Get.currentRoute == Routes.VERIFY_OTP) {
+    if (Get.currentRoute == Routes.authGateway ||
+        Get.currentRoute == Routes.signIn ||
+        Get.currentRoute == Routes.verifyOtp) {
       _isSessionDialogShowing = false;
       return;
     }
@@ -149,7 +149,7 @@ class AuthService {
                           onPressed: () {
                             _isSessionDialogShowing = false;
                             Get.back();
-                            Get.offAllNamed(Routes.AUTH_GATEWAY);
+                            Get.offAllNamed(Routes.authGateway);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: LightThemeColors.primaryColor,
@@ -195,9 +195,9 @@ class AuthService {
     if (token == null || token.isEmpty) {
       isLoggedIn.value = false;
       await MySharedPref.removeUserToken();
-      if (Get.currentRoute != Routes.AUTH_GATEWAY &&
-          Get.currentRoute != Routes.SPLASH) {
-        Get.offAllNamed(Routes.AUTH_GATEWAY);
+      if (Get.currentRoute != Routes.authGateway &&
+          Get.currentRoute != Routes.splash) {
+        Get.offAllNamed(Routes.authGateway);
       }
       return;
     }
@@ -218,7 +218,7 @@ class AuthService {
 
         // Check profile completion requirement
         if (!res.profileCompleted || res.rawData?['update_profile_required'] == true) {
-          Get.toNamed(Routes.PROFILE_UPDATE_REQUIRED, arguments: {
+          Get.toNamed(Routes.profileUpdateRequired, arguments: {
             "phoneNumber": res.user?.phone ?? res.rawData?["data"]?["phone"] ?? "",
           });
         }
@@ -265,7 +265,7 @@ class AuthService {
       }
 
       CustomSnackBar.showCustomToast(message: "লগআউট সফল হয়েছে");
-      Get.offAllNamed(Routes.AUTH_GATEWAY);
+      Get.offAllNamed(Routes.authGateway);
     }
   }
 

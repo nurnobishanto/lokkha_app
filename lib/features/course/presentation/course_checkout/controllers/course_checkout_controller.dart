@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/navigation/navigation.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/packages/packages.dart';
 

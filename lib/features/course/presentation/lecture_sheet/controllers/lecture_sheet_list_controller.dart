@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/features/course/course.dart';

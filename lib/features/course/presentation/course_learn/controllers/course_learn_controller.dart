@@ -30,7 +30,7 @@ class CourseLearnController extends GetxController {
 
     if (!isLoggedIn.value) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Get.offAllNamed(Routes.AUTH_GATEWAY);
+        Get.offAllNamed(Routes.authGateway);
       });
       return;
     }
@@ -89,7 +89,7 @@ class CourseLearnController extends GetxController {
             backgroundColor: Colors.red,
             colorText: Colors.white,
           );
-          Get.offNamed(Routes.COURSE_DETAILS, arguments: courseId);
+          Get.offNamed(Routes.courseDetails, arguments: courseId);
         }
       });
     } catch (e) {

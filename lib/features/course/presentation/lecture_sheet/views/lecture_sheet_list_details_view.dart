@@ -5,7 +5,7 @@ import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/lecture_sheet.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 
 class LectureSheetListDetailsView extends StatelessWidget {
   final int id;
@@ -81,7 +81,7 @@ class LectureSheetListDetailsView extends StatelessWidget {
                     ...controller.lectureSheets.map(
                       (sheet) => GestureDetector(
                           onTap: () {
-                            Get.toNamed(Routes.SHEET_DETAILS,
+                            Get.toNamed(Routes.sheetDetails,
                                 arguments: sheet.id);
                           },
                           child: Container(
@@ -140,7 +140,7 @@ class LectureSheetListDetailsView extends StatelessWidget {
 Widget buildSheetTile(LectureSheet sheet, BuildContext context) {
   return GestureDetector(
     onTap: () {
-      Get.toNamed(Routes.SHEET_DETAILS, arguments: sheet.id);
+      Get.toNamed(Routes.sheetDetails, arguments: sheet.id);
     },
     child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

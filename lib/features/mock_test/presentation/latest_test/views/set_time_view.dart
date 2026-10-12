@@ -279,7 +279,7 @@ class SetTimeView extends StatelessWidget {
                       if (isLoggedIn.value) {
                         controller.startExam();
                       } else {
-                        Get.toNamed(Routes.AUTH_GATEWAY);
+                        Get.toNamed(Routes.authGateway);
                       }
                     },
                   ),

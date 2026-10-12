@@ -171,7 +171,7 @@ class CustomDrawer extends StatelessWidget {
                     ),
                     onTap: () {
                       Get.back();
-                      Get.toNamed(Routes.AUTH_GATEWAY);
+                      Get.toNamed(Routes.authGateway);
                     },
                   ),
                   const Divider(height: 0.5, color: LightThemeColors.primaryColor),

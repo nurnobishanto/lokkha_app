@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/home/home.dart';

@@ -7,8 +7,8 @@ import 'package:lokkha/features/contest/contest.dart';
 
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
-import 'package:lokkha/core/network/base_client.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/core/network/rest_client.dart';
 import '../views/contest_submit_view.dart';
 
 class ContestStartController extends GetxController {

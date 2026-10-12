@@ -4,7 +4,7 @@ import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/course/course.dart';
 
 class AllCourseView extends GetView<SeeAllItemsController> {
@@ -62,7 +62,7 @@ class AllCourseView extends GetView<SeeAllItemsController> {
                         rating: '5',
                         onPressed: () {
                           // Handle buy button tap
-                          Get.toNamed(Routes.COURSE_DETAILS,
+                          Get.toNamed(Routes.courseDetails,
                               arguments: {'course_id': course.id});
                         },
                       );

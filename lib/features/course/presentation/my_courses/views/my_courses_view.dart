@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/router/router.dart';
 import '../controllers/my_courses_controller.dart';
@@ -111,7 +111,7 @@ class _CourseCard extends StatelessWidget {
     return InkWell(
       onTap: () {
               Get.toNamed(
-                Routes.COURSE_DETAILS,
+                Routes.courseDetails,
                 arguments: {
                   'course_id': course.id,
                 },

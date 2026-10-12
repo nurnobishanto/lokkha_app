@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/api_call_status.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import '../controllers/my_packages_controller.dart';
@@ -117,7 +117,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
 
                   // নতুন প্যাকেজ Button
                   InkWell(
-                    onTap: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
+                    onTap: () => Get.toNamed(Routes.packages),
                     borderRadius: BorderRadius.circular(20.r),
                     child: Container(
                       padding: EdgeInsets.symmetric(
@@ -211,7 +211,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
           ),
           SizedBox(height: 18.h),
           ElevatedButton(
-            onPressed: () => Get.toNamed(Routes.PREMIUM_PACKAGES),
+            onPressed: () => Get.toNamed(Routes.packages),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF59E0B),
               elevation: 0,
@@ -428,7 +428,7 @@ class PackageCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: onRenew ?? () => Get.toNamed(Routes.PREMIUM_PACKAGES),
+              onPressed: onRenew ?? () => Get.toNamed(Routes.packages),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF59E0B),
                 elevation: 0,

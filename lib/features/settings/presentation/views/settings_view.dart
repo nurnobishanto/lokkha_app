@@ -191,7 +191,7 @@ class SettingsView extends StatelessWidget {
 
           // Edit profile button
           InkWell(
-            onTap: () => Get.toNamed(Routes.PROFILE_UPDATE),
+            onTap: () => Get.toNamed(Routes.profileUpdate),
             borderRadius: BorderRadius.circular(10.r),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
@@ -737,7 +737,7 @@ class SettingsView extends StatelessWidget {
           iconBg: const Color(0xFFFFFBEB),
           title: "নোটিফিকেশন",
           subtitle: "পরীক্ষা ও লাইভ ইভেন্টের নোটিফিকেশন দেখুন",
-          onTap: () => Get.toNamed(Routes.NOTIFICATIONS),
+          onTap: () => Get.toNamed(Routes.notifications),
         ),
       ],
     );
@@ -769,7 +769,7 @@ class SettingsView extends StatelessWidget {
           iconBg: const Color(0xFFEEF2FF),
           title: "শর্তাবলী ও নীতিমালা",
           subtitle: "ব্যবহারের নিয়মাবলী এবং পলিসি পড়ুন",
-          onTap: () => Get.toNamed(Routes.TERMS_CONDITION),
+          onTap: () => Get.toNamed(Routes.termsCondition),
         ),
         const Divider(height: 0, indent: 56),
         _buildListTile(
