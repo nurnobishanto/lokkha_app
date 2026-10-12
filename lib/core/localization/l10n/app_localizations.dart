@@ -182,6 +182,18 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logout;
 
+  /// Reset password label
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get resetPassword;
+
+  /// Forgot password label
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password'**
+  String get forgotPassword;
+
   /// Retry action label
   ///
   /// In en, this message translates to:

@@ -53,6 +53,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
+  String get resetPassword => 'Reset Password';
+
+  @override
+  String get forgotPassword => 'Forgot Password';
+
+  @override
   String get retry => 'Retry';
 
   @override

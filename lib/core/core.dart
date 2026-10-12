@@ -17,6 +17,7 @@ export 'enums/api_call_status.dart';
 // Extensions
 export 'extensions/common_extension.dart';
 export 'extensions/decorations_extensions.dart';
+export 'extensions/context_extension.dart';
 
 // Theme
 export 'package:lokkha/app/theme/app_theme.dart';

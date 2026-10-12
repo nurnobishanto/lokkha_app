@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 
+export 'package:lokkha/core/extensions/context_extension.dart';
+
 /// ─────────────────────────────────────────────────────────────────────────────
 /// Light Theme Color Palette
 /// ─────────────────────────────────────────────────────────────────────────────
@@ -189,54 +191,4 @@ class AppColors {
 
   static Color infoLight(BuildContext context) =>
       isDarkMode(context) ? const Color(0xFF082F49).withValues(alpha: 0.4) : const Color(0xFFE0F2FE);
-}
-
-/// ─────────────────────────────────────────────────────────────────────────────
-/// Extension for fast, clean, boilerplate-free syntax:
-/// Example: `context.cardColor`, `context.textPrimary`, `context.isDark`
-/// ─────────────────────────────────────────────────────────────────────────────
-extension BuildContextThemeTokens on BuildContext {
-  // Theme inspection
-  bool get isDark => AppColors.isDarkMode(this);
-  ThemeData get theme => Theme.of(this);
-  TextTheme get textTheme => Theme.of(this).textTheme;
-  ColorScheme get colorScheme => Theme.of(this).colorScheme;
-
-  // Scaffolds & Surfaces
-  Color get scaffoldColor => AppColors.scaffold(this);
-  Color get scaffoldBg => AppColors.scaffold(this);
-  Color get cardColor => AppColors.card(this);
-  Color get surfaceColor => AppColors.card(this);
-  Color get surfaceMuted => AppColors.surfaceMuted(this);
-  Color get surfaceSubtle => AppColors.surfaceSubtle(this);
-  Color get subtleSurfaceColor => AppColors.surfaceSubtle(this);
-
-  // Borders & Dividers
-  Color get borderColor => AppColors.border(this);
-  Color get border => AppColors.border(this);
-  Color get borderLight => AppColors.borderLight(this);
-  Color get dividerColor => AppColors.divider(this);
-  Color get divider => AppColors.divider(this);
-
-  // Typography
-  Color get textPrimary => AppColors.textPrimary(this);
-  Color get textSecondary => AppColors.textSecondary(this);
-  Color get textMuted => AppColors.textMuted(this);
-  Color get textLight => AppColors.textLight(this);
-
-  // Brand & Semantic
-  Color get primaryColor => AppColors.primary;
-  Color get primaryDark => AppColors.primaryDark;
-  Color get primaryLight => AppColors.primaryLight(this);
-  Color get accentColor => AppColors.accent(this);
-
-  Color get successColor => AppColors.success(this);
-  Color get successLight => AppColors.successLight(this);
-  Color get warningColor => AppColors.warning(this);
-  Color get warningDark => AppColors.warningDark(this);
-  Color get warningLight => AppColors.warningLight(this);
-  Color get dangerColor => AppColors.danger(this);
-  Color get dangerLight => AppColors.dangerLight(this);
-  Color get infoColor => AppColors.info(this);
-  Color get infoLight => AppColors.infoLight(this);
 }

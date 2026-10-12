@@ -55,6 +55,12 @@ class AppLocalizationsBn extends AppLocalizations {
   String get logout => 'লগআউট';
 
   @override
+  String get resetPassword => 'পাসওয়ার্ড রিসেট করুন';
+
+  @override
+  String get forgotPassword => 'পাসওয়ার্ড ভুলে গেছেন?';
+
+  @override
   String get retry => 'পুনরায় চেষ্টা করুন';
 
   @override

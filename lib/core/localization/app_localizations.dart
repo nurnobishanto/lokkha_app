@@ -9,7 +9,10 @@ export 'l10n/app_localizations.dart';
 
 /// Extension on BuildContext for quick, type-safe localization access
 extension LocalizationExtension on BuildContext {
-  /// Typed AppLocalizations accessor: `context.l10n.hello`
+  /// Typed AppLocalizations accessor: `context.locale.resetPassword`
+  AppLocalizations get locale => AppLocalizations.of(this)!;
+
+  /// Typed AppLocalizations accessor: `context.l10n.resetPassword`
   AppLocalizations get l10n => AppLocalizations.of(this)!;
 
   /// Shorthand alias: `context.tr.appName`

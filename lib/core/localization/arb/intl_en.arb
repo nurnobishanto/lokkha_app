@@ -56,6 +56,14 @@
   "@logout": {
     "description": "Logout button label"
   },
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "Reset password label"
+  },
+  "forgotPassword": "Forgot Password",
+  "@forgotPassword": {
+    "description": "Forgot password label"
+  },
   "retry": "Retry",
   "@retry": {
     "description": "Retry action label"
