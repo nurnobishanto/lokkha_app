@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/shared.dart';
@@ -60,8 +59,13 @@ class NotificationDetailsPage extends StatelessWidget {
                     if (webLink != null && webLink!.isNotEmpty) {
                       launchUrlString(webLink!);
                     } else {
-                      Get.to(ImagePreviewPage(
-                          url: AppConstants.storageUrl + image!));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ImagePreviewPage(
+                            url: AppConstants.storageUrl + image!,
+                          ),
+                        ),
+                      );
                     }
                   },
                   child: Image.network(

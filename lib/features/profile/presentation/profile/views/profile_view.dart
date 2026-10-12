@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
@@ -16,34 +17,49 @@ import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
-import '../controllers/profile_controller.dart';
+import '../controllers/profile_notifier.dart';
 
-class ProfileView extends GetView<ProfileController> {
+class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});
 
   @override
+  ConsumerState<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends ConsumerState<ProfileView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(profileNotifierProvider.notifier).fetchProfileData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ProfileController controller = Get.put(ProfileController());
+    final profileState = ref.watch(profileNotifierProvider);
+    final status = profileState.profileApiStatus;
+    final profileData = myUser;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: 'প্রোফাইল',
         centerTitle: true,
       ),
-      body: Obx(() {
-        final status = controller.profileApiStatus.value;
-        final profileData = myUser;
-        if (status == ApiCallStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: Builder(
+        builder: (context) {
+          if (status == ApiCallStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (!isLoggedIn.value) {
-          return const AuthGatewayView();
-        }
+          if (!isLoggedIn.value) {
+            return const AuthGatewayView();
+          }
 
-        if (status == ApiCallStatus.error) {
-          return const Center(child: Text("তথ্য লোড করা সম্ভব হয়নি"));
-        }
+          if (status == ApiCallStatus.error) {
+            return const Center(child: Text("তথ্য লোড করা সম্ভব হয়নি"));
+          }
 
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -288,7 +304,7 @@ class ProfileView extends GetView<ProfileController> {
 
                         // Right: প্রোফাইল এডিট
                         InkWell(
-                          onTap: () => Get.toNamed(Routes.profileUpdate),
+                          onTap: () => context.push(Routes.profileUpdate),
                           borderRadius: BorderRadius.circular(20.r),
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -346,27 +362,32 @@ class ProfileView extends GetView<ProfileController> {
                 childAspectRatio: 2,
                 children: [
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.myPackages),
+                    onTap: () => context.push(Routes.myPackages),
                     text: 'আমার প্যাকেজ',
                     icon: Icons.inventory_2,
                     color: Colors.orange,
                   ),
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.myCourses),
+                    onTap: () => context.push(Routes.myCourses),
                     text: 'আমার কোর্স',
                     icon: Icons.school,
                     color: Colors.purple,
                   ),
                   _buildGridItem(
-                    onTap: () => Get.to(WebExamView(
-                        title: "Favourite Question",
-                        url: AppConstants.myQuestions)),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => WebExamView(
+                          title: "Favourite Question",
+                          url: AppConstants.myQuestions,
+                        ),
+                      ),
+                    ),
                     text: 'ফেভারিট প্রশ্ন',
                     icon: Icons.favorite,
                     color: Colors.redAccent,
                   ),
                   _buildGridItem(
-                    onTap: () => Get.toNamed(Routes.myOrders),
+                    onTap: () => context.push(Routes.myOrders),
                     text: 'আমার অর্ডারস',
                     icon: Icons.receipt_long,
                     color: Colors.teal,
@@ -402,13 +423,27 @@ class ProfileView extends GetView<ProfileController> {
                     const Divider(height: 0, indent: 50),
                     _buildListItem(
                       onTap: () {
-                        Get.defaultDialog(
-                          title: "অ্যাকাউন্ট ডিলিট",
-                          middleText: "কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।",
-                          onConfirm: () {
-                            Get.back();
-                            Get.to(const CustomerSupportView());
-                          },
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text("অ্যাকাউন্ট ডিলিট"),
+                            content: const Text("কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(ctx).pop(),
+                                child: const Text("বাতিল"),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop();
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => const CustomerSupportView()),
+                                  );
+                                },
+                                child: const Text("যোগাযোগ"),
+                              ),
+                            ],
+                          ),
                         );
                       },
                       text: 'অ্যাকাউন্ট ডিলিট করুন',
@@ -429,8 +464,9 @@ class ProfileView extends GetView<ProfileController> {
             ],
           ),
         );
-      }),
-    );
+      },
+    ),
+  );
   }
 
   Widget _buildSectionLabel(String text) {

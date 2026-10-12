@@ -1,308 +1,551 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
-import '../controllers/blog_detail_controller.dart';
+import 'package:lokkha/shared/widgets/custom_snackbar.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/features/blog/blog.dart';
 
-class BlogDetailView extends GetView<BlogDetailController> {
-  const BlogDetailView({super.key});
+class BlogDetailView extends StatefulWidget {
+  final BlogPost? post;
+  const BlogDetailView({super.key, this.post});
 
   @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final post = controller.post.value;
-      final baseBodyFontSize = 15.sp + controller.fontSizeDelta.value;
+  State<BlogDetailView> createState() => _BlogDetailViewState();
+}
 
-      return Scaffold(
-        backgroundColor: context.scaffoldColor,
-        appBar: AppBar(
-          title: Text(post?.category ?? 'ব্লগ বিস্তারিত'),
-          centerTitle: true,
-        ),
-        body: post == null
-            ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      controller: controller.scrollController,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Main Article Card
-                          Container(
-                            decoration: BoxDecoration(
-                              color: context.cardColor,
-                              borderRadius: BorderRadius.circular(16.r),
-                              border: Border.all(
-                                color: context.borderColor,
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x08000000),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(16.w),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Category Tag
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12.w,
-                                    vertical: 6.h,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1B6B50),
-                                    borderRadius: BorderRadius.circular(8.r),
-                                  ),
-                                  child: Text(
-                                    post.category,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 12.h),
+class _BlogDetailViewState extends State<BlogDetailView> {
+  final ScrollController _scrollController = ScrollController();
+  late final BlogPost _post;
+  double _fontSizeDelta = 0.0;
+  bool _showScrollToTop = false;
 
-                                // Article Title
-                                Text(
-                                  post.title,
-                                  style: TextStyle(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.textPrimary,
-                                    height: 1.35,
-                                  ),
-                                ),
-                                SizedBox(height: 12.h),
+  @override
+  void initState() {
+    super.initState();
+    _post = widget.post ?? BlogPost.samplePosts.first;
 
-                                // Metadata Row
-                                _buildMetadataRow(context, post),
-                                SizedBox(height: 14.h),
-
-                                Divider(
-                                  color: context.borderColor,
-                                  height: 1,
-                                ),
-                                SizedBox(height: 14.h),
-
-                                // Reading & Social Controls
-                                _buildReadingAndSocialRow(context),
-                                SizedBox(height: 16.h),
-
-                                // Featured Image
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  child: CachedNetworkImage(
-                                    imageUrl: post.imageUrl,
-                                    width: double.infinity,
-                                    height: 220.h,
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) => Container(
-                                      height: 220.h,
-                                      color: context.surfaceColor,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ),
-                                    errorWidget: (context, url, error) =>
-                                        Container(
-                                      height: 220.h,
-                                      color: context.surfaceColor,
-                                      child: const Icon(
-                                        Icons.image_not_supported_outlined,
-                                        size: 48,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 20.h),
-
-                                // Article Sections
-                                ...post.sections.map((section) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(bottom: 18.h),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (section.title != null &&
-                                            section.title!.isNotEmpty) ...[
-                                          Text(
-                                            section.title!,
-                                            style: TextStyle(
-                                              fontSize: 18.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: context.textPrimary,
-                                              height: 1.35,
-                                            ),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                        ],
-                                        Text(
-                                          section.content,
-                                          style: TextStyle(
-                                            fontSize: baseBodyFontSize,
-                                            color: context.textSecondary,
-                                            height: 1.7,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }),
-
-                                // Source Attribution
-                                if (post.source != null &&
-                                    post.source!.isNotEmpty) ...[
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'সূত্র: ${post.source}',
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                      color: context.textMuted,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                  SizedBox(height: 16.h),
-                                ],
-
-                                // Author / Mentor Card
-                                _buildMentorCard(context, post),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 40.h),
-                        ],
-                      ),
-                    ),
-
-                    // Scroll to Top FAB
-                    if (controller.showScrollToTop.value)
-                      Positioned(
-                        bottom: 20.h,
-                        right: 16.w,
-                        child: FloatingActionButton.small(
-                          onPressed: controller.scrollToTop,
-                          backgroundColor: const Color(0xFF1B6B50),
-                          elevation: 4,
-                          child: const Icon(
-                            Icons.keyboard_arrow_up,
-                            color: Colors.white,
-                            size: 26,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-      );
+    _scrollController.addListener(() {
+      if (_scrollController.offset > 300 && !_showScrollToTop) {
+        setState(() => _showScrollToTop = true);
+      } else if (_scrollController.offset <= 300 && _showScrollToTop) {
+        setState(() => _showScrollToTop = false);
+      }
     });
   }
 
-  Widget _buildMetadataRow(BuildContext context, BlogPost post) {
-    return Wrap(
-      spacing: 6.w,
-      runSpacing: 6.h,
-      crossAxisAlignment: WrapCrossAlignment.center,
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _setFontSizeDelta(double delta) {
+    setState(() => _fontSizeDelta = delta);
+  }
+
+  void _scrollToTop() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _sharePost() {
+    SharePlus.instance.share(
+      ShareParams(
+        text:
+            '${_post.title}\n\nপড়ুন লক্ষ্য অ্যাপে: https://lokkha.app/blog/${_post.id}',
+      ),
+    );
+  }
+
+  Future<void> _shareOnFacebook() async {
+    final url = Uri.parse(
+      'https://www.facebook.com/sharer/sharer.php?u=https://lokkha.app/blog/${_post.id}',
+    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      _sharePost();
+    }
+  }
+
+  Future<void> _shareOnWhatsApp() async {
+    final text = Uri.encodeComponent(
+      '${_post.title}\nhttps://lokkha.app/blog/${_post.id}',
+    );
+    final url = Uri.parse('whatsapp://send?text=$text');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      _sharePost();
+    }
+  }
+
+  Future<void> _shareOnX() async {
+    final text = Uri.encodeComponent(
+      '${_post.title} https://lokkha.app/blog/${_post.id}',
+    );
+    final url = Uri.parse('https://twitter.com/intent/tweet?text=$text');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      _sharePost();
+    }
+  }
+
+  void _copyLink() {
+    final link = 'https://lokkha.app/blog/${_post.id}';
+    Clipboard.setData(ClipboardData(text: link));
+    CustomSnackBar.showCustomToast(
+      title: 'সফল হয়েছে',
+      message: 'লিংকটি ক্লিপবোর্ডে কপি করা হয়েছে',
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final baseBodyFontSize = 15.sp + _fontSizeDelta;
+
+    return Scaffold(
+      backgroundColor: context.scaffoldColor,
+      appBar: AppBar(
+        title: Text(_post.category),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              controller: _scrollController,
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.w,
+                vertical: 12.h,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Main Article Card
+                  Container(
+                    decoration: BoxDecoration(
+                      color: context.cardColor,
+                      borderRadius: BorderRadius.circular(16.r),
+                      border: Border.all(
+                        color: context.borderColor,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x08000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Article Hero Image
+                        ClipRRect(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16.r),
+                          ),
+                          child: CachedNetworkImage(
+                            imageUrl: _post.imageUrl,
+                            width: double.infinity,
+                            height: 200.h,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              height: 200.h,
+                              color: context.surfaceColor,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              height: 200.h,
+                              color: context.surfaceColor,
+                              child: const Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 48,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Category Badge & Meta Row
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                      vertical: 5.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFD9EDE1),
+                                      borderRadius: BorderRadius.circular(6.r),
+                                    ),
+                                    child: Text(
+                                      _post.category,
+                                      style: TextStyle(
+                                        color: const Color(0xFF1B6B50),
+                                        fontSize: 11.5.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 13.sp,
+                                        color: context.textSecondary,
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        _post.publishDate,
+                                        style: TextStyle(
+                                          fontSize: 11.5.sp,
+                                          color: context.textSecondary,
+                                        ),
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      Icon(
+                                        Icons.remove_red_eye_outlined,
+                                        size: 14.sp,
+                                        color: const Color(0xFF1B6B50),
+                                      ),
+                                      SizedBox(width: 4.w),
+                                      Text(
+                                        _post.views,
+                                        style: TextStyle(
+                                          fontSize: 11.5.sp,
+                                          color: const Color(0xFF1B6B50),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+
+                              // Title
+                              Text(
+                                _post.title,
+                                style: TextStyle(
+                                  fontSize: 18.5.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: context.textPrimary,
+                                  height: 1.35,
+                                ),
+                              ),
+                              SizedBox(height: 10.h),
+
+                              // Excerpt Box
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(12.w),
+                                decoration: BoxDecoration(
+                                  color: context.subtleSurfaceColor,
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  border: Border(
+                                    left: BorderSide(
+                                      color: const Color(0xFF1B6B50),
+                                      width: 4.w,
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  _post.excerpt,
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontStyle: FontStyle.italic,
+                                    color: context.textSecondary,
+                                    height: 1.45,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 14.h),
+
+                              // Mentor Info Bar
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 10.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context.subtleSurfaceColor,
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 18.r,
+                                      backgroundColor:
+                                          const Color(0xFF1B6B50),
+                                      child: Text(
+                                        _post.mentor.isNotEmpty
+                                            ? _post.mentor[0]
+                                            : 'L',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _post.mentor,
+                                            style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: context.textPrimary,
+                                            ),
+                                          ),
+                                          Text(
+                                            'বিসিএস ক্যাডার ও স্টাডি কনসালটেন্ট',
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              color: context.textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 14.h),
+
+                              // Font Size Toolbar
+                              _buildFontSizeBar(context),
+                              Divider(
+                                height: 24.h,
+                                color: context.borderColor,
+                              ),
+
+                              // Article Sections
+                              ..._post.sections.map((section) {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 18.h),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (section.title != null &&
+                                          section.title!.isNotEmpty) ...[
+                                        Text(
+                                          section.title!,
+                                          style: TextStyle(
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: context.textPrimary,
+                                            height: 1.35,
+                                          ),
+                                        ),
+                                        SizedBox(height: 10.h),
+                                      ],
+                                      Text(
+                                        section.content,
+                                        style: TextStyle(
+                                          fontSize: baseBodyFontSize,
+                                          color: context.textPrimary,
+                                          height: 1.7,
+                                          letterSpacing: 0.1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                              SizedBox(height: 20.h),
+
+                              // Social Sharing Section
+                              _buildShareSection(context),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 40.h),
+                ],
+              ),
+            ),
+
+            // Scroll to Top FAB
+            if (_showScrollToTop)
+              Positioned(
+                bottom: 20.h,
+                right: 16.w,
+                child: FloatingActionButton.small(
+                  onPressed: _scrollToTop,
+                  backgroundColor: const Color(0xFF1B6B50),
+                  elevation: 4,
+                  child: const Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Colors.white,
+                    size: 26,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFontSizeBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: context.subtleSurfaceColor,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.format_size,
+                size: 16.sp,
+                color: context.textSecondary,
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                'ফন্ট সাইজ:',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: context.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              _buildFontButton(
+                label: 'A-',
+                onTap: () {
+                  if (_fontSizeDelta > -4) {
+                    _setFontSizeDelta(_fontSizeDelta - 1);
+                  }
+                },
+                context: context,
+              ),
+              SizedBox(width: 8.w),
+              _buildFontButton(
+                label: 'Default',
+                onTap: () => _setFontSizeDelta(0),
+                context: context,
+              ),
+              SizedBox(width: 8.w),
+              _buildFontButton(
+                label: 'A+',
+                onTap: () {
+                  if (_fontSizeDelta < 8) {
+                    _setFontSizeDelta(_fontSizeDelta + 1);
+                  }
+                },
+                context: context,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFontButton({
+    required String label,
+    required VoidCallback onTap,
+    required BuildContext context,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(4.r),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: context.cardColor,
+          borderRadius: BorderRadius.circular(4.r),
+          border: Border.all(color: context.borderColor),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1B6B50),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShareSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Mentor
+        Divider(color: context.borderColor),
+        SizedBox(height: 8.h),
+        Text(
+          'আর্টিকেলটি বন্ধুদের সাথে শেয়ার করুন:',
+          style: TextStyle(
+            fontSize: 13.sp,
+            fontWeight: FontWeight.bold,
+            color: context.textPrimary,
+          ),
+        ),
+        SizedBox(height: 12.h),
         Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Icon(
-              Icons.school_outlined,
-              size: 15.sp,
+            _buildShareIcon(
+              icon: FontAwesomeIcons.facebook,
+              color: const Color(0xFF1877F2),
+              label: 'Facebook',
+              onTap: _shareOnFacebook,
+            ),
+            _buildShareIcon(
+              icon: FontAwesomeIcons.whatsapp,
+              color: const Color(0xFF25D366),
+              label: 'WhatsApp',
+              onTap: _shareOnWhatsApp,
+            ),
+            _buildShareIcon(
+              icon: FontAwesomeIcons.xTwitter,
+              color: Colors.black,
+              label: 'X',
+              onTap: _shareOnX,
+            ),
+            _buildShareIcon(
+              icon: Icons.link,
               color: const Color(0xFF1B6B50),
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              post.mentor,
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.bold,
-                color: context.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
-
-        // Date & Time
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 13.sp,
-              color: context.textSecondary,
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              post.publishTime != null
-                  ? '${post.publishDate} · ${post.publishTime}'
-                  : post.publishDate,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: context.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
-
-        // Views
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.remove_red_eye_outlined,
-              size: 14.sp,
-              color: const Color(0xFF1B6B50),
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              post.views,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: const Color(0xFF1B6B50),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        Text('•', style: TextStyle(color: context.textMuted, fontSize: 14.sp)),
-
-        // Read Time
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.access_time,
-              size: 13.sp,
-              color: context.textSecondary,
-            ),
-            SizedBox(width: 4.w),
-            Text(
-              post.readTime,
-              style: TextStyle(
-                fontSize: 12.sp,
-                color: context.textSecondary,
-              ),
+              label: 'কপি লিংক',
+              onTap: _copyLink,
             ),
           ],
         ),
@@ -310,186 +553,41 @@ class BlogDetailView extends GetView<BlogDetailController> {
     );
   }
 
-  Widget _buildReadingAndSocialRow(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Font Size Switcher
-          Row(
-            children: [
-              Text(
-                'T ফন্ট সাইজ: ',
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w600,
-                  color: context.textSecondary,
-                ),
-              ),
-              SizedBox(width: 4.w),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: context.borderColor),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Row(
-                  children: [
-                    _buildFontSizeButton(context, 'A-', -2.0),
-                    _buildFontSizeButton(context, 'A', 0.0),
-                    _buildFontSizeButton(context, 'A+', 2.0),
-                    _buildFontSizeButton(context, 'A++', 4.0),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(width: 14.w),
-
-          // Social Share Icons
-          Row(
-            children: [
-              _buildSocialIconButton(
-                context: context,
-                child: FaIcon(
-                  FontAwesomeIcons.facebookF,
-                  size: 14,
-                  color: context.textSecondary,
-                ),
-                onTap: controller.shareOnFacebook,
-              ),
-              SizedBox(width: 6.w),
-              _buildSocialIconButton(
-                context: context,
-                child: FaIcon(
-                  FontAwesomeIcons.whatsapp,
-                  size: 15,
-                  color: context.textSecondary,
-                ),
-                onTap: controller.shareOnWhatsApp,
-              ),
-              SizedBox(width: 6.w),
-              _buildSocialIconButton(
-                context: context,
-                child: FaIcon(
-                  FontAwesomeIcons.xTwitter,
-                  size: 14,
-                  color: context.textSecondary,
-                ),
-                onTap: controller.shareOnX,
-              ),
-              SizedBox(width: 6.w),
-              _buildSocialIconButton(
-                context: context,
-                child: Icon(
-                  Icons.link,
-                  size: 16,
-                  color: context.textSecondary,
-                ),
-                onTap: controller.copyLink,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFontSizeButton(BuildContext context, String label, double delta) {
-    return Obx(() {
-      final isSelected = controller.fontSizeDelta.value == delta;
-      return InkWell(
-        onTap: () => controller.setFontSizeDelta(delta),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 4.h),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF1B6B50) : Colors.transparent,
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 11.sp,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Colors.white : context.textSecondary,
-            ),
-          ),
-        ),
-      );
-    });
-  }
-
-  Widget _buildSocialIconButton({
-    required BuildContext context,
-    required Widget child,
+  Widget _buildShareIcon({
+    required dynamic icon,
+    required Color color,
+    required String label,
     required VoidCallback onTap,
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6.r),
-      child: Container(
-        width: 32.w,
-        height: 32.w,
-        decoration: BoxDecoration(
-          color: context.surfaceColor,
-          borderRadius: BorderRadius.circular(6.r),
-          border: Border.all(color: context.borderColor),
+      borderRadius: BorderRadius.circular(8.r),
+      child: Padding(
+        padding: EdgeInsets.all(8.w),
+        child: Column(
+          children: [
+            Container(
+              width: 40.r,
+              height: 40.r,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Icon(icon as IconData, color: color, size: 20.sp),
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-        alignment: Alignment.center,
-        child: child,
-      ),
-    );
-  }
-
-  Widget _buildMentorCard(BuildContext context, BlogPost post) {
-    return Container(
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(
-        color: context.surfaceColor,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: context.borderColor),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 48.w,
-            height: 48.w,
-            decoration: const BoxDecoration(
-              color: Color(0xFF1B6B50),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.school,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'লক্ষ্য শিক্ষক ও মেন্টর প্যানেল',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  'বিসিএস, ব্যাংক ও সরকারি চাকরির পরীক্ষা প্রস্তুতি সংক্রান্ত নিয়মিত বিশ্লেষণ ও বিষয়ভিত্তিক সহায়িকা।',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: context.textSecondary,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

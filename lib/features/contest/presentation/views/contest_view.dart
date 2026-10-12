@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:lokkha/core/compat/get_compat.dart';
-
-import '../controllers/contest_controller.dart';
-
-class ContestView extends GetView<ContestController> {
+class ContestView extends StatelessWidget {
   const ContestView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -20,14 +20,18 @@ import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/settings/settings.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'routes.dart';
 export 'routes.dart';
+
+/// Central Navigation & Messenger Keys
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 /// Central GoRouter Riverpod provider
 final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    navigatorKey: Get.key,
+    navigatorKey: rootNavigatorKey,
     initialLocation: Routes.splash,
     routes: [
       GoRoute(
@@ -49,7 +53,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // Navbar ShellRoute for persistent bottom navigation
       ShellRoute(
         builder: (context, state, child) {
-          NavbarBinding().dependencies();
           return NavbarView(child: child);
         },
         routes: [
@@ -57,7 +60,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.navbar,
             name: Routes.navbar,
             builder: (context, state) {
-              NavbarBinding().dependencies();
               return const NavbarView();
             },
           ),
@@ -65,7 +67,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             path: Routes.home,
             name: Routes.home,
             builder: (context, state) {
-              HomeBinding().dependencies();
               return const HomeView();
             },
           ),
@@ -76,7 +77,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.questionBank,
         name: Routes.questionBank,
         builder: (context, state) {
-          QuestionBankBinding().dependencies();
           return const QuestionBankView();
         },
       ),
@@ -84,7 +84,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.contest,
         name: Routes.contest,
         builder: (context, state) {
-          AllContestBinding().dependencies();
           return const ContestTabView();
         },
       ),
@@ -92,7 +91,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.allContest,
         name: Routes.allContest,
         builder: (context, state) {
-          AllContestBinding().dependencies();
           return const ContestTabView(initialIndex: 1);
         },
       ),
@@ -100,7 +98,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.blog,
         name: Routes.blog,
         builder: (context, state) {
-          BlogBinding().dependencies();
           return const BlogView();
         },
       ),
@@ -108,15 +105,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.blogDetails,
         name: Routes.blogDetails,
         builder: (context, state) {
-          BlogDetailBinding().dependencies();
-          return const BlogDetailView();
+          final post = state.extra as BlogPost?;
+          return BlogDetailView(post: post);
         },
       ),
       GoRoute(
         path: Routes.profile,
         name: Routes.profile,
         builder: (context, state) {
-          ProfileBinding().dependencies();
           return const ProfileView();
         },
       ),
@@ -124,7 +120,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.mockTest,
         name: Routes.mockTest,
         builder: (context, state) {
-          MockTestBinding().dependencies();
           return const MockTestView();
         },
       ),
@@ -133,8 +128,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: Routes.signIn,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final phone = extra['phoneNumber'] as String?;
-          final type = extra['type'] as String?;
+          final phone = extra['phoneNumber'] as String? ?? '';
+          final type = extra['type'] as String? ?? 'password';
           return SignInView(phoneNumber: phone, type: type);
         },
       ),
@@ -153,8 +148,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: Routes.verifyOtp,
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
-          final phone = extra['phoneNumber'] as String?;
-          final type = extra['type'] as String?;
+          final phone = extra['phoneNumber'] as String? ?? '';
+          final type = extra['type'] as String? ?? 'Registration';
           return VerifyOtpView(phoneNumber: phone, type: type);
         },
       ),
@@ -176,85 +171,57 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.profileUpdate,
         name: Routes.profileUpdate,
-        builder: (context, state) {
-          ProfileUpdateBinding().dependencies();
-          return const ProfileUpdateView();
-        },
+        builder: (context, state) => const ProfileUpdateView(),
       ),
       GoRoute(
         path: Routes.profileHistory,
         name: Routes.profileHistory,
-        builder: (context, state) {
-          ProfileHistoryBinding().dependencies();
-          return const ProfileHistoryView();
-        },
+        builder: (context, state) => const ProfileHistoryView(),
       ),
       GoRoute(
         path: Routes.selfExamHistory,
         name: Routes.selfExamHistory,
-        builder: (context, state) {
-          SelfExamHistoryBinding().dependencies();
-          return const SelfExamHistoryView();
-        },
+        builder: (context, state) => const SelfExamHistoryView(),
       ),
       GoRoute(
         path: Routes.contestHistory,
         name: Routes.contestHistory,
-        builder: (context, state) {
-          ContestHistoryBinding().dependencies();
-          return const ContestHistoryView();
-        },
+        builder: (context, state) => const ContestHistoryView(),
       ),
       GoRoute(
         path: Routes.accuracyProgress,
         name: Routes.accuracyProgress,
-        builder: (context, state) {
-          AccuracyProgressBinding().dependencies();
-          return const AccuracyProgressView();
-        },
+        builder: (context, state) => const AccuracyProgressView(),
       ),
       GoRoute(
         path: Routes.referral,
         name: Routes.referral,
-        builder: (context, state) {
-          ReferralBinding().dependencies();
-          return const ReferralView();
-        },
+        builder: (context, state) => const ReferralView(),
       ),
       GoRoute(
         path: Routes.profileUpdateRequired,
         name: Routes.profileUpdateRequired,
         builder: (context, state) {
-          ProfileUpdateRequiredBinding().dependencies();
-          return ProfileUpdateRequiredView();
+          final phone = (state.extra as Map<String, dynamic>?)?['phoneNumber'] as String? ?? '';
+          return ProfileUpdateRequiredView(phoneNumber: phone);
         },
       ),
       GoRoute(
         path: Routes.mockTestTab,
         name: Routes.mockTestTab,
         builder: (context, state) {
-          if (!Get.isRegistered<MockTestTabController>()) {
-            Get.lazyPut(() => MockTestTabController());
-          }
-          if (!Get.isRegistered<MockTestController>()) {
-            Get.lazyPut(() => MockTestController());
-          }
           return const MockTestTabView();
         },
       ),
       GoRoute(
         path: Routes.fastPractice,
         name: Routes.fastPractice,
-        builder: (context, state) {
-          FastPracticeBinding().dependencies();
-          return const FastPracticeView();
-        },
+        builder: (context, state) => const FastPracticeView(),
       ),
       GoRoute(
         path: Routes.jobs,
         name: Routes.jobs,
         builder: (context, state) {
-          JobsBinding().dependencies();
           return const JobsView();
         },
       ),
@@ -262,7 +229,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.jobDetails,
         name: Routes.jobDetails,
         builder: (context, state) {
-          JobsBinding().dependencies();
           final id = state.extra is int
               ? state.extra as int
               : (int.tryParse(state.extra?.toString() ?? '') ?? 0);
@@ -273,7 +239,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.currentAffairs,
         name: Routes.currentAffairs,
         builder: (context, state) {
-          CurrentAffairsBinding().dependencies();
           return const CurrentAffairsView();
         },
       ),
@@ -281,55 +246,38 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.packages,
         name: Routes.packages,
         builder: (context, state) {
-          PremiumPackagesBinding().dependencies();
           return const PremiumPackagesView();
         },
       ),
       GoRoute(
         path: Routes.myPackages,
         name: Routes.myPackages,
-        builder: (context, state) {
-          MyPackagesBinding().dependencies();
-          return const MyPackagesView();
-        },
+        builder: (context, state) => const MyPackagesView(),
       ),
       GoRoute(
         path: Routes.myOrders,
         name: Routes.myOrders,
-        builder: (context, state) {
-          MyOrdersBinding().dependencies();
-          return const MyOrdersView();
-        },
+        builder: (context, state) => const MyOrdersView(),
       ),
       GoRoute(
         path: Routes.latestExam,
         name: Routes.latestExam,
-        builder: (context, state) {
-          LatestExamBinding().dependencies();
-          return const LatestExamView();
-        },
+        builder: (context, state) => const LatestExamView(),
       ),
       GoRoute(
         path: Routes.maintenanceMode,
         name: Routes.maintenanceMode,
-        builder: (context, state) {
-          MaintenanceModeBinding().dependencies();
-          return const MaintenanceModeView();
-        },
+        builder: (context, state) => const MaintenanceModeView(),
       ),
       GoRoute(
         path: Routes.sponsorAds,
         name: Routes.sponsorAds,
-        builder: (context, state) {
-          SponsorAdsBinding().dependencies();
-          return const SponsorAdsView();
-        },
+        builder: (context, state) => const SponsorAdsView(),
       ),
       GoRoute(
         path: Routes.vocabulary,
         name: Routes.vocabulary,
         builder: (context, state) {
-          VocabularyBinding().dependencies();
           return const VocabularyView();
         },
       ),
@@ -337,7 +285,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.lectureSheet,
         name: Routes.lectureSheet,
         builder: (context, state) {
-          LectureSheetBinding().dependencies();
           return const LectureSheetListView();
         },
       ),
@@ -345,71 +292,122 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.sheetDetails,
         name: Routes.sheetDetails,
         builder: (context, state) {
-          SheetDetailsBinding().dependencies();
-          return const LectureSheetDetailsView();
+          final extra = state.extra;
+          int id = 0;
+          if (extra is int) {
+            id = extra;
+          } else if (extra is Map) {
+            id = extra['id'] as int? ?? int.tryParse(extra['id']?.toString() ?? '') ?? 0;
+          }
+          if (id == 0) {
+            id = int.tryParse(state.uri.queryParameters['id'] ?? '') ?? 0;
+          }
+          return LectureSheetDetailsView(id: id);
         },
       ),
       GoRoute(
         path: Routes.examCategory,
         name: Routes.examCategory,
-        builder: (context, state) {
-          ExamCategoryBinding().dependencies();
-          return const ExamCategoryView();
-        },
+        builder: (context, state) => const ExamCategoryView(),
       ),
       GoRoute(
         path: Routes.examCategoryDetails,
         name: Routes.examCategoryDetails,
         builder: (context, state) {
-          ExamCategoryDetailsBinding().dependencies();
-          return const ExamCategoryDetailsView();
+          final extra = state.extra;
+          int categoryId = 0;
+          String categoryName = '';
+          if (extra is Map) {
+            categoryId = extra['category_id'] as int? ??
+                int.tryParse(extra['category_id']?.toString() ?? '') ??
+                0;
+            categoryName = extra['category_name'] as String? ?? '';
+          }
+          return ExamCategoryDetailsView(
+            categoryId: categoryId,
+            categoryName: categoryName,
+          );
         },
       ),
       GoRoute(
         path: Routes.courses,
         name: Routes.courses,
         builder: (context, state) {
-          CoursesBinding().dependencies();
-          return CoursesView();
+          final extra = state.extra;
+          int? categoryId;
+          String? categoryName;
+          if (extra is Map) {
+            final rawId = extra['course_category_id'] ?? extra['id'];
+            if (rawId is int) {
+              categoryId = rawId;
+            } else if (rawId != null) {
+              categoryId = int.tryParse(rawId.toString());
+            }
+            categoryName = extra['category_name']?.toString();
+          }
+          categoryId ??= int.tryParse(state.uri.queryParameters['course_category_id'] ?? '');
+          categoryName ??= state.uri.queryParameters['category_name'];
+          return CoursesView(categoryId: categoryId, categoryName: categoryName);
         },
       ),
       GoRoute(
         path: Routes.courseDetails,
         name: Routes.courseDetails,
         builder: (context, state) {
-          CourseDetailsBinding().dependencies();
-          return const CourseDetailsView();
+          final extra = state.extra;
+          int courseId = 0;
+          if (extra is int) {
+            courseId = extra;
+          } else if (extra is Map) {
+            final rawId = extra['course_id'] ?? extra['id'];
+            if (rawId is int) {
+              courseId = rawId;
+            } else if (rawId != null) {
+              courseId = int.tryParse(rawId.toString()) ?? 0;
+            }
+          }
+          if (courseId == 0) {
+            final param = state.uri.queryParameters['course_id'] ??
+                state.uri.queryParameters['id'];
+            if (param != null) {
+              courseId = int.tryParse(param) ?? 0;
+            }
+          }
+          return CourseDetailsView(courseId: courseId);
         },
       ),
       GoRoute(
         path: Routes.courseLearn,
         name: Routes.courseLearn,
         builder: (context, state) {
-          CourseLearnBinding().dependencies();
-          return const CourseLearnView();
+          final extra = state.extra;
+          int? id;
+          int? itemId;
+          if (extra is Map) {
+            id = extra['id'] as int? ?? int.tryParse(extra['id']?.toString() ?? '');
+            itemId = extra['item_id'] as int? ?? int.tryParse(extra['item_id']?.toString() ?? '');
+          } else if (extra is int) {
+            id = extra;
+          }
+          id ??= int.tryParse(state.uri.queryParameters['id'] ?? '');
+          itemId ??= int.tryParse(state.uri.queryParameters['item_id'] ?? '');
+          return CourseLearnView(id: id, itemId: itemId);
         },
       ),
       GoRoute(
         path: Routes.allCourses,
         name: Routes.allCourses,
-        builder: (context, state) {
-          SeeAllItemsBinding().dependencies();
-          return const AllCourseView();
-        },
+        builder: (context, state) => const AllCourseView(),
       ),
       GoRoute(
         path: Routes.allExam,
         name: Routes.allExam,
-        builder: (context, state) {
-          SeeAllItemsBinding().dependencies();
-          return const AllExamView();
-        },
+        builder: (context, state) => const AllExamView(),
       ),
       GoRoute(
         path: Routes.notifications,
         name: Routes.notifications,
         builder: (context, state) {
-          NotificationsBinding().dependencies();
           return const NotificationsView();
         },
       ),
@@ -417,7 +415,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.myCourses,
         name: Routes.myCourses,
         builder: (context, state) {
-          MyCoursesBinding().dependencies();
           return const MyCoursesView();
         },
       ),
@@ -430,7 +427,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.settings,
         name: Routes.settings,
         builder: (context, state) {
-          SettingsBinding().dependencies();
           return const SettingsView();
         },
       ),
@@ -438,7 +434,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.subjectSection,
         name: Routes.subjectSection,
         builder: (context, state) {
-          final subject = state.extra as Subject? ?? (Get.arguments as Subject?);
+          final subject = state.extra as Subject?;
           return SubjectSectionView(subject: subject);
         },
       ),
@@ -446,7 +442,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.topicSelection,
         name: Routes.topicSelection,
         builder: (context, state) {
-          final subject = (state.extra as Subject?) ?? (Get.arguments as Subject?);
+          final subject = state.extra as Subject?;
           return TopicSelectionView(subject: subject ?? Subject());
         },
       ),

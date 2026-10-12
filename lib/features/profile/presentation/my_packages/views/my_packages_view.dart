@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/features/auth/auth.dart';
@@ -8,162 +9,167 @@ import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
-import '../controllers/my_packages_controller.dart';
+import '../controllers/my_packages_notifier.dart';
 
-class MyPackagesView extends GetView<MyPackagesController> {
+class MyPackagesView extends ConsumerWidget {
   const MyPackagesView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(myPackagesNotifierProvider);
+    final notifier = ref.read(myPackagesNotifierProvider.notifier);
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'My Packages',
         centerTitle: true,
       ),
-      body: Obx(() {
-        if (!isLoggedIn.value) {
-          return const AuthGatewayView();
-        }
+      body: Builder(
+        builder: (context) {
+          if (!isLoggedIn.value) {
+            return const AuthGatewayView();
+          }
 
-        if (controller.apiCallStatus.value == ApiCallStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+          if (state.apiCallStatus == ApiCallStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (controller.apiCallStatus.value == ApiCallStatus.error) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline_rounded,
-                  size: 48.sp,
-                  color: const Color(0xFFDC2626),
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  "ডেটা লোড করতে সমস্যা হয়েছে",
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: context.textSecondary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                ElevatedButton(
-                  onPressed: controller.fetchMyPackages,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059669),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.r),
-                    ),
-                  ),
-                  child: const Text(
-                    "আবার চেষ্টা করুন",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        final packages = controller.model.value.packages ?? [];
-
-        return ListView(
-          padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 24.h),
-          children: [
-            // 1. Top Header Card (Matching media_1789896243103.png)
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: context.borderColor),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
+          if (state.apiCallStatus == ApiCallStatus.error) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "My Packages",
-                          style: TextStyle(
-                            fontSize: 16.5.sp,
-                            fontWeight: FontWeight.w800,
-                            color: context.textPrimary,
-                          ),
-                        ),
-                        SizedBox(height: 2.h),
-                        Text(
-                          "আমার সাবস্ক্রিপশন প্যাকেজসমূহ",
-                          style: TextStyle(
-                            fontSize: 11.5.sp,
-                            color: context.textSecondary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 48.sp,
+                    color: const Color(0xFFDC2626),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "ডেটা লোড করতে সমস্যা হয়েছে",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: context.textSecondary,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                  // নতুন প্যাকেজ Button
-                  InkWell(
-                    onTap: () => Get.toNamed(Routes.packages),
-                    borderRadius: BorderRadius.circular(20.r),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.w,
-                        vertical: 7.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF59E0B),
+                  SizedBox(height: 12.h),
+                  ElevatedButton(
+                    onPressed: notifier.fetchMyPackages,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF059669),
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.r),
                       ),
-                      child: const Text(
-                        "নতুন প্যাকেজ",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
-                        ),
-                      ),
+                    ),
+                    child: const Text(
+                      "আবার চেষ্টা করুন",
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
-            ),
+            );
+          }
 
-            SizedBox(height: 14.h),
+          final packages = state.model.packages ?? [];
 
-            // 2. Packages List or Empty State
-            if (packages.isEmpty)
-              _buildEmptyState(context)
-            else
-              ...packages.map((pkg) {
-                final name = pkg.package?.name ?? 'ফিচারসমূহ';
-                final startDate = pkg.subscribedAt ?? DateTime.now();
-                final endDate = pkg.cancelledAt ?? DateTime.now();
-                return Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: PackageCard(
-                    name: name,
-                    startDate: startDate,
-                    endDate: endDate,
-                  ),
-                );
-              }),
-          ],
-        );
-      }),
+          return ListView(
+            padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 24.h),
+            children: [
+              // 1. Top Header Card (Matching media_1789896243103.png)
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                decoration: BoxDecoration(
+                  color: context.cardColor,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(color: context.borderColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "My Packages",
+                            style: TextStyle(
+                              fontSize: 16.5.sp,
+                              fontWeight: FontWeight.w800,
+                              color: context.textPrimary,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Text(
+                            "আমার সাবস্ক্রিপশন প্যাকেজসমূহ",
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              color: context.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // নতুন প্যাকেজ Button
+                    InkWell(
+                      onTap: () => context.push(Routes.packages),
+                      borderRadius: BorderRadius.circular(20.r),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14.w,
+                          vertical: 7.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF59E0B),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: const Text(
+                          "নতুন প্যাকেজ",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 14.h),
+
+              // 2. Packages List or Empty State
+              if (packages.isEmpty)
+                _buildEmptyState(context)
+              else
+                ...packages.map((pkg) {
+                  final name = pkg.package?.name ?? 'ফিচারসমূহ';
+                  final startDate = pkg.subscribedAt ?? DateTime.now();
+                  final endDate = pkg.cancelledAt ?? DateTime.now();
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 12.h),
+                    child: PackageCard(
+                      name: name,
+                      startDate: startDate,
+                      endDate: endDate,
+                    ),
+                  );
+                }),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -211,7 +217,7 @@ class MyPackagesView extends GetView<MyPackagesController> {
           ),
           SizedBox(height: 18.h),
           ElevatedButton(
-            onPressed: () => Get.toNamed(Routes.packages),
+            onPressed: () => context.push(Routes.packages),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF59E0B),
               elevation: 0,
@@ -428,7 +434,7 @@ class PackageCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: onRenew ?? () => Get.toNamed(Routes.packages),
+              onPressed: onRenew ?? () => context.push(Routes.packages),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFF59E0B),
                 elevation: 0,

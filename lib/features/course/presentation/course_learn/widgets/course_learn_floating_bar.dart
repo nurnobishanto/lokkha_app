@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-
 import 'package:lokkha/shared/models/course.dart';
 import 'course_module_learn_expansion.dart';
 
 class CourseLearnFloatingBar extends StatelessWidget {
   final BuildContext context;
   final Course course;
+  final void Function(int courseId, int? itemId)? onItemSelected;
 
   const CourseLearnFloatingBar({
     super.key,
     required this.context,
     required this.course,
+    this.onItemSelected,
   });
 
   @override
@@ -56,6 +57,7 @@ class CourseLearnFloatingBar extends StatelessWidget {
                               title: module.title ?? 'Untitled Module',
                               items: module.items ?? [],
                               isEnrolled: course.isEnrolled ?? false,
+                              onItemTap: onItemSelected,
                             )),
                     const SizedBox(height: 80),
                   ],
@@ -66,9 +68,9 @@ class CourseLearnFloatingBar extends StatelessWidget {
         );
       },
       icon: const Icon(Icons.menu_book, color: Colors.white),
-      label: Text(
+      label: const Text(
         "Module",
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white),
       ),
       backgroundColor: Colors.green,
     );

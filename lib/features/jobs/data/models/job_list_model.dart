@@ -23,6 +23,15 @@ class JobListModel {
         jobs: json["jobs"] == null ? null : Jobs.fromJson(json["jobs"]),
       );
 
+  JobListModel copyWith({
+    bool? status,
+    Jobs? jobs,
+  }) =>
+      JobListModel(
+        status: status ?? this.status,
+        jobs: jobs ?? this.jobs,
+      );
+
   Map<String, dynamic> toJson() => {
         "status": status,
         "jobs": jobs?.toJson(),
@@ -78,6 +87,37 @@ class Jobs {
         prevPageUrl: json["prev_page_url"],
         to: json["to"],
         total: json["total"],
+      );
+
+  Jobs copyWith({
+    int? currentPage,
+    List<Job>? data,
+    String? firstPageUrl,
+    int? from,
+    int? lastPage,
+    String? lastPageUrl,
+    List<Link>? links,
+    dynamic nextPageUrl,
+    String? path,
+    int? perPage,
+    dynamic prevPageUrl,
+    int? to,
+    int? total,
+  }) =>
+      Jobs(
+        currentPage: currentPage ?? this.currentPage,
+        data: data ?? this.data,
+        firstPageUrl: firstPageUrl ?? this.firstPageUrl,
+        from: from ?? this.from,
+        lastPage: lastPage ?? this.lastPage,
+        lastPageUrl: lastPageUrl ?? this.lastPageUrl,
+        links: links ?? this.links,
+        nextPageUrl: nextPageUrl ?? this.nextPageUrl,
+        path: path ?? this.path,
+        perPage: perPage ?? this.perPage,
+        prevPageUrl: prevPageUrl ?? this.prevPageUrl,
+        to: to ?? this.to,
+        total: total ?? this.total,
       );
 
   Map<String, dynamic> toJson() => {

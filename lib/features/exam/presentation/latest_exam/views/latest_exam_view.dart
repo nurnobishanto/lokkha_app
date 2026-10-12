@@ -1,51 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/core.dart';
-import 'package:lokkha/features/exam/presentation/latest_exam/views/latest_exam_start_view.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/core/utils/global.dart';
+import 'package:lokkha/features/exam/presentation/latest_exam/views/latest_exam_start_view.dart';
+import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
+import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/login_required_dialog.dart';
-import '../controllers/latest_exam_controller.dart';
 
-class LatestExamView extends GetView<LatestExamController> {
+class LatestExamView extends ConsumerWidget {
   const LatestExamView({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(LatestExamController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(latestExamNotifierProvider);
+    final examsList = state.model?.latestExams?.data ?? [];
+    final lastPage = state.model?.latestExams?.lastPage ?? 1;
+
     return Scaffold(
       backgroundColor: context.scaffoldBg,
       appBar: const CustomAppBar(title: 'সর্বশেষ নিয়োগ পরীক্ষা'),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else {
+      body: Builder(
+        builder: (context) {
+          if (state.isLoading && state.model == null) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView.separated(
-                itemCount: controller.model.value.latestExams!.data!.length + 1,
+                itemCount: examsList.length + 1,
                 itemBuilder: (c, index) {
-                  if (index ==
-                      controller.model.value.latestExams!.data!.length) {
-                    return (controller.model.value.latestExams!.lastPage! >
-                            controller.currentPage.value)
+                  if (index == examsList.length) {
+                    return (lastPage > state.currentPage)
                         ? Column(
                             children: [
                               const SizedBox(height: 5.0),
                               GestureDetector(
                                 onTap: () {
-                                  controller.fetchLatestExam(
-                                      page: controller.currentPage.value + 1);
+                                  ref
+                                      .read(latestExamNotifierProvider.notifier)
+                                      .fetchLatestExam(
+                                          page: state.currentPage + 1);
                                 },
                                 child: Container(
                                   height: 30,
-                                  width: Get.width / 2,
+                                  width:
+                                      MediaQuery.sizeOf(context).width / 2,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderRadius:
+                                        BorderRadius.circular(15.0),
                                     border: Border.all(
                                       color: LightThemeColors.primaryColor,
                                       width: 1,
@@ -66,10 +75,11 @@ class LatestExamView extends GetView<LatestExamController> {
                           )
                         : const SizedBox.shrink();
                   }
-                  final data = controller.model.value.latestExams?.data![index];
+
+                  final data = examsList[index];
                   return LatestExamCard(
-                    title: data?.title ?? '',
-                    date: data!.date,
+                    title: data.title ?? '',
+                    date: data.date,
                     onTap: () {
                       showDialog(
                         context: context,
@@ -95,8 +105,8 @@ class LatestExamView extends GetView<LatestExamController> {
               ),
             ),
           );
-        }
-      }),
+        },
+      ),
     );
   }
 }

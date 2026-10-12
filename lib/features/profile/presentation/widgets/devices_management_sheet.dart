@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/profile/profile.dart';
@@ -53,8 +52,9 @@ class _DevicesManagementSheetState extends State<DevicesManagementSheet> {
   }
 
   Future<void> _terminateDevice(DeviceSessionModel device) async {
-    final confirmed = await Get.dialog<bool>(
-      AlertDialog(
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
         backgroundColor: context.cardColor,
         title: Text(
           "ডিভাইস সেশন বন্ধ",
@@ -66,12 +66,12 @@ class _DevicesManagementSheetState extends State<DevicesManagementSheet> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(result: false),
+            onPressed: () => Navigator.of(ctx).pop(false),
             child: Text("বাতিল", style: TextStyle(color: context.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Get.back(result: true),
+            onPressed: () => Navigator.of(ctx).pop(true),
             child: const Text("বন্ধ করুন", style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -108,8 +108,9 @@ class _DevicesManagementSheetState extends State<DevicesManagementSheet> {
   }
 
   Future<void> _terminateOtherDevices() async {
-    final confirmed = await Get.dialog<bool>(
-      AlertDialog(
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
         backgroundColor: context.cardColor,
         title: Text(
           "অন্যান্য ডিভাইস লগআউট",
@@ -121,12 +122,12 @@ class _DevicesManagementSheetState extends State<DevicesManagementSheet> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(result: false),
+            onPressed: () => Navigator.of(ctx).pop(false),
             child: Text("না", style: TextStyle(color: context.textMuted)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => Get.back(result: true),
+            onPressed: () => Navigator.of(ctx).pop(true),
             child: const Text("লগআউট", style: TextStyle(color: Colors.white)),
           ),
         ],

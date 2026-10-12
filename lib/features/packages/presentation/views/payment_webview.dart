@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -19,6 +18,7 @@ class _PaymentWebViewState extends State<PaymentWebView> {
   late WebViewController webViewController;
   double _progress = 0;
   bool _isNavigating = false;
+
   @override
   void initState() {
     debugPrint("Payment url page:${widget.url}");
@@ -29,17 +29,24 @@ class _PaymentWebViewState extends State<PaymentWebView> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            // Convert 0–100 → 0.0–1.0
-            setState(() => _progress = progress / 100);
+            if (mounted) {
+              setState(() => _progress = progress / 100);
+            }
           },
           onPageStarted: (String url) {
-            setState(() => _progress = 0);
+            if (mounted) {
+              setState(() => _progress = 0);
+            }
           },
           onPageFinished: (String url) {
-            setState(() => _progress = 1);
+            if (mounted) {
+              setState(() => _progress = 1);
+            }
           },
           onWebResourceError: (WebResourceError error) {
-            setState(() => _progress = 1);
+            if (mounted) {
+              setState(() => _progress = 1);
+            }
           },
           onNavigationRequest: (NavigationRequest request) async {
             if (_isNavigating) {
@@ -49,26 +56,25 @@ class _PaymentWebViewState extends State<PaymentWebView> {
             if (request.url.contains('order-details')) {
               _isNavigating = true;
 
-              await Get.find<PremiumEntitlementService>()
-                  .refreshAfterPurchase();
+              try {
+                final entitlement = PremiumEntitlementService.to;
+                await entitlement.refreshAfterPurchase();
+              } catch (e) {
+                debugPrint("Entitlement refresh error: $e");
+              }
 
               AuthService().authCheck();
-              //Get.offAll(OrderDetailsScreen(url: request.url));
-              Get.to(SplashView());
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const SplashView()),
+                  (route) => false,
+                );
+              }
               return NavigationDecision.prevent;
             }
 
             return NavigationDecision.navigate;
           },
-          // onNavigationRequest: (NavigationRequest request) {
-          //   if (request.url.contains('order-details')) {
-          //     Get.find<PremiumEntitlementService>().refreshAfterPurchase();
-          //     Get.off(OrderDetailsScreen(url: request.url));
-          //   } else if (request.url.startsWith("https://youtube.com")) {
-          //     return NavigationDecision.prevent;
-          //   }
-          //   return NavigationDecision.navigate;
-          // },
         ),
       )
       ..loadRequest(Uri.parse(widget.url.toString()));

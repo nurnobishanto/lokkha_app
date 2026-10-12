@@ -24,11 +24,3 @@ export 'presentation/sign_up/views/sign_up_view.dart';
 export 'presentation/verify_otp/views/verify_otp_view.dart';
 export 'presentation/forget_password/views/forget_password_view.dart';
 export 'presentation/terms_condition/views/terms_condition_view.dart';
-
-// Backward-compatible GetX Bindings & Controllers
-export 'presentation/auth_gateway/bindings/auth_gateway_binding.dart';
-export 'presentation/auth_gateway/controllers/auth_gateway_controller.dart';
-export 'presentation/forget_password/bindings/forget_password_binding.dart';
-export 'presentation/forget_password/controllers/forget_password_controller.dart';
-export 'presentation/terms_condition/bindings/terms_condition_binding.dart';
-export 'presentation/terms_condition/controllers/terms_condition_controller.dart';

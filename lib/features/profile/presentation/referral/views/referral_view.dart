@@ -1,35 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import '../controllers/referral_controller.dart';
+import '../controllers/referral_notifier.dart';
 
-class ReferralView extends GetView<ReferralController> {
+class ReferralView extends ConsumerWidget {
   const ReferralView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(referralNotifierProvider);
+    final notifier = ref.read(referralNotifierProvider.notifier);
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
         title: 'আমার রেফারেল',
         centerTitle: true,
       ),
-      body: Obx(() {
-        if (!isLoggedIn.value) {
-          return const AuthGatewayView();
-        }
+      body: Builder(
+        builder: (context) {
+          if (!isLoggedIn.value) {
+            return const AuthGatewayView();
+          }
 
-        final code = controller.referralCode.value;
-        final link = controller.referralLink.value;
-        final totalInvited = controller.totalInvited.value;
-        final earnedPoints = controller.earnedPoints.value;
-        final successful = controller.successfulReferrals.value;
-        final users = controller.referredUsers;
+          final code = state.referralCode;
+          final link = state.referralLink;
+          final totalInvited = state.totalInvited;
+          final earnedPoints = state.earnedPoints;
+          final successful = state.successfulReferrals;
+          final users = state.referredUsers;
 
         return ListView(
           physics: const BouncingScrollPhysics(),
@@ -59,7 +63,7 @@ class ReferralView extends GetView<ReferralController> {
                     children: [
                       // Back Button
                       InkWell(
-                        onTap: () => Get.back(),
+                        onTap: () => Navigator.of(context).pop(),
                         borderRadius: BorderRadius.circular(20.r),
                         child: Container(
                           width: 36.r,
@@ -224,7 +228,7 @@ class ReferralView extends GetView<ReferralController> {
                     children: [
                       // Referral Code Badge
                       InkWell(
-                        onTap: controller.copyReferralCode,
+                        onTap: notifier.copyReferralCode,
                         borderRadius: BorderRadius.circular(10.r),
                         child: Container(
                           padding: EdgeInsets.symmetric(
@@ -317,7 +321,7 @@ class ReferralView extends GetView<ReferralController> {
                         ),
                         SizedBox(width: 8.w),
                         InkWell(
-                          onTap: controller.copyReferralLink,
+                          onTap: notifier.copyReferralLink,
                           borderRadius: BorderRadius.circular(10.r),
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -374,7 +378,7 @@ class ReferralView extends GetView<ReferralController> {
                           size: 16,
                         ),
                         bgColor: const Color(0xFF25D366),
-                        onTap: controller.shareWhatsApp,
+                        onTap: notifier.shareWhatsApp,
                       ),
                       SizedBox(width: 10.w),
                       _buildSocialBtn(
@@ -384,7 +388,7 @@ class ReferralView extends GetView<ReferralController> {
                           size: 15,
                         ),
                         bgColor: const Color(0xFF1877F2),
-                        onTap: controller.shareFacebook,
+                        onTap: notifier.shareFacebook,
                       ),
                       SizedBox(width: 10.w),
                       _buildSocialBtn(
@@ -394,7 +398,7 @@ class ReferralView extends GetView<ReferralController> {
                           size: 15,
                         ),
                         bgColor: const Color(0xFF229ED9),
-                        onTap: controller.shareTelegram,
+                        onTap: notifier.shareTelegram,
                       ),
                     ],
                   ),
@@ -457,8 +461,9 @@ class ReferralView extends GetView<ReferralController> {
               ...users.map((u) => _buildReferredUserCard(u, context)),
           ],
         );
-      }),
-    );
+      },
+    ),
+  );
   }
 
   // ---------------------------------------------------------------------------

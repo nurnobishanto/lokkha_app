@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 
 class CustomDropdownButton extends StatelessWidget {
@@ -17,7 +16,7 @@ class CustomDropdownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.height / 20.0,
+      height: MediaQuery.sizeOf(context).height / 20.0,
       decoration: BoxDecoration(
         color: context.cardColor,
         border: Border.all(

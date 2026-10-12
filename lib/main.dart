@@ -47,11 +47,11 @@ Future<void> main() async {
     debugPrint("Fetch app version failed: $e");
   }
 
-  // Initialize core app bindings
+  // Initialize core app services
   try {
-    InitialBindings().dependencies();
+    AppLifecycleService.init();
   } catch (e) {
-    debugPrint("Bindings setup failed: $e");
+    debugPrint("Services setup failed: $e");
   }
 
   runApp(

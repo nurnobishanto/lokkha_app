@@ -1,138 +1,156 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/app/router/router.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("Build Drawer///");
+    final isAuth = isLoggedIn.value;
+
     return Drawer(
       backgroundColor: Theme.of(context).cardColor,
-      child: Column(
-        children: <Widget>[
-          /// Reduced height for Drawer Header
-          70.h.height,
-          Image.asset(
-            AssetImagePaths.appIcon,
-            height: 100,
-          ),
-
-          20.h.height,
-
-          /// Drawer Items (standard)
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.info_outline,
-                color: LightThemeColors.primaryColor, size: 20),
-            title:
-                const Text('আমাদের সম্পর্কে', style: TextStyle(fontSize: 14)),
-            onTap: () {
-              Get.to(
-                BaseWebView(title: "আমাদের সম্পর্কে", url: AppConstants.about),
-              );
-            },
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.share,
-                color: LightThemeColors.primaryColor, size: 20),
-            title: const Text(
-              'শেয়ার',
-              style: TextStyle(fontSize: 14),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.0.w)
+            .copyWith(bottom: 20.0.h),
+        child: Column(
+          children: <Widget>[
+            /// Reduced height for Drawer Header
+            70.h.height,
+            Image.asset(
+              AssetImagePaths.appIcon,
+              height: 100,
             ),
-            onTap: () {
-              if (Platform.isAndroid) {
-                SharePlus.instance.share(
-                  ShareParams(
-                      text:
-                          "https://play.google.com/store/apps/details?id=$appPackage"),
+
+            20.h.height,
+
+            /// Drawer Items (standard)
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.info_outline,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title:
+                  const Text('আমাদের সম্পর্কে', style: TextStyle(fontSize: 14)),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BaseWebView(
+                        title: "আমাদের সম্পর্কে", url: AppConstants.about),
+                  ),
                 );
-              } else if (Platform.isIOS) {
-                SharePlus.instance.share(
-                  ShareParams(
-                      text:
-                          "https://apps.apple.com/us/app/app name/id6670564455"),
+              },
+            ),
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.share,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title: const Text(
+                'শেয়ার',
+                style: TextStyle(fontSize: 14),
+              ),
+              onTap: () {
+                if (Platform.isAndroid) {
+                  SharePlus.instance.share(
+                    ShareParams(
+                        text:
+                            "https://play.google.com/store/apps/details?id=$appPackage"),
+                  );
+                } else if (Platform.isIOS) {
+                  SharePlus.instance.share(
+                    ShareParams(
+                        text:
+                            "https://apps.apple.com/us/app/app name/id6670564455"),
+                  );
+                }
+              },
+            ),
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.headset_mic,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title:
+                  const Text('কাস্টমার সাপোর্ট', style: TextStyle(fontSize: 14)),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerSupportView(),
+                  ),
                 );
-              }
-            },
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+              },
+            ),
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.security,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title:
+                  const Text('প্রাইভেসি পলিসি', style: TextStyle(fontSize: 14)),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BaseWebView(
+                      title: "প্রাইভেসি পলিসি", url: AppConstants.privacyPolicy),
+                ),
+              ),
+            ),
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
 
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.headset_mic,
-                color: LightThemeColors.primaryColor, size: 20),
-            title:
-                const Text('কাস্টমার সাপোর্ট', style: TextStyle(fontSize: 14)),
-            onTap: () {
-              Get.to(const CustomerSupportView());
-            },
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.security,
-                color: LightThemeColors.primaryColor, size: 20),
-            title:
-                const Text('প্রাইভেসি পলিসি', style: TextStyle(fontSize: 14)),
-            onTap: () => Get.to(
-              () => BaseWebView(
-                  title: "প্রাইভেসি পলিসি", url: AppConstants.privacyPolicy),
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.payments,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title: const Text('রিফান্ড পলিসি', style: TextStyle(fontSize: 14)),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BaseWebView(
+                      title: "রিফান্ড পলিসি", url: AppConstants.refundPolicy),
+                ),
+              ),
             ),
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.payments,
-                color: LightThemeColors.primaryColor, size: 20),
-            title: const Text('রিফান্ড পলিসি', style: TextStyle(fontSize: 14)),
-            onTap: () => Get.to(
-              () => BaseWebView(
-                  title: "রিফান্ড পলিসি", url: AppConstants.refundPolicy),
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.emoji_events,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title: const Text('কন্টেস্ট পলিসি', style: TextStyle(fontSize: 14)),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BaseWebView(
+                      title: "কন্টেস্ট পলিসি", url: AppConstants.contestPolicy),
+                ),
+              ),
             ),
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.emoji_events,
-                color: LightThemeColors.primaryColor, size: 20),
-            title: const Text('কন্টেস্ট পলিসি', style: TextStyle(fontSize: 14)),
-            onTap: () => Get.to(
-              () => BaseWebView(
-                  title: "কন্টেস্ট পলিসি", url: AppConstants.contestPolicy),
+            const Divider(height: .7, color: LightThemeColors.primaryColor),
+            ListTile(
+              visualDensity: VisualDensity.standard,
+              leading: const Icon(Icons.description,
+                  color: LightThemeColors.primaryColor, size: 20),
+              title: const Text('টার্মস এন্ড কন্ডিশন',
+                  style: TextStyle(fontSize: 14)),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BaseWebView(
+                      title: "টার্মস এন্ড কন্ডিশন", url: AppConstants.termsPolicy),
+                ),
+              ),
             ),
-          ),
-          const Divider(height: .7, color: LightThemeColors.primaryColor),
-          ListTile(
-            visualDensity: VisualDensity.standard,
-            leading: const Icon(Icons.description,
-                color: LightThemeColors.primaryColor, size: 20),
-            title: const Text('টার্মস এন্ড কন্ডিশন',
-                style: TextStyle(fontSize: 14)),
-            onTap: () => Get.to(
-              () => BaseWebView(
-                  title: "টার্মস এন্ড কন্ডিশন", url: AppConstants.termsPolicy),
-            ),
-          ),
-          const Divider(height: 0.5, color: LightThemeColors.primaryColor),
-          Obx(() {
-            if (isLoggedIn.value) {
-              return Column(
+            const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+            if (isAuth)
+              Column(
                 children: [
                   ListTile(
                     visualDensity: VisualDensity.standard,
@@ -147,15 +165,16 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      Get.back();
+                      Navigator.of(context).pop();
                       AuthService.confirmAndLogout();
                     },
                   ),
-                  const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+                  const Divider(
+                      height: 0.5, color: LightThemeColors.primaryColor),
                 ],
-              );
-            } else {
-              return Column(
+              )
+            else
+              Column(
                 children: [
                   ListTile(
                     visualDensity: VisualDensity.standard,
@@ -170,44 +189,40 @@ class CustomDrawer extends StatelessWidget {
                       ),
                     ),
                     onTap: () {
-                      Get.back();
-                      Get.toNamed(Routes.authGateway);
+                      Navigator.of(context).pop();
+                      context.pushNamed(Routes.authGateway);
                     },
                   ),
-                  const Divider(height: 0.5, color: LightThemeColors.primaryColor),
+                  const Divider(
+                      height: 0.5, color: LightThemeColors.primaryColor),
                 ],
-              );
-            }
-          }),
-          15.h.height,
-          const Spacer(),
+              ),
+            15.h.height,
+            const Spacer(),
 
-          /// App Version (standard)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0),
-            child: Center(
-              child: Text(
-                '© 2025 Lokkha. All rights reserved.',
-                style: AppTextStyles.body1.copyWith(fontSize: 11),
+            /// App Version (standard)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0),
+              child: Center(
+                child: Text(
+                  '© 2025 Lokkha. All rights reserved.',
+                  style: AppTextStyles.body1.copyWith(fontSize: 11),
+                ),
               ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 1),
-            child: Center(
-              child: Obx(
-                () => Text(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 1),
+              child: Center(
+                child: Text(
                   'অ্যাপ ভার্শন: ${appVersion.value.isNotEmpty ? appVersion.value : ''}',
                   style: AppTextStyles.body1.copyWith(fontSize: 11),
                 ),
               ),
             ),
-          ),
-        ],
-      )
-          .paddingSymmetric(horizontal: 10.0.w)
-          .paddingOnly(bottom: 20.0.h), // Reduced horizontal padding
+          ],
+        ),
+      ),
     );
   }
 }

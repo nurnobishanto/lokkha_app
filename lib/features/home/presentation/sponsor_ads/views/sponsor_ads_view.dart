@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:lokkha/core/compat/get_compat.dart';
-
-import '../controllers/sponsor_ads_controller.dart';
-
-class SponsorAdsView extends GetView<SponsorAdsController> {
+class SponsorAdsView extends StatelessWidget {
   const SponsorAdsView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

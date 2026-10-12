@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/auth/auth.dart';
@@ -11,14 +12,20 @@ import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
-import '../controllers/settings_controller.dart';
+import '../providers/settings_notifier.dart';
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final SettingsController controller = Get.put(SettingsController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (!isLoggedIn.value) {
+      return const Scaffold(body: AuthGatewayView());
+    }
+
+    final state = ref.watch(settingsNotifierProvider);
+    final notifier = ref.read(settingsNotifierProvider.notifier);
+    final user = state.currentUser;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -26,69 +33,61 @@ class SettingsView extends StatelessWidget {
         title: 'সেটিংস',
         centerTitle: true,
       ),
-      body: Obx(() {
-        if (!isLoggedIn.value) {
-          return const AuthGatewayView();
-        }
+      body: RefreshIndicator(
+        onRefresh: notifier.refreshSettings,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. MINI USER PROFILE HEADER
+              _buildUserProfileBanner(context, user),
 
-        final user = controller.currentUser.value;
+              SizedBox(height: 18.h),
 
-        return RefreshIndicator(
-          onRefresh: controller.refreshSettings,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(
-              parent: BouncingScrollPhysics(),
-            ),
-            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 1. MINI USER PROFILE HEADER
-                _buildUserProfileBanner(context, user),
+              // 2. MODULE: DEVICE & SESSION MANAGEMENT (API: /api/v1/user/devices)
+              _buildDeviceManagementModule(context, state, notifier),
 
-                SizedBox(height: 18.h),
+              SizedBox(height: 20.h),
 
-                // 2. MODULE: DEVICE & SESSION MANAGEMENT (API: /api/v1/user/devices)
-                _buildDeviceManagementModule(context, controller),
+              // 3. MODULE: SECURITY & PASSWORD
+              _buildSecurityModule(context),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-                // 3. MODULE: SECURITY & PASSWORD
-                _buildSecurityModule(context),
+              // 4. MODULE: DISPLAY & PREFERENCES
+              _buildPreferencesModule(context),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-                // 4. MODULE: DISPLAY & PREFERENCES
-                _buildPreferencesModule(context),
+              // 5. MODULE: SUPPORT & LEGAL
+              _buildSupportAndLegalModule(context),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-                // 5. MODULE: SUPPORT & LEGAL
-                _buildSupportAndLegalModule(context),
+              // 6. MODULE: ACCOUNT CONTROL (DANGER ZONE)
+              _buildAccountControlModule(context),
 
-                SizedBox(height: 20.h),
+              SizedBox(height: 14.h),
 
-                // 6. MODULE: ACCOUNT CONTROL (DANGER ZONE)
-                _buildAccountControlModule(context),
-
-                SizedBox(height: 14.h),
-
-                // App Version Footer
-                Center(
-                  child: Text(
-                    "লক্ষা অ্যাপ v1.0.0 • সকল স্বত্ব সংরক্ষিত",
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      color: context.textMuted,
-                      fontWeight: FontWeight.w500,
-                    ),
+              // App Version Footer
+              Center(
+                child: Text(
+                  "লক্ষা অ্যাপ v1.0.0 • সকল স্বত্ব সংরক্ষিত",
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: context.textMuted,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        );
-      }),
+        ),
+      ),
     );
   }
 
@@ -191,7 +190,7 @@ class SettingsView extends StatelessWidget {
 
           // Edit profile button
           InkWell(
-            onTap: () => Get.toNamed(Routes.profileUpdate),
+            onTap: () => context.pushNamed(Routes.profileUpdate),
             borderRadius: BorderRadius.circular(10.r),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.h),
@@ -222,13 +221,14 @@ class SettingsView extends StatelessWidget {
   }
 
   // ---------------------------------------------------------------------------
-  // 2. DEVICE & SESSION MANAGEMENT MODULE (API: /api/v1/user/devices)
+  // 2. DEVICE & SESSION MANAGEMENT MODULE
   // ---------------------------------------------------------------------------
   Widget _buildDeviceManagementModule(
     BuildContext context,
-    SettingsController controller,
+    SettingsState state,
+    SettingsNotifier notifier,
   ) {
-    final devicesData = controller.userDevices.value;
+    final devicesData = state.userDevices;
     final activeCount = devicesData?.activeCount ?? 0;
     final maxAllowed = devicesData?.maxAllowed ?? 3;
     final devices = devicesData?.activeDevices ?? [];
@@ -311,7 +311,7 @@ class SettingsView extends StatelessWidget {
 
           SizedBox(height: 12.h),
 
-          // Policy Info Card (Max 3: 1 Android, 1 iOS, 1 Windows)
+          // Policy Info Card
           Container(
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
@@ -385,7 +385,7 @@ class SettingsView extends StatelessWidget {
           SizedBox(height: 14.h),
 
           // Devices List
-          if (controller.isLoadingDevices.value) ...[
+          if (state.isLoadingDevices) ...[
             Padding(
               padding: EdgeInsets.symmetric(vertical: 24.h),
               child: const Center(child: CircularProgressIndicator()),
@@ -408,18 +408,18 @@ class SettingsView extends StatelessWidget {
               separatorBuilder: (_, __) => SizedBox(height: 10.h),
               itemBuilder: (context, index) {
                 final device = devices[index];
-                return _buildDeviceCard(context, controller, device);
+                return _buildDeviceCard(context, state, notifier, device);
               },
             ),
           ],
 
-          // Logout all other devices action button (if more than 1 device)
+          // Logout all other devices action button
           if (devices.length > 1) ...[
             SizedBox(height: 14.h),
             InkWell(
-              onTap: controller.isLoggingOutOthers.value
+              onTap: state.isLoggingOutOthers
                   ? null
-                  : () => controller.logoutOtherDevices(context),
+                  : () => notifier.logoutOtherDevices(context),
               borderRadius: BorderRadius.circular(12.r),
               child: Container(
                 width: double.infinity,
@@ -438,7 +438,7 @@ class SettingsView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (controller.isLoggingOutOthers.value)
+                    if (state.isLoggingOutOthers)
                       SizedBox(
                         width: 16.r,
                         height: 16.r,
@@ -525,10 +525,11 @@ class SettingsView extends StatelessWidget {
 
   Widget _buildDeviceCard(
     BuildContext context,
-    SettingsController controller,
+    SettingsState state,
+    SettingsNotifier notifier,
     DeviceSessionModel device,
   ) {
-    final isTerminating = controller.terminatingDeviceId.value == device.id;
+    final isTerminating = state.terminatingDeviceId == device.id;
 
     IconData platformIcon = Icons.devices_other_rounded;
     Color iconColor = const Color(0xFF059669);
@@ -647,7 +648,7 @@ class SettingsView extends StatelessWidget {
             InkWell(
               onTap: isTerminating
                   ? null
-                  : () => controller.terminateDevice(context, device),
+                  : () => notifier.terminateDevice(context, device),
               borderRadius: BorderRadius.circular(8.r),
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 6.h),
@@ -737,7 +738,7 @@ class SettingsView extends StatelessWidget {
           iconBg: const Color(0xFFFFFBEB),
           title: "নোটিফিকেশন",
           subtitle: "পরীক্ষা ও লাইভ ইভেন্টের নোটিফিকেশন দেখুন",
-          onTap: () => Get.toNamed(Routes.notifications),
+          onTap: () => context.pushNamed(Routes.notifications),
         ),
       ],
     );
@@ -759,7 +760,11 @@ class SettingsView extends StatelessWidget {
           iconBg: const Color(0xFFECFDF5),
           title: "সাহায্য ও কাস্টমার সাপোর্ট",
           subtitle: "যেকোনো সমস্যা বা সহায়তায় সরাসরি যোগাযোগ",
-          onTap: () => Get.to(const CustomerSupportView()),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const CustomerSupportView(),
+            ),
+          ),
         ),
         const Divider(height: 0, indent: 56),
         _buildListTile(
@@ -769,7 +774,7 @@ class SettingsView extends StatelessWidget {
           iconBg: const Color(0xFFEEF2FF),
           title: "শর্তাবলী ও নীতিমালা",
           subtitle: "ব্যবহারের নিয়মাবলী এবং পলিসি পড়ুন",
-          onTap: () => Get.toNamed(Routes.termsCondition),
+          onTap: () => context.pushNamed(Routes.termsCondition),
         ),
         const Divider(height: 0, indent: 56),
         _buildListTile(
@@ -803,17 +808,35 @@ class SettingsView extends StatelessWidget {
           subtitle: "অ্যাকাউন্ট সম্পূর্ণভাবে মুছে ফেলার অনুরোধ জানান",
           titleColor: Colors.red.shade700,
           onTap: () {
-            Get.defaultDialog(
-              title: "অ্যাকাউন্ট ডিলিট",
-              middleText: "অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলতে আমাদের কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।",
-              textConfirm: "যোগাযোগ করুন",
-              textCancel: "বাতিল",
-              confirmTextColor: Colors.white,
-              buttonColor: Colors.red,
-              onConfirm: () {
-                Get.back();
-                Get.to(const CustomerSupportView());
-              },
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text("অ্যাকাউন্ট ডিলিট"),
+                content: const Text(
+                  "অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলতে আমাদের কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।",
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text("বাতিল"),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CustomerSupportView(),
+                        ),
+                      );
+                    },
+                    child: const Text("যোগাযোগ করুন"),
+                  ),
+                ],
+              ),
             );
           },
         ),

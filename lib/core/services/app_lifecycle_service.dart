@@ -1,8 +1,5 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-
 import 'premium_entitlement_service.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
@@ -13,12 +10,16 @@ import 'premium_entitlement_service.dart';
 ///
 /// Responsibilities:
 ///  - Re-validate premium entitlement on app resume
-///  - Trigger app-update/maintenance check on app resume
 /// ─────────────────────────────────────────────────────────────────────────────
-class AppLifecycleService extends GetxService with WidgetsBindingObserver {
-  @override
-  void onInit() {
-    super.onInit();
+class AppLifecycleService with WidgetsBindingObserver {
+  static final AppLifecycleService instance = AppLifecycleService._();
+  AppLifecycleService._();
+
+  static void init() {
+    instance._init();
+  }
+
+  void _init() {
     WidgetsBinding.instance.addObserver(this);
     log('AppLifecycleService initialized');
   }
@@ -27,15 +28,11 @@ class AppLifecycleService extends GetxService with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       log('📱 App resumed — re-validating entitlement');
-      // Re-validate premium entitlement when user returns to app.
-      // This catches cases where the package expired while app was backgrounded.
-      Get.find<PremiumEntitlementService>().validateEntitlement();
+      PremiumEntitlementService.to.validateEntitlement();
     }
   }
 
-  @override
-  void onClose() {
+  void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    super.onClose();
   }
 }

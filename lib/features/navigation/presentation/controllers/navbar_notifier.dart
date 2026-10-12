@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
@@ -11,7 +10,6 @@ import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/navigation/data/models/profile_data_model.dart';
-import 'package:lokkha/features/navigation/presentation/controllers/navbar_controller.dart';
 import 'package:lokkha/shared/models/user.dart';
 
 class NavbarState {
@@ -53,11 +51,9 @@ class NavbarNotifier extends Notifier<NavbarState> {
 
   void changeIndex(int index) {
     state = state.copyWith(currentIndex: index);
-    if (Get.isRegistered<NavbarController>()) {
-      Get.find<NavbarController>().currentIndex = index;
-      Get.find<NavbarController>().update();
-    }
   }
+
+  Future<void> fetchProfileInfo() => getMeProfileInfo();
 
   Future<void> getMeProfileInfo() async {
     debugPrint("Called Get Me Profile Information (Riverpod)");
@@ -84,13 +80,6 @@ class NavbarNotifier extends Notifier<NavbarState> {
             isLoggedIn: true,
             profileStatus: ApiCallStatus.success,
           );
-
-          if (Get.isRegistered<NavbarController>()) {
-            final getController = Get.find<NavbarController>();
-            getController.profileDataModel.value = profile;
-            getController.getProfileApiStatus.value = ApiCallStatus.success;
-            getController.update();
-          }
 
           debugPrint("✅ Profile Data fetch Success: ${myUser.name}");
           return;
@@ -121,10 +110,6 @@ class NavbarNotifier extends Notifier<NavbarState> {
       isLoggedIn: false,
       profileStatus: ApiCallStatus.holding,
     );
-
-    if (Get.isRegistered<NavbarController>()) {
-      Get.find<NavbarController>().clearProfileState();
-    }
   }
 }
 

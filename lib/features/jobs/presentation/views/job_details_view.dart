@@ -1,24 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-
 import 'package:lokkha/core/utils/date_formatter.dart';
+import '../providers/jobs_notifier.dart';
 
-class JobDetailsScreen extends StatelessWidget {
+class JobDetailsScreen extends ConsumerWidget {
   final int id;
-  JobDetailsScreen({super.key, required this.id});
-  final JobsController controller = Get.put(JobsController());
+  const JobDetailsScreen({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.getSingleJob(id);
-    });
-
+  Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("govJob Id: $id ");
+    final state = ref.watch(jobDetailsNotifierProvider(id));
 
     return Scaffold(
       backgroundColor: context.scaffoldBg,
@@ -28,16 +24,21 @@ class JobDetailsScreen extends StatelessWidget {
           style: AppTextStyles.heading4.copyWith(color: Colors.white),
         ),
       ),
-      body: Obx(
-        () {
-          if (controller.isLoading.value) {
+      body: Builder(
+        builder: (context) {
+          if (state.isLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final jobData = controller.detailsModel.value;
-          // Check if deadline is over
+          final jobData = state.job;
+          if (jobData == null) {
+            return Center(
+              child: Text(state.error ?? "তথ্য পাওয়া যায়নি"),
+            );
+          }
+
           final isDeadlineOver = jobData.deadline != null &&
               DateTime.now().isAfter(jobData.deadline!);
 
@@ -56,7 +57,9 @@ class JobDetailsScreen extends StatelessWidget {
                             : context.cardColor,
                         border: Border.all(
                           color: isDeadlineOver
-                              ? (context.isDark ? const Color(0xFFF43F5E) : Colors.red)
+                              ? (context.isDark
+                                  ? const Color(0xFFF43F5E)
+                                  : Colors.red)
                               : context.borderColor,
                           width: 1.5,
                         ),
@@ -73,10 +76,12 @@ class JobDetailsScreen extends StatelessWidget {
                                 Expanded(
                                   flex: 5,
                                   child: Text(
-                                    (jobData.title != null && jobData.title!.trim().isNotEmpty)
+                                    (jobData.title != null &&
+                                            jobData.title!.trim().isNotEmpty)
                                         ? jobData.title!.trim()
                                         : (jobData.companyName ?? ''),
-                                    style: AppTextStyles.heading5.copyWith(color: context.textPrimary),
+                                    style: AppTextStyles.heading5
+                                        .copyWith(color: context.textPrimary),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -85,11 +90,13 @@ class JobDetailsScreen extends StatelessWidget {
                             ),
                             if (jobData.companyName != null &&
                                 jobData.companyName!.trim().isNotEmpty &&
-                                jobData.companyName!.trim() != jobData.title?.trim()) ...[
+                                jobData.companyName!.trim() !=
+                                    jobData.title?.trim()) ...[
                               const SizedBox(height: 2.0),
                               Text(
                                 "প্রতিষ্ঠান: ${jobData.companyName!.trim()}",
-                                style: AppTextStyles.heading6.copyWith(color: context.primaryColor),
+                                style: AppTextStyles.heading6
+                                    .copyWith(color: context.primaryColor),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -97,7 +104,8 @@ class JobDetailsScreen extends StatelessWidget {
                             const SizedBox(height: 2.0),
                             Text(
                               "প্রকাশিত: ${DateFormatter.formatJobDeadline(jobData.createdAt)}",
-                              style: AppTextStyles.heading5.copyWith(color: context.textSecondary),
+                              style: AppTextStyles.heading5
+                                  .copyWith(color: context.textSecondary),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -106,7 +114,9 @@ class JobDetailsScreen extends StatelessWidget {
                               "আবেদনের শেষ তারিখ: ${DateFormatter.formatJobDeadline(jobData.deadline)}",
                               style: AppTextStyles.heading5.copyWith(
                                 color: isDeadlineOver
-                                    ? (context.isDark ? const Color(0xFFFDA4AF) : Colors.red.shade700)
+                                    ? (context.isDark
+                                        ? const Color(0xFFFDA4AF)
+                                        : Colors.red.shade700)
                                     : context.textPrimary,
                               ),
                               maxLines: 2,
@@ -115,39 +125,45 @@ class JobDetailsScreen extends StatelessWidget {
                             const SizedBox(height: 5.0),
                             Text(
                               "সোর্স: ${jobData.source ?? ''}",
-                              style: AppTextStyles.heading5.copyWith(color: context.textSecondary),
+                              style: AppTextStyles.heading5
+                                  .copyWith(color: context.textSecondary),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 10.0),
 
                             // PDF or Image Viewer
-                            jobData.sourceFile!.contains("pdf")
-                                ? SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.6,
-                                    child: SfPdfViewer.network(
-                                      getFullUrl(jobData.sourceFile),
-                                    ))
-                                : SizedBox(
-                                    width: double.infinity,
-                                    child: InteractiveViewer(
-                                      panEnabled: true,
-                                      minScale: 0.5,
-                                      maxScale: 4.5,
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            "${AppConstants.storageUrl}${jobData.sourceFile.toString()}",
-                                        fit: BoxFit.fitHeight,
-                                        placeholder: (context, url) =>
-                                            const Center(
-                                                child:
-                                                    CircularProgressIndicator()),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
+                            if (jobData.sourceFile != null &&
+                                jobData.sourceFile!.isNotEmpty)
+                              jobData.sourceFile!.contains("pdf")
+                                  ? SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.6,
+                                      child: SfPdfViewer.network(
+                                        "${AppConstants.storageUrl}${jobData.sourceFile}",
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      width: double.infinity,
+                                      child: InteractiveViewer(
+                                        panEnabled: true,
+                                        minScale: 0.5,
+                                        maxScale: 4.5,
+                                        child: CachedNetworkImage(
+                                          imageUrl:
+                                              "${AppConstants.storageUrl}${jobData.sourceFile.toString()}",
+                                          fit: BoxFit.fitHeight,
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                            child:
+                                                CircularProgressIndicator(),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                        ),
                                       ),
                                     ),
-                                  ),
                           ],
                         ),
                       ),

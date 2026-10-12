@@ -1,23 +1,70 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../controllers/my_orders_controller.dart';
+import '../controllers/my_orders_notifier.dart';
 import 'order_details_view.dart';
 
-class MyOrdersView extends GetView<MyOrdersController> {
+class MyOrdersView extends ConsumerStatefulWidget {
   const MyOrdersView({super.key});
 
   @override
+  ConsumerState<MyOrdersView> createState() => _MyOrdersViewState();
+}
+
+class _MyOrdersViewState extends ConsumerState<MyOrdersView> {
+  late final TextEditingController _searchController;
+  late final ScrollController _scrollController;
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final state = ref.read(myOrdersNotifierProvider);
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        state.hasMore &&
+        !state.isLoadingMore &&
+        state.apiCallStatus == ApiCallStatus.success) {
+      ref.read(myOrdersNotifierProvider.notifier).loadMore();
+    }
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      ref.read(myOrdersNotifierProvider.notifier).setSearchQuery(query);
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    ref.read(myOrdersNotifierProvider.notifier).clearSearch();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Ensure controller is registered
-    final MyOrdersController controller = Get.isRegistered<MyOrdersController>()
-        ? Get.find<MyOrdersController>()
-        : Get.put(MyOrdersController());
+    final state = ref.watch(myOrdersNotifierProvider);
+    final notifier = ref.read(myOrdersNotifierProvider.notifier);
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
@@ -26,58 +73,63 @@ class MyOrdersView extends GetView<MyOrdersController> {
         child: Column(
           children: [
             // Search & Filter Header
-            _buildSearchAndFilters(context, controller),
+            _buildSearchAndFilters(context, state, notifier),
 
             // Orders List
             Expanded(
-              child: Obx(() {
-                final status = controller.apiCallStatus.value;
+              child: Builder(
+                builder: (context) {
+                  final status = state.apiCallStatus;
 
-                if (status == ApiCallStatus.loading && controller.orders.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                  if (status == ApiCallStatus.loading && state.orders.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (status == ApiCallStatus.error && controller.orders.isEmpty) {
-                  return _buildErrorState(context, controller);
-                }
+                  if (status == ApiCallStatus.error && state.orders.isEmpty) {
+                    return _buildErrorState(context, notifier);
+                  }
 
-                if (controller.orders.isEmpty) {
-                  return _buildEmptyState(context, controller);
-                }
+                  if (state.orders.isEmpty) {
+                    return _buildEmptyState(context, state, notifier);
+                  }
 
-                return RefreshIndicator(
-                  onRefresh: () => controller.fetchOrders(refresh: true),
-                  child: ListView.separated(
-                    controller: controller.scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    itemCount: controller.orders.length +
-                        (controller.hasMore.value ? 1 : 0),
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      if (index == controller.orders.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20),
-                          child: Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                  return RefreshIndicator(
+                    onRefresh: () => notifier.fetchOrders(refresh: true),
+                    child: ListView.separated(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      itemCount: state.orders.length + (state.hasMore ? 1 : 0),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        if (index == state.orders.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            child: Center(
+                              child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
                             ),
-                          ),
-                        );
-                      }
+                          );
+                        }
 
-                      final order = controller.orders[index];
-                      return OrderCardV1(
-                        order: order,
-                        onTap: () {
-                          Get.to(() => OrderDetailsScreen(orderId: order.id));
-                        },
-                      );
-                    },
-                  ),
-                );
-              }),
+                        final order = state.orders[index];
+                        return OrderCardV1(
+                          order: order,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => OrderDetailsScreen(orderId: order.id),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -87,7 +139,10 @@ class MyOrdersView extends GetView<MyOrdersController> {
 
   /// Search bar and category filter chips
   Widget _buildSearchAndFilters(
-      BuildContext context, MyOrdersController controller) {
+    BuildContext context,
+    MyOrdersState state,
+    MyOrdersNotifier notifier,
+  ) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       decoration: BoxDecoration(
@@ -114,8 +169,8 @@ class MyOrdersView extends GetView<MyOrdersController> {
               ),
             ),
             child: TextField(
-              controller: controller.searchController,
-              onChanged: controller.onSearchChanged,
+              controller: _searchController,
+              onChanged: _onSearchChanged,
               style: TextStyle(
                 color: context.textPrimary,
                 fontSize: 14,
@@ -131,19 +186,16 @@ class MyOrdersView extends GetView<MyOrdersController> {
                   color: context.textMuted,
                   size: 20,
                 ),
-                suffixIcon: Obx(() {
-                  if (controller.searchQuery.value.isNotEmpty) {
-                    return IconButton(
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: context.textMuted,
-                        size: 18,
-                      ),
-                      onPressed: controller.clearSearch,
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
+                suffixIcon: state.searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: context.textMuted,
+                          size: 18,
+                        ),
+                        onPressed: _clearSearch,
+                      )
+                    : const SizedBox.shrink(),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
@@ -152,101 +204,99 @@ class MyOrdersView extends GetView<MyOrdersController> {
           const SizedBox(height: 10),
 
           // Status Filter Badges Row
-          Obx(() {
-            final counts = controller.filterCounts.value;
-            final currentStatus = controller.selectedStatus.value;
-
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  _FilterChipBadge(
-                    label: 'সব',
-                    count: counts.all,
-                    isSelected: currentStatus == 'all',
-                    onTap: () => controller.setStatusFilter('all'),
-                    activeColor: context.primaryColor,
-                  ),
-                  const SizedBox(width: 8),
-                  _FilterChipBadge(
-                    label: 'পরিশোধিত',
-                    count: counts.paid,
-                    isSelected: currentStatus == 'paid',
-                    onTap: () => controller.setStatusFilter('paid'),
-                    activeColor: const Color(0xFF10B981),
-                    badgeBgColor: const Color(0xFF059669),
-                  ),
-                  const SizedBox(width: 8),
-                  _FilterChipBadge(
-                    label: 'অপেক্ষমাণ',
-                    count: counts.pending,
-                    isSelected: currentStatus == 'pending',
-                    onTap: () => controller.setStatusFilter('pending'),
-                    activeColor: const Color(0xFFF59E0B),
-                    badgeBgColor: const Color(0xFFD97706),
-                  ),
-                  const SizedBox(width: 8),
-                  _FilterChipBadge(
-                    label: 'ব্যর্থ',
-                    count: counts.failed,
-                    isSelected: currentStatus == 'failed',
-                    onTap: () => controller.setStatusFilter('failed'),
-                    activeColor: const Color(0xFFEF4444),
-                    badgeBgColor: const Color(0xFFDC2626),
-                  ),
-                ],
-              ),
-            );
-          }),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _FilterChipBadge(
+                  label: 'সব',
+                  count: state.filterCounts.all,
+                  isSelected: state.selectedStatus == 'all',
+                  onTap: () => notifier.setStatusFilter('all'),
+                  activeColor: context.primaryColor,
+                ),
+                const SizedBox(width: 8),
+                _FilterChipBadge(
+                  label: 'পরিশোধিত',
+                  count: state.filterCounts.paid,
+                  isSelected: state.selectedStatus == 'paid',
+                  onTap: () => notifier.setStatusFilter('paid'),
+                  activeColor: const Color(0xFF10B981),
+                  badgeBgColor: const Color(0xFF059669),
+                ),
+                const SizedBox(width: 8),
+                _FilterChipBadge(
+                  label: 'অপেক্ষমাণ',
+                  count: state.filterCounts.pending,
+                  isSelected: state.selectedStatus == 'pending',
+                  onTap: () => notifier.setStatusFilter('pending'),
+                  activeColor: const Color(0xFFF59E0B),
+                  badgeBgColor: const Color(0xFFD97706),
+                ),
+                const SizedBox(width: 8),
+                _FilterChipBadge(
+                  label: 'ব্যর্থ',
+                  count: state.filterCounts.failed,
+                  isSelected: state.selectedStatus == 'failed',
+                  onTap: () => notifier.setStatusFilter('failed'),
+                  activeColor: const Color(0xFFEF4444),
+                  badgeBgColor: const Color(0xFFDC2626),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 8),
 
           // Model Type Filter Badges Row
-          Obx(() {
-            final counts = controller.filterCounts.value;
-            final currentType = controller.selectedModelType.value;
-
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  _TypeFilterChip(
-                    label: 'সব আইটেম',
-                    isSelected: currentType == 'all',
-                    onTap: () => controller.setModelTypeFilter('all'),
-                  ),
-                  const SizedBox(width: 8),
-                  _TypeFilterChip(
-                    label: 'প্যাকেজ',
-                    count: counts.package,
-                    isSelected: currentType == 'Package',
-                    onTap: () => controller.setModelTypeFilter('Package'),
-                  ),
-                  const SizedBox(width: 8),
-                  _TypeFilterChip(
-                    label: 'কোর্স',
-                    count: counts.course,
-                    isSelected: currentType == 'Course',
-                    onTap: () => controller.setModelTypeFilter('Course'),
-                  ),
-                  const SizedBox(width: 8),
-                  _TypeFilterChip(
-                    label: 'মডেল টেস্ট',
-                    count: counts.exam,
-                    isSelected: currentType == 'Exam',
-                    onTap: () => controller.setModelTypeFilter('Exam'),
-                  ),
-                ],
-              ),
-            );
-          }),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _TypeFilterChip(
+                  label: 'সব আইটেম',
+                  isSelected: state.selectedModelType == 'all',
+                  onTap: () => notifier.setModelTypeFilter('all'),
+                ),
+                const SizedBox(width: 8),
+                _TypeFilterChip(
+                  label: 'প্যাকেজ',
+                  count: state.filterCounts.package,
+                  isSelected: state.selectedModelType == 'Package',
+                  onTap: () => notifier.setModelTypeFilter('Package'),
+                ),
+                const SizedBox(width: 8),
+                _TypeFilterChip(
+                  label: 'কোর্স',
+                  count: state.filterCounts.course,
+                  isSelected: state.selectedModelType == 'Course',
+                  onTap: () => notifier.setModelTypeFilter('Course'),
+                ),
+                const SizedBox(width: 8),
+                _TypeFilterChip(
+                  label: 'মডেল টেস্ট',
+                  count: state.filterCounts.exam,
+                  isSelected: state.selectedModelType == 'Exam',
+                  onTap: () => notifier.setModelTypeFilter('Exam'),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, MyOrdersController controller) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    MyOrdersState state,
+    MyOrdersNotifier notifier,
+  ) {
+    final hasActiveFilter = state.searchQuery.isNotEmpty ||
+        state.selectedStatus != 'all' ||
+        state.selectedModelType != 'all';
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -276,9 +326,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
             ),
             const SizedBox(height: 8),
             Text(
-              controller.searchQuery.value.isNotEmpty ||
-                      controller.selectedStatus.value != 'all' ||
-                      controller.selectedModelType.value != 'all'
+              hasActiveFilter
                   ? "নির্বাচিত ফিল্টারের সাথে মিলে এমন কোনো অর্ডার নেই।"
                   : "আপনার অ্যাকাউন্টে এখনও কোনো অর্ডার সম্পন্ন হয়নি।",
               textAlign: TextAlign.center,
@@ -288,16 +336,13 @@ class MyOrdersView extends GetView<MyOrdersController> {
               ),
             ),
             const SizedBox(height: 20),
-            if (controller.searchQuery.value.isNotEmpty ||
-                controller.selectedStatus.value != 'all' ||
-                controller.selectedModelType.value != 'all')
+            if (hasActiveFilter)
               ElevatedButton.icon(
                 onPressed: () {
-                  controller.searchController.clear();
-                  controller.searchQuery.value = '';
-                  controller.selectedStatus.value = 'all';
-                  controller.selectedModelType.value = 'all';
-                  controller.fetchOrders(refresh: true);
+                  _searchController.clear();
+                  notifier.clearSearch();
+                  notifier.setStatusFilter('all');
+                  notifier.setModelTypeFilter('all');
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: const Text('সব ফিল্টার মুছুন'),
@@ -315,7 +360,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, MyOrdersController controller) {
+  Widget _buildErrorState(BuildContext context, MyOrdersNotifier notifier) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -339,7 +384,7 @@ class MyOrdersView extends GetView<MyOrdersController> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () => controller.fetchOrders(refresh: true),
+              onPressed: () => notifier.fetchOrders(refresh: true),
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('পুনরায় চেষ্টা করুন'),
               style: ElevatedButton.styleFrom(

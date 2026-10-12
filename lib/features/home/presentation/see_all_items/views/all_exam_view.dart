@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/features/home/home.dart';
+import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
+import 'package:lokkha/features/home/presentation/see_all_items/widgets/show_log_in.dart';
 import 'package:lokkha/shared/models/exam.dart';
 
-class AllExamView extends GetView<SeeAllItemsController> {
+class AllExamView extends ConsumerWidget {
   const AllExamView({super.key});
 
   void _handleExamTap(BuildContext context, Exam exam) {
@@ -21,8 +24,9 @@ class AllExamView extends GetView<SeeAllItemsController> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<SeeAllItemsController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(seeAllItemsNotifierProvider);
+    final notifier = ref.read(seeAllItemsNotifierProvider.notifier);
 
     return Scaffold(
       backgroundColor: AppColors.scaffold(context),
@@ -46,7 +50,7 @@ class AllExamView extends GetView<SeeAllItemsController> {
             size: 18.sp,
             color: Colors.white,
           ),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
@@ -55,333 +59,340 @@ class AllExamView extends GetView<SeeAllItemsController> {
             SizedBox(height: 8.h),
 
             // Modern Segmented Filter Bar
-            _buildModernFilterBar(context, controller),
+            _buildModernFilterBar(context, state, notifier),
 
             SizedBox(height: 8.h),
 
             // Exam List
             Expanded(
-              child: Obx(() {
-                final status = controller.examApiCallStatus.value;
-                final exams = controller.examsList.isNotEmpty
-                    ? controller.examsList
-                    : (controller.allExamModel.value.exams?.data ?? []);
+              child: Builder(
+                builder: (context) {
+                  final status = state.examApiCallStatus;
+                  final exams = state.examsList.isNotEmpty
+                      ? state.examsList
+                      : (state.allExamModel.exams?.data ?? []);
 
-                if (status == ApiCallStatus.loading) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: context.primaryColor,
-                    ),
-                  );
-                }
-
-                if (status == ApiCallStatus.error) {
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(14.r),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.error_outline_rounded,
-                              size: 36.sp,
-                              color: Colors.redAccent,
-                            ),
-                          ),
-                          SizedBox(height: 12.h),
-                          Text(
-                            "পরীক্ষা লোড করতে সমস্যা হয়েছে",
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w600,
-                              color: context.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            "ইন্টারনেট সংযোগ চেক করে পুনরায় চেষ্টা করুন",
-                            style: TextStyle(
-                              fontSize: 12.5.sp,
-                              color: context.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 16.h),
-                          ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.primaryColor,
-                              foregroundColor: Colors.white,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 18.w,
-                                vertical: 9.h,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                            ),
-                            icon: const Icon(Icons.refresh_rounded, size: 16),
-                            label: const Text("পুনরায় চেষ্টা করুন"),
-                            onPressed: () => controller.fetchAllExams(
-                              page: controller.currentExamPage.value,
-                            ),
-                          ),
-                        ],
+                  if (status == ApiCallStatus.loading) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: context.primaryColor,
                       ),
-                    ),
-                  );
-                }
+                    );
+                  }
 
-                if (exams.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32.w),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(18.r),
-                            decoration: BoxDecoration(
-                              color: context.surfaceSubtle,
-                              shape: BoxShape.circle,
+                  if (status == ApiCallStatus.error) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(14.r),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.error_outline_rounded,
+                                size: 36.sp,
+                                color: Colors.redAccent,
+                              ),
                             ),
-                            child: Icon(
-                              Icons.assignment_outlined,
-                              size: 42.sp,
-                              color:
-                                  context.textSecondary.withValues(alpha: 0.6),
+                            SizedBox(height: 12.h),
+                            Text(
+                              "পরীক্ষা লোড করতে সমস্যা হয়েছে",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                color: context.textPrimary,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 14.h),
-                          Text(
-                            controller.selectedFilter.value == 'attempted'
-                                ? "আপনি এখনো কোনো পরীক্ষা দেননি"
-                                : "কোনো পরীক্ষা পাওয়া যায়নি",
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              color: context.textPrimary,
-                              fontWeight: FontWeight.w600,
+                            SizedBox(height: 6.h),
+                            Text(
+                              "ইন্টারনেট সংযোগ চেক করে পুনরায় চেষ্টা করুন",
+                              style: TextStyle(
+                                fontSize: 12.5.sp,
+                                color: context.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                          SizedBox(height: 6.h),
-                          Text(
-                            controller.selectedFilter.value == 'attempted'
-                                ? "পরীক্ষায় অংশ নিয়ে আপনার মেধা যাচাই করুন"
-                                : "নতুন পরীক্ষা যুক্ত হলে এখানে দেখতে পাবেন",
-                            style: TextStyle(
-                              fontSize: 12.5.sp,
-                              color: context.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          if (controller.selectedFilter.value != 'all') ...[
-                            SizedBox(height: 14.h),
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: context.primaryColor),
+                            SizedBox(height: 16.h),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: context.primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 18.w,
+                                  vertical: 9.h,
+                                ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.r),
+                                  borderRadius: BorderRadius.circular(10.r),
                                 ),
                               ),
-                              onPressed: () => controller.setFilter('all'),
-                              child: Text(
-                                "সব পরীক্ষা দেখুন",
-                                style: TextStyle(
-                                  color: context.primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              icon: const Icon(Icons.refresh_rounded, size: 16),
+                              label: const Text("পুনরায় চেষ্টা করুন"),
+                              onPressed: () => notifier.fetchAllExams(
+                                page: state.currentExamPage,
                               ),
                             ),
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                return RefreshIndicator(
-                  color: context.primaryColor,
-                  backgroundColor: context.cardColor,
-                  onRefresh: () async {
-                    await controller.fetchAllExams(
-                      page: controller.currentExamPage.value,
                     );
-                  },
-                  child: ListView.separated(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 4.h,
-                    ),
-                    itemCount: exams.length,
-                    separatorBuilder: (_, __) => SizedBox(height: 8.h),
-                    itemBuilder: (context, index) {
-                      final exam = exams[index];
-                      return _buildCompactExamCard(
-                        context: context,
-                        exam: exam,
-                        onTap: () => _handleExamTap(context, exam),
+                  }
+
+                  if (exams.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 32.w),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(18.r),
+                              decoration: BoxDecoration(
+                                color: context.surfaceSubtle,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.assignment_outlined,
+                                size: 42.sp,
+                                color:
+                                    context.textSecondary.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            SizedBox(height: 14.h),
+                            Text(
+                              state.selectedFilter == 'attempted'
+                                  ? "আপনি এখনো কোনো পরীক্ষা দেননি"
+                                  : "কোনো পরীক্ষা পাওয়া যায়নি",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                color: context.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              state.selectedFilter == 'attempted'
+                                  ? "পরীক্ষায় অংশ নিয়ে আপনার মেধা যাচাই করুন"
+                                  : "নতুন পরীক্ষা যুক্ত হলে এখানে দেখতে পাবেন",
+                              style: TextStyle(
+                                fontSize: 12.5.sp,
+                                color: context.textSecondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            if (state.selectedFilter != 'all') ...[
+                              SizedBox(height: 14.h),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: context.primaryColor),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                  ),
+                                ),
+                                onPressed: () => notifier.setFilter('all'),
+                                child: Text(
+                                  "সব পরীক্ষা দেখুন",
+                                  style: TextStyle(
+                                    color: context.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    color: context.primaryColor,
+                    backgroundColor: context.cardColor,
+                    onRefresh: () async {
+                      await notifier.fetchAllExams(
+                        page: state.currentExamPage,
                       );
                     },
-                  ),
-                );
-              }),
+                    child: ListView.separated(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 4.h,
+                      ),
+                      itemCount: exams.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 8.h),
+                      itemBuilder: (context, index) {
+                        final exam = exams[index];
+                        return _buildCompactExamCard(
+                          context: context,
+                          exam: exam,
+                          onTap: () => _handleExamTap(context, exam),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
       ),
 
       // Theme-Adaptive Bottom Pagination Bar
-      bottomNavigationBar: Obx(() {
-        final totalPages = controller.totalExamPages.value;
-        final currentPage = controller.currentExamPage.value;
+      bottomNavigationBar: Builder(
+        builder: (context) {
+          final totalPages = state.totalExamPages;
+          final currentPage = state.currentExamPage;
 
-        if (totalPages <= 1) {
-          return const SizedBox.shrink();
-        }
+          if (totalPages <= 1) {
+            return const SizedBox.shrink();
+          }
 
-        return Container(
-          decoration: BoxDecoration(
-            color: context.cardColor,
-            border: Border(
-              top: BorderSide(
-                color: context.borderColor.withValues(alpha: 0.6),
-                width: 1,
+          return Container(
+            decoration: BoxDecoration(
+              color: context.cardColor,
+              border: Border(
+                top: BorderSide(
+                  color: context.borderColor.withValues(alpha: 0.6),
+                  width: 1,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
+            child: SafeArea(
+              top: false,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // First Page (|<)
+                    _buildNavArrowButton(
+                      context: context,
+                      icon: Icons.first_page_rounded,
+                      isEnabled: currentPage > 1,
+                      onTap: notifier.firstExamPage,
+                    ),
+
+                    // Previous Page (<)
+                    _buildNavArrowButton(
+                      context: context,
+                      icon: Icons.chevron_left_rounded,
+                      isEnabled: currentPage > 1,
+                      onTap: notifier.previousExamPage,
+                    ),
+
+                    SizedBox(width: 3.w),
+
+                    // Page Numbers
+                    ..._buildPaginationNumbers(
+                      context: context,
+                      currentPage: currentPage,
+                      totalPages: totalPages,
+                      onPageSelected: (page) => notifier.goToExamPage(page),
+                    ),
+
+                    SizedBox(width: 3.w),
+
+                    // Next Page (>)
+                    _buildNavArrowButton(
+                      context: context,
+                      icon: Icons.chevron_right_rounded,
+                      isEnabled: currentPage < totalPages,
+                      onTap: notifier.nextExamPage,
+                    ),
+
+                    // Last Page (>|)
+                    _buildNavArrowButton(
+                      context: context,
+                      icon: Icons.last_page_rounded,
+                      isEnabled: currentPage < totalPages,
+                      onTap: notifier.lastExamPage,
+                    ),
+                  ],
+                ),
               ),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
-          child: SafeArea(
-            top: false,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // First Page (|<)
-                  _buildNavArrowButton(
-                    context: context,
-                    icon: Icons.first_page_rounded,
-                    isEnabled: currentPage > 1,
-                    onTap: controller.firstExamPage,
-                  ),
-
-                  // Previous Page (<)
-                  _buildNavArrowButton(
-                    context: context,
-                    icon: Icons.chevron_left_rounded,
-                    isEnabled: currentPage > 1,
-                    onTap: controller.previousExamPage,
-                  ),
-
-                  SizedBox(width: 3.w),
-
-                  // Page Numbers
-                  ..._buildPaginationNumbers(
-                    context: context,
-                    currentPage: currentPage,
-                    totalPages: totalPages,
-                    onPageSelected: (page) => controller.goToExamPage(page),
-                  ),
-
-                  SizedBox(width: 3.w),
-
-                  // Next Page (>)
-                  _buildNavArrowButton(
-                    context: context,
-                    icon: Icons.chevron_right_rounded,
-                    isEnabled: currentPage < totalPages,
-                    onTap: controller.nextExamPage,
-                  ),
-
-                  // Last Page (>|)
-                  _buildNavArrowButton(
-                    context: context,
-                    icon: Icons.last_page_rounded,
-                    isEnabled: currentPage < totalPages,
-                    onTap: controller.lastExamPage,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
   // Modern Segmented Filter Pills (All / Attempted / Not Attempted)
   Widget _buildModernFilterBar(
     BuildContext context,
-    SeeAllItemsController controller,
+    SeeAllItemsState state,
+    SeeAllItemsNotifier notifier,
   ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.w),
-      child: Obx(() {
-        final currentFilter = controller.selectedFilter.value;
+      child: Builder(
+        builder: (context) {
+          final currentFilter = state.selectedFilter;
 
-        return Container(
-          padding: EdgeInsets.all(3.r),
-          decoration: BoxDecoration(
-            color: context.surfaceSubtle,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: context.borderColor.withValues(alpha: 0.6),
+          return Container(
+            padding: EdgeInsets.all(3.r),
+            decoration: BoxDecoration(
+              color: context.surfaceSubtle,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: context.borderColor.withValues(alpha: 0.6),
+              ),
             ),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildFilterTab(
-                  context: context,
-                  label: "সব পরীক্ষা",
-                  isSelected: currentFilter == 'all',
-                  onTap: () => controller.setFilter('all'),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildFilterTab(
+                    context: context,
+                    label: "সব পরীক্ষা",
+                    isSelected: currentFilter == 'all',
+                    onTap: () => notifier.setFilter('all'),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _buildFilterTab(
-                  context: context,
-                  label: "দেওয়া হয়েছে",
-                  isSelected: currentFilter == 'attempted',
-                  onTap: () {
-                    if (isLoggedIn.value) {
-                      controller.setFilter('attempted');
-                    } else {
-                      showLoginPopup(context);
-                    }
-                  },
+                Expanded(
+                  child: _buildFilterTab(
+                    context: context,
+                    label: "দেওয়া হয়েছে",
+                    isSelected: currentFilter == 'attempted',
+                    onTap: () {
+                      if (isLoggedIn.value) {
+                        notifier.setFilter('attempted');
+                      } else {
+                        showLoginPopup(context);
+                      }
+                    },
+                  ),
                 ),
-              ),
-              Expanded(
-                child: _buildFilterTab(
-                  context: context,
-                  label: "দেওয়া হয়নি",
-                  isSelected: currentFilter == 'not_attempted',
-                  onTap: () {
-                    if (isLoggedIn.value) {
-                      controller.setFilter('not_attempted');
-                    } else {
-                      showLoginPopup(context);
-                    }
-                  },
+                Expanded(
+                  child: _buildFilterTab(
+                    context: context,
+                    label: "দেওয়া হয়নি",
+                    isSelected: currentFilter == 'not_attempted',
+                    onTap: () {
+                      if (isLoggedIn.value) {
+                        notifier.setFilter('not_attempted');
+                      } else {
+                        showLoginPopup(context);
+                      }
+                    },
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

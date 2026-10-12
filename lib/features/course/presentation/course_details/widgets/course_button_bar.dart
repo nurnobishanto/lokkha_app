@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/course.dart';
@@ -80,9 +79,19 @@ class CourseBottomBar extends StatelessWidget {
               onPressed: () {
                 // TODO: Add enroll logic
                 if (isLoggedIn.value) {
-                  Get.to(CourseCheckoutView(course: courseModel));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CourseCheckoutView(course: courseModel),
+                    ),
+                  );
                 } else {
-                  Get.to(const AuthGatewayView());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AuthGatewayView(),
+                    ),
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(

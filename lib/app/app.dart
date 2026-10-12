@@ -25,6 +25,7 @@ class MyApp extends ConsumerWidget {
         return MaterialApp.router(
           title: AppStrings.appName,
           debugShowCheckedModeBanner: false,
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
           routerConfig: router,
           locale: currentLocale,
           supportedLocales: AppLocalizations.supportedLocales,

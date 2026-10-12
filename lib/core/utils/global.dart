@@ -6,7 +6,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'rx.dart';
+export 'rx.dart';
 import 'package:lokkha/core/services/storage/my_get_storage.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/constants/app_strings.dart';
@@ -286,7 +287,14 @@ Future<void> openAppOrWebView(String url) async {
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   } else {
-    Get.to(BaseWebView(url: url, title: ''));
+    final ctx = rootNavigatorKey.currentContext;
+    if (ctx != null) {
+      Navigator.of(ctx).push(
+        MaterialPageRoute(
+          builder: (_) => BaseWebView(url: url, title: ''),
+        ),
+      );
+    }
   }
 }
 

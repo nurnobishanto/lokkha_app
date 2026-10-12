@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:lokkha/app/router/router.dart';
 
 class WebExamView extends StatefulWidget {
@@ -22,21 +21,24 @@ class WebExamView extends StatefulWidget {
   });
 
   @override
-  _WebExamViewState createState() => _WebExamViewState();
+  State<WebExamView> createState() => _WebExamViewState();
 }
 
 class _WebExamViewState extends State<WebExamView> {
   late WebViewController _controller;
   bool isLoading = false;
   String currentUrl = '';
+
   @override
   void initState() {
     super.initState();
 
     String? token = MySharedPref.getUserToken();
 
-    if (token == '' || token.isEmpty) {
-      Get.toNamed(Routes.authGateway);
+    if (token == null || token.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.pushNamed(Routes.authGateway);
+      });
     }
 
     Map<String, String> headers = {
@@ -52,19 +54,19 @@ class _WebExamViewState extends State<WebExamView> {
           log("PROGRESS $progress%");
         },
         onPageStarted: (String url) {
+          if (!mounted) return;
           setState(() {
             isLoading = true;
             currentUrl = url;
           });
           if (url.contains('packages')) {
-            Get.toNamed(Routes.packages);
+            context.pushNamed(Routes.packages);
           } else if (url.contains('goback')) {
-            Get.back();
-          } else if (url.contains('goback')) {
-            Get.toNamed(Routes.authGateway);
+            Navigator.of(context).pop();
           }
         },
         onPageFinished: (String url) {
+          if (!mounted) return;
           setState(() {
             isLoading = false;
             currentUrl = url;
@@ -75,21 +77,24 @@ class _WebExamViewState extends State<WebExamView> {
             _controller.goBack();
           } else if (url.contains('login')) {
             _controller.goBack();
-          }
-          else if(url.contains('pdf')) {
-            Get.to(PdfViewerScreen(title: "Download", file: url));
+          } else if (url.contains('pdf')) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PdfViewerScreen(title: "Download", file: url),
+              ),
+            );
             _controller.goBack();
           }
           debugPrint("PROGRESS $url");
         },
         onWebResourceError: (error) {
+          if (!mounted) return;
           setState(() {
             isLoading = false;
           });
         },
       ));
 
-    /// 🔹 Build GET params (token + body)
     final Map<String, dynamic> dataWithToken = {
       'token': token,
       ...?widget.body,
@@ -105,6 +110,44 @@ class _WebExamViewState extends State<WebExamView> {
     );
   }
 
+  Future<bool?> _showCancelExamDialog() {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text("Cancel Exam"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "আপনি কি নিশ্চিত যে পরীক্ষা বাতিল করতে চান?\nআপনার অগ্রগতি সংরক্ষিত হবে না।",
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomActionButton(
+                    text: 'না',
+                    onPressed: () => Navigator.of(dialogCtx).pop(false),
+                    btnBackgroundColor: Colors.grey,
+                    borderColor: Colors.transparent,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: CustomActionButton(
+                    text: 'হ্যাঁ, বাতিল করুন',
+                    onPressed: () => Navigator.of(dialogCtx).pop(true),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,26 +157,21 @@ class _WebExamViewState extends State<WebExamView> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
-            //  if exam page
             if (currentUrl.endsWith('start')) {
               bool? shouldExit = await _showCancelExamDialog();
               if (shouldExit != true) {
-                return; //  cancel
+                return;
               }
             }
-            print("currentUrl check $currentUrl%");
-            if (currentUrl.contains('submit')) {
-              Get.back();
-            } else if (currentUrl.contains('start')) {
-              Get.back();
-            } else if (currentUrl.contains('result')) {
-              Get.back();
-            }
-            else {
+            if (currentUrl.contains('submit') ||
+                currentUrl.contains('start') ||
+                currentUrl.contains('result')) {
+              if (context.mounted) Navigator.of(context).pop();
+            } else {
               if (await _controller.canGoBack()) {
                 _controller.goBack();
               } else {
-                Get.back();
+                if (context.mounted) Navigator.of(context).pop();
               }
             }
           },
@@ -145,7 +183,7 @@ class _WebExamViewState extends State<WebExamView> {
             WebViewWidget(controller: _controller),
             if (isLoading)
               Container(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 child: const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -154,8 +192,7 @@ class _WebExamViewState extends State<WebExamView> {
         ),
       ),
       floatingActionButton: currentUrl.contains('pdf')
-          ?
-      FloatingActionButton.extended(
+          ? FloatingActionButton.extended(
               onPressed: () {
                 launchUrlString(currentUrl);
               },
@@ -175,44 +212,6 @@ class _WebExamViewState extends State<WebExamView> {
   }
 }
 
-Future<bool?> _showCancelExamDialog() {
-  return Get.dialog<bool>(
-    AlertDialog(
-      title: const Text("Cancel Exam"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "আপনি কি নিশ্চিত যে পরীক্ষা বাতিল করতে চান?\nআপনার অগ্রগতি সংরক্ষিত হবে না।",
-            //textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: CustomActionButton(
-                  text: 'না',
-                  onPressed: () => Get.back(result: false),
-                  btnBackgroundColor: Colors.grey,
-                  borderColor: Colors.transparent,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: CustomActionButton(
-                  text: 'হ্যাঁ, বাতিল করুন',
-                  onPressed: () => Get.back(result: true),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-    barrierDismissible: false,
-  );
-}
-
 Map<String, String> encodeQueryParams(Map<String, dynamic> data) {
   final Map<String, String> result = {};
 
@@ -222,7 +221,6 @@ Map<String, String> encodeQueryParams(Map<String, dynamic> data) {
     if (value is String || value is num || value is bool) {
       result[key] = value.toString();
     } else {
-      // List / Map / Object
       result[key] = jsonEncode(value);
     }
   });

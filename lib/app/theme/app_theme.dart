@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/localization/app_localizations.dart';
 import 'app_colors.dart';
@@ -42,76 +42,84 @@ class MyFonts {
 /// Central Semantic Text Styles
 /// ─────────────────────────────────────────────────────────────────────────────
 class AppTextStyles {
+  static TextTheme get _textTheme {
+    final ctx = rootNavigatorKey.currentContext;
+    if (ctx != null) {
+      return Theme.of(ctx).textTheme;
+    }
+    return ThemeData.light().textTheme;
+  }
+
   static TextStyle get heading1 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline1TextSize,
         fontWeight: FontWeight.bold,
-        color: Get.textTheme.displayLarge?.color,
+        color: _textTheme.displayLarge?.color,
       );
 
   static TextStyle get heading2 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline2TextSize,
         fontWeight: FontWeight.bold,
-        color: Get.textTheme.displayMedium?.color,
+        color: _textTheme.displayMedium?.color,
       );
 
   static TextStyle get heading3 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline3TextSize,
         fontWeight: FontWeight.w700,
-        color: Get.textTheme.displaySmall?.color,
+        color: _textTheme.displaySmall?.color,
       );
 
   static TextStyle get heading4 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline4TextSize,
         fontWeight: FontWeight.w600,
-        color: Get.textTheme.headlineMedium?.color,
+        color: _textTheme.headlineMedium?.color,
       );
 
   static TextStyle get heading5 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline5TextSize,
         fontWeight: FontWeight.w600,
-        color: Get.textTheme.headlineSmall?.color,
+        color: _textTheme.headlineSmall?.color,
       );
 
   static TextStyle get heading6 => MyFonts.headlineTextStyle.copyWith(
         fontSize: MyFonts.headline6TextSize,
         fontWeight: FontWeight.w500,
-        color: Get.textTheme.titleLarge?.color,
+        color: _textTheme.titleLarge?.color,
       );
 
   static TextStyle get body1 => MyFonts.bodyTextStyle.copyWith(
         fontSize: MyFonts.body1TextSize,
         fontWeight: FontWeight.normal,
-        color: Get.textTheme.bodyLarge?.color,
+        color: _textTheme.bodyLarge?.color,
       );
 
   static TextStyle get body2 => MyFonts.bodyTextStyle.copyWith(
         fontSize: MyFonts.body2TextSize,
         fontWeight: FontWeight.normal,
-        color: Get.textTheme.bodyMedium?.color,
+        color: _textTheme.bodyMedium?.color,
       );
 
   static TextStyle get caption => MyFonts.bodyTextStyle.copyWith(
         fontSize: MyFonts.captionTextSize,
         fontWeight: FontWeight.w400,
-        color: Get.textTheme.bodySmall?.color,
+        color: _textTheme.bodySmall?.color,
       );
 
   static TextStyle get button => MyFonts.buttonTextStyle.copyWith(
         fontSize: MyFonts.buttonTextSize,
         fontWeight: FontWeight.w600,
-        color: Get.textTheme.labelLarge?.color,
+        color: _textTheme.labelLarge?.color,
       );
 
   static TextStyle get chip => MyFonts.chipTextStyle.copyWith(
         fontSize: MyFonts.chipTextSize,
         fontWeight: FontWeight.w500,
-        color: Get.textTheme.bodySmall?.color,
+        color: _textTheme.bodySmall?.color,
       );
 
   static TextStyle get appBar => MyFonts.appBarTextStyle.copyWith(
         fontSize: MyFonts.appBarTittleSize,
         fontWeight: FontWeight.bold,
-        color: Get.textTheme.titleLarge?.color,
+        color: _textTheme.titleLarge?.color,
       );
 
   static TextStyle custom({
@@ -124,7 +132,7 @@ class AppTextStyles {
     return MyFonts.bodyTextStyle.copyWith(
       fontSize: fontSize ?? MyFonts.body2TextSize,
       fontWeight: fontWeight ?? FontWeight.normal,
-      color: color ?? Get.textTheme.bodyMedium?.color,
+      color: color ?? _textTheme.bodyMedium?.color,
       decoration: decoration,
       letterSpacing: letterSpacing,
     );
@@ -378,92 +386,11 @@ class AppTheme {
     bool isLightTheme = MySharedPref.getThemeIsLight();
     bool newIsLight = !isLightTheme;
     MySharedPref.setThemeIsLight(newIsLight);
-    Get.changeTheme(getThemeData(isLight: newIsLight));
   }
 }
 
 /// Backward compatibility alias
 typedef MyTheme = AppTheme;
-
-/// ─────────────────────────────────────────────────────────────────────────────
-/// ThemeController (Backward Compatibility for existing switchers)
-/// ─────────────────────────────────────────────────────────────────────────────
-class ThemeController extends GetxController {
-  static ThemeController get to => Get.find<ThemeController>();
-
-  final Rx<ThemeMode> themeMode = ThemeMode.light.obs;
-  final RxBool isDark = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    _loadInitialThemeMode();
-  }
-
-  void _loadInitialThemeMode() {
-    final savedMode = MySharedPref.getThemeMode();
-    switch (savedMode) {
-      case 'dark':
-        themeMode.value = ThemeMode.dark;
-        isDark.value = true;
-        break;
-      case 'system':
-        themeMode.value = ThemeMode.system;
-        isDark.value = Get.isPlatformDarkMode;
-        break;
-      case 'light':
-      default:
-        themeMode.value = ThemeMode.light;
-        isDark.value = false;
-        break;
-    }
-  }
-
-  void setThemeMode(ThemeMode mode) {
-    themeMode.value = mode;
-
-    String modeString = 'light';
-    bool newIsLight = true;
-
-    if (mode == ThemeMode.dark) {
-      modeString = 'dark';
-      newIsLight = false;
-      isDark.value = true;
-    } else if (mode == ThemeMode.light) {
-      modeString = 'light';
-      newIsLight = true;
-      isDark.value = false;
-    } else {
-      modeString = 'system';
-      final isSysDark = Get.isPlatformDarkMode;
-      newIsLight = !isSysDark;
-      isDark.value = isSysDark;
-    }
-
-    MySharedPref.setThemeMode(modeString);
-    Get.changeTheme(AppTheme.getThemeData(isLight: newIsLight));
-    Get.changeThemeMode(mode);
-  }
-
-  void toggleTheme() {
-    if (themeMode.value == ThemeMode.dark) {
-      setThemeMode(ThemeMode.light);
-    } else {
-      setThemeMode(ThemeMode.dark);
-    }
-  }
-
-  String get currentThemeTitle {
-    switch (themeMode.value) {
-      case ThemeMode.dark:
-        return 'ডার্ক মোড';
-      case ThemeMode.system:
-        return 'সিস্টেম ডিফল্ট';
-      case ThemeMode.light:
-        return 'লাইট মোড';
-    }
-  }
-}
 
 /// ─────────────────────────────────────────────────────────────────────────────
 /// Riverpod Theme Mode State Management

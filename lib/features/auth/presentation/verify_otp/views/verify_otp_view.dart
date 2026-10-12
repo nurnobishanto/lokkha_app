@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
@@ -14,14 +13,11 @@ class VerifyOtpView extends ConsumerStatefulWidget {
   final String phoneNumber;
   final String type;
 
-  VerifyOtpView({
+  const VerifyOtpView({
     super.key,
-    String? phoneNumber,
-    String? type,
-  })  : phoneNumber = phoneNumber ??
-            Get.arguments?['phoneNumber']?.toString() ??
-            '',
-        type = type ?? Get.arguments?['type']?.toString() ?? 'Registration';
+    this.phoneNumber = '',
+    this.type = 'Registration',
+  });
 
   @override
   ConsumerState<VerifyOtpView> createState() => _VerifyOtpViewState();

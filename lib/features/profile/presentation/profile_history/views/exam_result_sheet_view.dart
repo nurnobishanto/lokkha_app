@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
+import '../controllers/exam_result_sheet_notifier.dart';
 import '../widgets/result_question_card.dart';
 
-class ExamResultSheetView extends StatelessWidget {
+class ExamResultSheetView extends ConsumerWidget {
   final ExamHistoryModel exam;
 
   const ExamResultSheetView({
@@ -16,11 +17,8 @@ class ExamResultSheetView extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(
-      ExamResultSheetController(exam: exam),
-      tag: exam.id,
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(examResultSheetNotifierProvider(exam));
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
@@ -28,11 +26,12 @@ class ExamResultSheetView extends StatelessWidget {
         title: 'ফলাফল ও সমাধান',
         centerTitle: true,
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Builder(
+        builder: (context) {
+          if (state.isLoading) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircularProgressIndicator(),
                 SizedBox(height: 12.h),
@@ -48,49 +47,51 @@ class ExamResultSheetView extends StatelessWidget {
           );
         }
 
-        if (controller.errorMessage.value.isNotEmpty &&
-            controller.detail.value == null) {
-          return Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline_rounded,
-                    size: 48.r,
-                    color: Colors.redAccent,
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    controller.errorMessage.value,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: context.textPrimary,
-                      fontWeight: FontWeight.w600,
+          if (state.errorMessage.isNotEmpty &&
+              state.detail == null) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      size: 48.r,
+                      color: Colors.redAccent,
                     ),
-                  ),
-                  SizedBox(height: 16.h),
-                  ElevatedButton.icon(
-                    onPressed: controller.fetchReview,
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text("আবার চেষ্টা করুন"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: context.primaryColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
+                    SizedBox(height: 12.h),
+                    Text(
+                      state.errorMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: context.textPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 16.h),
+                    ElevatedButton.icon(
+                      onPressed: () => ref
+                          .read(examResultSheetNotifierProvider(exam).notifier)
+                          .fetchReview(),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text("আবার চেষ্টা করুন"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
+            );
+          }
 
-        final detail = controller.detail.value;
+          final detail = state.detail;
         final questions = detail?.questions ?? [];
 
         final scoreDisplay = detail != null && detail.score != 0.0
@@ -540,9 +541,10 @@ class ExamResultSheetView extends StatelessWidget {
               ),
           ],
         );
-      }),
-    );
-  }
+      },
+    ),
+  );
+}
 
   static String _formatNum(num val) {
     if (val.truncateToDouble() == val) {

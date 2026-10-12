@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 import '../controllers/sign_in_notifier.dart';
@@ -16,14 +14,11 @@ class SignInView extends ConsumerStatefulWidget {
   final String phoneNumber;
   final String type;
 
-  SignInView({
+  const SignInView({
     super.key,
-    String? phoneNumber,
-    String? type,
-  })  : phoneNumber = phoneNumber ??
-            Get.arguments?['phoneNumber']?.toString() ??
-            '',
-        type = type ?? Get.arguments?['type']?.toString() ?? 'password';
+    this.phoneNumber = '',
+    this.type = 'password',
+  });
 
   @override
   ConsumerState<SignInView> createState() => _SignInViewState();
@@ -100,20 +95,13 @@ class _SignInViewState extends ConsumerState<SignInView> {
                 alignment: Alignment.topRight,
                 child: GestureDetector(
                   onTap: () {
-                    try {
-                      context.push(
-                        Routes.verifyOtp,
-                        extra: {
-                          'phoneNumber': widget.phoneNumber,
-                          'type': 'Login',
-                        },
-                      );
-                    } catch (_) {
-                      Get.toNamed(Routes.verifyOtp, arguments: {
+                    context.push(
+                      Routes.verifyOtp,
+                      extra: {
                         'phoneNumber': widget.phoneNumber,
                         'type': 'Login',
-                      });
-                    }
+                      },
+                    );
                   },
                   child: Text(
                     'পাসওয়ার্ড মনে নেই? OTP দিয়ে লগইন করুন!',

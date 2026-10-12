@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import '../controllers/contest_history_controller.dart';
+import '../controllers/contest_history_notifier.dart';
 import '../widgets/contest_history_card.dart';
 import '../widgets/saved_question_card.dart';
 
-class ContestHistoryView extends GetView<ContestHistoryController> {
+class ContestHistoryView extends ConsumerWidget {
   const ContestHistoryView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(contestHistoryNotifierProvider);
+    final notifier = ref.read(contestHistoryNotifierProvider.notifier);
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(
@@ -48,7 +51,7 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
 
               // চলমান কনটেস্ট Button
               InkWell(
-                onTap: controller.openLiveContests,
+                onTap: () => notifier.openLiveContests(context),
                 borderRadius: BorderRadius.circular(20.r),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
@@ -80,42 +83,39 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
           SizedBox(height: 12.h),
 
           // Contest Cards List
-          Obx(() {
-            if (controller.contestList.isEmpty) {
-              return Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: context.cardColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: context.borderColor),
-                ),
-                child: Center(
-                  child: Text(
-                    "কোনো কনটেস্ট হিস্ট্রি পাওয়া যায়নি",
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: context.textSecondary,
-                    ),
+          if (state.contestList.isEmpty)
+            Container(
+              padding: EdgeInsets.all(16.r),
+              decoration: BoxDecoration(
+                color: context.cardColor,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: context.borderColor),
+              ),
+              child: Center(
+                child: Text(
+                  "কোনো কনটেস্ট হিস্ট্রি পাওয়া যায়নি",
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: context.textSecondary,
                   ),
                 ),
-              );
-            }
-
-            return ListView.separated(
+              ),
+            )
+          else
+            ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.contestList.length,
+              itemCount: state.contestList.length,
               separatorBuilder: (_, __) => SizedBox(height: 12.h),
               itemBuilder: (context, index) {
-                final item = controller.contestList[index];
+                final item = state.contestList[index];
                 return ContestHistoryCard(
                   item: item,
-                  onViewRanking: () => controller.viewRanking(item),
-                  onViewResult: () => controller.viewResult(item),
+                  onViewRanking: () => notifier.viewRanking(context, item),
+                  onViewResult: () => notifier.viewResult(context, item),
                 );
               },
-            );
-          }),
+            ),
 
           SizedBox(height: 22.h),
 
@@ -144,24 +144,22 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
                 ],
               ),
 
-              Obx(
-                () => Container(
-                  padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
-                  decoration: BoxDecoration(
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 3.h),
+                decoration: BoxDecoration(
+                  color: context.isDark
+                      ? const Color(0xFF064E3B).withValues(alpha: 0.4)
+                      : const Color(0xFFECFDF5),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  "${state.savedQuestionList.length} টি",
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
                     color: context.isDark
-                        ? const Color(0xFF064E3B).withValues(alpha: 0.4)
-                        : const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Text(
-                    "${controller.savedQuestionList.length} টি",
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.bold,
-                      color: context.isDark
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFF059669),
-                    ),
+                        ? const Color(0xFF34D399)
+                        : const Color(0xFF059669),
                   ),
                 ),
               ),
@@ -171,41 +169,38 @@ class ContestHistoryView extends GetView<ContestHistoryController> {
           SizedBox(height: 12.h),
 
           // Saved Questions List
-          Obx(() {
-            if (controller.savedQuestionList.isEmpty) {
-              return Container(
-                padding: EdgeInsets.all(16.r),
-                decoration: BoxDecoration(
-                  color: context.cardColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(color: context.borderColor),
-                ),
-                child: Center(
-                  child: Text(
-                    "কোনো সংরক্ষিত প্রশ্ন পাওয়া যায়নি",
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: context.textSecondary,
-                    ),
+          if (state.savedQuestionList.isEmpty)
+            Container(
+              padding: EdgeInsets.all(16.r),
+              decoration: BoxDecoration(
+                color: context.cardColor,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: context.borderColor),
+              ),
+              child: Center(
+                child: Text(
+                  "কোনো সংরক্ষিত প্রশ্ন পাওয়া যায়নি",
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: context.textSecondary,
                   ),
                 ),
-              );
-            }
-
-            return ListView.separated(
+              ),
+            )
+          else
+            ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.savedQuestionList.length,
+              itemCount: state.savedQuestionList.length,
               separatorBuilder: (_, __) => SizedBox(height: 10.h),
               itemBuilder: (context, index) {
-                final item = controller.savedQuestionList[index];
+                final item = state.savedQuestionList[index];
                 return SavedQuestionCard(
                   item: item,
-                  onTap: () => controller.viewSavedQuestion(item),
+                  onTap: () => notifier.viewSavedQuestion(item),
                 );
               },
-            );
-          }),
+            ),
         ],
       ),
     );

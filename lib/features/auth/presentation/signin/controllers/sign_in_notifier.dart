@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
-import 'package:lokkha/features/navigation/navigation.dart';
-import 'package:lokkha/app/router/router.dart';
+import 'package:lokkha/features/navigation/presentation/controllers/navbar_notifier.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class SignInState {
@@ -60,16 +58,10 @@ class SignInNotifier extends Notifier<SignInState> {
           message: res.message ?? "লগইন সফল হয়েছে!",
         );
 
-        if (Get.isRegistered<NavbarController>()) {
-          Get.find<NavbarController>().getMeProfileInfo();
-        }
+        ref.read(navbarNotifierProvider.notifier).fetchProfileInfo();
 
         if (context.mounted) {
-          try {
-            context.go(Routes.navbar);
-          } catch (_) {
-            Get.offAllNamed(Routes.navbar);
-          }
+          context.go(Routes.navbar);
         }
       } else {
         state = state.copyWith(

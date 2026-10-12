@@ -38,3 +38,33 @@ class ContestStartModel {
             : List<dynamic>.from(questions!.map((x) => x.toJson())),
       };
 }
+
+class UserAnswer {
+  final int questionId;
+  dynamic answers;
+
+  UserAnswer({
+    required this.questionId,
+    this.answers,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'question_id': questionId,
+      'answer': answers,
+    };
+  }
+
+  factory UserAnswer.fromJson(Map<String, dynamic> json) {
+    return UserAnswer(
+      questionId: json['question_id'],
+      answers: json['answer'],
+    );
+  }
+
+  @override
+  String toString() {
+    return '{question_id: $questionId, answer: $answers}';
+  }
+}
+

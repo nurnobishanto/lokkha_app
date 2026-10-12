@@ -41,8 +41,5 @@ export 'utils/date_formatter.dart';
 // Localization
 export 'localization/app_localizations.dart';
 
-// Bindings
-export 'bindings/initial_bindings.dart';
-
 // Pure Flutter Get Compatibility Layer
 export 'compat/get_compat.dart';

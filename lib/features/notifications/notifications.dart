@@ -10,8 +10,7 @@ export 'domain/usecases/get_notifications_usecase.dart';
 export 'domain/usecases/mark_notification_read_usecase.dart';
 
 // Presentation
-export 'presentation/bindings/notifications_binding.dart';
-export 'presentation/controllers/notifications_controller.dart';
+export 'presentation/providers/notifications_notifier.dart';
 export 'presentation/views/notifications_view.dart';
 export 'presentation/views/notification_details_view.dart';
 export 'presentation/widgets/notification_card.dart';

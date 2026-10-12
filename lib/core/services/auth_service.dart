@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/services/storage/my_get_storage.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
-import 'package:lokkha/features/navigation/navigation.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
@@ -43,31 +41,23 @@ class AuthService {
     MyGetStorage.removeCache(MyGetStorage.meUser);
     myUser = User();
 
-    if (Get.isRegistered<NavbarController>()) {
-      Get.find<NavbarController>().clearProfileState();
-    }
-
-    // Do not show dialog if already on authentication screens
-    if (Get.currentRoute == Routes.authGateway ||
-        Get.currentRoute == Routes.signIn ||
-        Get.currentRoute == Routes.verifyOtp) {
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) {
       _isSessionDialogShowing = false;
       return;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.isDialogOpen == true) {
-        Get.back();
-      }
-
       final bool isBanglaMessage =
           message != null && RegExp(r'[\u0980-\u09FF]').hasMatch(message);
       final String dialogMessage = isBanglaMessage
           ? message
           : "আপনার অ্যাকাউন্টের সুরক্ষার স্বার্থে সেশনের মেয়াদ শেষ হয়েছে। অ্যাপের সকল সুবিধা পেতে অনুগ্রহ করে পুনরায় লগইন করুন।";
 
-      Get.dialog(
-        PopScope(
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogCtx) => PopScope(
           canPop: true,
           onPopInvokedWithResult: (didPop, result) {
             _isSessionDialogShowing = false;
@@ -124,7 +114,7 @@ class AuthService {
                         child: OutlinedButton(
                           onPressed: () {
                             _isSessionDialogShowing = false;
-                            Get.back();
+                            Navigator.of(dialogCtx).pop();
                           },
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -148,8 +138,8 @@ class AuthService {
                         child: ElevatedButton(
                           onPressed: () {
                             _isSessionDialogShowing = false;
-                            Get.back();
-                            Get.offAllNamed(Routes.authGateway);
+                            Navigator.of(dialogCtx).pop();
+                            context.goNamed(Routes.authGateway);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: LightThemeColors.primaryColor,
@@ -176,7 +166,6 @@ class AuthService {
             ),
           ),
         ),
-        barrierDismissible: false,
       );
     });
   }
@@ -195,9 +184,9 @@ class AuthService {
     if (token == null || token.isEmpty) {
       isLoggedIn.value = false;
       await MySharedPref.removeUserToken();
-      if (Get.currentRoute != Routes.authGateway &&
-          Get.currentRoute != Routes.splash) {
-        Get.offAllNamed(Routes.authGateway);
+      final context = rootNavigatorKey.currentContext;
+      if (context != null) {
+        context.goNamed(Routes.authGateway);
       }
       return;
     }
@@ -218,13 +207,12 @@ class AuthService {
 
         // Check profile completion requirement
         if (!res.profileCompleted || res.rawData?['update_profile_required'] == true) {
-          Get.toNamed(Routes.profileUpdateRequired, arguments: {
-            "phoneNumber": res.user?.phone ?? res.rawData?["data"]?["phone"] ?? "",
-          });
-        }
-
-        if (Get.isRegistered<NavbarController>()) {
-          Get.find<NavbarController>().getMeProfileInfo();
+          final context = rootNavigatorKey.currentContext;
+          if (context != null) {
+            context.pushNamed(Routes.profileUpdateRequired, extra: {
+              "phoneNumber": res.user?.phone ?? res.rawData?["data"]?["phone"] ?? "",
+            });
+          }
         }
       } else {
         // Explicit invalid session response from server
@@ -260,31 +248,46 @@ class AuthService {
       havePackage.value = false;
       myUser = User();
 
-      if (Get.isRegistered<NavbarController>()) {
-        Get.find<NavbarController>().clearProfileState();
-      }
-
       CustomSnackBar.showCustomToast(message: "লগআউট সফল হয়েছে");
-      Get.offAllNamed(Routes.authGateway);
+      final context = rootNavigatorKey.currentContext;
+      if (context != null) {
+        context.goNamed(Routes.authGateway);
+      }
     }
   }
 
   /// Show a standardized logout confirmation modal
   static void confirmAndLogout() {
-    Get.defaultDialog(
-      title: "লগ আউট",
-      titleStyle: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-      middleText: "আপনি কি নিশ্চিতভাবে আপনার অ্যাকাউন্ট থেকে লগ আউট করতে চান?",
-      middleTextStyle: TextStyle(fontSize: 14.sp),
-      textConfirm: "হ্যাঁ, লগ আউট",
-      textCancel: "বাতিল",
-      confirmTextColor: Colors.white,
-      cancelTextColor: Colors.black87,
-      buttonColor: Colors.redAccent,
-      onConfirm: () {
-        Get.back();
-        AuthService().logout();
-      },
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          "লগ আউট",
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          "আপনি কি নিশ্চিতভাবে আপনার অ্যাকাউন্ট থেকে লগ আউট করতে চান?",
+          style: TextStyle(fontSize: 14.sp),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("বাতিল", style: TextStyle(color: Colors.black87)),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              AuthService().logout();
+            },
+            child: const Text("হ্যাঁ, লগ আউট", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
+import 'package:lokkha/core/core.dart';
 
 void showLoginPopup(BuildContext context) {
   showDialog(
@@ -27,7 +27,7 @@ void showLoginPopup(BuildContext context) {
                   color: Colors.blue.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.lock_outline,
                   color: Colors.blue,
                   size: 40,
@@ -37,7 +37,7 @@ void showLoginPopup(BuildContext context) {
               const SizedBox(height: 20),
 
               // Title
-              Text(
+              const Text(
                 "Please Login",
                 style: TextStyle(
                   fontSize: 22,
@@ -48,7 +48,7 @@ void showLoginPopup(BuildContext context) {
               const SizedBox(height: 8),
 
               // Description
-              Text(
+              const Text(
                 "You need to log in to continue using this feature.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -72,7 +72,7 @@ void showLoginPopup(BuildContext context) {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Cancel",
                         style: TextStyle(
                           fontSize: 15,
@@ -89,7 +89,7 @@ void showLoginPopup(BuildContext context) {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        Get.toNamed(Routes.authGateway);
+                        context.push(Routes.authGateway);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -97,7 +97,7 @@ void showLoginPopup(BuildContext context) {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Login",
                         style: TextStyle(
                             fontSize: 15, color: LightThemeColors.white),

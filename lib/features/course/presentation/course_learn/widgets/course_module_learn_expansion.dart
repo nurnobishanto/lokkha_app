@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/models/course_item.dart';
-import '../controllers/course_learn_controller.dart';
 
 class CourseModuleLearnExpansion extends StatelessWidget {
   final String title;
   final List<CourseItem> items;
   final bool initiallyExpanded;
   final bool isEnrolled;
+  final void Function(int courseId, int? itemId)? onItemTap;
 
   const CourseModuleLearnExpansion({
     super.key,
@@ -15,6 +14,7 @@ class CourseModuleLearnExpansion extends StatelessWidget {
     required this.items,
     this.initiallyExpanded = false,
     this.isEnrolled = false,
+    this.onItemTap,
   });
 
   @override
@@ -98,8 +98,9 @@ class CourseModuleLearnExpansion extends StatelessWidget {
                       Navigator.of(context).pop();
                       final courseId = item.courseId;
                       final itemId = item.id;
-                      Get.find<CourseLearnController>()
-                          .fetchCourseItem(courseId!, itemID: itemId);
+                      if (courseId != null) {
+                        onItemTap?.call(courseId, itemId);
+                      }
                     }
                   : null,
             );

@@ -1,12 +1,11 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/core/services/storage/secure_storage_service.dart';
-import 'package:lokkha/features/auth/auth.dart';
-
-import 'package:lokkha/core/utils/global.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/core/services/storage/secure_storage_service.dart';
+import 'package:lokkha/core/utils/global.dart';
+import 'package:lokkha/features/auth/auth.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
 /// PremiumEntitlementService
@@ -15,35 +14,30 @@ import 'package:lokkha/core/enums/api_call_status.dart';
 ///
 /// Replaces the scattered `havePackage.value` reads across the app.
 /// Every premium feature check must go through this service.
-///
-/// Key guarantees:
-///  - Entitlement is re-validated from the server on app start, app resume,
-///    and immediately after any purchase completes.
-///  - Local cache is invalidated after [_cacheDuration] minutes.
-///  - The global `havePackage` Rx variable is always kept in sync so that
-///    existing Obx() widgets continue to react without any changes.
-///  - Controller lifecycle cannot accidentally grant access via stale state.
 /// ─────────────────────────────────────────────────────────────────────────────
-class PremiumEntitlementService extends GetxService {
+class PremiumEntitlementService {
+  static final PremiumEntitlementService _instance =
+      PremiumEntitlementService._internal();
+  factory PremiumEntitlementService() => _instance;
+  PremiumEntitlementService._internal();
+
+  static PremiumEntitlementService get to => _instance;
+  static PremiumEntitlementService get instance => _instance;
+
   // ── Public reactive state ────────────────────────────────────────────────
-  final Rx<ApiCallStatus> validationStatus = ApiCallStatus.holding.obs;
+  final ValueNotifier<ApiCallStatus> validationStatus =
+      ValueNotifier<ApiCallStatus>(ApiCallStatus.holding);
 
   // ── Cache control ────────────────────────────────────────────────────────
   DateTime? _lastValidatedAt;
   static const Duration _cacheDuration = Duration(minutes: 5);
 
-  // ── Singleton accessor ───────────────────────────────────────────────────
-  static PremiumEntitlementService get to =>
-      Get.find<PremiumEntitlementService>();
-
   // ── Public API ───────────────────────────────────────────────────────────
 
   /// Convenience getter — the authoritative premium check.
-  /// All premium guards must use this, never read [havePackage] directly.
   bool get isPremiumValid => havePackage.value;
 
   /// Full server-side validation.
-  /// Call on: app start, app resume.
   Future<void> validateEntitlement() async {
     // Skip if recently validated (unless forced)
     if (_isCacheValid()) {
@@ -54,23 +48,13 @@ class PremiumEntitlementService extends GetxService {
   }
 
   /// Force refresh — always hits the server.
-  /// Call immediately after: PaymentWebView completes, IAP purchase delivers.
   Future<void> refreshAfterPurchase() async {
     log('🔑 Refreshing entitlement after purchase...');
     _lastValidatedAt = null; // Invalidate cache
     await _fetchEntitlement();
   }
 
-  /// Asserts premium access. If not valid, calls [onDenied] or shows a
-  /// navigate-to-packages bottom sheet by default.
-  ///
-  /// Usage in controller.onInit():
-  /// ```dart
-  /// PremiumEntitlementService.to.assertPremiumAccess(onDenied: () {
-  ///   Get.back();
-  ///   Get.toNamed(Routes.packages);
-  /// });
-  /// ```
+  /// Asserts premium access. If not valid, calls [onDenied] or redirects.
   void assertPremiumAccess({VoidCallback? onDenied}) {
     if (!isPremiumValid) {
       log('🔒 Premium access denied — redirecting');
@@ -92,7 +76,6 @@ class PremiumEntitlementService extends GetxService {
   Future<void> _fetchEntitlement() async {
     final token = await SecureStorageService.getToken();
     if (token == null || token.isEmpty) {
-      // Not logged in → no entitlement
       _updateState(hasPremium: false);
       return;
     }
@@ -112,29 +95,19 @@ class PremiumEntitlementService extends GetxService {
         validationStatus.value = ApiCallStatus.error;
       }
     } catch (e) {
-      // On network error: keep the CURRENT cached value — do not revoke
-      // access on transient failures to avoid locking out paying users.
       validationStatus.value = ApiCallStatus.error;
       log('❌ Entitlement network error: $e — keeping cached state');
     }
   }
 
   void _updateState({required bool hasPremium}) {
-    havePackage.value = hasPremium; // Keeps global Rx in sync
+    havePackage.value = hasPremium;
     _lastValidatedAt = DateTime.now();
   }
 
   void _defaultDenialAction() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.toNamed('/packages');
+      rootNavigatorKey.currentContext?.push(Routes.packages);
     });
-  }
-
-  // ── Lifecycle ────────────────────────────────────────────────────────────
-
-  @override
-  void onInit() {
-    super.onInit();
-    log('PremiumEntitlementService initialized');
   }
 }

@@ -1,74 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/features/contest/presentation/controllers/latest_contest_controller.dart';
-import '../views/contest_tab_view.dart';
+import 'package:lokkha/features/contest/contest.dart';
 
-class LatestContestWidget extends StatelessWidget {
+class LatestContestWidget extends ConsumerWidget {
   const LatestContestWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(LatestContestController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(latestContestNotifierProvider);
 
-    return Obx(() {
-      return controller.contestModel.value.contest == null
-          ? const SizedBox.shrink()
-          : controller.isLoading.value
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : InkWell(
-                  onTap: () {
-                    Get.to(const ContestTabView());
-                  },
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(7.0),
-                    child: Stack(
-                      children: [
-                        //isCheckedGifImage(controller.imageUrl.value),
-                        Image.network(
-                          controller.imageUrl.value,
-                          height: 110.0.h,
-                          width: double.infinity,
-                          fit: BoxFit.fitWidth,
+    if (state.contestModel?.contest == null) {
+      return const SizedBox.shrink();
+    }
+
+    if (state.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ContestTabView()),
+        );
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7.0),
+        child: Stack(
+          children: [
+            Image.network(
+              state.imageUrl,
+              height: 110.0.h,
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+              errorBuilder: (_, __, ___) => Container(
+                height: 110.0.h,
+                color: Colors.grey.shade200,
+                child: const Center(
+                  child: Icon(Icons.image_not_supported, color: Colors.grey),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8.0,
+              left: 8.0,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: state.status == 'timer'
+                    ? Text(
+                        "${state.hours.toString().padLeft(2, '0')}:"
+                        "${state.minutes.toString().padLeft(2, '0')}:"
+                        "${state.seconds.toString().padLeft(2, '0')}",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.5.sp,
+                          fontWeight: FontWeight.w500,
                         ),
-                        Positioned(
-                          top: 8.0,
-                          left: 8.0,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0, vertical: 4.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: controller.status.value == 'timer'
-                                ? Text(
-                                    "${controller.hours.value.toString().padLeft(2, '0')}:"
-                                    "${controller.minutes.value.toString().padLeft(2, '0')}:"
-                                    "${controller.seconds.value.toString().padLeft(2, '0')}",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.5.sp,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
-                                : controller.status.value == 'ongoing'
-                                    ? const Text(
-                                        "🟡 Ongoing",
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    : const Text(
-                                        '🔴 Ended',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                      )
+                    : state.status == 'ongoing'
+                        ? const Text(
+                            "🟡 Ongoing",
+                            style: TextStyle(color: Colors.white),
+                          )
+                        : const Text(
+                            '🔴 Ended',
+                            style: TextStyle(color: Colors.white),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-    });
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

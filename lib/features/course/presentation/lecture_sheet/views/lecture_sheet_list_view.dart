@@ -1,53 +1,73 @@
 import 'package:flutter/material.dart';
-
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/features/course/course.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
-
 import 'package:lokkha/shared/models/category.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
-import '../controllers/lecture_sheet_list_controller.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
+import 'lecture_sheet_list_details_view.dart';
 
-class LectureSheetListView extends GetView<LectureSheetListController> {
+class LectureSheetListView extends ConsumerStatefulWidget {
   const LectureSheetListView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(LectureSheetListController());
-    final scrollController = ScrollController();
-    scrollController.addListener(() {
-      if (scrollController.position.pixels >=
-          scrollController.position.maxScrollExtent - 200) {
-        controller
-            .fetchSheetListCategories(); // Safe fetch handled in controller
+  ConsumerState<LectureSheetListView> createState() => _LectureSheetListViewState();
+}
+
+class _LectureSheetListViewState extends ConsumerState<LectureSheetListView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        ref.read(lectureSheetListNotifierProvider.notifier).fetchCategories();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(lectureSheetListNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text("Lecture Sheets")),
-      body: Obx(() {
-        if (controller.apiCallStatus.value == ApiCallStatus.loading &&
-            controller.categories.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: ListView.separated(
-            controller: scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            itemCount: controller.categories.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 5),
-            itemBuilder: (context, index) {
-              final item = controller.categories[index];
-              return SimpleCategoryCard(
-                item: item,
-                onTap: () => Get.to(
-                    () => LectureSheetListDetailsView(id: item.id!.toInt())),
-              );
-            },
-          ),
-        );
-      }),
+      body: Builder(
+        builder: (context) {
+          if (state.status == ApiCallStatus.loading && state.categories.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ListView.separated(
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              itemCount: state.categories.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 5),
+              itemBuilder: (context, index) {
+                final item = state.categories[index];
+                return SimpleCategoryCard(
+                  item: item,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LectureSheetListDetailsView(
+                        id: item.id!.toInt(),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -77,7 +97,7 @@ class SimpleCategoryCard extends StatelessWidget {
         ),
       ),
       child: Material(
-        color: Colors.transparent, // Keep Material transparent to show border
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           borderRadius: BorderRadius.circular(12),

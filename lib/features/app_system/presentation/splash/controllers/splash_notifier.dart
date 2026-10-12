@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
@@ -23,9 +22,7 @@ class SplashNotifier extends Notifier<SplashState> {
     await Future.wait([
       () async {
         try {
-          if (Get.isRegistered<PremiumEntitlementService>()) {
-            await Get.find<PremiumEntitlementService>().validateEntitlement();
-          }
+          await PremiumEntitlementService.to.validateEntitlement();
         } catch (e) {
           debugPrint("Error validating premium entitlement: $e");
         }
@@ -40,15 +37,17 @@ class SplashNotifier extends Notifier<SplashState> {
       Future.delayed(const Duration(milliseconds: 1800)),
     ]);
 
-    final canProceed = appUpdateService.handleStartupFlow();
-    if (canProceed && context.mounted) {
+    if (!context.mounted) return;
+
+    if (appUpdateService.maintenanceMode) {
+      context.go(Routes.maintenanceMode);
+    } else if (appUpdateService.updateRequired) {
+      context.go(Routes.appUpdate);
+    } else {
       context.go(Routes.navbar);
-      Future.delayed(const Duration(milliseconds: 700), () {
-        appUpdateService.showInAppAnnouncementIfAvailable();
-      });
     }
-    state = const SplashState(isInitialized: true);
   }
 }
 
-final splashNotifierProvider = NotifierProvider<SplashNotifier, SplashState>(SplashNotifier.new);
+final splashNotifierProvider =
+    NotifierProvider<SplashNotifier, SplashState>(SplashNotifier.new);

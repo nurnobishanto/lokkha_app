@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/features/notifications/notifications.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
@@ -47,33 +46,11 @@ class HomeController extends GetxController {
   Rx<SubjectSectionModel> get subjectSectionModel =>
       homeApiService.subjectSectionModel;
 
-  LatestContestController? _contestController;
-  ExamCategoryController? _examController;
-
-  LatestContestController get contestController {
-    if (_contestController != null) return _contestController!;
-    _contestController = Get.isRegistered<LatestContestController>()
-        ? Get.find<LatestContestController>()
-        : Get.put(LatestContestController());
-    return _contestController!;
-  }
-
-  ExamCategoryController get examController {
-    if (_examController != null) return _examController!;
-    _examController = Get.isRegistered<ExamCategoryController>()
-        ? Get.find<ExamCategoryController>()
-        : Get.put(ExamCategoryController());
-    return _examController!;
-  }
 
   @override
   void onInit() {
     super.onInit();
     debugPrint("HomeController Initialized with V1 Dashboard Repository");
-
-    if (!Get.isRegistered<NotificationsController>() && Get.isRegistered<GetNotificationsUseCase>()) {
-      Get.put(NotificationsController());
-    }
 
     // Initial 1-call API fetch
     _fetchInitialData();
@@ -98,10 +75,6 @@ class HomeController extends GetxController {
       await Future.wait([
         homeApiService.fetchSliders(),
         homeApiService.fetchSubjectSection(),
-        contestController.fetchContest(),
-        contestController.fetchContestResult(),
-        contestController.fetchAllContest(),
-        examController.fetchCourseCategories(),
       ]);
       debugPrint("Initial Home data fetched successfully");
     } catch (e) {

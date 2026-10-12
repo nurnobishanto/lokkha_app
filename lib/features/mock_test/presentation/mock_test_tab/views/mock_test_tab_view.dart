@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/features/mock_test/mock_test.dart';
-import 'package:lokkha/core/core.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import '../controllers/mock_test_tab_controller.dart';
+import 'package:lokkha/features/mock_test/mock_test.dart';
+import 'package:lokkha/shared/shared.dart';
 
-class MockTestTabView extends GetView<MockTestTabController> {
+class MockTestTabView extends StatelessWidget {
   const MockTestTabView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         backgroundColor: LightThemeColors.primaryColor,
-        appBar: CustomAppBar(
+        appBar: const CustomAppBar(
           title: "বিষয়ভিত্তিক পরীক্ষা",
           centerTitle: true,
           fontSize: 18.0,

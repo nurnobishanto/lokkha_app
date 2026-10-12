@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/course_item.dart';
 import 'package:lokkha/app/router/router.dart';
@@ -111,9 +111,10 @@ class CourseModuleExpansion extends StatelessWidget {
                     final courseId = item.courseId;
                     final itemId = item.id;
                     debugPrint("Course id:$courseId $itemId ");
-                    //
-                    Get.toNamed(Routes.courseLearn,
-                        arguments: {'id': courseId, 'item_id': itemId});
+                    context.pushNamed(
+                      Routes.courseLearn,
+                      extra: {'id': courseId, 'item_id': itemId},
+                    );
                   }
                 });
           }).toList(),

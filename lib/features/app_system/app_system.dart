@@ -16,8 +16,6 @@ export 'presentation/splash/views/splash_view.dart';
 export 'presentation/app_update/views/app_update_view_view.dart';
 
 // Presentation - Maintenance Mode
-export 'presentation/maintenance_mode/bindings/maintenance_mode_view_binding.dart';
-export 'presentation/maintenance_mode/controllers/maintenance_mode_view_controller.dart';
 export 'presentation/maintenance_mode/views/maintenance_mode_view_view.dart';
 
 // Presentation - Customer Support

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
-
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/app/router/router.dart';
 
@@ -78,7 +77,7 @@ class LoginRequiredDialog extends StatelessWidget {
           ),
           onPressed: () {
             Navigator.of(context).pop();
-            Get.toNamed(Routes.authGateway);
+            context.pushNamed(Routes.authGateway);
           },
         ),
       ],

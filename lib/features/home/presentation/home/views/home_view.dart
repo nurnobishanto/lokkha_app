@@ -4,34 +4,47 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/core.dart';
-import 'package:lokkha/features/contest/contest.dart';
-import 'package:lokkha/features/exam/exam.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/features/course/course.dart';
-import 'package:lokkha/features/home/home.dart';
-import 'package:lokkha/features/study_material/study_material.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
+import 'package:lokkha/features/contest/contest.dart';
+import 'package:lokkha/features/course/course.dart';
+import 'package:lokkha/features/exam/exam.dart';
+import 'package:lokkha/features/home/home.dart';
+import 'package:lokkha/features/jobs/jobs.dart';
+import 'package:lokkha/features/mock_test/mock_test.dart';
+import 'package:lokkha/features/study_material/study_material.dart';
+import 'package:lokkha/shared/shared.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final HomeController controller = Get.find();
-    final ExamCategoryController examController = Get.find();
-    Future<void> onRefresh() async {
-      await controller.refreshHomeViewData();
-      await AppUpdateService().fetchAppInfoAndCheckVersion();
-      AppUpdateService().showInAppAnnouncementIfAvailable(force: true);
-    }
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
 
+class _HomeViewState extends ConsumerState<HomeView> {
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(homeNotifierProvider.notifier).fetchInitialData();
       AppUpdateService().showInAppAnnouncementIfAvailable();
     });
+  }
+
+  Future<void> _onRefresh() async {
+    await ref.read(homeNotifierProvider.notifier).refreshHomeViewData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final homeState = ref.watch(homeNotifierProvider);
 
     return Scaffold(
       drawer: const CustomDrawer(),
@@ -48,7 +61,7 @@ class HomeView extends StatelessWidget {
               style: AppTextStyles.custom(fontSize: 16.sp).copyWith(
                 color: context.isDark
                     ? context.textPrimary
-                    : Get.theme.indicatorColor,
+                    : Theme.of(context).indicatorColor,
               ),
             ),
           ],
@@ -62,7 +75,7 @@ class HomeView extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  Get.toNamed(Routes.notifications);
+                  context.push(Routes.notifications);
                 },
                 icon: const Icon(Icons.notifications, size: 28),
               ),
@@ -71,31 +84,31 @@ class HomeView extends StatelessWidget {
               Positioned(
                 right: 6,
                 top: 6,
-                child: Obx(() {
-                  // if (unReadNotificationCount.value == 0) {
-                  //   return const SizedBox.shrink();
-                  // }
-                  return Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Text(
-                      unReadNotificationCount.value.toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: unReadNotificationCount,
+                  builder: (context, count, _) {
+                    return Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
                       ),
-                    ),
-                  );
-                }),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        count.toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -103,64 +116,58 @@ class HomeView extends StatelessWidget {
         ],
 
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(Get.height / 20 + 5),
+          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height / 20 + 5),
           child: _SearchBar(
-            onTap: () => Get.to(const ComingSoonPage()),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ComingSoonPage()),
+            ),
           ).paddingOnly(bottom: 5),
         ),
       ),
 
       body: RefreshIndicator(
-        onRefresh: onRefresh,
+        onRefresh: _onRefresh,
         child: ListView(
           padding: EdgeInsets.fromLTRB(8.r, 2.h, 8.r, 16.h),
           children: [
             const PromoBarWidget(),
             3.h.height,
-            _SliderSection(
-              controller: controller,
-              onTap: () {
-                debugPrint("asssss");
-              },
-            ),
+            const _SliderSection(),
             8.h.height,
-            _ShortcutGrid(controller: controller),
+            const _ShortcutGrid(),
             8.h.height,
             RandomQuestionSelector(),
             8.h.height,
             SectionTitleWithSeeAll(
-                title: "প্রিমিয়াম পরীক্ষা সমূহ",
-                onSeeAllPressed: () {
-                  Get.toNamed(Routes.allCourses);
-                }),
+              title: "প্রিমিয়াম পরীক্ষা সমূহ",
+              onSeeAllPressed: () {
+                context.push(Routes.allCourses);
+              },
+            ),
             SizedBox(height: 8.h),
-            _PremiumExamSection(),
+            const _PremiumExamSection(),
             10.h.height,
             SectionTitleWithSeeAll(
-                title: "ফ্রি পরীক্ষা সমূহ",
-                onSeeAllPressed: () {
-                  Get.toNamed(Routes.allExam);
-                }),
+              title: "ফ্রি পরীক্ষা সমূহ",
+              onSeeAllPressed: () {
+                context.push(Routes.allExam);
+              },
+            ),
             SizedBox(height: 8.h),
-            _FreeExamSection(examController: examController),
+            const _FreeExamSection(),
             8.h.height,
             const LatestContestWidget(),
             const LastContestResultWidget(),
             8.h.height,
-            Obx(() {
-              final overview = controller.dashboardOverview.value;
-              final points = overview?.data?.accuracyPoints;
-              if (points != null && points.isNotEmpty) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.h),
-                  child: AccuracyChartWidget(
-                    points: points,
-                    currentAccuracy: overview?.data?.accuracyRate ?? 0.0,
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
+            if (homeState.dashboardOverview?.data?.accuracyPoints != null &&
+                homeState.dashboardOverview!.data!.accuracyPoints!.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.h),
+                child: AccuracyChartWidget(
+                  points: homeState.dashboardOverview!.data!.accuracyPoints!,
+                  currentAccuracy: homeState.dashboardOverview!.data!.accuracyRate ?? 0.0,
+                ),
+              ),
             Center(
               child: Text(
                 "জনপ্রিয় প্রশ্নব্যাংক",
@@ -171,7 +178,7 @@ class HomeView extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8.h),
-            _SubjectSection(controller: controller),
+            const _SubjectSection(),
             Divider(color: context.borderColor),
             SocialLinksScreen(),
             8.h.height,
@@ -263,7 +270,7 @@ class _SearchBar extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: Get.height / 20,
+        height: MediaQuery.of(context).size.height / 20,
         decoration: BoxDecoration(
           color: context.primaryColor,
           borderRadius: BorderRadius.only(
@@ -301,185 +308,177 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-class _SliderSection extends StatelessWidget {
-  final HomeController controller;
+class _SliderSection extends ConsumerWidget {
   final void Function()? onTap;
-  const _SliderSection({required this.controller, this.onTap});
+  const _SliderSection({super.key, this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      switch (controller.sliderApiStatus.value) {
-        case ApiCallStatus.loading:
-          return const Center(child: CircularProgressIndicator());
-        case ApiCallStatus.error:
-          return const Center(child: Text("Slider loading failed"));
-        case ApiCallStatus.holding:
-          return const SizedBox.shrink();
-        case ApiCallStatus.success:
-          final sliders = controller.sliderModel.value.sliders ?? [];
-          if (sliders.isEmpty) return const SizedBox.shrink();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeNotifierProvider);
 
-          return CarouselSlider(
-            options: CarouselOptions(
-              aspectRatio: 14 / 4,
-              enlargeCenterPage: true,
-              enlargeStrategy: CenterPageEnlargeStrategy.height,
-              autoPlay: true,
-              viewportFraction: 1.0,
-              onPageChanged: (currentIndex, reason) {
-                controller.dotsCount = currentIndex;
-              },
-            ),
-            items: sliders.map((sliderItem) {
-              final imageUrl =
-                  AppConstants.storageUrl + (sliderItem.image ?? '');
-              if (kDebugMode) debugPrint('URL IMAGE : $imageUrl');
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(7.0),
-                child: InkWell(
-                  onTap: () {
-                    final page = sliderItem.page ?? "";
-                    final link = sliderItem.link ?? "";
-                    final param = sliderItem.param ?? "";
+    switch (homeState.sliderStatus) {
+      case ApiCallStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case ApiCallStatus.error:
+        return const Center(child: Text("Slider loading failed"));
+      case ApiCallStatus.holding:
+        return const SizedBox.shrink();
+      case ApiCallStatus.success:
+        final sliders = homeState.sliderModel.sliders ?? [];
+        if (sliders.isEmpty) return const SizedBox.shrink();
 
-                    if (page.isNotEmpty) {
-                      // Navigate to internal page
-                      if (param.isNotEmpty) {
-                        try {
-                          // Decode JSON param and pass as direct GetX arguments
-                          final decoded = jsonDecode(param); // JSON -> Map
-                          Get.toNamed(page, arguments: decoded);
-                        } catch (e) {
-                          // If JSON fails → pass raw string fallback
-                          Get.toNamed(page, arguments: {"param": param});
-                        }
-                      } else {
-                        // Simple navigation without param
-                        Get.toNamed(page);
+        return CarouselSlider(
+          options: CarouselOptions(
+            aspectRatio: 14 / 4,
+            enlargeCenterPage: true,
+            enlargeStrategy: CenterPageEnlargeStrategy.height,
+            autoPlay: true,
+            viewportFraction: 1.0,
+            onPageChanged: (currentIndex, reason) {
+              ref.read(homeNotifierProvider.notifier).setDotsCount(currentIndex);
+            },
+          ),
+          items: sliders.map((sliderItem) {
+            final imageUrl =
+                AppConstants.storageUrl + (sliderItem.image ?? '');
+            if (kDebugMode) debugPrint('URL IMAGE : $imageUrl');
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(7.0),
+              child: InkWell(
+                onTap: () {
+                  final page = sliderItem.page ?? "";
+                  final link = sliderItem.link ?? "";
+                  final param = sliderItem.param ?? "";
+
+                  if (page.isNotEmpty) {
+                    if (param.isNotEmpty) {
+                      try {
+                        final decoded = jsonDecode(param);
+                        context.push(page, extra: decoded);
+                      } catch (e) {
+                        context.push(page, extra: {"param": param});
                       }
-                    } else if (link.isNotEmpty) {
-                      final uri = Uri.tryParse(link);
-                      if (uri != null && uri.path.isNotEmpty) {
-                        final extractedPage = uri.path;
+                    } else {
+                      context.push(page);
+                    }
+                  } else if (link.isNotEmpty) {
+                    final uri = Uri.tryParse(link);
+                    if (uri != null && uri.path.isNotEmpty) {
+                      final extractedPage = uri.path;
 
-                        final segments = uri.pathSegments;
-                        if (segments.isNotEmpty) {
-                          final last = segments.last;
+                      final segments = uri.pathSegments;
+                      if (segments.isNotEmpty) {
+                        final last = segments.last;
 
-                          if (int.tryParse(last) != null) {
-                            final id = int.parse(last);
-
-                            // Build route without ID
-                            final baseRoute =
-                                "/${segments.sublist(0, segments.length - 1).join("/")}";
-
-                            // Navigate with ID
-                            Get.toNamed(baseRoute, arguments: id);
-                            return;
-                          }
+                        if (int.tryParse(last) != null) {
+                          final id = int.parse(last);
+                          final baseRoute =
+                              "/${segments.sublist(0, segments.length - 1).join("/")}";
+                          context.push(baseRoute, extra: id);
+                          return;
                         }
-                        if (isAppRoute(extractedPage)) {
-                          final queryParams = uri.queryParameters;
-                          debugPrint("3. $queryParams");
-                          final Map<String, dynamic> parsedParams = {};
+                      }
+                      if (isAppRoute(extractedPage)) {
+                        final queryParams = uri.queryParameters;
+                        final Map<String, dynamic> parsedParams = {};
 
-                          queryParams.forEach((key, value) {
-                            final lowerKey = key.toLowerCase();
+                        queryParams.forEach((key, value) {
+                          final lowerKey = key.toLowerCase();
+                          final isIdField = lowerKey.endsWith("id") ||
+                              lowerKey.contains("_id");
 
-                            // Rule 1: keys like id, user_id, course_id etc → ALWAYS INT
-                            final isIdField = lowerKey.endsWith("id") ||
-                                lowerKey.contains("_id");
-
-                            if (isIdField) {
-                              parsedParams[key] = int.tryParse(value) ?? 0;
-                            }
-                            // Rule 2: value is purely numeric → convert to int
-                            else if (int.tryParse(value) != null) {
-                              parsedParams[key] = int.parse(value);
-                            }
-                            // Rule 3: fallback → keep as string
-                            else {
-                              parsedParams[key] = value;
-                            }
-                          });
-
-                          if (parsedParams.isNotEmpty) {
-                            Get.toNamed(extractedPage, arguments: parsedParams);
+                          if (isIdField) {
+                            parsedParams[key] = int.tryParse(value) ?? 0;
+                          } else if (int.tryParse(value) != null) {
+                            parsedParams[key] = int.parse(value);
                           } else {
-                            Get.toNamed(extractedPage);
+                            parsedParams[key] = value;
                           }
+                        });
+
+                        if (parsedParams.isNotEmpty) {
+                          context.push(extractedPage, extra: parsedParams);
                         } else {
-                          debugPrint("4......");
-                          // No matching route → open external link
-                          openAppOrWebView(link);
+                          context.push(extractedPage);
                         }
                       } else {
-                        debugPrint("5......");
-                        // Invalid link fallback
                         openAppOrWebView(link);
                       }
+                    } else {
+                      openAppOrWebView(link);
                     }
-                  },
-                  child: Container(
-                    height: 120.h,
-                    decoration: BoxDecoration(color: Colors.grey.shade200),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (c, u) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (c, u, e) =>
-                            const Center(child: Icon(Icons.broken_image)),
-                      ),
+                  }
+                },
+                child: Container(
+                  height: 120.h,
+                  decoration: BoxDecoration(color: Colors.grey.shade200),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (c, u) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (c, u, e) =>
+                          const Center(child: Icon(Icons.broken_image)),
                     ),
                   ),
                 ),
-              );
-            }).toList(),
-          );
-        case ApiCallStatus.empty:
-          // TODO: Handle this case.
-          throw UnimplementedError();
-        case ApiCallStatus.cache:
-          // TODO: Handle this case.
-          throw UnimplementedError();
-        case ApiCallStatus.refresh:
-          // TODO: Handle this case.
-          throw UnimplementedError();
-      }
-    });
+              ),
+            );
+          }).toList(),
+        );
+      case ApiCallStatus.empty:
+      case ApiCallStatus.cache:
+      case ApiCallStatus.refresh:
+        return const SizedBox.shrink();
+    }
   }
 }
 
 class _ShortcutGrid extends StatelessWidget {
-  final HomeController controller;
-  const _ShortcutGrid({required this.controller});
+  const _ShortcutGrid();
+
+  static const List<String> gridViewTitle = [
+    'বিষয়ভিত্তিক পরীক্ষা',
+    'কারেন্ট এ্যাফেয়ার্স',
+    'সর্বশেষ নিয়োগ বিজ্ঞপ্তি',
+    'সর্বশেষ নিয়োগ পরীক্ষা',
+    'Vocabulary',
+    'পরীক্ষা সমূহ',
+  ];
+
+  static const List<Widget> gridViewRoutePage = [
+    MockTestTabView(),
+    CurrentAffairsView(),
+    JobsView(),
+    LatestExamView(),
+    VocabularyView(),
+    ExamCategoryView(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (int i = 0; i < controller.gridViewTitle.length; i += 2) ...[
+        for (int i = 0; i < gridViewTitle.length; i += 2) ...[
           if (i > 0) SizedBox(height: 10.h),
           Row(
             children: [
               Expanded(
                 child: _buildItem(
                   context,
-                  controller.gridViewTitle[i],
-                  controller.gridViewRoutePage[i],
+                  gridViewTitle[i],
+                  gridViewRoutePage[i],
                 ),
               ),
-              if (i + 1 < controller.gridViewTitle.length) ...[
+              if (i + 1 < gridViewTitle.length) ...[
                 SizedBox(width: 10.w),
                 Expanded(
                   child: _buildItem(
                     context,
-                    controller.gridViewTitle[i + 1],
-                    controller.gridViewRoutePage[i + 1],
+                    gridViewTitle[i + 1],
+                    gridViewRoutePage[i + 1],
                   ),
                 ),
               ],
@@ -492,11 +491,13 @@ class _ShortcutGrid extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, String title, Widget route) {
     return GestureDetector(
-      onTap: () => Get.to(route),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => route),
+      ),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
         decoration: BoxDecoration(
-          color: context.isDark ? context.cardColor : LightThemeColors.softBg, // soft premium look
+          color: context.isDark ? context.cardColor : LightThemeColors.softBg,
           borderRadius: BorderRadius.circular(10.0),
           border: Border.all(
             color: context.isDark
@@ -531,164 +532,162 @@ class _ShortcutGrid extends StatelessWidget {
   }
 }
 
-class _PremiumExamSection extends StatelessWidget {
+class _PremiumExamSection extends ConsumerWidget {
   const _PremiumExamSection();
 
   @override
-  Widget build(BuildContext context) {
-    Get.put(SeeAllItemsController());
-    final controller = Get.find<SeeAllItemsController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(seeAllItemsNotifierProvider);
 
-    return Obx(() {
-      if (controller.courseApiCallStatus.value == ApiCallStatus.loading) {
-        return SizedBox(
-          height: 200.h,
-          child: const Center(child: CircularProgressIndicator()),
-        );
-      }
-
-      final courses = controller.allCourseModel.value.courses?.data ?? [];
-
-      if (courses.isEmpty) {
-        return const SizedBox.shrink();
-      }
-
+    if (state.courseApiCallStatus == ApiCallStatus.loading &&
+        (state.allCourseModel.courses?.data ?? []).isEmpty) {
       return SizedBox(
-        height: 140.h,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          itemCount: courses.length,
-          separatorBuilder: (_, __) => SizedBox(width: 7.w),
-          itemBuilder: (_, index) {
-            final course = courses[index];
+        height: 200.h,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
-            return SizedBox(
-              width: 140.w,
-              child: CustomCourseCard(
-                imageUrl: AppConstants.storageUrl + course.image.toString(),
-                title: course.title ?? "",
-                regularPrice: course.regularPrice.toString(),
-                salePrice: course.salePrice.toString(),
-                rating: '5',
-                onPressed: () {
-                  Get.toNamed(
-                    Routes.courseDetails,
-                    arguments: {'course_id': course.id},
-                  );
-                },
+    final courses = state.allCourseModel.courses?.data ?? [];
+
+    if (courses.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: 140.h,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: courses.length,
+        separatorBuilder: (_, __) => SizedBox(width: 7.w),
+        itemBuilder: (_, index) {
+          final course = courses[index];
+
+          return SizedBox(
+            width: 140.w,
+            child: CustomCourseCard(
+              imageUrl: AppConstants.storageUrl + course.image.toString(),
+              title: course.title ?? "",
+              regularPrice: course.regularPrice.toString(),
+              salePrice: course.salePrice.toString(),
+              rating: '5',
+              onPressed: () {
+                context.push(
+                  Routes.courseDetails,
+                  extra: {'course_id': course.id},
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _FreeExamSection extends ConsumerWidget {
+  const _FreeExamSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(examCategoriesNotifierProvider);
+    final exams = state.examCategoriesModel?.examCategories ?? [];
+    if (exams.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 15,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: exams.length,
+        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+        itemBuilder: (_, x) {
+          final exam = exams[x];
+          return ExamCategoryCard(
+            title: exam.name ?? '',
+            onTap: () {
+              if (exam.id != null) {
+                context.push(Routes.examCategoryDetails, extra: {
+                  "category_id": exam.id,
+                  "category_name": exam.name,
+                });
+              }
+            },
+            borderColor: context.isDark
+                ? context.borderColor
+                : LightThemeColors.primaryColor.withValues(alpha: 0.4),
+            iconColor: context.primaryColor,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SubjectSection extends ConsumerWidget {
+  const _SubjectSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeState = ref.watch(homeNotifierProvider);
+
+    switch (homeState.subjectSectionStatus) {
+      case ApiCallStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case ApiCallStatus.error:
+        return const Center(child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
+      case ApiCallStatus.success:
+        final list = homeState.subjectSectionModel.subjectSections ?? [];
+        if (list.isEmpty) return const SizedBox.shrink();
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 4,
+          ),
+          padding: EdgeInsets.zero,
+          itemCount: list.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            final data = list[index];
+            return GestureDetector(
+              onTap: () {
+                MySharedPref.clearSubjectSection();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SubjectSectionView(subject: data.subject),
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.cardColor,
+                  borderRadius: BorderRadius.circular(7.0),
+                  border: Border.all(
+                    color: context.borderColor,
+                    width: 0.8.w,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    data.name.toString(),
+                    style: AppTextStyles.body2.copyWith(
+                      height: 1.1.h,
+                      fontSize: 12.sp,
+                      color: context.textPrimary,
+                    ),
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ).paddingSymmetric(horizontal: 2.00.w, vertical: 5.00.h),
+                ),
               ),
             );
           },
-        ),
-      );
-    });
-  }
-}
-
-class _FreeExamSection extends StatelessWidget {
-  final ExamCategoryController examController;
-  const _FreeExamSection({required this.examController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      final exams = examController.model.value.examCategories ?? [];
-      if (exams.isEmpty) return const SizedBox.shrink();
-      return SizedBox(
-        height: Get.height / 15,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          itemCount: exams.length,
-          separatorBuilder: (_, __) => SizedBox(width: 12.w),
-          itemBuilder: (_, x) {
-            final exam = exams[x];
-            return ExamCategoryCard(
-              title: exam.name ?? '',
-              onTap: () {
-                if (exam.id != null) {
-                  Get.toNamed(Routes.examCategoryDetails, arguments: {
-                    "category_id": exam.id,
-                    "category_name": exam.name,
-                  });
-                }
-              },
-              borderColor: context.isDark
-                  ? context.borderColor
-                  : LightThemeColors.primaryColor.withValues(alpha: 0.4),
-              iconColor: context.primaryColor,
-            );
-          },
-        ),
-      );
-    });
-  }
-}
-
-class _SubjectSection extends StatelessWidget {
-  final HomeController controller;
-  const _SubjectSection({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      switch (controller.subjectSectionApiStatus.value) {
-        case ApiCallStatus.loading:
-          return const Center(child: CircularProgressIndicator());
-        case ApiCallStatus.error:
-          return const Center(child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
-        case ApiCallStatus.success:
-          final list =
-              controller.subjectSectionModel.value.subjectSections ?? [];
-          if (list.isEmpty) return const SizedBox.shrink();
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 4,
-            ),
-            padding: EdgeInsets.zero,
-            itemCount: list.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final data = list[index];
-              return GestureDetector(
-                onTap: () {
-                  MySharedPref.clearSubjectSection();
-                  Get.to(SubjectSectionView(subject: data.subject));
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: context.cardColor,
-                    borderRadius: BorderRadius.circular(7.0),
-                    border: Border.all(
-                      color: context.borderColor,
-                      width: 0.8.w,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      data.name.toString(),
-                      style: AppTextStyles.body2.copyWith(
-                        height: 1.1.h,
-                        fontSize: 12.sp,
-                        color: context.textPrimary,
-                      ),
-                      maxLines: 2,
-                      textAlign: TextAlign.center,
-                      overflow: TextOverflow.ellipsis,
-                    ).paddingSymmetric(horizontal: 2.00.w, vertical: 5.00.h),
-                  ),
-                ),
-              );
-            },
-          );
-        default:
-          return const SizedBox.shrink();
-      }
-    });
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 }

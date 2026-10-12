@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
@@ -19,10 +19,10 @@ class AppUpdateService {
   AppUpdateService._internal();
 
   /// Reactive state for dynamic app information & version check
-  final Rx<AppInfoModel?> appInfo = Rx<AppInfoModel?>(null);
-  final RxBool isChecking = false.obs;
-  RxBool updateRequiredCheck = false.obs;
-  RxBool firstAppUpdateCalled = false.obs;
+  final ValueNotifier<AppInfoModel?> appInfo = ValueNotifier<AppInfoModel?>(null);
+  final ValueNotifier<bool> isChecking = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> updateRequiredCheck = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> firstAppUpdateCalled = ValueNotifier<bool>(false);
 
   bool updateRequired = false;
   bool maintenanceMode = false;
@@ -103,15 +103,22 @@ class AppUpdateService {
     final info = appInfo.value;
     if (info == null) return true;
 
+    final context = rootNavigatorKey.currentContext;
+
     // 1. Maintenance Mode Check
     if (maintenanceMode) {
       debugPrint('[AppUpdateService] System under maintenance. Redirecting...');
-      Get.offAll(
-        () => MaintenanceModeView(
-          title: info.data.systemStatus.maintenanceTitle,
-          message: info.data.systemStatus.maintenanceMessage,
-        ),
-      );
+      if (context != null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => MaintenanceModeView(
+              title: info.data.systemStatus.maintenanceTitle,
+              message: info.data.systemStatus.maintenanceMessage,
+            ),
+          ),
+          (_) => false,
+        );
+      }
       return false;
     }
 
@@ -127,9 +134,7 @@ class AppUpdateService {
       final latestName = info.data.clientVersionCheck?.latestVersionName.isNotEmpty == true
           ? info.data.clientVersionCheck!.latestVersionName
           : info.data.versions.android.latestVersionName;
-      final subtitleMessage = latestName.isNotEmpty
-          ? "নতুন ফিচার, উন্নত সেবা ও আরও ভালো অভিজ্ঞতার জন্য অনুগ্রহ করে অ্যাপটি আপডেট করে নিন।"
-          : "নতুন ফিচার, উন্নত সেবা ও আরও ভালো অভিজ্ঞতার জন্য অনুগ্রহ করে অ্যাপটি আপডেট করে নিন।";
+      const subtitleMessage = "নতুন ফিচার, উন্নত সেবা ও আরও ভালো অভিজ্ঞতার জন্য অনুগ্রহ করে অ্যাপটি আপডেট করে নিন।";
 
       final currentVer = appVersion.value.isNotEmpty
           ? appVersion.value
@@ -138,15 +143,20 @@ class AppUpdateService {
               : '2.03.12');
 
       debugPrint('[AppUpdateService] Force update required. Redirecting...');
-      Get.offAll(
-        () => AppUpdateView(
-          url: downloadUri,
-          title: "New Version Available",
-          message: subtitleMessage,
-          currentVersion: currentVer,
-          latestVersion: latestName,
-        ),
-      );
+      if (context != null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => AppUpdateView(
+              url: downloadUri,
+              title: "New Version Available",
+              message: subtitleMessage,
+              currentVersion: currentVer,
+              latestVersion: latestName,
+            ),
+          ),
+          (_) => false,
+        );
+      }
       return false;
     }
 
@@ -167,34 +177,47 @@ class AppUpdateService {
 
   /// Non-blocking update dialog for optional updates
   void showOptionalUpdateDialog(Uri url, String? message) {
-    Get.defaultDialog(
-      title: "নতুন আপডেট উপলব্ধ",
-      titlePadding: const EdgeInsets.only(top: 16.0),
-      buttonColor: LightThemeColors.primaryColor,
-      cancelTextColor: LightThemeColors.black,
-      confirmTextColor: LightThemeColors.white,
-      contentPadding: const EdgeInsets.all(16),
-      content: Column(
-        children: [
-          Image.asset(AssetImagePaths.appIcon, width: 80),
-          const SizedBox(height: 12.0),
-          Text(
-            message?.isNotEmpty == true
-                ? message!
-                : "অ্যাপের নতুন সংস্করণ এসেছে। নতুন ফিচার উপভোগ করতে এখনই আপডেট করুন।",
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14),
+    final context = rootNavigatorKey.currentContext;
+    if (context == null) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.only(top: 16.0),
+        contentPadding: const EdgeInsets.all(16),
+        title: const Text("নতুন আপডেট উপলব্ধ", textAlign: TextAlign.center),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(AssetImagePaths.appIcon, width: 80),
+            const SizedBox(height: 12.0),
+            Text(
+              message?.isNotEmpty == true
+                  ? message!
+                  : "অ্যাপের নতুন সংস্করণ এসেছে। নতুন ফিচার উপভোগ করতে এখনই আপডেট করুন।",
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("পরে", style: TextStyle(color: LightThemeColors.black)),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(backgroundColor: LightThemeColors.primaryColor),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+                debugPrint('Could not launch $url');
+              }
+            },
+            child: const Text("আপডেট করুন", style: TextStyle(color: LightThemeColors.white)),
           ),
         ],
       ),
-      onConfirm: () async {
-        if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-          debugPrint('Could not launch $url');
-        }
-      },
-      onCancel: () => Get.back(),
-      textConfirm: "আপডেট করুন",
-      textCancel: "পরে",
     );
   }
 
@@ -212,7 +235,7 @@ class AppUpdateService {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 300), () {
-        if (Get.context != null && !InAppPopupDialog.isShowing) {
+        if (rootNavigatorKey.currentContext != null && !InAppPopupDialog.isShowing) {
           debugPrint(
               '[AppUpdateService] Displaying InAppPopupDialog: ${popup.heading}');
           InAppPopupDialog.show(popup);

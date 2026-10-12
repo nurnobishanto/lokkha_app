@@ -1,56 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/app/router/router.dart';
-import '../controllers/my_courses_controller.dart';
+import 'package:lokkha/shared/shared.dart';
+import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 
-class MyCoursesView extends GetView<MyCoursesController> {
+class MyCoursesView extends ConsumerWidget {
   const MyCoursesView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Get.put(MyCoursesController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(myCoursesNotifierProvider);
+    final notifier = ref.read(myCoursesNotifierProvider.notifier);
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: CustomAppBar(title: 'আমার কোর্স'),
-      body: Obx(() {
-        final status = controller.apiCallStatus.value;
+      body: Builder(
+        builder: (context) {
+          final status = state.status;
 
-        if (status == ApiCallStatus.loading ||
-            status == ApiCallStatus.holding) {
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF28a745)),
-          );
-        }
+          if (status == ApiCallStatus.loading ||
+              status == ApiCallStatus.holding) {
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF28a745)),
+            );
+          }
 
-        if (status == ApiCallStatus.error) return _buildErrorState();
+          if (status == ApiCallStatus.error) {
+            return _buildErrorState(notifier);
+          }
 
-        final packages = controller.model.value.packages ?? [];
-        if (packages.isEmpty) return _buildEmptyState(context);
+          final packages = state.model.packages ?? [];
+          if (packages.isEmpty) return _buildEmptyState(context);
 
-        return RefreshIndicator(
-          color: const Color(0xFF28a745),
-          onRefresh: controller.fetchMyCourses,
-          child: GridView.builder(
-            padding: EdgeInsets.all(12.r),
-            itemCount: packages.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12.h,
-              crossAxisSpacing: 12.w,
-              childAspectRatio: 1.0,
+          return RefreshIndicator(
+            color: const Color(0xFF28a745),
+            onRefresh: notifier.fetchMyCourses,
+            child: GridView.builder(
+              padding: EdgeInsets.all(12.r),
+              itemCount: packages.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 12.h,
+                crossAxisSpacing: 12.w,
+                childAspectRatio: 1.0,
+              ),
+              itemBuilder: (context, index) {
+                final package = packages[index];
+                if (package.course == null) return const SizedBox.shrink();
+                return _CourseCard(package: package);
+              },
             ),
-            itemBuilder: (context, index) {
-              final package = packages[index];
-              if (package.course == null) return const SizedBox.shrink();
-              return _CourseCard(package: package);
-            },
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 
@@ -74,7 +80,7 @@ class MyCoursesView extends GetView<MyCoursesController> {
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(MyCoursesNotifier notifier) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -82,11 +88,14 @@ class MyCoursesView extends GetView<MyCoursesController> {
           Icon(Icons.wifi_off_rounded, size: 80.r, color: Colors.grey.shade400),
           SizedBox(height: 16.h),
           ElevatedButton(
-            onPressed: controller.fetchMyCourses,
+            onPressed: notifier.fetchMyCourses,
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF28a745)),
-            child: const Text('আবার চেষ্টা করুন',
-                style: TextStyle(color: Colors.white)),
+              backgroundColor: const Color(0xFF28a745),
+            ),
+            child: const Text(
+              'আবার চেষ্টা করুন',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -103,20 +112,16 @@ class _CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final course = package.course;
     if (course == null) return const SizedBox.shrink();
-    debugPrint('CourseCard Loaded with id: ${course.id.runtimeType}');
-    // final bool isLifetime = (package.lifetimeAccess ?? 0) == 1;
-    // final DateTime? expiry = package.accessExpiry;
-    // final bool isExpired =
-    //     !isLifetime && expiry != null && expiry.isBefore(DateTime.now());
+
     return InkWell(
       onTap: () {
-              Get.toNamed(
-                Routes.courseDetails,
-                arguments: {
-                  'course_id': course.id,
-                },
-              );
-            },
+        context.pushNamed(
+          Routes.courseDetails,
+          extra: {
+            'course_id': course.id,
+          },
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: context.cardColor,
@@ -124,7 +129,9 @@ class _CourseCard extends StatelessWidget {
           border: Border.all(color: context.borderColor),
           boxShadow: [
             BoxShadow(
-              color: context.isDark ? Colors.transparent : Colors.black.withOpacity(0.05),
+              color: context.isDark
+                  ? Colors.transparent
+                  : Colors.black.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -137,21 +144,22 @@ class _CourseCard extends StatelessWidget {
             children: [
               // --- TOP: Image Only ---
               Expanded(
-                  flex: 3,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: course.image != null
-                            ? Image.network(
-                                '${AppConstants.storageUrl}/${course.image}',
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    _placeholderImage(),
-                              )
-                            : _placeholderImage(),
-                      ),
-                    ],
-                  )),
+                flex: 3,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: course.image != null
+                          ? Image.network(
+                              '${AppConstants.storageUrl}/${course.image}',
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  _placeholderImage(),
+                            )
+                          : _placeholderImage(),
+                    ),
+                  ],
+                ),
+              ),
 
               // --- BOTTOM: Info Section ---
               Expanded(
@@ -206,8 +214,11 @@ class _CourseCard extends StatelessWidget {
   Widget _placeholderImage() {
     return Container(
       color: const Color(0xFFE8F5E9),
-      child:
-          const Icon(Icons.school_rounded, size: 40, color: Color(0xFF28a745)),
+      child: const Icon(
+        Icons.school_rounded,
+        size: 40,
+        color: Color(0xFF28a745),
+      ),
     );
   }
 }

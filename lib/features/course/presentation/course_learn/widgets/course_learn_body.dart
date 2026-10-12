@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/core/core.dart';
@@ -8,22 +7,31 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:lokkha/shared/shared.dart';
-import '../controllers/course_learn_controller.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'full_screen_image_view.dart';
 
-class CourseLearnBody extends StatelessWidget {
+class CourseLearnBody extends StatefulWidget {
   final CourseLearningModel model;
-  final CourseLearnController controller;
+  final VoidCallback? onPlayPrev;
+  final VoidCallback? onPlayNext;
 
   const CourseLearnBody({
     super.key,
     required this.model,
-    required this.controller,
+    this.onPlayPrev,
+    this.onPlayNext,
   });
 
   @override
+  State<CourseLearnBody> createState() => _CourseLearnBodyState();
+}
+
+class _CourseLearnBodyState extends State<CourseLearnBody> {
+  bool _isExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
+    final model = widget.model;
     final currentItem = model.data?.currentItem;
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -52,11 +60,16 @@ class CourseLearnBody extends StatelessWidget {
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () {
-                            Get.to(() => PdfViewerScreen(
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PdfViewerScreen(
                                   title: currentItem.title.toString(),
                                   file: AppConstants.storageUrl +
                                       currentItem.pdf!,
-                                ));
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -106,10 +119,15 @@ class CourseLearnBody extends StatelessWidget {
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () {
-                            Get.to(() => FullscreenImageView(
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FullscreenImageView(
                                   imageUrl: AppConstants.storageUrl +
                                       currentItem.image!,
-                                ));
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -136,7 +154,7 @@ class CourseLearnBody extends StatelessWidget {
               if (model.data?.prevItemId != null)
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: controller.playPrev,
+                    onPressed: widget.onPlayPrev,
                     icon: const Icon(Icons.skip_previous, size: 18),
                     label: Text("Previous"),
                     style: ElevatedButton.styleFrom(
@@ -155,7 +173,7 @@ class CourseLearnBody extends StatelessWidget {
               if (model.data?.nextItemId != null)
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: controller.playNext,
+                    onPressed: widget.onPlayNext,
                     icon: const Icon(Icons.skip_next, size: 18),
                     label: Text("Next"),
                     style: ElevatedButton.styleFrom(
@@ -182,10 +200,15 @@ class CourseLearnBody extends StatelessWidget {
                     currentItem.image!.isNotEmpty) ...[
                   ElevatedButton.icon(
                     onPressed: () {
-                      Get.to(() => FullscreenImageView(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FullscreenImageView(
                             imageUrl:
                                 AppConstants.storageUrl + currentItem.image!,
-                          ));
+                          ),
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.image),
                     label: Text("ViewImage"),
@@ -204,10 +227,15 @@ class CourseLearnBody extends StatelessWidget {
                 if (currentItem.pdf != null && currentItem.pdf!.isNotEmpty) ...[
                   ElevatedButton.icon(
                     onPressed: () {
-                      Get.to(() => PdfViewerScreen(
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PdfViewerScreen(
                             title: currentItem.title.toString(),
                             file: AppConstants.storageUrl + currentItem.pdf!,
-                          ));
+                          ),
+                        ),
+                      );
                     },
                     icon: const Icon(Icons.picture_as_pdf),
                     label: Text("ViewPdf"),
@@ -270,54 +298,54 @@ class CourseLearnBody extends StatelessWidget {
           if (currentItem.details != null &&
               currentItem.details!.isNotEmpty) ...[
             const SizedBox(height: 10),
-            Obx(() {
-              final expanded = controller.isExpanded.value;
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 300),
-                    crossFadeState: expanded
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    firstChild: ClipRect(
-                      child: SizedBox(
-                        height:
-                            100, // Adjust height for approx. 3 lines of HTML
-                        child: SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: HtmlWidget(
-                            onTapUrl: (url) {
-                              //conditionalUrlLaunch(url, context);
-                              launchUrlString(url.toString());
-                              return true;
-                            },
-                            currentItem.details!,
-                          ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 300),
+                  crossFadeState: _isExpanded
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                  firstChild: ClipRect(
+                    child: SizedBox(
+                      height: 100, // Adjust height for approx. 3 lines of HTML
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: HtmlWidget(
+                          onTapUrl: (url) {
+                            launchUrlString(url.toString());
+                            return true;
+                          },
+                          currentItem.details!,
                         ),
                       ),
                     ),
-                    secondChild: HtmlWidget(onTapUrl: (url) {
-                      //conditionalUrlLaunch(url, context);
+                  ),
+                  secondChild: HtmlWidget(
+                    onTapUrl: (url) {
                       launchUrlString(url.toString());
                       return true;
-                    }, currentItem.details!),
+                    },
+                    currentItem.details!,
                   ),
-                  const SizedBox(height: 6),
-                  GestureDetector(
-                    onTap: () => controller.isExpanded.toggle(),
-                    child: Text(
-                      expanded ? 'Read Less ' : "Read More",
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
+                ),
+                const SizedBox(height: 6),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Text(
+                    _isExpanded ? 'Read Less ' : "Read More",
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              );
-            }),
+                ),
+              ],
+            ),
           ],
         ],
       ),

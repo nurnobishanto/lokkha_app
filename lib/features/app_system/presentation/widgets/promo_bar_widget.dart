@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
+import 'package:lokkha/features/app_system/data/models/app_info_model.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class PromoBarWidget extends StatefulWidget {
@@ -96,7 +97,7 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
     if (trimmed.isEmpty) return;
     if (trimmed.startsWith('/')) {
       try {
-        Get.toNamed(trimmed);
+        context.push(trimmed);
       } catch (e) {
         debugPrint('[PromoBarWidget] Failed to navigate to $trimmed: $e');
       }
@@ -106,7 +107,7 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
         final pathWithQuery = uri.hasQuery ? '${uri.path}?${uri.query}' : uri.path;
         if (pathWithQuery.isNotEmpty && pathWithQuery.startsWith('/')) {
           try {
-            Get.toNamed(pathWithQuery);
+            context.push(pathWithQuery);
             return;
           } catch (e) {
             debugPrint('[PromoBarWidget] Internal route navigation failed: $e');
@@ -125,12 +126,13 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
   Widget build(BuildContext context) {
     if (PromoBarWidget.isSessionDismissed) return const SizedBox.shrink();
 
-    return Obx(() {
-      final promoBar =
-          AppUpdateService().appInfo.value?.data.announcements.promoBar;
-      if (promoBar == null || !promoBar.enabled) {
-        return const SizedBox.shrink();
-      }
+    return ValueListenableBuilder<AppInfoModel?>(
+      valueListenable: AppUpdateService().appInfo,
+      builder: (context, appInfoModel, _) {
+        final promoBar = appInfoModel?.data.announcements.promoBar;
+        if (promoBar == null || !promoBar.enabled) {
+          return const SizedBox.shrink();
+        }
 
       final days = _remaining.inDays;
       final hours = _remaining.inHours % 24;
@@ -318,6 +320,7 @@ class _PromoBarWidgetState extends State<PromoBarWidget> {
           ],
         ),
       );
-    });
+      },
+    );
   }
 }

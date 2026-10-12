@@ -1,14 +1,14 @@
 import 'dart:ui';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lokkha/app/router/router.dart';
+import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/exam.dart';
-import 'package:lokkha/app/router/router.dart';
-import '../../exam/controllers/exam_controller.dart';
+import 'package:lokkha/shared/widgets/custom_action_button.dart';
+import 'package:lokkha/shared/widgets/web_exam_view.dart';
 
 const Color primaryColor = Color(0xFF006A4E);
 
@@ -18,9 +18,6 @@ class ExamDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final examController = Get.put(ExamController());
-    examController.isExamLoading.value = false;
-    examController.isReadLoading.value = false;
     return Dialog(
       backgroundColor: context.cardColor,
       elevation: 10,
@@ -39,10 +36,10 @@ class ExamDetailsDialog extends StatelessWidget {
                   width: double.infinity,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: primaryColor,
                     borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
+                        BorderRadius.vertical(top: Radius.circular(20)),
                   ),
                   child: Row(
                     children: [
@@ -92,136 +89,70 @@ class ExamDetailsDialog extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 5),
-
-                      Obx(() {
-                        if (examController.errorMessage.value.isEmpty) {
-                          return const SizedBox.shrink();
-                        }
-
-                        return Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.symmetric(vertical: 8.0),
-                          padding: const EdgeInsets.all(12.0),
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent.withOpacity(0.1),
-                            border: Border.all(color: Colors.redAccent),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Icon(Icons.error_outline,
-                                  color: Colors.redAccent),
-                              const SizedBox(width: 8.0),
-                              Expanded(
-                                child: RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text:
-                                            '${examController.errorMessage.value} ',
-                                        style: const TextStyle(
-                                          color: Colors.redAccent,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: 'প্যাকেজ কিনুন',
-                                        style: const TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.bold,
-                                          //decoration: TextDecoration.underline,
-                                        ),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            Get.toNamed(
-                                                Routes.packages);
-                                          },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }),
-
                       const SizedBox(height: 10),
 
                       // Action Buttons
-                      Obx(() {
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                icon: examController.isReadLoading.value
-                                    ? const SizedBox.shrink()
-                                    : const Icon(Icons.menu_book),
-                                label: examController.isReadLoading.value
-                                    ? Center(
-                                        child: SizedBox(
-                                          height: 28,
-                                          width: 28,
-                                          child: CircularProgressIndicator(
-                                              color: Colors.white),
-                                        ),
-                                      )
-                                    : const Text('প্রশ্ন পড়ুন'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      primaryColor.withOpacity(0.9),
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 4,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.menu_book),
+                              label: const Text('প্রশ্ন পড়ুন'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    primaryColor.withOpacity(0.9),
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                onPressed: () {
-                                  // Handle read question
-                                  examController.fetchExamDetails(exam);
-                                },
+                                elevation: 4,
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                icon: examController.isExamLoading.value
-                                    ? const SizedBox.shrink()
-                                    : const Icon(Icons.edit),
-                                label: examController.isExamLoading.value
-                                    ? Center(
-                                        child: SizedBox(
-                                          height: 28,
-                                          width: 28,
-                                          child: CircularProgressIndicator(
-                                              color: Colors.white),
-                                        ),
-                                      )
-                                    : const Text('পরীক্ষা দিন'),
-                                //label: const Text('পরীক্ষা দিন'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => WebExamView(
+                                      title: exam.name.toString(),
+                                      url:
+                                          "${AppConstants.webExamRead}/${exam.id}",
+                                    ),
                                   ),
-                                  elevation: 4,
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  examController.startExam(exam);
-                                },
-                              ),
+                                );
+                              },
                             ),
-                          ],
-                        );
-                      }),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.edit),
+                              label: const Text('পরীক্ষা দিন'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                foregroundColor: Colors.white,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 4,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => WebExamView(
+                                      title: exam.name.toString(),
+                                      url:
+                                          "${AppConstants.webExamStart}/${exam.id}",
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                       10.h.height,
 
                       Container(
@@ -239,7 +170,7 @@ class ExamDetailsDialog extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.card_giftcard,
+                                const Icon(Icons.card_giftcard,
                                     color: primaryColor, size: 20),
                                 const SizedBox(width: 8),
                                 Expanded(
@@ -260,7 +191,8 @@ class ExamDetailsDialog extends StatelessWidget {
                               child: CustomActionButton(
                                 text: "প্যাকেজ কিনুন",
                                 onPressed: () {
-                                  Get.toNamed(Routes.packages);
+                                  Navigator.pop(context);
+                                  context.push(Routes.packages);
                                 },
                               ),
                             ),
@@ -280,7 +212,8 @@ class ExamDetailsDialog extends StatelessWidget {
     );
   }
 
-  Widget _infoCard(BuildContext context, IconData icon, String label, String value) {
+  Widget _infoCard(
+      BuildContext context, IconData icon, String label, String value) {
     final bool isNegative = label.contains('নেগেটিভ মার্ক');
 
     return Container(

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/constants/app_strings.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -408,7 +407,7 @@ class BaseClient {
     required Object error,
   }) {
     if (kDebugMode) debugPrint("[BaseClient] Unexpected error: $error");
-    final message = Strings.somethingWentWrong.tr;
+    final message = Strings.somethingWentWrong;
     if (onError != null) {
       onError(ApiException(message: message, url: url));
     } else {
@@ -421,7 +420,7 @@ class BaseClient {
     required String url,
   }) {
     if (kDebugMode) debugPrint("[BaseClient] Timeout error on $url");
-    final message = Strings.serverNotResponding.tr;
+    final message = Strings.serverNotResponding;
     if (onError != null) {
       onError(ApiException(message: message, url: url));
     } else {
@@ -434,7 +433,7 @@ class BaseClient {
     required String url,
   }) {
     if (kDebugMode) debugPrint("[BaseClient] No internet connection for $url");
-    final message = Strings.noInternetConnection.tr;
+    final message = Strings.noInternetConnection;
     if (onError != null) {
       onError(ApiException(message: message, url: url));
     } else {
@@ -476,7 +475,7 @@ class BaseClient {
     }
 
     if (statusCode == 404) {
-      final message = Strings.urlNotFound.tr;
+      final message = Strings.urlNotFound;
       final exception = ApiException(message: message, url: url, statusCode: 404);
       if (onError != null) {
         return onError(exception);
@@ -487,7 +486,7 @@ class BaseClient {
     }
 
     if (statusCode != null && statusCode >= 500) {
-      final message = Strings.serverNotResponding.tr;
+      final message = Strings.serverNotResponding;
       final exception = ApiException(message: message, url: url, statusCode: statusCode);
       if (onError != null) {
         return onError(exception);
@@ -499,7 +498,7 @@ class BaseClient {
 
     var exception = ApiException(
       url: url,
-      message: error.message ?? Strings.somethingWentWrong.tr,
+      message: error.message ?? Strings.somethingWentWrong,
       response: error.response,
       statusCode: statusCode,
     );

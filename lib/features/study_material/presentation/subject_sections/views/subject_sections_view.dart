@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/features/home/home.dart';
-import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/shared/models/subject.dart';
-import '../controllers/subject_section_controller.dart';
+import 'package:lokkha/shared/shared.dart';
 
-class SubjectSectionView extends GetView<SubjectSectionController> {
+class SubjectSectionView extends StatelessWidget {
   final Subject? subject;
   const SubjectSectionView({super.key, required this.subject});
 
   @override
   Widget build(BuildContext context) {
-    Get.put(HomeController());
-    Get.put(SubjectSectionController());
-    // final setNumberController = TextEditingController(text: "20").obs;
     return Scaffold(
       backgroundColor: context.scaffoldBg,
       appBar: AppBar(
@@ -37,12 +31,13 @@ class SubjectSectionView extends GetView<SubjectSectionController> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      CustomExpandSubject(
-                        subject: subject!,
-                        topic: subject!,
-                        padding: 0,
-                        initialExpand: true,
-                      ),
+                      if (subject != null)
+                        CustomExpandSubject(
+                          subject: subject!,
+                          topic: subject!,
+                          padding: 0,
+                          initialExpand: true,
+                        ),
                     ],
                   ),
                 ),
@@ -54,8 +49,13 @@ class SubjectSectionView extends GetView<SubjectSectionController> {
                   List<SubjectSectionSelect> selectSubjects =
                       await MySharedPref.getSubjectSection();
                   if (selectSubjects.isNotEmpty) {
-                    controller.getSubjects();
-                    Get.to(const SubSectionsSetTimeView());
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SubSectionsSetTimeView(),
+                        ),
+                      );
+                    }
                   } else {
                     CustomSnackBar.showCustomErrorSnackBar(
                       title: "বিষয় নির্বাচন করা হয়নি",
@@ -92,15 +92,15 @@ class CustomExpandSubject extends StatefulWidget {
 
 class _CustomExpandSubjectState extends State<CustomExpandSubject>
     with SingleTickerProviderStateMixin {
-  late final RxBool isExpanded;
-  final RxBool isChecked = false.obs;
+  late bool _isExpanded;
+  bool _isChecked = false;
   late final AnimationController _controller;
   late final Animation<double> _arrowRotation;
 
   @override
   void initState() {
     super.initState();
-    isExpanded = widget.initialExpand.obs;
+    _isExpanded = widget.initialExpand;
 
     _controller = AnimationController(
       vsync: this,
@@ -123,18 +123,27 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
   }
 
   Future<void> _loadCheckedState() async {
-    isChecked.value =
+    final checked =
         await MySharedPref.isSubjectSectionExist(widget.topic.id!.toInt());
+    if (mounted) {
+      setState(() {
+        _isChecked = checked;
+      });
+    }
   }
 
   void _toggleExpansion(bool expand) {
-    isExpanded.value = expand;
+    setState(() {
+      _isExpanded = expand;
+    });
     expand ? _controller.forward() : _controller.reverse();
   }
 
   void _handleCheckboxChange(bool? value) {
     if (value == null) return;
-    isChecked.value = value;
+    setState(() {
+      _isChecked = value;
+    });
 
     final subjectSelect = SubjectSectionSelect(
       id: widget.topic.id,
@@ -178,7 +187,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
           BoxShadow(
             color: context.isDark
                 ? Colors.transparent
-                : Colors.black.withOpacity(0.04),
+                : Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -186,7 +195,6 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
       ),
       child: Stack(
         children: [
-          // Amber vertical accent strip on the left
           Positioned(
             left: 0,
             top: 8,
@@ -202,19 +210,18 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
               ),
             ),
           ),
-
           Material(
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
               onTap: hasChildren
-                  ? () => _toggleExpansion(!isExpanded.value)
+                  ? () => _toggleExpansion(!_isExpanded)
                   : null,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: widget.topic.parentId != null
-                    ? Obx(() => _tileContent(context, theme, hasChildren))
+                    ? _tileContent(context, theme, hasChildren)
                     : const SizedBox.shrink(),
               ),
             ),
@@ -233,7 +240,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
           width: 20,
           height: 20,
           child: Checkbox(
-            value: isChecked.value,
+            value: _isChecked,
             onChanged: _handleCheckboxChange,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
@@ -243,7 +250,7 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
             activeColor: theme.primaryColor,
             checkColor: Colors.white,
             side: BorderSide(
-              color: isChecked.value
+              color: _isChecked
                   ? theme.primaryColor
                   : context.borderColor,
               width: 1.5,
@@ -286,38 +293,36 @@ class _CustomExpandSubjectState extends State<CustomExpandSubject>
   }
 
   Widget _children(BuildContext context) {
-    return Obx(
-      () => AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        height: isExpanded.value ? null : 0,
-        child: isExpanded.value
-            ? Container(
-                margin: const EdgeInsets.only(top: 6, left: 16),
-                padding: const EdgeInsets.only(left: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    left: BorderSide(color: context.borderColor, width: 2),
-                  ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      height: _isExpanded ? null : 0,
+      child: _isExpanded
+          ? Container(
+              margin: const EdgeInsets.only(top: 6, left: 16),
+              padding: const EdgeInsets.only(left: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(color: context.borderColor, width: 2),
                 ),
-                child: Column(
-                  children: widget.topic.children!
-                      .map(
-                        (child) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: CustomExpandSubject(
-                            subject: widget.subject,
-                            topic: child,
-                            padding: 0,
-                            initialExpand: false,
-                          ),
+              ),
+              child: Column(
+                children: widget.topic.children!
+                    .map(
+                      (child) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: CustomExpandSubject(
+                          subject: widget.subject,
+                          topic: child,
+                          padding: 0,
+                          initialExpand: false,
                         ),
-                      )
-                      .toList(),
-                ),
-              )
-            : const SizedBox.shrink(),
-      ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

@@ -2,14 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/shared/widgets/custom_decision_button.dart';
 
@@ -40,11 +38,7 @@ class AuthGatewayView extends ConsumerWidget {
                 text: "Sign in with Phone",
                 leadingWidget: const Icon(Icons.phone, size: 20),
                 onPressed: () {
-                  try {
-                    context.push(Routes.signUp);
-                  } catch (_) {
-                    Get.toNamed(Routes.signUp);
-                  }
+                  context.push(Routes.signUp);
                 },
               ),
               40.h.height,
@@ -66,10 +60,12 @@ class AuthGatewayView extends ConsumerWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Get.to(
-                            BaseWebView(
-                              title: "শর্তাবলী ও নীতিমালা",
-                              url: AppConstants.termsPolicy,
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => BaseWebView(
+                                title: "শর্তাবলী ও নীতিমালা",
+                                url: AppConstants.termsPolicy,
+                              ),
                             ),
                           );
                         },

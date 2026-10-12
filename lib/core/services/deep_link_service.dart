@@ -1,17 +1,15 @@
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/router/router.dart';
 
-class DeepLinkService extends GetxController {
-  RxString appVersion = ''.obs;
+class DeepLinkService {
+  static final DeepLinkService instance = DeepLinkService._();
+  DeepLinkService._();
 
-  @override
-  void onReady() {
-    super.onReady();
-    debugPrint("DeepLinkService / MyAppController Called");
-    _initializeApp();
+  static void init() {
+    instance._initializeApp();
   }
 
   void _initializeApp() async {
@@ -46,7 +44,9 @@ typedef MyAppController = DeepLinkService;
 void handleDeepLink(Uri uri) {
   debugPrint("Deep link received: $uri");
 
-  // Path segments এবং query parameters
+  final context = rootNavigatorKey.currentContext;
+  if (context == null) return;
+
   if (uri.pathSegments.isNotEmpty) {
     final firstSegment = uri.pathSegments[0]; // exam, course, login, profile
     final secondSegment = uri.pathSegments.length > 1 ? uri.pathSegments[1] : '';
@@ -54,26 +54,24 @@ void handleDeepLink(Uri uri) {
 
     switch (firstSegment) {
       case 'profile':
-        Get.toNamed(Routes.profile);
+        context.pushNamed(Routes.profile);
         break;
 
       case 'login':
-        Get.toNamed(Routes.authGateway);
+        context.pushNamed(Routes.authGateway);
         break;
 
       case 'course':
-        // slug/id support
         final idOrSlug = secondSegment.isNotEmpty ? secondSegment : queryParams['id'] ?? '';
         if (idOrSlug.isNotEmpty) {
-          Get.toNamed('/course/$idOrSlug');
+          context.push('/course/$idOrSlug');
         }
         break;
 
       case 'exam':
-        // slug/id support
         final idOrSlug = secondSegment.isNotEmpty ? secondSegment : queryParams['id'] ?? '';
         if (idOrSlug.isNotEmpty) {
-          Get.toNamed('/exam/$idOrSlug');
+          context.push('/exam/$idOrSlug');
         }
         break;
 

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/features/exam/exam.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import '../controllers/latest_exam_controller.dart';
+import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/exam/exam.dart';
+import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
 
-class LatestExamStartDialog extends StatefulWidget {
+class LatestExamStartDialog extends ConsumerStatefulWidget {
   final LatestExam latestExam;
 
   const LatestExamStartDialog({super.key, required this.latestExam});
 
   @override
-  State<LatestExamStartDialog> createState() => _LatestExamStartDialogState();
+  ConsumerState<LatestExamStartDialog> createState() =>
+      _LatestExamStartDialogState();
 }
 
-class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
+class _LatestExamStartDialogState
+    extends ConsumerState<LatestExamStartDialog> {
   late TextEditingController examTimeController;
   late String selectedNegativeMark;
 
@@ -33,8 +36,8 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
 
   @override
   Widget build(BuildContext context) {
-    var questionCount = widget.latestExam.tag?.questionCount ?? 0;
-    (questionCount * 0.4).toStringAsFixed(0);
+    final questionCount = widget.latestExam.tag?.questionCount ?? 0;
+    final state = ref.watch(latestExamNotifierProvider);
 
     return Dialog(
       backgroundColor: context.cardColor,
@@ -84,52 +87,57 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
             Row(
               children: [
                 _button('পরীক্ষা শুরু', Colors.redAccent, Colors.white, () {
-                  Get.find<LatestExamController>().fetchTagQuestions(
-                    widget.latestExam.tag!,
-                    true,
-                    int.tryParse(examTimeController.text) ?? 60,
-                    selectedNegativeMark,
-                    context,
-                  );
+                  ref.read(latestExamNotifierProvider.notifier).fetchTagQuestions(
+                        tag: widget.latestExam.tag!,
+                        isStartExam: true,
+                        duration:
+                            int.tryParse(examTimeController.text) ?? 60,
+                        selectedNegativeMark: selectedNegativeMark,
+                        context: context,
+                      );
                 }),
                 const SizedBox(width: 8),
                 _button('পড়ুন', Colors.green, Colors.white, () {
-                  Get.find<LatestExamController>().fetchTagQuestions(
-                    widget.latestExam.tag!,
-                    false,
-                    int.tryParse(examTimeController.text) ?? 60,
-                    selectedNegativeMark,
-                    context,
-                  );
+                  ref.read(latestExamNotifierProvider.notifier).fetchTagQuestions(
+                        tag: widget.latestExam.tag!,
+                        isStartExam: false,
+                        duration:
+                            int.tryParse(examTimeController.text) ?? 60,
+                        selectedNegativeMark: selectedNegativeMark,
+                        context: context,
+                      );
                 }),
                 const SizedBox(width: 8),
-                _button('বাতিল', context.isDark ? context.subtleSurfaceColor : Colors.grey.shade300, context.textPrimary, () {
+                _button(
+                    'বাতিল',
+                    context.isDark
+                        ? context.subtleSurfaceColor
+                        : Colors.grey.shade300,
+                    context.textPrimary, () {
                   Navigator.pop(context);
                 }),
               ],
             ),
-            Obx(() {
-              return Column(children: [
-                if (Get.find<LatestExamController>()
-                    .isLoadingQuestion
-                    .value) ...[
-                  const SizedBox(height: 20),
-                  CircularProgressIndicator()
-                ]
-              ]);
-            })
+            if (state.isLoadingQuestion) ...[
+              const SizedBox(height: 20),
+              const CircularProgressIndicator(),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _readOnlyField({required BuildContext context, required String label, required String value}) {
+  Widget _readOnlyField(
+      {required BuildContext context,
+      required String label,
+      required String value}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: context.textPrimary)),
+          Text(label,
+              style: TextStyle(fontSize: 13, color: context.textPrimary)),
           const SizedBox(height: 6),
           TextField(
             readOnly: true,
@@ -140,10 +148,12 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
               filled: true,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
-              enabledBorder:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: context.borderColor)),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: context.borderColor)),
               isDense: true,
             ),
           ),
@@ -153,12 +163,15 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
   }
 
   Widget _editableField(
-      {required BuildContext context, required String label, required TextEditingController controller}) {
+      {required BuildContext context,
+      required String label,
+      required TextEditingController controller}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: context.textPrimary)),
+          Text(label,
+              style: TextStyle(fontSize: 13, color: context.textPrimary)),
           const SizedBox(height: 6),
           TextField(
             controller: controller,
@@ -169,10 +182,12 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
               filled: true,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
-              enabledBorder:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: context.borderColor)),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: context.borderColor)),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: context.borderColor)),
               isDense: true,
             ),
           ),
@@ -193,7 +208,8 @@ class _LatestExamStartDialogState extends State<LatestExamStartDialog> {
         style: ElevatedButton.styleFrom(
           backgroundColor: bgColor,
           foregroundColor: textColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),
         child: Text(

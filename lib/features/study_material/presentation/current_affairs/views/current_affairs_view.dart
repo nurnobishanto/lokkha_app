@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import '../controllers/current_affairs_controller.dart';
-import 'international_current_affairs_content_view.dart';
 
-class CurrentAffairsView extends GetView<CurrentAffairsController> {
+class CurrentAffairsView extends StatelessWidget {
   const CurrentAffairsView({super.key});
 
   double _getResponsiveFontSize(BuildContext context) {
@@ -47,8 +43,8 @@ class CurrentAffairsView extends GetView<CurrentAffairsController> {
             ],
           ),
         ),
-        body: SafeArea(
-          child: const TabBarView(
+        body: const SafeArea(
+          child: TabBarView(
             children: [
               CurrentAffairsContentView(),
               InternationalCurrentAffairsContentView(),

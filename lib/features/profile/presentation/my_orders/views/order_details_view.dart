@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/packages/presentation/views/payment_webview.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../controllers/orders_details_controller.dart';
+import '../controllers/orders_details_notifier.dart';
 
-class OrderDetailsScreen extends StatelessWidget {
+class OrderDetailsScreen extends ConsumerWidget {
   final dynamic orderId;
   final String? url;
 
@@ -20,31 +20,26 @@ class OrderDetailsScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final OrdersDetailsController controller =
-        Get.isRegistered<OrdersDetailsController>()
-            ? Get.find<OrdersDetailsController>()
-            : Get.put(OrdersDetailsController());
-
-    // Trigger fetch on load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchOrdersDetails(id: orderId, url: url);
-    });
+  Widget build(BuildContext context, WidgetRef ref) {
+    final param = (id: orderId, url: url);
+    final state = ref.watch(ordersDetailsNotifierProvider(param));
+    final notifier = ref.read(ordersDetailsNotifierProvider(param).notifier);
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: const CustomAppBar(title: 'অর্ডার ইনফরমেশন'),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: Builder(
+        builder: (context) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (controller.apiCallStatus.value == ApiCallStatus.error ||
-            controller.orderDetail.value == null) {
-          return _buildErrorState(context, controller);
-        }
+          if (state.apiCallStatus == ApiCallStatus.error ||
+              state.orderDetail == null) {
+            return _buildErrorState(context, notifier);
+          }
 
-        final order = controller.orderDetail.value!;
+          final order = state.orderDetail!;
         return SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -73,60 +68,67 @@ class OrderDetailsScreen extends StatelessWidget {
             ),
           ),
         );
-      }),
+      },
+    ),
       // Sticky bottom pay button if order is pending and has payment url
-      bottomNavigationBar: Obx(() {
-        final order = controller.orderDetail.value;
-        if (order != null &&
-            !order.isPaid &&
-            order.status == 'pending' &&
-            order.activePaymentUrl != null) {
-          return SafeArea(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                border: Border(
-                  top: BorderSide(color: context.borderColor, width: 1),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, -4),
+      bottomNavigationBar: Builder(
+        builder: (context) {
+          final order = state.orderDetail;
+          if (order != null &&
+              !order.isPaid &&
+              order.status == 'pending' &&
+              order.activePaymentUrl != null) {
+            return SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: context.cardColor,
+                  border: Border(
+                    top: BorderSide(color: context.borderColor, width: 1),
                   ),
-                ],
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Get.to(() => PaymentWebView(url: order.activePaymentUrl!));
-                  },
-                  icon: const Icon(Icons.payment_rounded, size: 20),
-                  label: const Text(
-                    'এখনই পেমেন্ট সম্পন্ন করুন',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => PaymentWebView(url: order.activePaymentUrl!),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.payment_rounded, size: 20),
+                    label: const Text(
+                      'এখনই পেমেন্ট সম্পন্ন করুন',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
                 ),
               ),
-            ),
-          );
-        }
-        return const SizedBox.shrink();
-      }),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 
@@ -656,7 +658,12 @@ class OrderDetailsScreen extends StatelessWidget {
                         height: 38,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            Get.to(() => PaymentWebView(url: payment.paymentUrl!));
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    PaymentWebView(url: payment.paymentUrl!),
+                              ),
+                            );
                           },
                           icon: const Icon(Icons.payment, size: 16),
                           label: const Text(
@@ -744,7 +751,7 @@ class OrderDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildErrorState(
-      BuildContext context, OrdersDetailsController controller) {
+      BuildContext context, OrdersDetailsNotifier notifier) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -765,7 +772,7 @@ class OrderDetailsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () =>
-                  controller.fetchOrdersDetails(id: orderId, url: url),
+                  notifier.fetchOrdersDetails(id: orderId, url: url),
               icon: const Icon(Icons.refresh, size: 18),
               label: const Text('পুনরায় চেষ্টা করুন'),
               style: ElevatedButton.styleFrom(

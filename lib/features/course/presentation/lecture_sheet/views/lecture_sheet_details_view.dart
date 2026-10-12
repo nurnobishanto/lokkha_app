@@ -1,59 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/shared/shared.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import '../controllers/sheet_details_controller.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 
-class LectureSheetDetailsView extends GetView<SheetDetailsController> {
-  const LectureSheetDetailsView({super.key});
+class LectureSheetDetailsView extends ConsumerWidget {
+  final int id;
+  const LectureSheetDetailsView({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(sheetDetailsNotifierProvider(id));
+
     return Scaffold(
       appBar: CustomAppBar(title: "Sheet Details"),
-      body: Obx(() {
-        final data = controller.model.value;
-        final status = controller.apiCallStatus.value;
+      body: Builder(
+        builder: (context) {
+          final data = state.model;
+          final status = state.status;
 
-        switch (status) {
-          case ApiCallStatus.loading:
-            return const Center(child: CircularProgressIndicator());
+          switch (status) {
+            case ApiCallStatus.loading:
+              return const Center(child: CircularProgressIndicator());
 
-          case ApiCallStatus.error:
-            return Center(
-              child: Text(
-                "Something went wrong",
-                style: TextStyle(color: context.textPrimary),
-              ),
-            );
-
-          case ApiCallStatus.success:
-            if (data == null || data.lectureSheet == null) {
+            case ApiCallStatus.error:
               return Center(
                 child: Text(
-                  "No data available",
+                  "Something went wrong",
                   style: TextStyle(color: context.textPrimary),
                 ),
               );
-            }
-            final sheet = data.lectureSheet!;
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: LectureSheetCard(
-                  name: sheet.name ?? '',
-                  description: sheet.details ?? '',
-                  fileUrl: sheet.file ?? '',
+
+            case ApiCallStatus.success:
+              if (data == null || data.lectureSheet == null) {
+                return Center(
+                  child: Text(
+                    "No data available",
+                    style: TextStyle(color: context.textPrimary),
+                  ),
+                );
+              }
+              final sheet = data.lectureSheet!;
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: LectureSheetCard(
+                    name: sheet.name ?? '',
+                    description: sheet.details ?? '',
+                    fileUrl: sheet.file ?? '',
+                  ),
                 ),
-              ),
-            );
-          default:
-            return const SizedBox();
-        }
-      }),
+              );
+            default:
+              return const SizedBox();
+          }
+        },
+      ),
     );
   }
 }
@@ -74,6 +78,7 @@ class LectureSheetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isPdf = fileUrl.toLowerCase().endsWith('.pdf');
     final fullFileUrl = AppConstants.storageUrl + fileUrl;
+    final theme = Theme.of(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -86,13 +91,13 @@ class LectureSheetCard extends StatelessWidget {
               style: AppTextStyles.heading4.copyWith(color: context.textPrimary),
             ),
 
-            SizedBox(height: description!.isNotEmpty ? 0 : 10.h),
+            SizedBox(height: (description ?? '').isNotEmpty ? 0 : 10.h),
 
             /// Description
-            description!.isNotEmpty
+            (description ?? '').isNotEmpty
                 ? Text(
                     description!,
-                    style: Get.textTheme.bodyMedium?.copyWith(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       height: 1.5,
                       color: context.textSecondary,
                     ),
@@ -102,7 +107,7 @@ class LectureSheetCard extends StatelessWidget {
             /// Label
             Text(
               "Attached File",
-              style: Get.textTheme.titleMedium?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: context.textPrimary,
               ),

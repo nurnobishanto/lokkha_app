@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 
 import 'l10n/app_localizations.dart';
@@ -37,9 +36,6 @@ class LocaleNotifier extends Notifier<Locale> {
     if (state != targetLocale) {
       state = targetLocale;
       await MySharedPref.setCurrentLanguage(languageCode);
-      if (!Get.testMode) {
-        Get.updateLocale(targetLocale);
-      }
     }
   }
 
@@ -83,10 +79,6 @@ class LocalizationService {
   static Future<void> updateLanguage(String languageCode) async {
     if (!isLanguageSupported(languageCode)) return;
     await MySharedPref.setCurrentLanguage(languageCode);
-    final target = supportedLanguages[languageCode] ?? defaultLanguage;
-    if (!Get.testMode) {
-      Get.updateLocale(target);
-    }
   }
 
   static bool isItEnglish() =>

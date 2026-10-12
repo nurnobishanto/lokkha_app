@@ -1,30 +1,34 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
-import '../controllers/premium_packages_controller.dart';
+import '../providers/premium_packages_notifier.dart';
 
-class PremiumPackagesView extends GetView<PremiumPackagesController> {
+class PremiumPackagesView extends ConsumerWidget {
   const PremiumPackagesView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(PremiumPackagesController());
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(premiumPackagesNotifierProvider);
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar:
           const CustomAppBar(title: 'প্রিমিয়াম প্যাকেজ', centerTitle: true),
-      body: Obx(() {
-        return controller.isLoading.value
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Container(
+      body: state.isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : RefreshIndicator(
+              onRefresh: () => ref
+                  .read(premiumPackagesNotifierProvider.notifier)
+                  .fetchPremiumPackages(),
+              child: Container(
                 margin: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                     color: context.cardColor,
@@ -36,22 +40,31 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                     Divider(height: 0, color: context.borderColor),
                     Flexible(
                       child: ListView.builder(
-                        itemCount: controller.model.value.packages?.length ?? 0,
+                        itemCount: state.packages.length,
                         itemBuilder: (context, index) {
-                          final pkg = controller.model.value.packages![index];
+                          final pkg = state.packages[index];
                           return Column(
                             children: [
                               _buildPackageTable(
                                 context: context,
                                 onTapCheckout: () {
-                                  if (isLoggedIn.value) {
-                                    Get.to(
-                                      PremiumPackageCheckoutView(
-                                        packagesModel: pkg,
+                                  final isAuth = isLoggedIn.value;
+                                  if (isAuth) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            PremiumPackageCheckoutView(
+                                          packagesModel: pkg,
+                                        ),
                                       ),
                                     );
                                   } else {
-                                    Get.to(const AuthGatewayView());
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const AuthGatewayView(),
+                                      ),
+                                    );
                                   }
                                 },
                                 title: pkg.name.toString(),
@@ -82,8 +95,8 @@ class PremiumPackagesView extends GetView<PremiumPackagesController> {
                     ),
                   ],
                 ),
-              );
-      }),
+              ),
+            ),
     );
   }
 

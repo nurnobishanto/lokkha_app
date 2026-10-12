@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
 import 'decorations_extensions.dart';
 
 /// Make any variable nullable
@@ -44,7 +43,7 @@ void snackBar(
         animation: animation,
         width: width,
         shape: shape,
-        duration: duration ?? 4.seconds,
+        duration: duration ?? const Duration(seconds: 4),
         behavior: margin != null ? SnackBarBehavior.floating : behavior,
         elevation: elevation,
         onVisible: onVisible?.call(),
@@ -165,4 +164,12 @@ extension SpacingExtension on num {
 
   /// Creates a horizontal spacing with the given width
   SizedBox get width => SizedBox(width: toDouble());
+}
+
+extension DurationIntExtension on int {
+  Duration get seconds => Duration(seconds: this);
+  Duration get milliseconds => Duration(milliseconds: this);
+  Duration get minutes => Duration(minutes: this);
+  Duration get hours => Duration(hours: this);
+  Duration get days => Duration(days: this);
 }
