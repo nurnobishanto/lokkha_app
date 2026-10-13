@@ -37,48 +37,48 @@ export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 
 // Presentation - Profile
-export 'presentation/profile/controllers/profile_notifier.dart';
+export 'presentation/profile/riverpod/profile_notifier.dart';
 export 'presentation/profile/views/profile_view.dart';
 
 // Presentation - Profile Update
-export 'presentation/profile_update/controllers/profile_update_notifier.dart';
+export 'presentation/profile_update/riverpod/profile_update_notifier.dart';
 export 'presentation/profile_update/views/profile_update_view.dart';
 
 // Presentation - History
-export 'presentation/profile_history/controllers/profile_history_notifier.dart';
-export 'presentation/profile_history/controllers/exam_result_sheet_notifier.dart';
+export 'presentation/profile_history/riverpod/profile_history_notifier.dart';
+export 'presentation/profile_history/riverpod/exam_result_sheet_notifier.dart';
 export 'presentation/profile_history/views/profile_history_view.dart';
 export 'presentation/profile_history/views/exam_result_sheet_view.dart';
 export 'presentation/profile_history/views/exam_rank_view.dart';
 
 // Presentation - Accuracy Progress
-export 'presentation/accuracy_progress/controllers/accuracy_progress_notifier.dart';
+export 'presentation/accuracy_progress/riverpod/accuracy_progress_notifier.dart';
 export 'presentation/accuracy_progress/views/accuracy_progress_view.dart';
 
 // Presentation - Self Exam History
-export 'presentation/self_exam_history/controllers/self_exam_history_notifier.dart';
+export 'presentation/self_exam_history/riverpod/self_exam_history_notifier.dart';
 export 'presentation/self_exam_history/views/self_exam_history_view.dart';
 export 'presentation/self_exam_history/views/self_exam_result_view.dart';
 
 // Presentation - Contest History
-export 'presentation/contest_history/controllers/contest_history_notifier.dart';
+export 'presentation/contest_history/riverpod/contest_history_notifier.dart';
 export 'presentation/contest_history/views/contest_history_view.dart';
 
 // Presentation - Orders & Packages
-export 'presentation/my_orders/controllers/my_orders_notifier.dart';
-export 'presentation/my_orders/controllers/orders_details_notifier.dart';
+export 'presentation/my_orders/riverpod/my_orders_notifier.dart';
+export 'presentation/my_orders/riverpod/orders_details_notifier.dart';
 export 'presentation/my_orders/views/my_orders_view.dart';
 export 'presentation/my_orders/views/order_details_view.dart';
 
-export 'presentation/my_packages/controllers/my_packages_notifier.dart';
+export 'presentation/my_packages/riverpod/my_packages_notifier.dart';
 export 'presentation/my_packages/views/my_packages_view.dart';
 
 // Presentation - Referral
-export 'presentation/referral/controllers/referral_notifier.dart';
+export 'presentation/referral/riverpod/referral_notifier.dart';
 export 'presentation/referral/views/referral_view.dart';
 
 // Presentation - Dashboard Portal & Update Required
-export 'presentation/dashboard_portal/controllers/dashboard_portal_notifier.dart';
+export 'presentation/dashboard_portal/riverpod/dashboard_portal_notifier.dart';
 export 'presentation/dashboard_portal/views/dashboard_portal_view.dart';
-export 'presentation/profile_update_required/controllers/profile_update_required_notifier.dart';
+export 'presentation/profile_update_required/riverpod/profile_update_required_notifier.dart';
 export 'presentation/profile_update_required/views/profile_update_required_view.dart';

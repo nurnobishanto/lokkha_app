@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/utils/global.dart';
-import '../controllers/navbar_notifier.dart';
+import '../riverpod/navbar_notifier.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
   final StatefulNavigationShell? navigationShell;

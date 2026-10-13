@@ -8,7 +8,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
-import '../controllers/sign_in_notifier.dart';
+import '../riverpod/sign_in_notifier.dart';
 
 class SignInView extends ConsumerStatefulWidget {
   final String phoneNumber;

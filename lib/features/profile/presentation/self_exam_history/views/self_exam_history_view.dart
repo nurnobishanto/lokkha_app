@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import '../../profile_history/widgets/exam_history_pagination.dart';
-import '../controllers/self_exam_history_notifier.dart';
+import '../riverpod/self_exam_history_notifier.dart';
 import '../widgets/self_exam_card.dart';
 
 class SelfExamHistoryView extends ConsumerWidget {

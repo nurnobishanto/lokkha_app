@@ -10,7 +10,7 @@ export 'data/models/dashboard_overview_model.dart';
 export 'data/repositories/dashboard_repository.dart';
 
 // Presentation - Home
-export 'presentation/home/controllers/home_notifier.dart';
+export 'presentation/home/riverpod/home_notifier.dart';
 export 'presentation/home/views/home_view.dart';
 export 'presentation/home/widgets/accuracy_chart_widget.dart';
 export 'presentation/home/components/home_components.dart';

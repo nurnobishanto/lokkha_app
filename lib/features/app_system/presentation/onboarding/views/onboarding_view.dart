@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/shared/shared.dart';
-import '../controllers/onboarding_notifier.dart';
+import '../riverpod/onboarding_notifier.dart';
 import '../widgets/onboarding_bottom_bar.dart';
 import '../widgets/onboarding_curved_header.dart';
 import '../widgets/onboarding_page_indicator.dart';
@@ -33,7 +33,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
   void _onComplete() {
     ref.read(onboardingNotifierProvider.notifier).completeOnboarding();
-    context.goNamed(Routes.home);
+    context.goNamed(Routes.authGateway);
   }
 
   void _onNext() {
@@ -72,6 +72,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                     left: 0,
                     right: 0,
                     child: OnboardingCurvedHeader(
+                      key: ValueKey('header_$index'),
                       pageIndex: index,
                       height: 290.h,
                     ),

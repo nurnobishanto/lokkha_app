@@ -6,7 +6,7 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../controllers/my_orders_notifier.dart';
+import '../riverpod/my_orders_notifier.dart';
 import 'order_details_view.dart';
 
 class MyOrdersView extends ConsumerStatefulWidget {

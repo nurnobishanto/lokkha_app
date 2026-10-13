@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/features/navigation/presentation/controllers/navbar_notifier.dart';
+import 'package:lokkha/features/navigation/presentation/riverpod/navbar_notifier.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 
 class NavbarView extends ConsumerStatefulWidget {

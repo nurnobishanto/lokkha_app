@@ -13,7 +13,7 @@ import 'package:lokkha/shared/widgets/theme/theme_mode_selector_sheet.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../controllers/dashboard_portal_notifier.dart';
+import '../riverpod/dashboard_portal_notifier.dart';
 
 class DashboardPortalView extends ConsumerStatefulWidget {
   const DashboardPortalView({super.key});

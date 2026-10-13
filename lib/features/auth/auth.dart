@@ -13,9 +13,9 @@ export 'domain/usecases/register_usecase.dart';
 export 'domain/usecases/logout_usecase.dart';
 
 // Presentation - Riverpod Notifiers
-export 'presentation/sign_up/controllers/sign_up_notifier.dart';
-export 'presentation/signin/controllers/sign_in_notifier.dart';
-export 'presentation/verify_otp/controllers/verify_otp_notifier.dart';
+export 'presentation/sign_up/riverpod/sign_up_notifier.dart';
+export 'presentation/signin/riverpod/sign_in_notifier.dart';
+export 'presentation/verify_otp/riverpod/verify_otp_notifier.dart';
 
 // Presentation - Views
 export 'presentation/auth_gateway/views/auth_gateway_view.dart';

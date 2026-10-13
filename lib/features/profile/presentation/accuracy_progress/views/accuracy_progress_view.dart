@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import '../controllers/accuracy_progress_notifier.dart';
+import '../riverpod/accuracy_progress_notifier.dart';
 import '../widgets/accuracy_exam_card.dart';
 import '../widgets/accuracy_stat_card.dart';
 import '../widgets/accuracy_trend_chart.dart';

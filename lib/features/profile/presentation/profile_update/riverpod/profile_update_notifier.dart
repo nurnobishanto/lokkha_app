@@ -8,7 +8,7 @@ import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
 import 'package:lokkha/features/profile/domain/usecases/change_password_usecase.dart';
 import 'package:lokkha/features/profile/domain/usecases/update_profile_usecase.dart';
-import 'package:lokkha/features/profile/presentation/profile/controllers/profile_notifier.dart';
+import 'package:lokkha/features/profile/presentation/profile/riverpod/profile_notifier.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class ProfileUpdateState {

@@ -10,7 +10,7 @@ import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_drop_down_button.dart';
 import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
-import '../controllers/profile_update_notifier.dart';
+import '../riverpod/profile_update_notifier.dart';
 
 class ProfileUpdateView extends ConsumerStatefulWidget {
   const ProfileUpdateView({super.key});

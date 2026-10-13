@@ -50,7 +50,12 @@ class SplashNotifier extends Notifier<SplashState> {
       if (!isOnboardingSeen) {
         context.go(Routes.onBoarding);
       } else {
-        context.go(Routes.navbar);
+        final token = MySharedPref.getUserToken();
+        if (token.isEmpty) {
+          context.go(Routes.authGateway);
+        } else {
+          context.go(Routes.navbar);
+        }
       }
     }
   }

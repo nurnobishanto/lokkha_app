@@ -6,7 +6,7 @@ import 'package:lokkha/features/packages/presentation/views/payment_webview.dart
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../controllers/orders_details_notifier.dart';
+import '../riverpod/orders_details_notifier.dart';
 
 class OrderDetailsScreen extends ConsumerWidget {
   final dynamic orderId;

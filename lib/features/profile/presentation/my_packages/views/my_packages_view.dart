@@ -8,7 +8,7 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
-import '../controllers/my_packages_notifier.dart';
+import '../riverpod/my_packages_notifier.dart';
 
 class MyPackagesView extends ConsumerWidget {
   const MyPackagesView({super.key});

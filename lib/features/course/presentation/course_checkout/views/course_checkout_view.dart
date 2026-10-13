@@ -7,7 +7,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 import 'package:lokkha/features/packages/presentation/views/payment_webview.dart';
-import 'package:lokkha/features/profile/presentation/profile/controllers/profile_notifier.dart';
+import 'package:lokkha/features/profile/presentation/profile/riverpod/profile_notifier.dart';
 import 'package:lokkha/shared/models/course.dart';
 import 'package:lokkha/shared/widgets/base_webview.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';

@@ -5,7 +5,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../controllers/exam_result_sheet_notifier.dart';
+import '../riverpod/exam_result_sheet_notifier.dart';
 import '../widgets/result_question_card.dart';
 
 class ExamResultSheetView extends ConsumerWidget {

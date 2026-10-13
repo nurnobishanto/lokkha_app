@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/features/app_system/domain/models/onboarding_item.dart';
 import 'package:lokkha/features/app_system/domain/usecases/get_onboarding_items_usecase.dart';
-import 'package:lokkha/features/app_system/presentation/onboarding/controllers/onboarding_notifier.dart';
+import 'package:lokkha/features/app_system/presentation/onboarding/riverpod/onboarding_notifier.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

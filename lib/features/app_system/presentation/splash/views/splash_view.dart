@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_images.dart';
-import '../controllers/splash_notifier.dart';
+import '../riverpod/splash_notifier.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});

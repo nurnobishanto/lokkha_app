@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import '../controllers/contest_history_notifier.dart';
+import '../riverpod/contest_history_notifier.dart';
 import '../widgets/contest_history_card.dart';
 import '../widgets/saved_question_card.dart';
 

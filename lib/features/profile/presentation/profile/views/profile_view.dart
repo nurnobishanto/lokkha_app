@@ -16,7 +16,7 @@ import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
-import '../controllers/profile_notifier.dart';
+import '../riverpod/profile_notifier.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({super.key});

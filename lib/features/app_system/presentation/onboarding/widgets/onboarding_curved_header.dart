@@ -17,10 +17,13 @@ class OnboardingCurvedHeader extends StatelessWidget {
     return SizedBox(
       height: height,
       width: double.infinity,
-      child: CustomPaint(
-        painter: _OnboardingCurvedPainter(
-          pageIndex: pageIndex,
-          color: color,
+      child: RepaintBoundary(
+        child: CustomPaint(
+          size: Size(MediaQuery.of(context).size.width, height),
+          painter: _OnboardingCurvedPainter(
+            pageIndex: pageIndex,
+            color: color,
+          ),
         ),
       ),
     );
@@ -31,7 +34,7 @@ class _OnboardingCurvedPainter extends CustomPainter {
   final int pageIndex;
   final Color color;
 
-  _OnboardingCurvedPainter({
+  const _OnboardingCurvedPainter({
     required this.pageIndex,
     required this.color,
   });
@@ -70,15 +73,13 @@ class _OnboardingCurvedPainter extends CustomPainter {
       );
       path.lineTo(size.width, 0);
     } else {
-      // Slide 3: Smooth organic slope sweeping gracefully from upper left downwards to right
-      path.lineTo(0, size.height * 0.42);
-      path.cubicTo(
-        size.width * 0.35,
-        size.height * 0.68,
-        size.width * 0.70,
-        size.height * 0.92,
+      // Slide 3: Smooth organic slope sweeping gracefully without pinch or notch glitch
+      path.lineTo(0, size.height * 0.45);
+      path.quadraticBezierTo(
+        size.width * 0.45,
+        size.height * 0.82,
         size.width,
-        size.height * 0.94,
+        size.height * 0.92,
       );
       path.lineTo(size.width, 0);
     }

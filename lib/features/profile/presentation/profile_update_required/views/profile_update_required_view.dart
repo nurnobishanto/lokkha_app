@@ -7,7 +7,7 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
-import '../controllers/profile_update_required_notifier.dart';
+import '../riverpod/profile_update_required_notifier.dart';
 
 class ProfileUpdateRequiredView extends ConsumerStatefulWidget {
   final String? phoneNumber;

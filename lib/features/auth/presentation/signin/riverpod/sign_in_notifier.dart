@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/di/auth_provider.dart';
-import 'package:lokkha/features/navigation/presentation/controllers/navbar_notifier.dart';
+import 'package:lokkha/features/navigation/presentation/riverpod/navbar_notifier.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class SignInState {

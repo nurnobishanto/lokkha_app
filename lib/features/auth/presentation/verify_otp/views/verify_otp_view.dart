@@ -7,7 +7,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:pinput/pinput.dart';
-import '../controllers/verify_otp_notifier.dart';
+import '../riverpod/verify_otp_notifier.dart';
 
 class VerifyOtpView extends ConsumerStatefulWidget {
   final String phoneNumber;

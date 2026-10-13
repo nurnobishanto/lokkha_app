@@ -6,7 +6,7 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import '../controllers/referral_notifier.dart';
+import '../riverpod/referral_notifier.dart';
 
 class ReferralView extends ConsumerWidget {
   const ReferralView({super.key});

@@ -4,8 +4,8 @@ import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_order_details_usecase.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_user_orders_usecase.dart';
-import 'package:lokkha/features/profile/presentation/my_orders/controllers/my_orders_notifier.dart';
-import 'package:lokkha/features/profile/presentation/my_orders/controllers/orders_details_notifier.dart';
+import 'package:lokkha/features/profile/presentation/my_orders/riverpod/my_orders_notifier.dart';
+import 'package:lokkha/features/profile/presentation/my_orders/riverpod/orders_details_notifier.dart';
 
 class MockProfileRepository implements ProfileRepository {
   final OrderV1ListResponse mockListResponse;
