@@ -2,29 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class SignUpState {
   final bool isLoading;
-  final ApiCallStatus status;
   final String? errorMessage;
 
   const SignUpState({
     this.isLoading = false,
-    this.status = ApiCallStatus.holding,
     this.errorMessage,
   });
 
   SignUpState copyWith({
     bool? isLoading,
-    ApiCallStatus? status,
     String? errorMessage,
   }) {
     return SignUpState(
       isLoading: isLoading ?? this.isLoading,
-      status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -44,7 +39,7 @@ class SignUpNotifier extends Notifier<SignUpState> {
       return;
     }
 
-    state = state.copyWith(isLoading: true, status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final checkPhoneUseCase = ref.read(checkPhoneUseCaseProvider);
@@ -52,7 +47,6 @@ class SignUpNotifier extends Notifier<SignUpState> {
       state = state.copyWith(isLoading: false);
 
       if (res.status) {
-        state = state.copyWith(status: ApiCallStatus.success);
         final targetPhone = res.canonicalPhone ?? phone;
         final isRegistration = !res.isRegistered || res.suggestedStep == 'register';
 
@@ -69,7 +63,6 @@ class SignUpNotifier extends Notifier<SignUpState> {
         }
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           errorMessage: res.message ?? "ফোন নম্বরটি যাচাই করা সম্ভব হয়নি।",
         );
         CustomSnackBar.showCustomErrorSnackBar(
@@ -80,7 +73,6 @@ class SignUpNotifier extends Notifier<SignUpState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: "সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।",
       );
       CustomSnackBar.showCustomErrorSnackBar(

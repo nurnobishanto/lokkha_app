@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/shared/models/tag.dart';
+import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/shared/widgets/web_exam_view.dart';
 
 // ============================================================================
@@ -57,18 +56,24 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
     return RandomQuestionState();
   }
 
+  void setAnswerSelected(bool value) {
+    state = state.copyWith(isAnswerSelected: value);
+  }
+
+  void setIsAnswerSelected(bool value) {
+    state = state.copyWith(isAnswerSelected: value);
+  }
+
   Future<void> getRandomQuestion({bool forceNew = false}) async {
     state = state.copyWith(isLoading: true, isAnswerSelected: false);
-
     if (forceNew) {
       MyGetStorage.removeCache(MyGetStorage.randomQuestionKey);
-    } else if (MyGetStorage.getStorage.hasData(MyGetStorage.randomQuestionKey)) {
-      final cacheData =
-          MyGetStorage.readCache(MyGetStorage.randomQuestionKey);
+    }
+    if (!forceNew && MyGetStorage.hasData(MyGetStorage.randomQuestionKey)) {
+      final cacheData = MyGetStorage.readCache(MyGetStorage.randomQuestionKey);
       if (cacheData != null) {
-        final model = RandomQuestionModel.fromJson(cacheData);
         state = state.copyWith(
-          randomQuestionModel: model,
+          randomQuestionModel: RandomQuestionModel.fromJson(cacheData),
           isLoading: false,
         );
         return;
@@ -77,23 +82,22 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
 
     final deviceID = await getDeviceId();
     final url =
-        "${AppConstants.randomQuestion}?forceNew=$forceNew&deviceID=$deviceID";
-
+        '${AppConstants.randomQuestion}?forceNew=$forceNew&deviceID=$deviceID';
     try {
       final response = await _client.get(url);
-      if (response.data['status'] == true) {
+      if (response.data != null && response.data['status'] == true) {
         final data = RandomQuestionModel.fromJson(response.data);
         MyGetStorage.writeCacheData(
             MyGetStorage.randomQuestionKey, response.data);
         state = state.copyWith(
           randomQuestionModel: data,
-          isLoading: false,
           randomQuestionPackage: response.data['package_required'] == true,
+          isLoading: false,
         );
       } else {
         state = state.copyWith(
           isLoading: false,
-          randomQuestionPackage: response.data['package_required'] == true,
+          randomQuestionPackage: response.data?['package_required'] == true,
         );
       }
     } catch (_) {
@@ -101,8 +105,50 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
     }
   }
 
-  void setIsAnswerSelected(bool value) {
-    state = state.copyWith(isAnswerSelected: value);
+  Future<void> getRandomQuestionPackageCheck() async {
+    state = state.copyWith(isLoading: true);
+    final isPremium = havePackage.value;
+    final cached = MyGetStorage.readCache(MyGetStorage.meUser);
+    if (cached != null) {
+      final bool havePkg = cached is User
+          ? (cached.hasActiveSubscription == true || cached.isSubscribed == true)
+          : (cached is Map
+              ? (cached['have_package'] == true || cached['have_package'] == 1)
+              : false);
+      havePackage.value = havePkg;
+      state = state.copyWith(
+        randomQuestionPackage: havePkg,
+        isLoading: false,
+      );
+      return;
+    }
+
+    final token = await SecureStorageService.getToken();
+    final url = AppConstants.v1UserProfile;
+    try {
+      final response = await _client.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.data != null && response.data['user'] != null) {
+        final havePkg = response.data['user']['have_package'] ?? false;
+        havePackage.value = havePkg;
+        state = state.copyWith(
+          randomQuestionPackage: havePkg,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(
+          randomQuestionPackage: isPremium,
+          isLoading: false,
+        );
+      }
+    } catch (_) {
+      state = state.copyWith(
+        randomQuestionPackage: isPremium,
+        isLoading: false,
+      );
+    }
   }
 }
 
@@ -118,28 +164,36 @@ final randomQuestionNotifierProvider =
 class ExamCategoriesState {
   final ExamCategoriesModel? examCategoriesModel;
   final CourseCategoriesModel? courseCategoriesModel;
-  final ApiCallStatus examApiStatus;
-  final ApiCallStatus courseApiStatus;
+  final bool isExamLoading;
+  final bool isExamError;
+  final bool isCourseLoading;
+  final bool isCourseError;
 
   ExamCategoriesState({
     this.examCategoriesModel,
     this.courseCategoriesModel,
-    this.examApiStatus = ApiCallStatus.holding,
-    this.courseApiStatus = ApiCallStatus.holding,
+    this.isExamLoading = false,
+    this.isExamError = false,
+    this.isCourseLoading = false,
+    this.isCourseError = false,
   });
 
   ExamCategoriesState copyWith({
     ExamCategoriesModel? examCategoriesModel,
     CourseCategoriesModel? courseCategoriesModel,
-    ApiCallStatus? examApiStatus,
-    ApiCallStatus? courseApiStatus,
+    bool? isExamLoading,
+    bool? isExamError,
+    bool? isCourseLoading,
+    bool? isCourseError,
   }) {
     return ExamCategoriesState(
       examCategoriesModel: examCategoriesModel ?? this.examCategoriesModel,
       courseCategoriesModel:
           courseCategoriesModel ?? this.courseCategoriesModel,
-      examApiStatus: examApiStatus ?? this.examApiStatus,
-      courseApiStatus: courseApiStatus ?? this.courseApiStatus,
+      isExamLoading: isExamLoading ?? this.isExamLoading,
+      isExamError: isExamError ?? this.isExamError,
+      isCourseLoading: isCourseLoading ?? this.isCourseLoading,
+      isCourseError: isCourseError ?? this.isCourseError,
     );
   }
 }
@@ -160,25 +214,26 @@ class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
   }
 
   Future<void> fetchExamCategories() async {
-    state = state.copyWith(examApiStatus: ApiCallStatus.loading);
+    state = state.copyWith(isExamLoading: true, isExamError: false);
     final url = AppConstants.examsCategories;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
         state = state.copyWith(
           examCategoriesModel: ExamCategoriesModel.fromJson(response.data),
-          examApiStatus: ApiCallStatus.success,
+          isExamLoading: false,
+          isExamError: false,
         );
       } else {
-        state = state.copyWith(examApiStatus: ApiCallStatus.error);
+        state = state.copyWith(isExamLoading: false, isExamError: true);
       }
     } catch (_) {
-      state = state.copyWith(examApiStatus: ApiCallStatus.error);
+      state = state.copyWith(isExamLoading: false, isExamError: true);
     }
   }
 
   Future<void> fetchCourseCategories() async {
-    state = state.copyWith(courseApiStatus: ApiCallStatus.loading);
+    state = state.copyWith(isCourseLoading: true, isCourseError: false);
     final url = AppConstants.courseCategories;
     try {
       final response = await _client.get(url);
@@ -186,13 +241,14 @@ class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
         state = state.copyWith(
           courseCategoriesModel:
               CourseCategoriesModel.fromJson(response.data),
-          courseApiStatus: ApiCallStatus.success,
+          isCourseLoading: false,
+          isCourseError: false,
         );
       } else {
-        state = state.copyWith(courseApiStatus: ApiCallStatus.error);
+        state = state.copyWith(isCourseLoading: false, isCourseError: true);
       }
     } catch (_) {
-      state = state.copyWith(courseApiStatus: ApiCallStatus.error);
+      state = state.copyWith(isCourseLoading: false, isCourseError: true);
     }
   }
 }
@@ -208,32 +264,32 @@ final examCategoriesNotifierProvider =
 
 class LatestExamState {
   final bool isLoading;
+  final bool hasError;
   final bool isLoadingQuestion;
   final int currentPage;
   final LatestExamModel? model;
-  final ApiCallStatus apiCallStatus;
 
   LatestExamState({
     this.isLoading = true,
+    this.hasError = false,
     this.isLoadingQuestion = false,
     this.currentPage = 1,
     this.model,
-    this.apiCallStatus = ApiCallStatus.holding,
   });
 
   LatestExamState copyWith({
     bool? isLoading,
+    bool? hasError,
     bool? isLoadingQuestion,
     int? currentPage,
     LatestExamModel? model,
-    ApiCallStatus? apiCallStatus,
   }) {
     return LatestExamState(
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       isLoadingQuestion: isLoadingQuestion ?? this.isLoadingQuestion,
       currentPage: currentPage ?? this.currentPage,
       model: model ?? this.model,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
     );
   }
 }
@@ -255,8 +311,8 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
     String search = '',
   }) async {
     state = state.copyWith(
-      apiCallStatus: ApiCallStatus.loading,
       isLoading: true,
+      hasError: false,
     );
     final url =
         "${AppConstants.latestExam}?search=$search&page=$page&date=$date";
@@ -269,23 +325,23 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
           state = state.copyWith(
             currentPage: page,
             isLoading: false,
-            apiCallStatus: ApiCallStatus.success,
+            hasError: false,
           );
         } else {
           state = state.copyWith(
             model: modelData,
             currentPage: page,
             isLoading: false,
-            apiCallStatus: ApiCallStatus.success,
+            hasError: false,
           );
         }
       } else {
-        state = state.copyWith(isLoading: false);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (_) {
       state = state.copyWith(
-        apiCallStatus: ApiCallStatus.error,
         isLoading: false,
+        hasError: true,
       );
     }
   }
@@ -342,7 +398,8 @@ class ExamCategoryDetailsState {
   final int currentPage;
   final int totalPages;
   final bool isLastPage;
-  final ApiCallStatus apiCallStatus;
+  final bool isLoading;
+  final bool hasError;
   final ExamCategoryDetailsModel? examCategoryDetailsModel;
   final ExamCategoriesModel? categoriesWithParentID;
 
@@ -351,7 +408,8 @@ class ExamCategoryDetailsState {
     this.currentPage = 1,
     this.totalPages = 1,
     this.isLastPage = false,
-    this.apiCallStatus = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     this.examCategoryDetailsModel,
     this.categoriesWithParentID,
   });
@@ -360,7 +418,8 @@ class ExamCategoryDetailsState {
     int? currentPage,
     int? totalPages,
     bool? isLastPage,
-    ApiCallStatus? apiCallStatus,
+    bool? isLoading,
+    bool? hasError,
     ExamCategoryDetailsModel? examCategoryDetailsModel,
     ExamCategoriesModel? categoriesWithParentID,
   }) {
@@ -369,7 +428,8 @@ class ExamCategoryDetailsState {
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
       isLastPage: isLastPage ?? this.isLastPage,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       examCategoryDetailsModel:
           examCategoryDetailsModel ?? this.examCategoryDetailsModel,
       categoriesWithParentID:
@@ -396,7 +456,7 @@ class ExamCategoryDetailsNotifier
   }
 
   Future<void> fetchExamCategoryDetails(int id) async {
-    state = state.copyWith(apiCallStatus: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, hasError: false);
     final url =
         '${AppConstants.examsCategory}/$id?page=${state.currentPage}';
 
@@ -410,13 +470,14 @@ class ExamCategoryDetailsNotifier
           totalPages: modelData.freeExams?.lastPage ?? 1,
           isLastPage: modelData.freeExams?.currentPage ==
               modelData.freeExams?.lastPage,
-          apiCallStatus: ApiCallStatus.success,
+          isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (_) {
-      state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+      state = state.copyWith(isLoading: false, hasError: true);
     }
   }
 

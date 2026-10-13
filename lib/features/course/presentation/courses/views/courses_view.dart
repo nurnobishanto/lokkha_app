@@ -32,7 +32,7 @@ class CoursesView extends ConsumerWidget {
       ),
       body: Builder(
         builder: (context) {
-          if (state.status == ApiCallStatus.loading) {
+          if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/shared/models/category.dart';
@@ -19,20 +18,24 @@ import 'package:lokkha/features/exam/exam.dart';
 // 1. Courses List Notifier
 // ---------------------------------------------------------------------------
 class CoursesState {
-  final ApiCallStatus status;
+  final bool isLoading;
+  final bool hasError;
   final CoursesModel model;
 
   const CoursesState({
-    this.status = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     required this.model,
   });
 
   CoursesState copyWith({
-    ApiCallStatus? status,
+    bool? isLoading,
+    bool? hasError,
     CoursesModel? model,
   }) {
     return CoursesState(
-      status: status ?? this.status,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       model: model ?? this.model,
     );
   }
@@ -51,26 +54,25 @@ class CoursesNotifier extends Notifier<CoursesState> {
     return CoursesState(model: CoursesModel());
   }
 
-  Future<void> fetchCourses([int? coursesID]) async {
-    state = state.copyWith(status: ApiCallStatus.loading);
-    try {
-      final id = coursesID ?? categoryId;
-      final url = (id != null && id > 0)
-          ? '${AppConstants.courses}?course_category_id=$id'
-          : AppConstants.courses;
+  Future<void> fetchCourses(int? id) async {
+    state = state.copyWith(isLoading: true, hasError: false);
+    final url =
+        id == null ? AppConstants.courses : '${AppConstants.courses}?category_id=$id';
 
+    try {
       final response = await _client.get(url);
       if (response.data != null && response.data['status'] == true) {
         state = state.copyWith(
-          model: CoursesModel.fromJson(response.data as Map<String, dynamic>),
-          status: ApiCallStatus.success,
+          model: CoursesModel.fromJson(response.data),
+          isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(status: ApiCallStatus.error);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (e) {
-      state = state.copyWith(status: ApiCallStatus.error);
-      debugPrint('exception in fetchCourses $e');
+      state = state.copyWith(isLoading: false, hasError: true);
+      if (kDebugMode) debugPrint('Error fetching courses: $e');
     }
   }
 }
@@ -84,28 +86,28 @@ final coursesNotifierProvider =
 // 2. Course Details Notifier
 // ---------------------------------------------------------------------------
 class CourseDetailsState {
-  final ApiCallStatus status;
   final CourseDetailsModel model;
   final bool isLoading;
+  final bool hasError;
   final bool showFullDetails;
 
   const CourseDetailsState({
-    this.status = ApiCallStatus.holding,
     required this.model,
     this.isLoading = true,
+    this.hasError = false,
     this.showFullDetails = false,
   });
 
   CourseDetailsState copyWith({
-    ApiCallStatus? status,
     CourseDetailsModel? model,
     bool? isLoading,
+    bool? hasError,
     bool? showFullDetails,
   }) {
     return CourseDetailsState(
-      status: status ?? this.status,
       model: model ?? this.model,
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       showFullDetails: showFullDetails ?? this.showFullDetails,
     );
   }
@@ -129,10 +131,7 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
   }
 
   Future<void> fetchCourseDetails(int id) async {
-    state = state.copyWith(
-      status: ApiCallStatus.loading,
-      isLoading: true,
-    );
+    state = state.copyWith(isLoading: true, hasError: false);
     final token = MySharedPref.getUserToken();
     final headers = {
       'Authorization': 'Bearer $token',
@@ -143,20 +142,20 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
       final response = await _client.get(url, headers: headers);
       if (response.data != null && response.data['status'] == true) {
         state = state.copyWith(
-          status: ApiCallStatus.success,
           isLoading: false,
+          hasError: false,
           model: CourseDetailsModel.fromJson(response.data),
         );
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           isLoading: false,
+          hasError: true,
         );
       }
     } catch (e) {
       state = state.copyWith(
-        status: ApiCallStatus.error,
         isLoading: false,
+        hasError: true,
       );
       if (kDebugMode) debugPrint('Error fetching course Details: $e');
     }
@@ -172,20 +171,24 @@ final courseDetailsNotifierProvider =
 // 3. My Courses Notifier
 // ---------------------------------------------------------------------------
 class MyCoursesState {
-  final ApiCallStatus status;
+  final bool isLoading;
+  final bool hasError;
   final MyCourseModel model;
 
   const MyCoursesState({
-    this.status = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     required this.model,
   });
 
   MyCoursesState copyWith({
-    ApiCallStatus? status,
+    bool? isLoading,
+    bool? hasError,
     MyCourseModel? model,
   }) {
     return MyCoursesState(
-      status: status ?? this.status,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       model: model ?? this.model,
     );
   }
@@ -203,7 +206,7 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
   }
 
   Future<void> fetchMyCourses() async {
-    state = state.copyWith(status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, hasError: false);
     final token = MySharedPref.getUserToken();
     final url = AppConstants.myCourses;
 
@@ -217,16 +220,17 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
       if (response.data != null && response.data['status'] == true) {
         state = state.copyWith(
           model: MyCourseModel.fromJson(response.data),
-          status: ApiCallStatus.success,
+          isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(status: ApiCallStatus.error);
+        state = state.copyWith(isLoading: false, hasError: true);
         CustomSnackBar.showCustomErrorToast(
           message: response.data?['message']?.toString() ?? 'কোর্স লোড করতে ব্যর্থ',
         );
       }
     } catch (error) {
-      state = state.copyWith(status: ApiCallStatus.error);
+      state = state.copyWith(isLoading: false, hasError: true);
       debugPrint('MyCourses API Error: $error');
       CustomSnackBar.showCustomErrorToast(
         message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
@@ -236,9 +240,7 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
 }
 
 final myCoursesNotifierProvider =
-    NotifierProvider<MyCoursesNotifier, MyCoursesState>(
-  MyCoursesNotifier.new,
-);
+    NotifierProvider<MyCoursesNotifier, MyCoursesState>(MyCoursesNotifier.new);
 
 // ---------------------------------------------------------------------------
 // 4. Course Checkout Notifier
@@ -250,7 +252,7 @@ class CourseCheckoutState {
   final int selectedPayment;
   final String selectedPaymentMethod;
   final CourseCheckoutModel dataModel;
-  final ApiCallStatus couponStatus;
+  final bool isCouponLoading;
   final String appliedCouponMessage;
   final int discountAmount;
   final int totalAmount;
@@ -262,7 +264,7 @@ class CourseCheckoutState {
     this.selectedPayment = 0,
     this.selectedPaymentMethod = 'bkash',
     required this.dataModel,
-    this.couponStatus = ApiCallStatus.holding,
+    this.isCouponLoading = false,
     this.appliedCouponMessage = '',
     this.discountAmount = -1,
     this.totalAmount = -1,
@@ -275,7 +277,7 @@ class CourseCheckoutState {
     int? selectedPayment,
     String? selectedPaymentMethod,
     CourseCheckoutModel? dataModel,
-    ApiCallStatus? couponStatus,
+    bool? isCouponLoading,
     String? appliedCouponMessage,
     int? discountAmount,
     int? totalAmount,
@@ -287,7 +289,7 @@ class CourseCheckoutState {
       selectedPayment: selectedPayment ?? this.selectedPayment,
       selectedPaymentMethod: selectedPaymentMethod ?? this.selectedPaymentMethod,
       dataModel: dataModel ?? this.dataModel,
-      couponStatus: couponStatus ?? this.couponStatus,
+      isCouponLoading: isCouponLoading ?? this.isCouponLoading,
       appliedCouponMessage: appliedCouponMessage ?? this.appliedCouponMessage,
       discountAmount: discountAmount ?? this.discountAmount,
       totalAmount: totalAmount ?? this.totalAmount,
@@ -298,7 +300,8 @@ class CourseCheckoutState {
 class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
   final RestClient _client;
 
-  CourseCheckoutNotifier({RestClient? client}) : _client = client ?? RestClient();
+  CourseCheckoutNotifier({RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   CourseCheckoutState build() {
@@ -308,12 +311,7 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
   void setIsChecked(bool value) {
     state = state.copyWith(isChecked: value);
     if (!value) {
-      state = state.copyWith(
-        couponStatus: ApiCallStatus.holding,
-        appliedCouponMessage: '',
-        discountAmount: -1,
-        totalAmount: -1,
-      );
+      clearCoupon();
     }
   }
 
@@ -343,54 +341,17 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
     );
   }
 
-  Future<String?> makePayment({
-    required int id,
-    required String couponCode,
-    required String email,
-  }) async {
-    state = state.copyWith(isLoading: true);
-    final token = MySharedPref.getUserToken();
-    final orderPlaceUrl = '${AppConstants.courseEnroll}/$id';
-
-    final headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-    final data = {
-      'coupon_code': couponCode,
-      'email': email,
-      'payment_method': state.selectedPaymentMethod,
-    };
-
-    String? paymentUrl;
-    try {
-      final response = await _client.post(
-        orderPlaceUrl,
-        data: data,
-        headers: headers,
-      );
-      state = state.copyWith(isLoading: false);
-      if (response.data != null && response.data['status'] == true) {
-        final checkoutModel = CourseCheckoutModel.fromJson(response.data);
-        state = state.copyWith(dataModel: checkoutModel);
-        paymentUrl = checkoutModel.paymentUrl?.toString();
-      } else {
-        CustomSnackBar.showCustomToast(
-          title: 'Something Went Wrong!',
-          message: response.data?['message']?.toString() ?? '',
-        );
-      }
-    } catch (err) {
-      state = state.copyWith(isLoading: false);
-      CustomSnackBar.showCustomErrorToast(
-        message: 'পেমেন্ট প্রসেসিং ব্যর্থ হয়েছে',
-      );
-    }
-    return paymentUrl;
+  void clearCoupon() {
+    state = state.copyWith(
+      isCouponLoading: false,
+      appliedCouponMessage: '',
+      discountAmount: -1,
+      totalAmount: -1,
+    );
   }
 
   Future<void> couponApply(String couponCode, String price) async {
-    state = state.copyWith(couponStatus: ApiCallStatus.loading);
+    state = state.copyWith(isCouponLoading: true);
     final token = MySharedPref.getUserToken();
     final url = AppConstants.couponApply;
     final headers = {
@@ -415,7 +376,7 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
         final discount = int.tryParse(response.data['discount']?.toString() ?? '') ?? -1;
         final total = int.tryParse(response.data['discount_price']?.toString() ?? '') ?? -1;
         state = state.copyWith(
-          couponStatus: ApiCallStatus.success,
+          isCouponLoading: false,
           appliedCouponMessage: message,
           discountAmount: discount,
           totalAmount: total,
@@ -423,7 +384,7 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
         CustomSnackBar.showCustomToast(message: message);
       } else {
         state = state.copyWith(
-          couponStatus: ApiCallStatus.error,
+          isCouponLoading: false,
           appliedCouponMessage: '',
           discountAmount: -1,
           totalAmount: -1,
@@ -432,13 +393,57 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
       }
     } catch (error) {
       state = state.copyWith(
-        couponStatus: ApiCallStatus.error,
+        isCouponLoading: false,
         appliedCouponMessage: '',
         discountAmount: -1,
         totalAmount: -1,
       );
       debugPrint('Coupon API error: $error');
       CustomSnackBar.showCustomErrorToast(message: 'সার্ভারে সমস্যা হয়েছে');
+    }
+  }
+
+  Future<String?> makePayment({
+    required int id,
+    String? couponCode,
+    String? email,
+  }) async {
+    state = state.copyWith(isLoading: true);
+    final token = MySharedPref.getUserToken();
+    final orderPlaceUrl = '${AppConstants.courseEnroll}/$id';
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final data = {
+      'coupon_code': couponCode ?? '',
+      'email': email ?? '',
+      'payment_method': state.selectedPaymentMethod,
+    };
+
+    try {
+      final response = await _client.post(
+        orderPlaceUrl,
+        headers: headers,
+        data: data,
+      );
+      state = state.copyWith(isLoading: false);
+      if (response.data != null && response.data['status'] == true) {
+        final checkoutModel = CourseCheckoutModel.fromJson(response.data);
+        state = state.copyWith(dataModel: checkoutModel);
+        return checkoutModel.paymentUrl?.toString();
+      } else {
+        CustomSnackBar.showCustomToast(
+          title: 'Something Went Wrong!',
+          message: response.data?['message']?.toString() ?? '',
+        );
+        return null;
+      }
+    } catch (error) {
+      state = state.copyWith(isLoading: false);
+      debugPrint('Payment API error: $error');
+      CustomSnackBar.showCustomErrorToast(message: 'সার্ভারে সমস্যা হয়েছে');
+      return null;
     }
   }
 }
@@ -452,31 +457,31 @@ final courseCheckoutNotifierProvider =
 // 5. Lecture Sheet Notifiers
 // ---------------------------------------------------------------------------
 class LectureSheetListState {
-  final ApiCallStatus status;
   final List<Category> categories;
   final bool isLoading;
+  final bool hasError;
   final bool isLastPage;
   final int currentPage;
 
   const LectureSheetListState({
-    this.status = ApiCallStatus.holding,
     this.categories = const [],
     this.isLoading = false,
+    this.hasError = false,
     this.isLastPage = false,
     this.currentPage = 1,
   });
 
   LectureSheetListState copyWith({
-    ApiCallStatus? status,
     List<Category>? categories,
     bool? isLoading,
+    bool? hasError,
     bool? isLastPage,
     int? currentPage,
   }) {
     return LectureSheetListState(
-      status: status ?? this.status,
       categories: categories ?? this.categories,
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       isLastPage: isLastPage ?? this.isLastPage,
       currentPage: currentPage ?? this.currentPage,
     );
@@ -499,7 +504,7 @@ class LectureSheetListNotifier extends Notifier<LectureSheetListState> {
     if (state.isLoading || state.isLastPage) return;
     state = state.copyWith(
       isLoading: true,
-      status: state.categories.isEmpty ? ApiCallStatus.loading : state.status,
+      hasError: false,
     );
 
     final url = '${AppConstants.lectureSheetCategories}?page=${state.currentPage}';
@@ -514,14 +519,14 @@ class LectureSheetListNotifier extends Notifier<LectureSheetListState> {
           categories: [...state.categories, ...newCategories],
           currentPage: state.currentPage + (newCategories.isNotEmpty ? 1 : 0),
           isLastPage: newCategories.isEmpty || isLast,
-          status: ApiCallStatus.success,
           isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (error) {
-      state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+      state = state.copyWith(isLoading: false, hasError: true);
       debugPrint('Pagination Error: $error');
     }
   }
@@ -533,20 +538,24 @@ final lectureSheetListNotifierProvider =
 );
 
 class SheetDetailsState {
-  final ApiCallStatus status;
+  final bool isLoading;
+  final bool hasError;
   final LectureSheetDetailsModel? model;
 
   const SheetDetailsState({
-    this.status = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     this.model,
   });
 
   SheetDetailsState copyWith({
-    ApiCallStatus? status,
+    bool? isLoading,
+    bool? hasError,
     LectureSheetDetailsModel? model,
   }) {
     return SheetDetailsState(
-      status: status ?? this.status,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       model: model ?? this.model,
     );
   }
@@ -566,7 +575,7 @@ class SheetDetailsNotifier extends Notifier<SheetDetailsState> {
   }
 
   Future<void> fetchSheetDetails(int id) async {
-    state = state.copyWith(status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, hasError: false);
     final url = '${AppConstants.lectureSheet}/$id';
     try {
       final response = await _client.get(url);
@@ -574,13 +583,14 @@ class SheetDetailsNotifier extends Notifier<SheetDetailsState> {
       if (data != null && data['status'] == true) {
         state = state.copyWith(
           model: LectureSheetDetailsModel.fromJson(data),
-          status: ApiCallStatus.success,
+          isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(status: ApiCallStatus.error);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (error) {
-      state = state.copyWith(status: ApiCallStatus.error);
+      state = state.copyWith(isLoading: false, hasError: true);
       debugPrint('Error: $error');
     }
   }
@@ -592,35 +602,35 @@ final sheetDetailsNotifierProvider =
 );
 
 class LectureSheetListDetailsState {
-  final ApiCallStatus status;
+  final bool isLoading;
+  final bool hasError;
   final LectureSheetCategory? detailsModel;
   final List<Category> lectureSheets;
-  final bool isLoading;
   final bool isLastPage;
   final int currentPage;
 
   const LectureSheetListDetailsState({
-    this.status = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     this.detailsModel,
     this.lectureSheets = const [],
-    this.isLoading = false,
     this.isLastPage = false,
     this.currentPage = 1,
   });
 
   LectureSheetListDetailsState copyWith({
-    ApiCallStatus? status,
+    bool? isLoading,
+    bool? hasError,
     LectureSheetCategory? detailsModel,
     List<Category>? lectureSheets,
-    bool? isLoading,
     bool? isLastPage,
     int? currentPage,
   }) {
     return LectureSheetListDetailsState(
-      status: status ?? this.status,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       detailsModel: detailsModel ?? this.detailsModel,
       lectureSheets: lectureSheets ?? this.lectureSheets,
-      isLoading: isLoading ?? this.isLoading,
       isLastPage: isLastPage ?? this.isLastPage,
       currentPage: currentPage ?? this.currentPage,
     );
@@ -646,7 +656,7 @@ class LectureSheetListDetailsNotifier
 
     state = state.copyWith(
       isLoading: true,
-      status: state.lectureSheets.isEmpty ? ApiCallStatus.loading : state.status,
+      hasError: false,
     );
     final url =
         '${AppConstants.lectureSheetCategories}/$id?page=${state.currentPage}';
@@ -664,14 +674,14 @@ class LectureSheetListDetailsNotifier
           lectureSheets: [...state.lectureSheets, ...sheets],
           currentPage: state.currentPage + (sheets.isNotEmpty ? 1 : 0),
           isLastPage: sheets.isEmpty || isLast,
-          status: ApiCallStatus.success,
           isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+        state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (error) {
-      state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+      state = state.copyWith(isLoading: false, hasError: true);
       debugPrint('Error: $error');
     }
   }
@@ -687,7 +697,6 @@ final lectureSheetListDetailsNotifierProvider =
 // 7. Course Learn Notifier
 // ---------------------------------------------------------------------------
 class CourseLearnState {
-  final ApiCallStatus status;
   final bool isLoading;
   final CourseLearningModel? model;
   final String? videoId;
@@ -696,7 +705,6 @@ class CourseLearnState {
   final int? currentItemId;
 
   const CourseLearnState({
-    this.status = ApiCallStatus.holding,
     this.isLoading = true,
     this.model,
     this.videoId,
@@ -706,7 +714,6 @@ class CourseLearnState {
   });
 
   CourseLearnState copyWith({
-    ApiCallStatus? status,
     bool? isLoading,
     CourseLearningModel? model,
     String? videoId,
@@ -715,7 +722,6 @@ class CourseLearnState {
     int? currentItemId,
   }) {
     return CourseLearnState(
-      status: status ?? this.status,
       isLoading: isLoading ?? this.isLoading,
       model: model ?? this.model,
       videoId: videoId ?? this.videoId,
@@ -754,7 +760,6 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
     if (token.isEmpty) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: 'Unauthenticated',
       );
       if (onError != null) onError('Unauthenticated');
@@ -791,7 +796,6 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
           model: data,
           videoId: extractedId,
           isLoading: false,
-          status: ApiCallStatus.success,
         );
         if (onVideoReady != null) {
           onVideoReady(extractedId);
@@ -800,7 +804,6 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
         final msg = response.data?['message']?.toString() ?? 'Something went wrong';
         state = state.copyWith(
           isLoading: false,
-          status: ApiCallStatus.error,
           errorMessage: msg,
         );
         if (onError != null) onError(msg);
@@ -808,7 +811,6 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: e.toString(),
       );
       if (onError != null) onError(e.toString());
@@ -820,4 +822,3 @@ final courseLearnNotifierProvider =
     NotifierProvider.family<CourseLearnNotifier, CourseLearnState, int>(
   CourseLearnNotifier.new,
 );
-

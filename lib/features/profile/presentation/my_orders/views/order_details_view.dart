@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/packages/presentation/views/payment_webview.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
@@ -34,7 +33,7 @@ class OrderDetailsScreen extends ConsumerWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.apiCallStatus == ApiCallStatus.error ||
+          if (state.hasError ||
               state.orderDetail == null) {
             return _buildErrorState(context, notifier);
           }

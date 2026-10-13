@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
@@ -15,26 +14,26 @@ import 'package:lokkha/shared/models/user.dart';
 class NavbarState {
   final int currentIndex;
   final ProfileDataModel? profile;
-  final ApiCallStatus profileStatus;
+  final bool isProfileLoading;
   final bool isLoggedIn;
 
   const NavbarState({
     this.currentIndex = 0,
     this.profile,
-    this.profileStatus = ApiCallStatus.holding,
+    this.isProfileLoading = false,
     this.isLoggedIn = false,
   });
 
   NavbarState copyWith({
     int? currentIndex,
     ProfileDataModel? Function()? profile,
-    ApiCallStatus? profileStatus,
+    bool? isProfileLoading,
     bool? isLoggedIn,
   }) {
     return NavbarState(
       currentIndex: currentIndex ?? this.currentIndex,
       profile: profile != null ? profile() : this.profile,
-      profileStatus: profileStatus ?? this.profileStatus,
+      isProfileLoading: isProfileLoading ?? this.isProfileLoading,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
     );
   }
@@ -64,7 +63,7 @@ class NavbarNotifier extends Notifier<NavbarState> {
       return;
     }
 
-    state = state.copyWith(profileStatus: ApiCallStatus.loading);
+    state = state.copyWith(isProfileLoading: true);
 
     try {
       final response = await RestClient().get(AppConstants.v1UserProfile);
@@ -78,22 +77,22 @@ class NavbarNotifier extends Notifier<NavbarState> {
           state = state.copyWith(
             profile: () => profile,
             isLoggedIn: true,
-            profileStatus: ApiCallStatus.success,
+            isProfileLoading: false,
           );
 
           debugPrint("✅ Profile Data fetch Success: ${myUser.name}");
           return;
         }
       }
-      state = state.copyWith(profileStatus: ApiCallStatus.error);
+      state = state.copyWith(isProfileLoading: false);
     } on DioException catch (e) {
-      state = state.copyWith(profileStatus: ApiCallStatus.error);
+      state = state.copyWith(isProfileLoading: false);
       debugPrint("❌ Profile Fetch Error: ${e.response?.statusCode} - ${e.message}");
       if (e.response?.statusCode == 401) {
         AuthService().handleSessionExpired();
       }
     } catch (e) {
-      state = state.copyWith(profileStatus: ApiCallStatus.error);
+      state = state.copyWith(isProfileLoading: false);
       debugPrint("❌ Profile Fetch Error: $e");
     }
   }
@@ -108,7 +107,7 @@ class NavbarNotifier extends Notifier<NavbarState> {
     state = state.copyWith(
       profile: () => null,
       isLoggedIn: false,
-      profileStatus: ApiCallStatus.holding,
+      isProfileLoading: false,
     );
   }
 }

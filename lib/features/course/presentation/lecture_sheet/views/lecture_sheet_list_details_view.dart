@@ -19,12 +19,20 @@ class LectureSheetListDetailsView extends ConsumerWidget {
       appBar: CustomAppBar(title: "Lecture Sheet Details"),
       body: Builder(
         builder: (context) {
-          switch (state.status) {
-            case ApiCallStatus.loading:
-              return const Center(child: CircularProgressIndicator());
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            case ApiCallStatus.success:
-              final model = state.detailsModel;
+          if (state.hasError) {
+            return Center(
+              child: Text(
+                "Something went wrong",
+                style: TextStyle(color: context.textPrimary),
+              ),
+            );
+          }
+
+          final model = state.detailsModel;
               if (model == null) {
                 return Center(
                   child: Text(
@@ -137,17 +145,6 @@ class LectureSheetListDetailsView extends ConsumerWidget {
                   ),
                 ),
               );
-            case ApiCallStatus.error:
-              return Center(
-                child: Text(
-                  "Something went wrong",
-                  style: TextStyle(color: context.textPrimary),
-                ),
-              );
-            case ApiCallStatus.holding:
-            default:
-              return const SizedBox();
-          }
         },
       ),
     );

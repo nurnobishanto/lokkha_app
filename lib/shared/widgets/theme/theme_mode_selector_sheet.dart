@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/app/theme/app_colors.dart';
-import 'package:lokkha/core/extensions/common_extension.dart';
 
 /// Reusable Bottom Sheet for 3-state Theme Mode Selection:
 /// - Light Mode

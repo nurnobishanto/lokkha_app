@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/theme/app_colors.dart';
-import 'package:lokkha/core/localization/app_localizations.dart';
 
 export 'package:go_router/go_router.dart';
 export 'package:lokkha/core/localization/app_localizations.dart';

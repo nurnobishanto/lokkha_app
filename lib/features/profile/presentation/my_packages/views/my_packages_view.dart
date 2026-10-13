@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import '../controllers/my_packages_notifier.dart';
@@ -31,11 +30,11 @@ class MyPackagesView extends ConsumerWidget {
             return const AuthGatewayView();
           }
 
-          if (state.apiCallStatus == ApiCallStatus.loading) {
+          if (state.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state.apiCallStatus == ApiCallStatus.error) {
+          if (state.hasError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

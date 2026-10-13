@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  late ValueNotifier<ApiCallStatus> apiStatusNotifier;
+  late ValueNotifier<bool> isLoadingNotifier;
+  late ValueNotifier<bool> isErrorNotifier;
   late ValueNotifier<SubjectSectionModel> sectionModelNotifier;
 
   Widget createTestableWidget() {
@@ -16,13 +16,19 @@ void main() {
       designSize: const Size(375, 812),
       builder: (_, __) => MaterialApp(
         home: Scaffold(
-          body: ValueListenableBuilder<ApiCallStatus>(
-            valueListenable: apiStatusNotifier,
-            builder: (context, status, _) {
-              switch (status) {
-                case ApiCallStatus.loading:
-                  return const Center(child: CircularProgressIndicator());
-                case ApiCallStatus.success:
+          body: ValueListenableBuilder<bool>(
+            valueListenable: isLoadingNotifier,
+            builder: (context, isLoading, _) {
+              if (isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ValueListenableBuilder<bool>(
+                valueListenable: isErrorNotifier,
+                builder: (context, isError, _) {
+                  if (isError) {
+                    return const Center(
+                        child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
+                  }
                   return ValueListenableBuilder<SubjectSectionModel>(
                     valueListenable: sectionModelNotifier,
                     builder: (context, model, _) {
@@ -47,12 +53,8 @@ void main() {
                       );
                     },
                   );
-                case ApiCallStatus.error:
-                  return const Center(
-                      child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
-                default:
-                  return const SizedBox();
-              }
+                },
+              );
             },
           ),
         ),
@@ -61,13 +63,14 @@ void main() {
   }
 
   setUp(() {
-    apiStatusNotifier = ValueNotifier<ApiCallStatus>(ApiCallStatus.holding);
+    isLoadingNotifier = ValueNotifier<bool>(false);
+    isErrorNotifier = ValueNotifier<bool>(false);
     sectionModelNotifier = ValueNotifier<SubjectSectionModel>(SubjectSectionModel());
   });
 
   group('SubjectSection Grid Widget', () {
     testWidgets('displays loading indicator', (tester) async {
-      apiStatusNotifier.value = ApiCallStatus.loading;
+      isLoadingNotifier.value = true;
 
       await tester.pumpWidget(createTestableWidget());
 
@@ -80,7 +83,8 @@ void main() {
         SubjectSection(name: "বিসিএস", subject: Subject()),
         SubjectSection(name: "বার কাউন্সিল", subject: Subject()),
       ]);
-      apiStatusNotifier.value = ApiCallStatus.success;
+      isLoadingNotifier.value = false;
+      isErrorNotifier.value = false;
 
       await tester.pumpWidget(createTestableWidget());
       await tester.pumpAndSettle();
@@ -91,7 +95,8 @@ void main() {
     });
 
     testWidgets('displays error message', (tester) async {
-      apiStatusNotifier.value = ApiCallStatus.error;
+      isLoadingNotifier.value = false;
+      isErrorNotifier.value = true;
 
       await tester.pumpWidget(createTestableWidget());
 

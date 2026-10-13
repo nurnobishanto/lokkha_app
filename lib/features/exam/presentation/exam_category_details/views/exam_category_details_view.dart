@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
 import '../../exam_category/widgets/exam_category_card.dart';
 import '../widgets/exam_card.dart';
@@ -77,7 +76,7 @@ class _ExamCategoryDetailsViewState
       body: SafeArea(
         child: Builder(
           builder: (context) {
-            if (state.apiCallStatus == ApiCallStatus.loading &&
+            if (state.isLoading &&
                 state.examCategoryDetailsModel == null) {
               return const Center(child: CircularProgressIndicator());
             }

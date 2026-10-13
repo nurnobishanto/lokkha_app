@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/home.dart';
@@ -20,9 +19,11 @@ class SeeAllItemsState {
   final List<Exam> examsList;
   final List<UserExamV1Item> v1ExamsList;
   final UserExamV1Meta? examMeta;
-  final ApiCallStatus examApiCallStatus;
+  final bool isExamLoading;
+  final bool isExamError;
   final AllCourseModel allCourseModel;
-  final ApiCallStatus courseApiCallStatus;
+  final bool isCourseLoading;
+  final bool isCourseError;
 
   SeeAllItemsState({
     this.selectedFilter = "all",
@@ -35,9 +36,11 @@ class SeeAllItemsState {
     this.examsList = const [],
     this.v1ExamsList = const [],
     this.examMeta,
-    this.examApiCallStatus = ApiCallStatus.holding,
+    this.isExamLoading = false,
+    this.isExamError = false,
     AllCourseModel? allCourseModel,
-    this.courseApiCallStatus = ApiCallStatus.holding,
+    this.isCourseLoading = false,
+    this.isCourseError = false,
   })  : allExamModel = allExamModel ?? AllExamModel(),
         allCourseModel = allCourseModel ?? AllCourseModel();
 
@@ -52,9 +55,11 @@ class SeeAllItemsState {
     List<Exam>? examsList,
     List<UserExamV1Item>? v1ExamsList,
     UserExamV1Meta? examMeta,
-    ApiCallStatus? examApiCallStatus,
+    bool? isExamLoading,
+    bool? isExamError,
     AllCourseModel? allCourseModel,
-    ApiCallStatus? courseApiCallStatus,
+    bool? isCourseLoading,
+    bool? isCourseError,
   }) {
     return SeeAllItemsState(
       selectedFilter: selectedFilter ?? this.selectedFilter,
@@ -67,9 +72,11 @@ class SeeAllItemsState {
       examsList: examsList ?? this.examsList,
       v1ExamsList: v1ExamsList ?? this.v1ExamsList,
       examMeta: examMeta ?? this.examMeta,
-      examApiCallStatus: examApiCallStatus ?? this.examApiCallStatus,
+      isExamLoading: isExamLoading ?? this.isExamLoading,
+      isExamError: isExamError ?? this.isExamError,
       allCourseModel: allCourseModel ?? this.allCourseModel,
-      courseApiCallStatus: courseApiCallStatus ?? this.courseApiCallStatus,
+      isCourseLoading: isCourseLoading ?? this.isCourseLoading,
+      isCourseError: isCourseError ?? this.isCourseError,
     );
   }
 }
@@ -101,7 +108,7 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
   }
 
   Future<void> fetchAllExams({int page = 1}) async {
-    state = state.copyWith(examApiCallStatus: ApiCallStatus.loading);
+    state = state.copyWith(isExamLoading: true, isExamError: false);
 
     try {
       final filterParam =
@@ -132,17 +139,19 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
         currentExamPage: response.meta.currentPage,
         totalExamPages:
             response.meta.lastPage > 0 ? response.meta.lastPage : 1,
-        examApiCallStatus: ApiCallStatus.success,
+        isExamLoading: false,
+        isExamError: false,
       );
     } catch (e) {
       debugPrint('[SeeAllItemsNotifier] fetchAllExams error: $e');
-      state = state.copyWith(examApiCallStatus: ApiCallStatus.error);
+      state = state.copyWith(isExamLoading: false, isExamError: true);
     }
   }
 
   Future<void> fetchAllCourses({int page = 1}) async {
     state = state.copyWith(
-      courseApiCallStatus: ApiCallStatus.loading,
+      isCourseLoading: true,
+      isCourseError: false,
       isLoading: true,
     );
 
@@ -173,7 +182,8 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
             ),
             currentCoursePage: page,
             totalCoursePages: modelData.courses?.lastPage ?? 1,
-            courseApiCallStatus: ApiCallStatus.success,
+            isCourseLoading: false,
+            isCourseError: false,
             isLoading: false,
           );
         } else {
@@ -181,19 +191,22 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
             allCourseModel: modelData,
             currentCoursePage: page,
             totalCoursePages: modelData.courses?.lastPage ?? 1,
-            courseApiCallStatus: ApiCallStatus.success,
+            isCourseLoading: false,
+            isCourseError: false,
             isLoading: false,
           );
         }
       } else {
         state = state.copyWith(
-          courseApiCallStatus: ApiCallStatus.error,
+          isCourseLoading: false,
+          isCourseError: true,
           isLoading: false,
         );
       }
     } catch (_) {
       state = state.copyWith(
-        courseApiCallStatus: ApiCallStatus.error,
+        isCourseLoading: false,
+        isCourseError: true,
         isLoading: false,
       );
     }

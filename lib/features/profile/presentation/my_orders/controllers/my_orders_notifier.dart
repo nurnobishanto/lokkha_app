@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_user_orders_usecase.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
@@ -8,7 +7,8 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 class MyOrdersState {
   final List<OrderV1Item> orders;
   final OrderV1FilterCounts filterCounts;
-  final ApiCallStatus apiCallStatus;
+  final bool isLoading;
+  final bool hasError;
   final String selectedStatus;
   final String selectedModelType;
   final String selectedPaymentMethod;
@@ -21,7 +21,8 @@ class MyOrdersState {
   MyOrdersState({
     this.orders = const [],
     OrderV1FilterCounts? filterCounts,
-    this.apiCallStatus = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
     this.selectedStatus = 'all',
     this.selectedModelType = 'all',
     this.selectedPaymentMethod = 'all',
@@ -35,7 +36,8 @@ class MyOrdersState {
   MyOrdersState copyWith({
     List<OrderV1Item>? orders,
     OrderV1FilterCounts? filterCounts,
-    ApiCallStatus? apiCallStatus,
+    bool? isLoading,
+    bool? hasError,
     String? selectedStatus,
     String? selectedModelType,
     String? selectedPaymentMethod,
@@ -48,7 +50,8 @@ class MyOrdersState {
     return MyOrdersState(
       orders: orders ?? this.orders,
       filterCounts: filterCounts ?? this.filterCounts,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       selectedStatus: selectedStatus ?? this.selectedStatus,
       selectedModelType: selectedModelType ?? this.selectedModelType,
       selectedPaymentMethod: selectedPaymentMethod ?? this.selectedPaymentMethod,
@@ -72,7 +75,7 @@ class MyOrdersNotifier extends Notifier<MyOrdersState> {
   MyOrdersState build() {
     _getUserOrdersUseCase = _injectedUseCase ?? GetUserOrdersUseCase();
     Future.microtask(() => fetchOrders(refresh: true));
-    return MyOrdersState(apiCallStatus: ApiCallStatus.loading);
+    return MyOrdersState(isLoading: true, hasError: false);
   }
 
   Future<void> fetchOrders({bool refresh = false}) async {
@@ -80,7 +83,8 @@ class MyOrdersNotifier extends Notifier<MyOrdersState> {
       state = state.copyWith(
         currentPage: 1,
         hasMore: false,
-        apiCallStatus: state.orders.isEmpty ? ApiCallStatus.loading : state.apiCallStatus,
+        isLoading: state.orders.isEmpty,
+        hasError: false,
         isRefreshing: state.orders.isNotEmpty,
       );
     }
@@ -103,7 +107,8 @@ class MyOrdersNotifier extends Notifier<MyOrdersState> {
         orders: newOrders,
         filterCounts: response.filterCounts,
         hasMore: response.meta.hasMore,
-        apiCallStatus: ApiCallStatus.success,
+        isLoading: false,
+        hasError: false,
         isRefreshing: false,
         isLoadingMore: false,
       );
@@ -111,12 +116,14 @@ class MyOrdersNotifier extends Notifier<MyOrdersState> {
       debugPrint('[MyOrdersNotifier] fetchOrders error: $e');
       if (state.orders.isEmpty) {
         state = state.copyWith(
-          apiCallStatus: ApiCallStatus.error,
+          isLoading: false,
+          hasError: true,
           isRefreshing: false,
           isLoadingMore: false,
         );
       } else {
         state = state.copyWith(
+          isLoading: false,
           isRefreshing: false,
           isLoadingMore: false,
         );

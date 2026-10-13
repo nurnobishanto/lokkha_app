@@ -12,7 +12,6 @@ export 'errors/api_exceptions.dart';
 
 // Enums
 export 'enums/question_type.dart';
-export 'enums/api_call_status.dart';
 
 // Extensions
 export 'extensions/common_extension.dart';

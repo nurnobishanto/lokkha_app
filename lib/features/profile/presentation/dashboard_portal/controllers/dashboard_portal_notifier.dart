@@ -1,22 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
-import 'package:lokkha/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_dashboard_overview_usecase.dart';
 
 class DashboardPortalState {
   final DashboardOverviewModel? dashboardOverview;
   final bool isLoading;
-  final ApiCallStatus apiCallStatus;
+  final bool hasError;
 
   const DashboardPortalState({
     this.dashboardOverview,
     this.isLoading = false,
-    this.apiCallStatus = ApiCallStatus.holding,
+    this.hasError = false,
   });
 
   DashboardData? get data => dashboardOverview?.data;
@@ -29,12 +27,12 @@ class DashboardPortalState {
   DashboardPortalState copyWith({
     DashboardOverviewModel? Function()? dashboardOverview,
     bool? isLoading,
-    ApiCallStatus? apiCallStatus,
+    bool? hasError,
   }) {
     return DashboardPortalState(
       dashboardOverview: dashboardOverview != null ? dashboardOverview() : this.dashboardOverview,
       isLoading: isLoading ?? this.isLoading,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
+      hasError: hasError ?? this.hasError,
     );
   }
 }
@@ -53,14 +51,14 @@ class DashboardPortalNotifier extends Notifier<DashboardPortalState> {
     if (token == null || token.isEmpty) {
       state = state.copyWith(
         isLoading: false,
-        apiCallStatus: ApiCallStatus.empty,
+        hasError: false,
       );
       return;
     }
 
     state = state.copyWith(
       isLoading: true,
-      apiCallStatus: ApiCallStatus.loading,
+      hasError: false,
     );
 
     try {
@@ -69,7 +67,7 @@ class DashboardPortalNotifier extends Notifier<DashboardPortalState> {
         state = state.copyWith(
           dashboardOverview: () => res,
           isLoading: false,
-          apiCallStatus: ApiCallStatus.success,
+          hasError: false,
         );
 
         // Sync subscription state
@@ -86,14 +84,14 @@ class DashboardPortalNotifier extends Notifier<DashboardPortalState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          apiCallStatus: ApiCallStatus.error,
+          hasError: true,
         );
       }
     } catch (e) {
       debugPrint("Error fetching dashboard overview (Riverpod): $e");
       state = state.copyWith(
         isLoading: false,
-        apiCallStatus: ApiCallStatus.error,
+        hasError: true,
       );
     }
   }

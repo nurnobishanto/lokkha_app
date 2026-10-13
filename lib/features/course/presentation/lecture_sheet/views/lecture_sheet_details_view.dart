@@ -19,43 +19,38 @@ class LectureSheetDetailsView extends ConsumerWidget {
       body: Builder(
         builder: (context) {
           final data = state.model;
-          final status = state.status;
-
-          switch (status) {
-            case ApiCallStatus.loading:
-              return const Center(child: CircularProgressIndicator());
-
-            case ApiCallStatus.error:
-              return Center(
-                child: Text(
-                  "Something went wrong",
-                  style: TextStyle(color: context.textPrimary),
-                ),
-              );
-
-            case ApiCallStatus.success:
-              if (data == null || data.lectureSheet == null) {
-                return Center(
-                  child: Text(
-                    "No data available",
-                    style: TextStyle(color: context.textPrimary),
-                  ),
-                );
-              }
-              final sheet = data.lectureSheet!;
-              return SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: LectureSheetCard(
-                    name: sheet.name ?? '',
-                    description: sheet.details ?? '',
-                    fileUrl: sheet.file ?? '',
-                  ),
-                ),
-              );
-            default:
-              return const SizedBox();
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
           }
+
+          if (state.hasError) {
+            return Center(
+              child: Text(
+                "Something went wrong",
+                style: TextStyle(color: context.textPrimary),
+              ),
+            );
+          }
+
+          if (data == null || data.lectureSheet == null) {
+            return Center(
+              child: Text(
+                "No data available",
+                style: TextStyle(color: context.textPrimary),
+              ),
+            );
+          }
+          final sheet = data.lectureSheet!;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: LectureSheetCard(
+                name: sheet.name ?? '',
+                description: sheet.details ?? '',
+                fileUrl: sheet.file ?? '',
+              ),
+            ),
+          );
         },
       ),
     );

@@ -40,7 +40,7 @@ class _LectureSheetListViewState extends ConsumerState<LectureSheetListView> {
       appBar: AppBar(title: const Text("Lecture Sheets")),
       body: Builder(
         builder: (context) {
-          if (state.status == ApiCallStatus.loading && state.categories.isEmpty) {
+          if (state.isLoading && state.categories.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
           return Padding(

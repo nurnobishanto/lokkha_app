@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/features/navigation/presentation/controllers/navbar_notifier.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
@@ -10,26 +9,22 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 class VerifyOtpState {
   final bool isLoading;
   final String otp;
-  final ApiCallStatus status;
   final String? errorMessage;
 
   const VerifyOtpState({
     this.isLoading = false,
     this.otp = '',
-    this.status = ApiCallStatus.holding,
     this.errorMessage,
   });
 
   VerifyOtpState copyWith({
     bool? isLoading,
     String? otp,
-    ApiCallStatus? status,
     String? errorMessage,
   }) {
     return VerifyOtpState(
       isLoading: isLoading ?? this.isLoading,
       otp: otp ?? this.otp,
-      status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -44,19 +39,18 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
   }
 
   Future<void> sendOtp(String phone, [String type = 'Registration']) async {
-    state = state.copyWith(status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final sendOtpUseCase = ref.read(sendOtpUseCaseProvider);
       final res = await sendOtpUseCase(phone, type: type);
+      state = state.copyWith(isLoading: false);
       if (res.status) {
-        state = state.copyWith(status: ApiCallStatus.success);
         CustomSnackBar.showCustomToast(
           message: res.message ?? "ওটিপি সফলভাবে পাঠানো হয়েছে।",
         );
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           errorMessage: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে।',
         );
         CustomSnackBar.showCustomErrorSnackBar(
@@ -66,7 +60,7 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       }
     } catch (e) {
       state = state.copyWith(
-        status: ApiCallStatus.error,
+        isLoading: false,
         errorMessage: 'ওটিপি পাঠাতে সমস্যা হয়েছে।',
       );
       CustomSnackBar.showCustomErrorSnackBar(
@@ -85,7 +79,7 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       return;
     }
 
-    state = state.copyWith(isLoading: true, status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final registerUseCase = ref.read(registerUseCaseProvider);
@@ -97,7 +91,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       state = state.copyWith(isLoading: false);
 
       if (res.status) {
-        state = state.copyWith(status: ApiCallStatus.success);
         CustomSnackBar.showCustomToast(
           message: res.message ?? "রেজিস্ট্রেশন সফল হয়েছে!",
         );
@@ -111,7 +104,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
         }
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           errorMessage: res.message ?? 'রেজিস্ট্রেশন সম্পন্ন করা সম্ভব হয়নি।',
         );
         CustomSnackBar.showCustomErrorSnackBar(
@@ -122,7 +114,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
       );
       CustomSnackBar.showCustomErrorSnackBar(
@@ -141,7 +132,7 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       return;
     }
 
-    state = state.copyWith(isLoading: true, status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final loginUseCase = ref.read(loginUseCaseProvider);
@@ -153,7 +144,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       state = state.copyWith(isLoading: false);
 
       if (res.status) {
-        state = state.copyWith(status: ApiCallStatus.success);
         CustomSnackBar.showCustomToast(
           message: res.message ?? "লগইন সফল হয়েছে!",
         );
@@ -164,7 +154,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
         }
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           errorMessage: res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
         );
         CustomSnackBar.showCustomErrorSnackBar(
@@ -175,7 +164,6 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
       );
       CustomSnackBar.showCustomErrorSnackBar(

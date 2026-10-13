@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';
@@ -25,8 +24,7 @@ class PremiumEntitlementService {
   static PremiumEntitlementService get instance => _instance;
 
   // ── Public reactive state ────────────────────────────────────────────────
-  final ValueNotifier<ApiCallStatus> validationStatus =
-      ValueNotifier<ApiCallStatus>(ApiCallStatus.holding);
+  final ValueNotifier<bool> isValidating = ValueNotifier<bool>(false);
 
   // ── Cache control ────────────────────────────────────────────────────────
   DateTime? _lastValidatedAt;
@@ -80,7 +78,7 @@ class PremiumEntitlementService {
       return;
     }
 
-    validationStatus.value = ApiCallStatus.loading;
+    isValidating.value = true;
 
     try {
       final authRepo = AuthRepository();
@@ -88,14 +86,14 @@ class PremiumEntitlementService {
       if (res != null && res.status) {
         _updateState(hasPremium: res.havePackage);
         log('✅ Entitlement validated: isPremium=${res.havePackage}');
-        validationStatus.value = ApiCallStatus.success;
+        isValidating.value = false;
       } else {
         _updateState(hasPremium: false);
         log('⚠️ Entitlement check returned status=false');
-        validationStatus.value = ApiCallStatus.error;
+        isValidating.value = false;
       }
     } catch (e) {
-      validationStatus.value = ApiCallStatus.error;
+      isValidating.value = false;
       log('❌ Entitlement network error: $e — keeping cached state');
     }
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
 import 'package:lokkha/shared/models/mock_subject_select_model.dart';
 
@@ -14,11 +13,15 @@ class MockTestView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(mockTestNotifierProvider);
 
-    switch (state.apiCallStatus) {
-      case ApiCallStatus.loading:
-        return const Center(child: CircularProgressIndicator());
-      case ApiCallStatus.success:
-        final subjects = state.model?.subjects ?? [];
+    if (state.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.hasError) {
+      return const Center(child: Text("Failed to load data. Try again."));
+    }
+
+    final subjects = state.model?.subjects ?? [];
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.only(
@@ -93,11 +96,5 @@ class MockTestView extends ConsumerWidget {
             ),
           ),
         );
-      case ApiCallStatus.error:
-        return const Center(child: Text("Failed to load data. Try again."));
-      case ApiCallStatus.holding:
-      default:
-        return const SizedBox.shrink();
-    }
   }
 }

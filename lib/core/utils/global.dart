@@ -90,7 +90,7 @@ void printAppInfo() {
 }
 
 void clearAuth() {
-  currentUserId?.value = '';
+  currentUserId.value = '';
   isLoggedIn.value = false;
   logInfo("🚪 Logged Out");
 }

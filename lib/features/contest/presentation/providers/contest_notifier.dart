@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/auth/auth.dart';
@@ -58,7 +55,6 @@ class ContestTimerState {
 class LatestContestState {
   final bool isLoading;
   final bool isResultLoading;
-  final ApiCallStatus apiCallStatus;
   final LatestContestModel? contestModel;
   final AllContestModel? allContestModel;
   final ContestResultModel? lastContestResultModel;
@@ -73,7 +69,6 @@ class LatestContestState {
   LatestContestState({
     this.isLoading = true,
     this.isResultLoading = true,
-    this.apiCallStatus = ApiCallStatus.holding,
     this.contestModel,
     this.allContestModel,
     this.lastContestResultModel,
@@ -90,7 +85,6 @@ class LatestContestState {
   LatestContestState copyWith({
     bool? isLoading,
     bool? isResultLoading,
-    ApiCallStatus? apiCallStatus,
     LatestContestModel? contestModel,
     AllContestModel? allContestModel,
     ContestResultModel? lastContestResultModel,
@@ -105,7 +99,6 @@ class LatestContestState {
     return LatestContestState(
       isLoading: isLoading ?? this.isLoading,
       isResultLoading: isResultLoading ?? this.isResultLoading,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
       contestModel: contestModel ?? this.contestModel,
       allContestModel: allContestModel ?? this.allContestModel,
       lastContestResultModel:

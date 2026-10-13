@@ -20,16 +20,13 @@ class MyCoursesView extends ConsumerWidget {
       appBar: CustomAppBar(title: 'আমার কোর্স'),
       body: Builder(
         builder: (context) {
-          final status = state.status;
-
-          if (status == ApiCallStatus.loading ||
-              status == ApiCallStatus.holding) {
+          if (state.isLoading) {
             return const Center(
               child: CircularProgressIndicator(color: Color(0xFF28a745)),
             );
           }
 
-          if (status == ApiCallStatus.error) {
+          if (state.hasError) {
             return _buildErrorState(notifier);
           }
 

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
@@ -36,7 +35,7 @@ class _MyOrdersViewState extends ConsumerState<MyOrdersView> {
             _scrollController.position.maxScrollExtent - 200 &&
         state.hasMore &&
         !state.isLoadingMore &&
-        state.apiCallStatus == ApiCallStatus.success) {
+        !state.isLoading) {
       ref.read(myOrdersNotifierProvider.notifier).loadMore();
     }
   }
@@ -79,13 +78,11 @@ class _MyOrdersViewState extends ConsumerState<MyOrdersView> {
             Expanded(
               child: Builder(
                 builder: (context) {
-                  final status = state.apiCallStatus;
-
-                  if (status == ApiCallStatus.loading && state.orders.isEmpty) {
+                  if (state.isLoading && state.orders.isEmpty) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (status == ApiCallStatus.error && state.orders.isEmpty) {
+                  if (state.hasError && state.orders.isEmpty) {
                     return _buildErrorState(context, notifier);
                   }
 

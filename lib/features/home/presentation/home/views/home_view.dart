@@ -9,7 +9,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -316,123 +315,117 @@ class _SliderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeNotifierProvider);
 
-    switch (homeState.sliderStatus) {
-      case ApiCallStatus.loading:
-        return const Center(child: CircularProgressIndicator());
-      case ApiCallStatus.error:
-        return const Center(child: Text("Slider loading failed"));
-      case ApiCallStatus.holding:
-        return const SizedBox.shrink();
-      case ApiCallStatus.success:
-        final sliders = homeState.sliderModel.sliders ?? [];
-        if (sliders.isEmpty) return const SizedBox.shrink();
+    if (homeState.isSliderLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (homeState.isSliderError) {
+      return const Center(child: Text("Slider loading failed"));
+    }
 
-        return CarouselSlider(
-          options: CarouselOptions(
-            aspectRatio: 14 / 4,
-            enlargeCenterPage: true,
-            enlargeStrategy: CenterPageEnlargeStrategy.height,
-            autoPlay: true,
-            viewportFraction: 1.0,
-            onPageChanged: (currentIndex, reason) {
-              ref.read(homeNotifierProvider.notifier).setDotsCount(currentIndex);
-            },
-          ),
-          items: sliders.map((sliderItem) {
-            final imageUrl =
-                AppConstants.storageUrl + (sliderItem.image ?? '');
-            if (kDebugMode) debugPrint('URL IMAGE : $imageUrl');
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(7.0),
-              child: InkWell(
-                onTap: () {
-                  final page = sliderItem.page ?? "";
-                  final link = sliderItem.link ?? "";
-                  final param = sliderItem.param ?? "";
+    final sliders = homeState.sliderModel.sliders ?? [];
+    if (sliders.isEmpty) return const SizedBox.shrink();
 
-                  if (page.isNotEmpty) {
-                    if (param.isNotEmpty) {
-                      try {
-                        final decoded = jsonDecode(param);
-                        context.push(page, extra: decoded);
-                      } catch (e) {
-                        context.push(page, extra: {"param": param});
-                      }
-                    } else {
-                      context.push(page);
-                    }
-                  } else if (link.isNotEmpty) {
-                    final uri = Uri.tryParse(link);
-                    if (uri != null && uri.path.isNotEmpty) {
-                      final extractedPage = uri.path;
+    return CarouselSlider(
+      options: CarouselOptions(
+        aspectRatio: 14 / 4,
+        enlargeCenterPage: true,
+        enlargeStrategy: CenterPageEnlargeStrategy.height,
+        autoPlay: true,
+        viewportFraction: 1.0,
+        onPageChanged: (currentIndex, reason) {
+          ref.read(homeNotifierProvider.notifier).setDotsCount(currentIndex);
+        },
+      ),
+      items: sliders.map((sliderItem) {
+        final imageUrl =
+            AppConstants.storageUrl + (sliderItem.image ?? '');
+        if (kDebugMode) debugPrint('URL IMAGE : $imageUrl');
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(7.0),
+          child: InkWell(
+            onTap: () {
+              final page = sliderItem.page ?? "";
+              final link = sliderItem.link ?? "";
+              final param = sliderItem.param ?? "";
 
-                      final segments = uri.pathSegments;
-                      if (segments.isNotEmpty) {
-                        final last = segments.last;
+              if (page.isNotEmpty) {
+                if (param.isNotEmpty) {
+                  try {
+                    final decoded = jsonDecode(param);
+                    context.push(page, extra: decoded);
+                  } catch (e) {
+                    context.push(page, extra: {"param": param});
+                  }
+                } else {
+                  context.push(page);
+                }
+              } else if (link.isNotEmpty) {
+                final uri = Uri.tryParse(link);
+                if (uri != null && uri.path.isNotEmpty) {
+                  final extractedPage = uri.path;
 
-                        if (int.tryParse(last) != null) {
-                          final id = int.parse(last);
-                          final baseRoute =
-                              "/${segments.sublist(0, segments.length - 1).join("/")}";
-                          context.push(baseRoute, extra: id);
-                          return;
-                        }
-                      }
-                      if (isAppRoute(extractedPage)) {
-                        final queryParams = uri.queryParameters;
-                        final Map<String, dynamic> parsedParams = {};
+                  final segments = uri.pathSegments;
+                  if (segments.isNotEmpty) {
+                    final last = segments.last;
 
-                        queryParams.forEach((key, value) {
-                          final lowerKey = key.toLowerCase();
-                          final isIdField = lowerKey.endsWith("id") ||
-                              lowerKey.contains("_id");
-
-                          if (isIdField) {
-                            parsedParams[key] = int.tryParse(value) ?? 0;
-                          } else if (int.tryParse(value) != null) {
-                            parsedParams[key] = int.parse(value);
-                          } else {
-                            parsedParams[key] = value;
-                          }
-                        });
-
-                        if (parsedParams.isNotEmpty) {
-                          context.push(extractedPage, extra: parsedParams);
-                        } else {
-                          context.push(extractedPage);
-                        }
-                      } else {
-                        openAppOrWebView(link);
-                      }
-                    } else {
-                      openAppOrWebView(link);
+                    if (int.tryParse(last) != null) {
+                      final id = int.parse(last);
+                      final baseRoute =
+                          "/${segments.sublist(0, segments.length - 1).join("/")}";
+                      context.push(baseRoute, extra: id);
+                      return;
                     }
                   }
-                },
-                child: Container(
-                  height: 120.h,
-                  decoration: BoxDecoration(color: Colors.grey.shade200),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (c, u) =>
-                          const Center(child: CircularProgressIndicator()),
-                      errorWidget: (c, u, e) =>
-                          const Center(child: Icon(Icons.broken_image)),
-                    ),
-                  ),
+                  if (isAppRoute(extractedPage)) {
+                    final queryParams = uri.queryParameters;
+                    final Map<String, dynamic> parsedParams = {};
+
+                    queryParams.forEach((key, value) {
+                      final lowerKey = key.toLowerCase();
+                      final isIdField = lowerKey.endsWith("id") ||
+                          lowerKey.contains("_id");
+
+                      if (isIdField) {
+                        parsedParams[key] = int.tryParse(value) ?? 0;
+                      } else if (int.tryParse(value) != null) {
+                        parsedParams[key] = int.parse(value);
+                      } else {
+                        parsedParams[key] = value;
+                      }
+                    });
+
+                    if (parsedParams.isNotEmpty) {
+                      context.push(extractedPage, extra: parsedParams);
+                    } else {
+                      context.push(extractedPage);
+                    }
+                  } else {
+                    openAppOrWebView(link);
+                  }
+                } else {
+                  openAppOrWebView(link);
+                }
+              }
+            },
+            child: Container(
+              height: 120.h,
+              decoration: BoxDecoration(color: Colors.grey.shade200),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (c, u) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorWidget: (c, u, e) =>
+                      const Center(child: Icon(Icons.broken_image)),
                 ),
               ),
-            );
-          }).toList(),
+            ),
+          ),
         );
-      case ApiCallStatus.empty:
-      case ApiCallStatus.cache:
-      case ApiCallStatus.refresh:
-        return const SizedBox.shrink();
-    }
+      }).toList(),
+    );
   }
 }
 
@@ -539,7 +532,7 @@ class _PremiumExamSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(seeAllItemsNotifierProvider);
 
-    if (state.courseApiCallStatus == ApiCallStatus.loading &&
+    if (state.isCourseLoading &&
         (state.allCourseModel.courses?.data ?? []).isEmpty) {
       return SizedBox(
         height: 200.h,
@@ -630,64 +623,62 @@ class _SubjectSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeState = ref.watch(homeNotifierProvider);
 
-    switch (homeState.subjectSectionStatus) {
-      case ApiCallStatus.loading:
-        return const Center(child: CircularProgressIndicator());
-      case ApiCallStatus.error:
-        return const Center(child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
-      case ApiCallStatus.success:
-        final list = homeState.subjectSectionModel.subjectSections ?? [];
-        if (list.isEmpty) return const SizedBox.shrink();
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 4,
-          ),
-          padding: EdgeInsets.zero,
-          itemCount: list.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            final data = list[index];
-            return GestureDetector(
-              onTap: () {
-                MySharedPref.clearSubjectSection();
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => SubjectSectionView(subject: data.subject),
-                  ),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.cardColor,
-                  borderRadius: BorderRadius.circular(7.0),
-                  border: Border.all(
-                    color: context.borderColor,
-                    width: 0.8.w,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    data.name.toString(),
-                    style: AppTextStyles.body2.copyWith(
-                      height: 1.1.h,
-                      fontSize: 12.sp,
-                      color: context.textPrimary,
-                    ),
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                  ).paddingSymmetric(horizontal: 2.00.w, vertical: 5.00.h),
-                ),
+    if (homeState.isSubjectSectionLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (homeState.isSubjectSectionError) {
+      return const Center(child: Text("কিছু ভুল হয়েছে, আবার চেষ্টা করুন"));
+    }
+
+    final list = homeState.subjectSectionModel.subjectSections ?? [];
+    if (list.isEmpty) return const SizedBox.shrink();
+
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 4,
+      ),
+      padding: EdgeInsets.zero,
+      itemCount: list.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        final data = list[index];
+        return GestureDetector(
+          onTap: () {
+            MySharedPref.clearSubjectSection();
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SubjectSectionView(subject: data.subject),
               ),
             );
           },
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.cardColor,
+              borderRadius: BorderRadius.circular(7.0),
+              border: Border.all(
+                color: context.borderColor,
+                width: 0.8.w,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                data.name.toString(),
+                style: AppTextStyles.body2.copyWith(
+                  height: 1.1.h,
+                  fontSize: 12.sp,
+                ),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ).paddingSymmetric(horizontal: 2.00.w, vertical: 5.00.h),
+            ),
+          ),
         );
-      default:
-        return const SizedBox.shrink();
-    }
+      },
+    );
   }
 }

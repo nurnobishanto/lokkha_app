@@ -1,30 +1,29 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_order_details_usecase.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class OrdersDetailsState {
   final bool isLoading;
+  final bool hasError;
   final OrderDetailV1Data? orderDetail;
-  final ApiCallStatus apiCallStatus;
 
   const OrdersDetailsState({
     this.isLoading = true,
+    this.hasError = false,
     this.orderDetail,
-    this.apiCallStatus = ApiCallStatus.holding,
   });
 
   OrdersDetailsState copyWith({
     bool? isLoading,
+    bool? hasError,
     OrderDetailV1Data? orderDetail,
-    ApiCallStatus? apiCallStatus,
   }) {
     return OrdersDetailsState(
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       orderDetail: orderDetail ?? this.orderDetail,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
     );
   }
 }
@@ -46,14 +45,14 @@ class OrdersDetailsNotifier extends Notifier<OrdersDetailsState> {
     }
     return const OrdersDetailsState(
       isLoading: true,
-      apiCallStatus: ApiCallStatus.loading,
+      hasError: false,
     );
   }
 
   Future<void> fetchOrdersDetails({dynamic id, String? url}) async {
     state = state.copyWith(
       isLoading: true,
-      apiCallStatus: ApiCallStatus.loading,
+      hasError: false,
     );
 
     try {
@@ -77,14 +76,14 @@ class OrdersDetailsNotifier extends Notifier<OrdersDetailsState> {
       final data = await _getOrderDetailsUseCase(orderId);
       state = state.copyWith(
         isLoading: false,
+        hasError: false,
         orderDetail: data,
-        apiCallStatus: ApiCallStatus.success,
       );
     } catch (e) {
       debugPrint('[OrdersDetailsNotifier] fetchOrdersDetails error: $e');
       state = state.copyWith(
         isLoading: false,
-        apiCallStatus: ApiCallStatus.error,
+        hasError: true,
       );
       CustomSnackBar.showCustomErrorToast(
         message: "অর্ডার তথ্য লোড করতে সমস্যা হয়েছে",

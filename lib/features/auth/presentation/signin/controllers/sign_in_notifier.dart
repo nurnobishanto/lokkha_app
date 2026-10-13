@@ -2,30 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/features/navigation/presentation/controllers/navbar_notifier.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class SignInState {
   final bool isLoading;
-  final ApiCallStatus status;
   final String? errorMessage;
 
   const SignInState({
     this.isLoading = false,
-    this.status = ApiCallStatus.holding,
     this.errorMessage,
   });
 
   SignInState copyWith({
     bool? isLoading,
-    ApiCallStatus? status,
     String? errorMessage,
   }) {
     return SignInState(
       isLoading: isLoading ?? this.isLoading,
-      status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -41,7 +36,7 @@ class SignInNotifier extends Notifier<SignInState> {
     required String password,
     required BuildContext context,
   }) async {
-    state = state.copyWith(isLoading: true, status: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final loginUseCase = ref.read(loginUseCaseProvider);
@@ -53,7 +48,6 @@ class SignInNotifier extends Notifier<SignInState> {
       state = state.copyWith(isLoading: false);
 
       if (res.status) {
-        state = state.copyWith(status: ApiCallStatus.success);
         CustomSnackBar.showCustomToast(
           message: res.message ?? "লগইন সফল হয়েছে!",
         );
@@ -65,7 +59,6 @@ class SignInNotifier extends Notifier<SignInState> {
         }
       } else {
         state = state.copyWith(
-          status: ApiCallStatus.error,
           errorMessage: res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
         );
         CustomSnackBar.showCustomErrorSnackBar(
@@ -76,7 +69,6 @@ class SignInNotifier extends Notifier<SignInState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        status: ApiCallStatus.error,
         errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
       );
       CustomSnackBar.showCustomErrorSnackBar(

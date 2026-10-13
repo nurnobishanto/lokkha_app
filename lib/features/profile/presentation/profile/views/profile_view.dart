@@ -8,7 +8,6 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
@@ -38,7 +37,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
   @override
   Widget build(BuildContext context) {
     final profileState = ref.watch(profileNotifierProvider);
-    final status = profileState.profileApiStatus;
     final profileData = myUser;
 
     return Scaffold(
@@ -49,7 +47,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       ),
       body: Builder(
         builder: (context) {
-          if (status == ApiCallStatus.loading) {
+          if (profileState.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -57,7 +55,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             return const AuthGatewayView();
           }
 
-          if (status == ApiCallStatus.error) {
+          if (profileState.hasError) {
             return const Center(child: Text("তথ্য লোড করা সম্ভব হয়নি"));
           }
 

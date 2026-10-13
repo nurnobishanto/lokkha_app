@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/shared/models/get_subjects.dart';
@@ -15,25 +14,25 @@ import 'package:lokkha/shared/widgets/web_exam_view.dart';
 // ============================================================================
 
 class MockTestState {
-  final ApiCallStatus apiCallStatus;
-  final GetSubjectsModel? model;
   final bool isLoading;
+  final bool hasError;
+  final GetSubjectsModel? model;
 
   MockTestState({
-    this.apiCallStatus = ApiCallStatus.holding,
-    this.model,
     this.isLoading = true,
+    this.hasError = false,
+    this.model,
   });
 
   MockTestState copyWith({
-    ApiCallStatus? apiCallStatus,
-    GetSubjectsModel? model,
     bool? isLoading,
+    bool? hasError,
+    GetSubjectsModel? model,
   }) {
     return MockTestState(
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
-      model: model ?? this.model,
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
+      model: model ?? this.model,
     );
   }
 }
@@ -51,8 +50,8 @@ class MockTestNotifier extends Notifier<MockTestState> {
 
   Future<void> getRootSubjects() async {
     state = state.copyWith(
-      apiCallStatus: ApiCallStatus.loading,
       isLoading: true,
+      hasError: false,
     );
 
     final url = AppConstants.getSubjects;
@@ -61,20 +60,20 @@ class MockTestNotifier extends Notifier<MockTestState> {
       if (response.data['status'] == true) {
         final data = GetSubjectsModel.fromJson(response.data);
         state = state.copyWith(
-          apiCallStatus: ApiCallStatus.success,
           model: data,
           isLoading: false,
+          hasError: false,
         );
       } else {
         state = state.copyWith(
-          apiCallStatus: ApiCallStatus.error,
           isLoading: false,
+          hasError: true,
         );
       }
     } catch (_) {
       state = state.copyWith(
-        apiCallStatus: ApiCallStatus.error,
         isLoading: false,
+        hasError: true,
       );
     }
   }

@@ -1,35 +1,33 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/navigation/data/models/profile_data_model.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
-import 'package:lokkha/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_profile_usecase.dart';
 
 class ProfileState {
   final bool isLoading;
+  final bool hasError;
   final ProfileDataModel? profileDataModel;
-  final ApiCallStatus profileApiStatus;
 
   const ProfileState({
     this.isLoading = true,
+    this.hasError = false,
     this.profileDataModel,
-    this.profileApiStatus = ApiCallStatus.holding,
   });
 
   ProfileState copyWith({
     bool? isLoading,
+    bool? hasError,
     ProfileDataModel? Function()? profileDataModel,
-    ApiCallStatus? profileApiStatus,
   }) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
       profileDataModel: profileDataModel != null ? profileDataModel() : this.profileDataModel,
-      profileApiStatus: profileApiStatus ?? this.profileApiStatus,
     );
   }
 }
@@ -48,14 +46,14 @@ class ProfileNotifier extends Notifier<ProfileState> {
     if (token == null || token.isEmpty) {
       state = state.copyWith(
         isLoading: false,
-        profileApiStatus: ApiCallStatus.error,
+        hasError: true,
       );
       return;
     }
 
     state = state.copyWith(
       isLoading: true,
-      profileApiStatus: ApiCallStatus.loading,
+      hasError: false,
     );
 
     try {
@@ -68,21 +66,21 @@ class ProfileNotifier extends Notifier<ProfileState> {
 
         state = state.copyWith(
           isLoading: false,
+          hasError: false,
           profileDataModel: () => profileModel,
-          profileApiStatus: ApiCallStatus.success,
         );
 
         return;
       }
       state = state.copyWith(
         isLoading: false,
-        profileApiStatus: ApiCallStatus.error,
+        hasError: true,
       );
     } catch (e) {
       debugPrint("Error fetching profile data (Riverpod): $e");
       state = state.copyWith(
         isLoading: false,
-        profileApiStatus: ApiCallStatus.error,
+        hasError: true,
       );
     }
   }

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
 import 'package:lokkha/features/profile/domain/usecases/change_password_usecase.dart';
@@ -17,14 +16,12 @@ class ProfileUpdateState {
   final String dob;
   final CroppedFile? croppedImage;
   final bool isLoading;
-  final ApiCallStatus apiCallStatus;
 
   const ProfileUpdateState({
     this.gender = 'অন্যান্য',
     this.dob = '',
     this.croppedImage,
     this.isLoading = false,
-    this.apiCallStatus = ApiCallStatus.holding,
   });
 
   ProfileUpdateState copyWith({
@@ -32,14 +29,12 @@ class ProfileUpdateState {
     String? dob,
     CroppedFile? croppedImage,
     bool? isLoading,
-    ApiCallStatus? apiCallStatus,
   }) {
     return ProfileUpdateState(
       gender: gender ?? this.gender,
       dob: dob ?? this.dob,
       croppedImage: croppedImage ?? this.croppedImage,
       isLoading: isLoading ?? this.isLoading,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
     );
   }
 }
@@ -152,7 +147,7 @@ class ProfileUpdateNotifier extends Notifier<ProfileUpdateState> {
       return false;
     }
 
-    state = state.copyWith(isLoading: true, apiCallStatus: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true);
 
     try {
       File? photoFile;
@@ -198,14 +193,14 @@ class ProfileUpdateNotifier extends Notifier<ProfileUpdateState> {
 
         ref.read(profileNotifierProvider.notifier).fetchProfileData();
 
-        state = state.copyWith(isLoading: false, apiCallStatus: ApiCallStatus.holding);
+        state = state.copyWith(isLoading: false);
         return true;
       } else {
         CustomSnackBar.showCustomErrorSnackBar(
           title: "আপডেট ব্যর্থ",
           message: res['message']?.toString() ?? "প্রোফাইল আপডেট সম্পন্ন করা সম্ভব হয়নি।",
         );
-        state = state.copyWith(isLoading: false, apiCallStatus: ApiCallStatus.holding);
+        state = state.copyWith(isLoading: false);
         return false;
       }
     } catch (e) {
@@ -214,7 +209,7 @@ class ProfileUpdateNotifier extends Notifier<ProfileUpdateState> {
         title: "ত্রুটি",
         message: "সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।",
       );
-      state = state.copyWith(isLoading: false, apiCallStatus: ApiCallStatus.holding);
+      state = state.copyWith(isLoading: false);
       return false;
     }
   }

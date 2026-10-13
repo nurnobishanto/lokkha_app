@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/exam/data/models/user_exam_v1_model.dart';
 import 'package:lokkha/features/exam/domain/repositories/exam_repository.dart';
 import 'package:lokkha/features/exam/domain/usecases/get_user_exams_usecase.dart';
@@ -165,7 +164,8 @@ void main() {
       await notifier.fetchAllExams(page: 1);
 
       var state = container.read(seeAllItemsNotifierProvider);
-      expect(state.examApiCallStatus, ApiCallStatus.success);
+      expect(state.isExamLoading, false);
+      expect(state.isExamError, false);
       expect(state.examsList.length, 2);
       expect(state.currentExamPage, 1);
       expect(state.totalExamPages, 5);

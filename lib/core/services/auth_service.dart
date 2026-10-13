@@ -9,7 +9,6 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
@@ -19,7 +18,6 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  ApiCallStatus apiCallStatus = ApiCallStatus.holding;
   static bool _isSessionDialogShowing = false;
 
   /// Handle session expiration with a dialog
@@ -201,7 +199,6 @@ class AuthService {
 
     if (res != null) {
       if (res.status) {
-        apiCallStatus = ApiCallStatus.success;
         isLoggedIn.value = true;
         havePackage.value = res.havePackage;
 
@@ -216,7 +213,6 @@ class AuthService {
         }
       } else {
         // Explicit invalid session response from server
-        apiCallStatus = ApiCallStatus.error;
         handleSessionExpired(message: res.message);
       }
     } else {

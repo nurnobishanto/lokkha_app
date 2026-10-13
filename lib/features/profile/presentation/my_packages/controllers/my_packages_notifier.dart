@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/profile/data/models/my_packages_model.dart';
@@ -9,24 +8,29 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class MyPackagesState {
   final MyPackagesModel model;
-  final ApiCallStatus apiCallStatus;
+  final bool isLoading;
+  final bool hasError;
 
   const MyPackagesState({
     required this.model,
-    this.apiCallStatus = ApiCallStatus.holding,
+    this.isLoading = false,
+    this.hasError = false,
   });
 
   MyPackagesState.initial()
       : model = MyPackagesModel(),
-        apiCallStatus = ApiCallStatus.holding;
+        isLoading = false,
+        hasError = false;
 
   MyPackagesState copyWith({
     MyPackagesModel? model,
-    ApiCallStatus? apiCallStatus,
+    bool? isLoading,
+    bool? hasError,
   }) {
     return MyPackagesState(
       model: model ?? this.model,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
+      isLoading: isLoading ?? this.isLoading,
+      hasError: hasError ?? this.hasError,
     );
   }
 }
@@ -41,12 +45,13 @@ class MyPackagesNotifier extends Notifier<MyPackagesState> {
     Future.microtask(() => fetchMyPackages());
     return MyPackagesState(
       model: MyPackagesModel(),
-      apiCallStatus: ApiCallStatus.loading,
+      isLoading: true,
+      hasError: false,
     );
   }
 
   Future<void> fetchMyPackages() async {
-    state = state.copyWith(apiCallStatus: ApiCallStatus.loading);
+    state = state.copyWith(isLoading: true, hasError: false);
     String? token = MySharedPref.getUserToken();
     String url = AppConstants.myPackages;
 
@@ -63,16 +68,17 @@ class MyPackagesNotifier extends Notifier<MyPackagesState> {
       if (response.data['status'] == true) {
         state = state.copyWith(
           model: MyPackagesModel.fromJson(response.data),
-          apiCallStatus: ApiCallStatus.success,
+          isLoading: false,
+          hasError: false,
         );
       } else {
-        state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+        state = state.copyWith(isLoading: false, hasError: true);
         CustomSnackBar.showCustomErrorToast(
           message: response.data['message'] ?? "প্যাকেজ লোড করতে ব্যর্থ",
         );
       }
     } catch (error) {
-      state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+      state = state.copyWith(isLoading: false, hasError: true);
       debugPrint("MyPackages API Error: $error");
       CustomSnackBar.showCustomErrorToast(
         message: "সার্ভার সংযোগে সমস্যা হয়েছে",

@@ -200,7 +200,7 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: state.couponStatus == ApiCallStatus.loading
+                                child: state.isCouponLoading
                                     ? const Center(
                                         child: CircularProgressIndicator(),
                                       )

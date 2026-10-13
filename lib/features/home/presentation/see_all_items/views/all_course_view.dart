@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/constants/app_constants.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
 
@@ -15,7 +14,7 @@ class AllCourseView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(seeAllItemsNotifierProvider);
 
-    if (state.courseApiCallStatus == ApiCallStatus.loading &&
+    if (state.isCourseLoading &&
         (state.allCourseModel.courses?.data ?? []).isEmpty) {
       return Scaffold(
         appBar: AppBar(

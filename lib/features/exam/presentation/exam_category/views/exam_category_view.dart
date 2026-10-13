@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
 import 'package:lokkha/features/home/home.dart';
 import '../widgets/exam_category_card.dart';
@@ -16,8 +15,7 @@ class ExamCategoryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(examCategoriesNotifierProvider);
 
-    if (state.examApiStatus == ApiCallStatus.loading ||
-        state.courseApiStatus == ApiCallStatus.loading) {
+    if (state.isExamLoading || state.isCourseLoading) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('পরীক্ষার ক্যাটাগরি'),

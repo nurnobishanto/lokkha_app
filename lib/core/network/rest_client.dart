@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import '../errors/exceptions.dart';
 import '../storage/secure_storage_service.dart';
 import 'endpoints.dart';
-import 'interceptor/token_manager.dart';
 
 export 'endpoints.dart';
 export 'interceptor/token_manager.dart';

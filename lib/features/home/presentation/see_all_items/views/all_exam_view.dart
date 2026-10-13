@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
@@ -67,12 +66,11 @@ class AllExamView extends ConsumerWidget {
             Expanded(
               child: Builder(
                 builder: (context) {
-                  final status = state.examApiCallStatus;
                   final exams = state.examsList.isNotEmpty
                       ? state.examsList
                       : (state.allExamModel.exams?.data ?? []);
 
-                  if (status == ApiCallStatus.loading) {
+                  if (state.isExamLoading) {
                     return Center(
                       child: CircularProgressIndicator(
                         color: context.primaryColor,
@@ -80,7 +78,7 @@ class AllExamView extends ConsumerWidget {
                     );
                   }
 
-                  if (status == ApiCallStatus.error) {
+                  if (state.isExamError) {
                     return Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 24.w),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/shared/models/vocabulary.dart';
@@ -123,7 +122,6 @@ class VocabularyState {
   final int currentPage;
   final int totalPages;
   final bool isLastPage;
-  final ApiCallStatus apiCallStatus;
   final Category? selectedType;
   final Category? selectedCategory;
   final VocabularyModel? model;
@@ -136,7 +134,6 @@ class VocabularyState {
     this.currentPage = 1,
     this.totalPages = 1,
     this.isLastPage = false,
-    this.apiCallStatus = ApiCallStatus.holding,
     this.selectedType,
     this.selectedCategory,
     this.model,
@@ -150,7 +147,6 @@ class VocabularyState {
     int? currentPage,
     int? totalPages,
     bool? isLastPage,
-    ApiCallStatus? apiCallStatus,
     Category? selectedType,
     Category? selectedCategory,
     VocabularyModel? model,
@@ -165,7 +161,6 @@ class VocabularyState {
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
       isLastPage: isLastPage ?? this.isLastPage,
-      apiCallStatus: apiCallStatus ?? this.apiCallStatus,
       selectedType: clearType ? null : (selectedType ?? this.selectedType),
       selectedCategory:
           clearCategory ? null : (selectedCategory ?? this.selectedCategory),
@@ -270,19 +265,16 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
           totalPages: lastPage,
           isLastPage: curPage >= lastPage,
           filteredVocab: filtered,
-          apiCallStatus: ApiCallStatus.success,
         );
       } else {
         state = state.copyWith(
           isLoading: false,
-          apiCallStatus: ApiCallStatus.error,
           filteredVocab: [],
         );
       }
     } catch (err) {
       state = state.copyWith(
         isLoading: false,
-        apiCallStatus: ApiCallStatus.error,
       );
     }
   }
