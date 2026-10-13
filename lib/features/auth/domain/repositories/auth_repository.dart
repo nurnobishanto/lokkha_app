@@ -1,5 +1,5 @@
 import '../../data/datasources/auth_remote_data_source.dart';
-import 'package:lokkha/features/auth/auth.dart';
+import '../../data/models/auth_response_model.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 
 abstract class AuthRepository {
@@ -14,9 +14,11 @@ abstract class AuthRepository {
   });
   Future<AuthResponseModel> login({
     required String phone,
+    String? type,
     String? password,
     String? otp,
     String? deviceName,
+    String? platform,
   });
   Future<AuthResponseModel> register({
     required String phone,

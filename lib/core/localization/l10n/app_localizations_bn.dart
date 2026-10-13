@@ -108,4 +108,25 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get googleSignInComingSoon => 'গুগল সাইন-ইন সেবাটি খুব শীঘ্রই আসছে...';
+
+  @override
+  String get loginWithPhoneNumber => 'আপনার ফোন নম্বর দিয়ে লগইন করুন';
+
+  @override
+  String get enterPassword => 'আপনার পাসওয়ার্ড লিখুন';
+
+  @override
+  String get forgotPasswordOrOtp => 'পাসওয়ার্ড মনে নেই? OTP দিয়ে লগইন করুন!';
+
+  @override
+  String get changePhone => 'পরিবর্তন';
+
+  @override
+  String get providePassword => 'অনুগ্রহ করে আপনার পাসওয়ার্ড লিখুন।';
+
+  @override
+  String get loginSuccess => 'লগইন সফল হয়েছে!';
+
+  @override
+  String get loginFailed => 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।';
 }

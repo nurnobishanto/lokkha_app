@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:lokkha/core/network/rest_client.dart';
+import 'package:lokkha/core/utils/device_utils.dart';
+import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/features/auth/auth.dart';
 
 abstract class AuthRemoteDataSource {
@@ -10,9 +12,11 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> verifyOtp({required String phone, required String otp});
   Future<AuthResponseModel> login({
     required String phone,
+    String? type,
     String? password,
     String? otp,
     String? deviceName,
+    String? platform,
   });
   Future<AuthResponseModel> register({
     required String phone,
@@ -97,20 +101,32 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel> login({
     required String phone,
+    String? type,
     String? password,
     String? otp,
     String? deviceName,
+    String? platform,
   }) async {
-    final platform = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'other');
-    final isOtp = otp != null && otp.isNotEmpty;
+    final isOtp = (type != null && type.toLowerCase() == 'otp') ||
+        (otp != null && otp.isNotEmpty);
+    final authType = isOtp ? 'otp' : 'password';
+    final value = isOtp ? (otp ?? '') : (password ?? '');
+    final resolvedPlatform = platform ?? DeviceUtils.getPlatform();
+    final resolvedDeviceName = deviceName ?? await DeviceUtils.getDeviceName();
+
+    // Canonicalize or clean phone to standard format
+    final cleanPhone = PhoneUtils.toLocal11Digit(phone).isNotEmpty
+        ? PhoneUtils.toLocal11Digit(phone)
+        : PhoneUtils.sanitize(phone);
+
     final payload = <String, dynamic>{
-      'phone': phone,
-      'type': isOtp ? 'otp' : 'password',
-      'value': isOtp ? otp : (password ?? ''),
+      'phone': cleanPhone,
+      'type': authType,
+      'value': value,
+      'device_name': resolvedDeviceName,
+      'platform': resolvedPlatform,
       if (password != null && password.isNotEmpty) 'password': password,
       if (otp != null && otp.isNotEmpty) 'otp': otp,
-      'device_name': deviceName ?? (Platform.isAndroid ? 'Android Device' : 'iOS Device'),
-      'platform': platform,
     };
 
     try {

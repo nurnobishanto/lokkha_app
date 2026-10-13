@@ -138,6 +138,7 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
       final loginUseCase = ref.read(loginUseCaseProvider);
       final res = await loginUseCase(
         phone: phone,
+        type: 'otp',
         otp: state.otp.trim(),
       );
 
@@ -150,7 +151,14 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
         ref.read(navbarNotifierProvider.notifier).fetchProfileInfo();
 
         if (context.mounted) {
-          context.go(Routes.navbar);
+          if (!res.profileCompleted) {
+            context.go(
+              Routes.profileUpdateRequired,
+              extra: {'phoneNumber': phone},
+            );
+          } else {
+            context.go(Routes.navbar);
+          }
         }
       } else {
         state = state.copyWith(

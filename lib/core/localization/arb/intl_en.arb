@@ -127,5 +127,33 @@
   "googleSignInComingSoon": "Google sign-in service is coming soon...",
   "@googleSignInComingSoon": {
     "description": "Notice when Google sign-in is pressed before backend integration"
+  },
+  "loginWithPhoneNumber": "Log in with your phone number",
+  "@loginWithPhoneNumber": {
+    "description": "Header title on sign in screen"
+  },
+  "enterPassword": "Enter your password",
+  "@enterPassword": {
+    "description": "Hint text for password field"
+  },
+  "forgotPasswordOrOtp": "Forgot password? Log in with OTP!",
+  "@forgotPasswordOrOtp": {
+    "description": "Link text to log in with OTP instead of password"
+  },
+  "changePhone": "Change",
+  "@changePhone": {
+    "description": "Button to change phone number"
+  },
+  "providePassword": "Please enter your password.",
+  "@providePassword": {
+    "description": "Validation error when password field is empty"
+  },
+  "loginSuccess": "Login successful!",
+  "@loginSuccess": {
+    "description": "Message displayed when login succeeds"
+  },
+  "loginFailed": "Login failed. Please try again.",
+  "@loginFailed": {
+    "description": "Message displayed when login fails"
   }
 }

@@ -6,7 +6,7 @@ import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
-import 'package:lokkha/features/auth/auth.dart';
+import '../models/auth_response_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -38,15 +38,19 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthResponseModel> login({
     required String phone,
+    String? type,
     String? password,
     String? otp,
     String? deviceName,
+    String? platform,
   }) async {
     final res = await remoteDataSource.login(
       phone: phone,
+      type: type,
       password: password,
       otp: otp,
       deviceName: deviceName,
+      platform: platform,
     );
     if (res.status && res.token != null) {
       await _saveSession(res);
@@ -117,8 +121,12 @@ class AuthRepositoryImpl implements AuthRepository {
     if (authRes.user != null) {
       myUser = authRes.user!;
       MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
+      currentUserId.value = authRes.user?.id?.toString() ?? authRes.user?.userId;
+      userName.value = authRes.user?.name;
+      userEmail.value = authRes.user?.email;
+      userPhone.value = authRes.user?.phone;
     }
     isLoggedIn.value = true;
-    havePackage.value = authRes.havePackage;
+    havePackage.value = authRes.havePackage || (authRes.user?.isSubscribed ?? false);
   }
 }

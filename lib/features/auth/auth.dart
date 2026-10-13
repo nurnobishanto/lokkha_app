@@ -29,3 +29,4 @@ export 'presentation/terms_condition/views/terms_condition_view.dart';
 export 'presentation/widgets/auth_action_button.dart';
 export 'presentation/widgets/auth_divider.dart';
 export 'presentation/widgets/auth_phone_field.dart';
+export 'presentation/widgets/auth_password_field.dart';

@@ -1,4 +1,4 @@
-import 'package:lokkha/features/auth/auth.dart';
+import '../../data/models/auth_response_model.dart';
 import '../repositories/auth_repository.dart';
 
 class LoginUseCase {
@@ -7,15 +7,19 @@ class LoginUseCase {
 
   Future<AuthResponseModel> call({
     required String phone,
+    String? type,
     String? password,
     String? otp,
     String? deviceName,
+    String? platform,
   }) {
     return repository.login(
       phone: phone,
+      type: type,
       password: password,
       otp: otp,
       deviceName: deviceName,
+      platform: platform,
     );
   }
 }

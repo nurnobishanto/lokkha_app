@@ -1,4 +1,4 @@
-import 'package:lokkha/features/auth/auth.dart';
+import '../../data/models/auth_response_model.dart';
 import '../repositories/auth_repository.dart';
 
 class CheckPhoneUseCase {

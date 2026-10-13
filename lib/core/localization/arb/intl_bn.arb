@@ -31,5 +31,12 @@
   "warningTitle": "সতর্কতা",
   "providePhoneNumber": "অনুগ্রহ করে আপনার ফোন নম্বরটি লিখুন।",
   "invalidPhoneNumber": "১১ সংখ্যার সঠিক ফোন নম্বর প্রদান করুন।",
-  "googleSignInComingSoon": "গুগল সাইন-ইন সেবাটি খুব শীঘ্রই আসছে..."
+  "googleSignInComingSoon": "গুগল সাইন-ইন সেবাটি খুব শীঘ্রই আসছে...",
+  "loginWithPhoneNumber": "আপনার ফোন নম্বর দিয়ে লগইন করুন",
+  "enterPassword": "আপনার পাসওয়ার্ড লিখুন",
+  "forgotPasswordOrOtp": "পাসওয়ার্ড মনে নেই? OTP দিয়ে লগইন করুন!",
+  "changePhone": "পরিবর্তন",
+  "providePassword": "অনুগ্রহ করে আপনার পাসওয়ার্ড লিখুন।",
+  "loginSuccess": "লগইন সফল হয়েছে!",
+  "loginFailed": "লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
 }

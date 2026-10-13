@@ -107,4 +107,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get googleSignInComingSoon =>
       'Google sign-in service is coming soon...';
+
+  @override
+  String get loginWithPhoneNumber => 'Log in with your phone number';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get forgotPasswordOrOtp => 'Forgot password? Log in with OTP!';
+
+  @override
+  String get changePhone => 'Change';
+
+  @override
+  String get providePassword => 'Please enter your password.';
+
+  @override
+  String get loginSuccess => 'Login successful!';
+
+  @override
+  String get loginFailed => 'Login failed. Please try again.';
 }

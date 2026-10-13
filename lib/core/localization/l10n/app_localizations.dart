@@ -289,6 +289,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google sign-in service is coming soon...'**
   String get googleSignInComingSoon;
+
+  /// Header title on sign in screen
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with your phone number'**
+  String get loginWithPhoneNumber;
+
+  /// Hint text for password field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterPassword;
+
+  /// Link text to log in with OTP instead of password
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password? Log in with OTP!'**
+  String get forgotPasswordOrOtp;
+
+  /// Button to change phone number
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changePhone;
+
+  /// Validation error when password field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password.'**
+  String get providePassword;
+
+  /// Message displayed when login succeeds
+  ///
+  /// In en, this message translates to:
+  /// **'Login successful!'**
+  String get loginSuccess;
+
+  /// Message displayed when login fails
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed. Please try again.'**
+  String get loginFailed;
 }
 
 class _AppLocalizationsDelegate

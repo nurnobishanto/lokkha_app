@@ -41,9 +41,12 @@ class SignInNotifier extends Notifier<SignInState> {
     try {
       final loginUseCase = ref.read(loginUseCaseProvider);
       final isOtpLogin = type.toLowerCase() == 'otp';
-      final res = isOtpLogin
-          ? await loginUseCase(phone: phone, otp: password)
-          : await loginUseCase(phone: phone, password: password);
+      final res = await loginUseCase(
+        phone: phone,
+        type: isOtpLogin ? 'otp' : 'password',
+        password: isOtpLogin ? null : password,
+        otp: isOtpLogin ? password : null,
+      );
 
       state = state.copyWith(isLoading: false);
 
@@ -55,15 +58,22 @@ class SignInNotifier extends Notifier<SignInState> {
         ref.read(navbarNotifierProvider.notifier).fetchProfileInfo();
 
         if (context.mounted) {
-          context.go(Routes.navbar);
+          if (!res.profileCompleted) {
+            context.go(
+              Routes.profileUpdateRequired,
+              extra: {'phoneNumber': phone},
+            );
+          } else {
+            context.go(Routes.navbar);
+          }
         }
       } else {
-        state = state.copyWith(
-          errorMessage: res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
-        );
+        final errorMsg =
+            res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+        state = state.copyWith(errorMessage: errorMsg);
         CustomSnackBar.showCustomErrorSnackBar(
           title: 'Login Failed',
-          message: res.message ?? 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+          message: errorMsg,
         );
       }
     } catch (e) {
@@ -73,7 +83,8 @@ class SignInNotifier extends Notifier<SignInState> {
       );
       CustomSnackBar.showCustomErrorSnackBar(
         title: 'Login Failed',
-        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। দয়া করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।',
+        message:
+            'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। দয়া করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।',
       );
     }
   }
