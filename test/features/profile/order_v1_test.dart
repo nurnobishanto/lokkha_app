@@ -1,10 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/features/profile/data/models/order_v1_model.dart';
 import 'package:lokkha/features/profile/domain/repositories/profile_repository.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_order_details_usecase.dart';
 import 'package:lokkha/features/profile/domain/usecases/get_user_orders_usecase.dart';
-import 'package:lokkha/features/profile/presentation/my_orders/controllers/my_orders_controller.dart';
-import 'package:lokkha/features/profile/presentation/my_orders/controllers/orders_details_controller.dart';
+import 'package:lokkha/features/profile/presentation/my_orders/controllers/my_orders_notifier.dart';
+import 'package:lokkha/features/profile/presentation/my_orders/controllers/orders_details_notifier.dart';
 
 class MockProfileRepository implements ProfileRepository {
   final OrderV1ListResponse mockListResponse;
@@ -217,7 +218,7 @@ void main() {
     });
   });
 
-  group('Order Controllers & UseCases Clean Architecture Tests', () {
+  group('Order Notifiers & UseCases Clean Architecture Tests', () {
     late MockProfileRepository mockRepo;
     late GetUserOrdersUseCase getUserOrdersUseCase;
     late GetOrderDetailsUseCase getOrderDetailsUseCase;
@@ -235,40 +236,59 @@ void main() {
       getOrderDetailsUseCase = GetOrderDetailsUseCase(repository: mockRepo);
     });
 
-    test('MyOrdersController fetches orders and updates filter counts', () async {
-      final controller = MyOrdersController(
-        getUserOrdersUseCase: getUserOrdersUseCase,
+    test('MyOrdersNotifier fetches orders and updates filter counts', () async {
+      final container = ProviderContainer(
+        overrides: [
+          myOrdersNotifierProvider.overrideWith(
+            () => MyOrdersNotifier(getUserOrdersUseCase: getUserOrdersUseCase),
+          ),
+        ],
       );
+      addTearDown(container.dispose);
 
-      await controller.fetchOrders(refresh: true);
+      final notifier = container.read(myOrdersNotifierProvider.notifier);
+      await notifier.fetchOrders(refresh: true);
 
-      expect(controller.orders.length, 1);
-      expect(controller.orders.first.invoiceNo, 'ORD-2026A-4921-105');
-      expect(controller.filterCounts.value.all, 5);
-      expect(controller.filterCounts.value.paid, 4);
-      expect(controller.filterCounts.value.pending, 1);
+      var state = container.read(myOrdersNotifierProvider);
+      expect(state.orders.length, 1);
+      expect(state.orders.first.invoiceNo, 'ORD-2026A-4921-105');
+      expect(state.filterCounts.all, 5);
+      expect(state.filterCounts.paid, 4);
+      expect(state.filterCounts.pending, 1);
 
       // Change status filter
-      controller.setStatusFilter('paid');
-      expect(controller.selectedStatus.value, 'paid');
+      notifier.setStatusFilter('paid');
+      state = container.read(myOrdersNotifierProvider);
+      expect(state.selectedStatus, 'paid');
 
       // Change model type filter
-      controller.setModelTypeFilter('Package');
-      expect(controller.selectedModelType.value, 'Package');
+      notifier.setModelTypeFilter('Package');
+      state = container.read(myOrdersNotifierProvider);
+      expect(state.selectedModelType, 'Package');
     });
 
-    test('OrdersDetailsController fetches order details correctly', () async {
-      final controller = OrdersDetailsController(
-        getOrderDetailsUseCase: getOrderDetailsUseCase,
+    test('OrdersDetailsNotifier fetches order details correctly', () async {
+      final container = ProviderContainer(
+        overrides: [
+          ordersDetailsNotifierProvider((id: 105, url: null)).overrideWith(
+            () => OrdersDetailsNotifier(
+              id: 105,
+              getOrderDetailsUseCase: getOrderDetailsUseCase,
+            ),
+          ),
+        ],
       );
+      addTearDown(container.dispose);
 
-      await controller.fetchOrdersDetails(id: 105);
+      final notifier = container.read(ordersDetailsNotifierProvider((id: 105, url: null)).notifier);
+      await notifier.fetchOrdersDetails(id: 105);
 
-      expect(controller.isLoading.value, false);
-      expect(controller.orderDetail.value, isNotNull);
-      expect(controller.orderDetail.value!.id, 105);
-      expect(controller.orderDetail.value!.billingDetails!.name, 'Arif Ahmed');
-      expect(controller.orderDetail.value!.coupon!.code, 'EID200');
+      final state = container.read(ordersDetailsNotifierProvider((id: 105, url: null)));
+      expect(state.isLoading, false);
+      expect(state.orderDetail, isNotNull);
+      expect(state.orderDetail!.id, 105);
+      expect(state.orderDetail!.billingDetails!.name, 'Arif Ahmed');
+      expect(state.orderDetail!.coupon!.code, 'EID200');
     });
   });
 }

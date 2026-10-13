@@ -4,13 +4,13 @@ import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 class _StorageWrapper {
   const _StorageWrapper();
 
-  bool hasData(String key) => MyGetStorage.hasData(key);
-  dynamic read(String key) => MyGetStorage.readCache(key);
-  Future<void> write(String key, dynamic val) => MyGetStorage.writeCacheData(key, val);
-  Future<void> remove(String key) => MyGetStorage.removeCache(key);
+  bool hasData(String key) => AppStorageCache.hasData(key);
+  dynamic read(String key) => AppStorageCache.readCache(key);
+  Future<void> write(String key, dynamic val) => AppStorageCache.writeCacheData(key, val);
+  Future<void> remove(String key) => AppStorageCache.removeCache(key);
 }
 
-class MyGetStorage {
+class AppStorageCache {
   static const _StorageWrapper getStorage = _StorageWrapper();
   static final Map<String, dynamic> _memoryCache = {};
 
@@ -82,3 +82,5 @@ class MyGetStorage {
     }
   }
 }
+
+typedef MyGetStorage = AppStorageCache;

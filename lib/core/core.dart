@@ -27,7 +27,7 @@ export 'services/auth_service.dart';
 export 'services/app_update_service.dart';
 export 'services/app_lifecycle_service.dart';
 export 'services/premium_entitlement_service.dart';
-export 'services/storage/my_get_storage.dart';
+export 'services/storage/app_storage_cache.dart';
 export 'services/storage/my_shared_pref.dart';
 export 'services/storage/secure_storage_service.dart';
 export 'services/deep_link_service.dart';
@@ -40,6 +40,3 @@ export 'utils/date_formatter.dart';
 
 // Localization
 export 'localization/app_localizations.dart';
-
-// Pure Flutter Get Compatibility Layer
-export 'compat/get_compat.dart';

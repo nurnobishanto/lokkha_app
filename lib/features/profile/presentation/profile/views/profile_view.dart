@@ -257,7 +257,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       children: [
                         // Left: 90 পয়েন্ট >
                         // InkWell(
-                        //   onTap: () => Get.toNamed(Routes.referral),
+                        //   onTap: () => context.pushNamed(Routes.referral),
                         //   borderRadius: BorderRadius.circular(20.r),
                         //   child: Container(
                         //     padding: EdgeInsets.symmetric(

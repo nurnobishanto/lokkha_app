@@ -1,9 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/core/enums/api_call_status.dart';
 import 'package:lokkha/features/exam/data/models/user_exam_v1_model.dart';
 import 'package:lokkha/features/exam/domain/repositories/exam_repository.dart';
 import 'package:lokkha/features/exam/domain/usecases/get_user_exams_usecase.dart';
-import 'package:lokkha/features/home/presentation/see_all_items/controllers/see_all_items_controller.dart';
+import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
 
 class MockExamRepository implements ExamRepository {
   UserExamsV1Response? responseToReturn;
@@ -146,27 +147,39 @@ void main() {
       expect(result.items.length, 2);
     });
 
-    test('SeeAllItemsController fetches exams and toggles filters', () async {
+    test('SeeAllItemsNotifier fetches exams and toggles filters', () async {
       final mockRepo = MockExamRepository();
       mockRepo.responseToReturn = UserExamsV1Response.fromJson(sampleJson);
       final useCase = GetUserExamsUseCase(repository: mockRepo);
 
-      final controller = SeeAllItemsController(getUserExamsUseCase: useCase);
-      await controller.fetchAllExams(page: 1);
+      final container = ProviderContainer(
+        overrides: [
+          seeAllItemsNotifierProvider.overrideWith(
+            () => SeeAllItemsNotifier(getUserExamsUseCase: useCase),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
 
-      expect(controller.examApiCallStatus.value, ApiCallStatus.success);
-      expect(controller.examsList.length, 2);
-      expect(controller.currentExamPage.value, 1);
-      expect(controller.totalExamPages.value, 5);
+      final notifier = container.read(seeAllItemsNotifierProvider.notifier);
+      await notifier.fetchAllExams(page: 1);
+
+      var state = container.read(seeAllItemsNotifierProvider);
+      expect(state.examApiCallStatus, ApiCallStatus.success);
+      expect(state.examsList.length, 2);
+      expect(state.currentExamPage, 1);
+      expect(state.totalExamPages, 5);
 
       // Filter toggle testing
-      controller.setFilter('attempted');
-      expect(controller.selectedFilter.value, 'attempted');
+      notifier.setFilter('attempted');
+      state = container.read(seeAllItemsNotifierProvider);
+      expect(state.selectedFilter, 'attempted');
       expect(mockRepo.lastFilter, 'attempted');
 
       // Toggling same filter resets to 'all'
-      controller.setFilter('attempted');
-      expect(controller.selectedFilter.value, 'all');
+      notifier.setFilter('attempted');
+      state = container.read(seeAllItemsNotifierProvider);
+      expect(state.selectedFilter, 'all');
       expect(mockRepo.lastFilter, null);
     });
   });

@@ -6,25 +6,15 @@ import 'package:lokkha/core/localization/app_localizations.dart';
 export 'package:go_router/go_router.dart';
 export 'package:lokkha/core/localization/app_localizations.dart';
 
-/// Centralized, production-grade BuildContext extensions following Clean Architecture.
-///
-/// Usage examples:
-/// - Colors: `context.color.primary`, `context.cardColor`, `context.borderColor`
-/// - Typography: `context.textStyle.titleLarge`, `context.textStyle.bodyMedium`
-/// - Navigation: `context.goNamed(Routes.signIn)`, `context.pop()`
-/// - Media & Dimensions: `context.width`, `context.height`, `context.isDark`
-/// - Localization: `context.l10n.hello`, `context.tr.appName`
 extension ContextExtension on BuildContext {
   // ─── Theme & Colors ───
   ThemeData get theme => Theme.of(this);
   bool get isDark => AppColors.isDarkMode(this);
 
-  /// Quick accessor for ColorScheme: `context.color.primary`
   ColorScheme get color => Theme.of(this).colorScheme;
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
 
   // ─── Typography / Text Styles ───
-  /// Quick accessor for TextTheme: `context.textStyle.titleLarge`
   TextTheme get textStyle => Theme.of(this).textTheme;
   TextTheme get textTheme => Theme.of(this).textTheme;
 

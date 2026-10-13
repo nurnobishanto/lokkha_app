@@ -1,62 +1,33 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/core/compat/get_compat.dart';
-import 'package:lokkha/features/course/presentation/courses/controllers/courses_controller.dart';
+import 'package:lokkha/core/enums/api_call_status.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  tearDown(() {
-    Get.reset();
-  });
-
-  group('CoursesController Arguments & Parameters Extraction Tests', () {
-    test('Initializes safely when Get.arguments is null without throwing NoSuchMethodError', () {
-      // Simulate null arguments and empty parameters
-      Get.parameters = {};
-
-      expect(() {
-        final controller = CoursesController();
-        controller.onInit();
-        expect(controller.id, isNull);
-      }, returnsNormally);
+  group('CoursesNotifier & State Riverpod Tests', () {
+    test('Initializes safely with null categoryId', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final state = container.read(coursesNotifierProvider(null));
+      expect(state.status, ApiCallStatus.holding);
+      expect(state.model.courses, isNull);
     });
 
-    test('Extracts course_category_id from Map arguments (int)', () {
-      Get.parameters = {};
-      // Set arguments as Map with int
-      Get.routing.args = {'course_category_id': 12};
-
-      final controller = CoursesController();
-      controller.onInit();
-      expect(controller.id, 12);
+    test('Initializes with integer categoryId correctly', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final state = container.read(coursesNotifierProvider(12));
+      expect(state.status, ApiCallStatus.holding);
     });
 
-    test('Extracts course_category_id from Map arguments (string)', () {
-      Get.parameters = {};
-      // Set arguments as Map with string
-      Get.routing.args = {'course_category_id': '15'};
-
-      final controller = CoursesController();
-      controller.onInit();
-      expect(controller.id, 15);
-    });
-
-    test('Extracts course_category_id from direct integer argument', () {
-      Get.parameters = {};
-      Get.routing.args = 7;
-
-      final controller = CoursesController();
-      controller.onInit();
-      expect(controller.id, 7);
-    });
-
-    test('Extracts course_category_id from URL parameters (e.g. /courses?course_category_id=5)', () {
-      Get.routing.args = null;
-      Get.parameters = {'course_category_id': '5'};
-
-      final controller = CoursesController();
-      controller.onInit();
-      expect(controller.id, 5);
+    test('CoursesState copyWith updates status and model correctly', () {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final initialState = container.read(coursesNotifierProvider(5));
+      final updated = initialState.copyWith(status: ApiCallStatus.loading);
+      expect(updated.status, ApiCallStatus.loading);
     });
   });
 }

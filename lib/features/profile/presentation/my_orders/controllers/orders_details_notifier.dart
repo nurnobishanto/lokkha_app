@@ -32,14 +32,18 @@ class OrdersDetailsState {
 class OrdersDetailsNotifier extends Notifier<OrdersDetailsState> {
   final dynamic id;
   final String? url;
+  final GetOrderDetailsUseCase? _injectedUseCase;
   late final GetOrderDetailsUseCase _getOrderDetailsUseCase;
 
-  OrdersDetailsNotifier({this.id, this.url});
+  OrdersDetailsNotifier({this.id, this.url, GetOrderDetailsUseCase? getOrderDetailsUseCase})
+      : _injectedUseCase = getOrderDetailsUseCase;
 
   @override
   OrdersDetailsState build() {
-    _getOrderDetailsUseCase = GetOrderDetailsUseCase();
-    Future.microtask(() => fetchOrdersDetails(id: id, url: url));
+    _getOrderDetailsUseCase = _injectedUseCase ?? GetOrderDetailsUseCase();
+    if (id != null || url != null) {
+      Future.microtask(() => fetchOrdersDetails(id: id, url: url));
+    }
     return const OrdersDetailsState(
       isLoading: true,
       apiCallStatus: ApiCallStatus.loading,

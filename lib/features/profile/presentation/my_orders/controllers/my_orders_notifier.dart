@@ -62,11 +62,15 @@ class MyOrdersState {
 }
 
 class MyOrdersNotifier extends Notifier<MyOrdersState> {
+  final GetUserOrdersUseCase? _injectedUseCase;
   late final GetUserOrdersUseCase _getUserOrdersUseCase;
+
+  MyOrdersNotifier({GetUserOrdersUseCase? getUserOrdersUseCase})
+      : _injectedUseCase = getUserOrdersUseCase;
 
   @override
   MyOrdersState build() {
-    _getUserOrdersUseCase = GetUserOrdersUseCase();
+    _getUserOrdersUseCase = _injectedUseCase ?? GetUserOrdersUseCase();
     Future.microtask(() => fetchOrders(refresh: true));
     return MyOrdersState(apiCallStatus: ApiCallStatus.loading);
   }

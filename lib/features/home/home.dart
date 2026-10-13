@@ -10,20 +10,17 @@ export 'data/models/dashboard_overview_model.dart';
 export 'data/repositories/dashboard_repository.dart';
 
 // Presentation - Home
-export 'presentation/home/controllers/home_controller.dart';
 export 'presentation/home/controllers/home_notifier.dart';
 export 'presentation/home/views/home_view.dart';
 export 'presentation/home/widgets/accuracy_chart_widget.dart';
 export 'presentation/home/components/home_components.dart';
 export 'presentation/home/components/social_links_widget.dart';
-export 'presentation/home/services/home_api_service.dart';
 
 // Presentation - Sponsor Ads
 export 'presentation/sponsor_ads/views/sponsor_ads_view.dart';
 
 // Presentation - See All Items
 export 'presentation/see_all_items/providers/see_all_items_notifier.dart';
-export 'presentation/see_all_items/controllers/see_all_items_controller.dart';
 export 'presentation/see_all_items/views/all_course_view.dart';
 export 'presentation/see_all_items/views/all_exam_view.dart';
 export 'presentation/see_all_items/widgets/show_log_in.dart';

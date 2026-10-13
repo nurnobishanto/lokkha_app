@@ -8,7 +8,6 @@ export 'data/models/lecture_sheet_category_model.dart';
 export 'data/models/lecture_sheet_list_categories_model.dart';
 
 // Courses
-export 'presentation/courses/controllers/courses_controller.dart';
 export 'presentation/courses/views/courses_view.dart';
 export 'presentation/courses/widgets/custom_course_card.dart';
 
