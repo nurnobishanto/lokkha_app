@@ -201,8 +201,8 @@ class CourseDetailsView extends ConsumerWidget {
                     onTap: () => makePhoneCall('+8801332804290'),
                     child: Row(
                       children: [
-                        Image.asset(
-                          'assets/images/phone_call.png',
+                        AppSvgImage.asset(
+                          AssetVectorPaths.phoneCall,
                           width: 17,
                           height: 17,
                         ),

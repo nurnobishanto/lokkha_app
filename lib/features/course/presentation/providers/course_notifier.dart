@@ -44,23 +44,28 @@ class CoursesState {
 class CoursesNotifier extends Notifier<CoursesState> {
   final int? categoryId;
   final RestClient _client;
+  bool _disposed = false;
 
   CoursesNotifier(this.categoryId, {RestClient? client})
       : _client = client ?? RestClient();
 
   @override
   CoursesState build() {
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
     Future.microtask(() => fetchCourses(categoryId));
     return CoursesState(model: CoursesModel());
   }
 
   Future<void> fetchCourses(int? id) async {
+    if (_disposed) return;
     state = state.copyWith(isLoading: true, hasError: false);
     final url =
         id == null ? AppConstants.courses : '${AppConstants.courses}?category_id=$id';
 
     try {
       final response = await _client.get(url);
+      if (_disposed) return;
       if (response.data != null && response.data['status'] == true) {
         state = state.copyWith(
           model: CoursesModel.fromJson(response.data),
@@ -71,6 +76,7 @@ class CoursesNotifier extends Notifier<CoursesState> {
         state = state.copyWith(isLoading: false, hasError: true);
       }
     } catch (e) {
+      if (_disposed) return;
       state = state.copyWith(isLoading: false, hasError: true);
       if (kDebugMode) debugPrint('Error fetching courses: $e');
     }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/core.dart';
+import 'package:lokkha/core/constants/app_images.dart';
 import '../controllers/splash_notifier.dart';
 
 class SplashView extends ConsumerStatefulWidget {
@@ -10,13 +10,43 @@ class SplashView extends ConsumerStatefulWidget {
   ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends ConsumerState<SplashView> {
+class _SplashViewState extends ConsumerState<SplashView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _scaleAnimation;
+
   @override
   void initState() {
     super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeIn,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.94, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animController,
+        curve: Curves.easeOutBack,
+      ),
+    );
+
+    _animController.forward();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(splashNotifierProvider.notifier).initAppAndNavigate(context);
     });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
   }
 
   @override
@@ -24,36 +54,27 @@ class _SplashViewState extends ConsumerState<SplashView> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: Center(
-        child: Container(
-          height: size.height,
-          width: size.width,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(AssetImagePaths.seamlessImg),
-              fit: BoxFit.cover,
+      backgroundColor: const Color(0xFFE5F3EF),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Gradient and Watermark
+          Image.asset(
+            AssetImagePaths.splashBg,
+            width: size.width,
+            height: size.height,
+            fit: BoxFit.cover,
+          ),
+
+          // Smooth Entrance Fade
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: const SizedBox.expand(),
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: size.height / 5,
-                  width: size.width / 1.7,
-                  child: Image.asset(AssetImagePaths.appIcon),
-                ),
-                Text(
-                  'সঠিক পথে, স্বল্প সময়ে',
-                  style: AppTextStyles.heading4
-                      .copyWith(color: LightThemeColors.primaryColor),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
+        ],
       ),
     );
   }

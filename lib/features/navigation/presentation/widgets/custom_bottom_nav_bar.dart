@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/utils/global.dart';
 import '../controllers/navbar_notifier.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
-  const CustomBottomNavBar({super.key});
+  final StatefulNavigationShell? navigationShell;
+  const CustomBottomNavBar({super.key, this.navigationShell});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,6 +18,7 @@ class CustomBottomNavBar extends ConsumerWidget {
     final bottomInset = MediaQuery.of(context).padding.bottom;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userLoggedIn = navState.isLoggedIn || isLoggedIn.value;
+    final activeIndex = navigationShell?.currentIndex ?? navState.currentIndex;
 
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -68,7 +71,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   _buildNavItem(
                     ref: ref,
                     index: 0,
-                    currentIndex: navState.currentIndex,
+                    currentIndex: activeIndex,
                     label: "হোম",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => Icon(
@@ -84,7 +87,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   _buildNavItem(
                     ref: ref,
                     index: 1,
-                    currentIndex: navState.currentIndex,
+                    currentIndex: activeIndex,
                     label: "পরীক্ষা",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => FaIcon(
@@ -100,7 +103,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   _buildNavItem(
                     ref: ref,
                     index: 2,
-                    currentIndex: navState.currentIndex,
+                    currentIndex: activeIndex,
                     label: "মেসেঞ্জার",
                     activeGradient: const LinearGradient(
                       colors: [Color(0xFF00C6FF), Color(0xFF0078FF)],
@@ -140,7 +143,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   _buildNavItem(
                     ref: ref,
                     index: 3,
-                    currentIndex: navState.currentIndex,
+                    currentIndex: activeIndex,
                     label: "প্রিমিয়াম",
                     activeGradient: const LinearGradient(
                       colors: [Color(0xFFFFA000), Color(0xFFFF6F00)],
@@ -203,7 +206,7 @@ class CustomBottomNavBar extends ConsumerWidget {
                   _buildNavItem(
                     ref: ref,
                     index: 4,
-                    currentIndex: navState.currentIndex,
+                    currentIndex: activeIndex,
                     label: !userLoggedIn ? "লগইন" : "প্রোফাইল",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                     iconBuilder: (isSelected) => Icon(
@@ -240,7 +243,15 @@ class CustomBottomNavBar extends ConsumerWidget {
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => ref.read(navbarNotifierProvider.notifier).changeIndex(index),
+        onTap: () {
+          if (navigationShell != null) {
+            navigationShell!.goBranch(
+              index,
+              initialLocation: index == navigationShell!.currentIndex,
+            );
+          }
+          ref.read(navbarNotifierProvider.notifier).changeIndex(index);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeInOut,

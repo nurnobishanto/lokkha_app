@@ -22,6 +22,7 @@ class MySharedPref {
   static const String _userTokenKey = 'user_token';
   static const String _mockSubjectsKey = 'mock_subjects';
   static const String _randomQuestionCheckKey = 'random_question_check';
+  static const String _onboardingSeenKey = 'onboarding_seen';
 
   /// Initialize shared preferences
   static Future<void> init() async {
@@ -193,4 +194,16 @@ class MySharedPref {
 
   static Future<int> getRandomQuestionCheck() async =>
       _prefs.getInt(_randomQuestionCheckKey) ?? 0;
+
+  /// ───── Onboarding ─────
+  static Future<void> setOnboardingSeen(bool seen) async =>
+      await _prefs.setBool(_onboardingSeenKey, seen);
+
+  static bool isOnboardingSeen() {
+    try {
+      return _prefs.getBool(_onboardingSeenKey) ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
 }

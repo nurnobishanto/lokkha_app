@@ -5,6 +5,8 @@ import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/core/services/premium_entitlement_service.dart';
 
+import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+
 class SplashState {
   final bool isInitialized;
   const SplashState({this.isInitialized = false});
@@ -44,7 +46,12 @@ class SplashNotifier extends Notifier<SplashState> {
     } else if (appUpdateService.updateRequired) {
       context.go(Routes.appUpdate);
     } else {
-      context.go(Routes.navbar);
+      final isOnboardingSeen = MySharedPref.isOnboardingSeen();
+      if (!isOnboardingSeen) {
+        context.go(Routes.onBoarding);
+      } else {
+        context.go(Routes.navbar);
+      }
     }
   }
 }

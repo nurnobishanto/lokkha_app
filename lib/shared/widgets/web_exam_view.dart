@@ -33,9 +33,9 @@ class _WebExamViewState extends State<WebExamView> {
   void initState() {
     super.initState();
 
-    String? token = MySharedPref.getUserToken();
+    final token = MySharedPref.getUserToken();
 
-    if (token == null || token.isEmpty) {
+    if (token.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.pushNamed(Routes.authGateway);
       });

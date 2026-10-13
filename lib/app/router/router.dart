@@ -50,25 +50,82 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // Navbar ShellRoute for persistent bottom navigation
-      ShellRoute(
-        builder: (context, state, child) {
-          return NavbarView(child: child);
+      // Redirect /navbar to /home
+      GoRoute(
+        path: Routes.navbar,
+        name: Routes.navbar,
+        redirect: (_, __) => Routes.home,
+      ),
+
+      // StatefulShellRoute for persistent bottom navigation
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return NavbarView(navigationShell: navigationShell);
         },
-        routes: [
-          GoRoute(
-            path: Routes.navbar,
-            name: Routes.navbar,
-            builder: (context, state) {
-              return const NavbarView();
-            },
+        branches: [
+          // Branch 0: হোম (Home)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                name: Routes.home,
+                builder: (context, state) {
+                  return const HomeView();
+                },
+              ),
+            ],
           ),
-          GoRoute(
-            path: Routes.home,
-            name: Routes.home,
-            builder: (context, state) {
-              return const HomeView();
-            },
+
+          // Branch 1: পরীক্ষা (Exam)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.examCategory,
+                name: Routes.examCategory,
+                builder: (context, state) {
+                  return const ExamCategoryView();
+                },
+              ),
+            ],
+          ),
+
+          // Branch 2: মেসেঞ্জার (Messenger)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.messenger,
+                name: Routes.messenger,
+                builder: (context, state) {
+                  return const MessengerRedirectScreen();
+                },
+              ),
+            ],
+          ),
+
+          // Branch 3: প্রিমিয়াম (Premium Packages)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.packages,
+                name: Routes.packages,
+                builder: (context, state) {
+                  return const PremiumPackagesView();
+                },
+              ),
+            ],
+          ),
+
+          // Branch 4: প্রোফাইল / ড্যাশবোর্ড (Profile / Dashboard)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.dashboardPortal,
+                name: Routes.dashboardPortal,
+                builder: (context, state) {
+                  return const DashboardPortalView();
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -243,13 +300,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(
-        path: Routes.packages,
-        name: Routes.packages,
-        builder: (context, state) {
-          return const PremiumPackagesView();
-        },
-      ),
-      GoRoute(
         path: Routes.myPackages,
         name: Routes.myPackages,
         builder: (context, state) => const MyPackagesView(),
@@ -304,11 +354,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           }
           return LectureSheetDetailsView(id: id);
         },
-      ),
-      GoRoute(
-        path: Routes.examCategory,
-        name: Routes.examCategory,
-        builder: (context, state) => const ExamCategoryView(),
       ),
       GoRoute(
         path: Routes.examCategoryDetails,
@@ -417,11 +462,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           return const MyCoursesView();
         },
-      ),
-      GoRoute(
-        path: Routes.dashboardPortal,
-        name: Routes.dashboardPortal,
-        builder: (context, state) => const DashboardPortalView(),
       ),
       GoRoute(
         path: Routes.settings,

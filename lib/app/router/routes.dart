@@ -17,6 +17,7 @@ class Routes {
   // Navigation & Shell
   static const String navbar = '/navbar';
   static const String home = '/home';
+  static const String messenger = '/messenger';
   static const String profile = '/profile';
   static const String profileUpdate = '/profile-update';
   static const String profileHistory = '/profile-history';

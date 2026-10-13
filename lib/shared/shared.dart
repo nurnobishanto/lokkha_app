@@ -19,6 +19,7 @@ export 'widgets/package_required_popup.dart';
 export 'widgets/web_exam_view.dart';
 export 'widgets/pdf_viewer.dart';
 export 'widgets/coming_soon_view.dart';
+export 'widgets/app_svg_image.dart';
 
 // Shared Models
 export 'models/user.dart';
