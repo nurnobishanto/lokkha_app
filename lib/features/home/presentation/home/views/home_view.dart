@@ -338,7 +338,7 @@ class _SliderSection extends ConsumerWidget {
       ),
       items: sliders.map((sliderItem) {
         final imageUrl =
-            AppConstants.storageUrl + (sliderItem.image ?? '');
+            Endpoints.storageUrl + (sliderItem.image ?? '');
         if (kDebugMode) debugPrint('URL IMAGE : $imageUrl');
         return ClipRRect(
           borderRadius: BorderRadius.circular(7.0),
@@ -559,7 +559,7 @@ class _PremiumExamSection extends ConsumerWidget {
           return SizedBox(
             width: 140.w,
             child: CustomCourseCard(
-              imageUrl: AppConstants.storageUrl + course.image.toString(),
+              imageUrl: Endpoints.storageUrl + course.image.toString(),
               title: course.title ?? "",
               regularPrice: course.regularPrice.toString(),
               salePrice: course.salePrice.toString(),

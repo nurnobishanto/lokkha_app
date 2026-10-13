@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/exam/exam.dart';
@@ -157,7 +157,7 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
 
     try {
       final response = await _client.get(
-        AppConstants.courses,
+        Endpoints.courses,
         queryParameters: {'page': page},
       );
 

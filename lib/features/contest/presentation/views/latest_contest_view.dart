@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -118,7 +118,7 @@ class LatestContestView extends ConsumerWidget {
                               }
                             },
                             child: Image.network(
-                              AppConstants.storageUrl + contest!.sponsorImage!,
+                              Endpoints.storageUrl + contest!.sponsorImage!,
                             ),
                           ),
                           SizedBox(height: 10.0.h),

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/exam.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
@@ -115,7 +115,7 @@ class ExamDetailsDialog extends StatelessWidget {
                                     builder: (_) => WebExamView(
                                       title: exam.name.toString(),
                                       url:
-                                          "${AppConstants.webExamRead}/${exam.id}",
+                                          "${Endpoints.webExamRead}/${exam.id}",
                                     ),
                                   ),
                                 );
@@ -144,7 +144,7 @@ class ExamDetailsDialog extends StatelessWidget {
                                     builder: (_) => WebExamView(
                                       title: exam.name.toString(),
                                       url:
-                                          "${AppConstants.webExamStart}/${exam.id}",
+                                          "${Endpoints.webExamStart}/${exam.id}",
                                     ),
                                   ),
                                 );

@@ -141,7 +141,7 @@ class JobDetailsScreen extends ConsumerWidget {
                                           MediaQuery.of(context).size.height *
                                               0.6,
                                       child: SfPdfViewer.network(
-                                        "${AppConstants.storageUrl}${jobData.sourceFile}",
+                                        "${Endpoints.storageUrl}${jobData.sourceFile}",
                                       ),
                                     )
                                   : SizedBox(
@@ -152,7 +152,7 @@ class JobDetailsScreen extends ConsumerWidget {
                                         maxScale: 4.5,
                                         child: CachedNetworkImage(
                                           imageUrl:
-                                              "${AppConstants.storageUrl}${jobData.sourceFile.toString()}",
+                                              "${Endpoints.storageUrl}${jobData.sourceFile.toString()}",
                                           fit: BoxFit.fitHeight,
                                           placeholder: (context, url) =>
                                               const Center(

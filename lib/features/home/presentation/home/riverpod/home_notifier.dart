@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -112,7 +112,7 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<void> fetchSliders() async {
     state = state.copyWith(isSliderLoading: true, isSliderError: false);
     try {
-      final response = await _client.get(AppConstants.sliders);
+      final response = await _client.get(Endpoints.sliders);
       if (response.data != null && response.data['status'] == true) {
         final model = SliderModel.fromJson(response.data as Map<String, dynamic>);
         state = state.copyWith(
@@ -131,7 +131,7 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<void> fetchSubjectSections() async {
     state = state.copyWith(isSubjectSectionLoading: true, isSubjectSectionError: false);
     try {
-      final response = await _client.get(AppConstants.subjectSections);
+      final response = await _client.get(Endpoints.subjectSections);
       if (response.data != null && response.data['status'] == true) {
         final model = SubjectSectionModel.fromJson(response.data as Map<String, dynamic>);
         state = state.copyWith(

@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/shared.dart';
@@ -376,7 +376,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                       MaterialPageRoute(
                         builder: (_) => WebExamView(
                           title: "Favourite Question",
-                          url: AppConstants.myQuestions,
+                          url: Endpoints.myQuestions,
                         ),
                       ),
                     ),

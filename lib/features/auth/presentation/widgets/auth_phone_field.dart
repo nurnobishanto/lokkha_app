@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/utils/phone_utils.dart';
 
 /// Clean, minimal, reusable phone number input field for authentication screens.
 /// Matches the dimensions and styling of [AuthActionButton].
@@ -103,8 +103,7 @@ class _AuthPhoneFieldState extends State<AuthPhoneField> {
               onSubmitted: widget.onSubmitted,
               onChanged: widget.onChanged,
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(11),
+                SmartPhoneInputFormatter(),
               ],
               cursorColor: primaryColor,
               cursorWidth: 1.8,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -87,7 +87,7 @@ class AllContestView extends ConsumerWidget {
                       child: Stack(
                         children: [
                           Image.network(
-                            AppConstants.resolveUrl(
+                            Endpoints.resolveUrl(
                                 contest.sponsorImage.toString()),
                             height: 110.0.h,
                             width: double.infinity,

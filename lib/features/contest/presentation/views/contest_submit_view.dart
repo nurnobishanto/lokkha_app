@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/shared/shared.dart';
 
@@ -82,7 +82,7 @@ class ContestSubmitView extends StatelessWidget {
                             children: [
                               if (question.question?.questionImage != null)
                                 Image.network(
-                                  "${AppConstants.storageUrl}${question.question!.questionImage}",
+                                  "${Endpoints.storageUrl}${question.question!.questionImage}",
                                   errorBuilder: (context, error, stackTrace) =>
                                       const Icon(Icons.error,
                                           color: Colors.red),
@@ -310,7 +310,7 @@ class AnswerAndSolutionWidgets extends StatelessWidget {
   }
 
   Widget _buildExplanationImage(BuildContext context) {
-    String fileUrl = AppConstants.storageUrl +
+    String fileUrl = Endpoints.storageUrl +
         question.question!.explanationImage.toString();
     bool isPdf = fileUrl.toLowerCase().endsWith('.pdf');
     return SizedBox(

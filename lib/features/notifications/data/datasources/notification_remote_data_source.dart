@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/errors/exceptions.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
@@ -26,7 +26,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     final headers = {
       'Authorization': 'Bearer $token',
     };
-    final url = "${AppConstants.notifications}?device_id=$deviceId";
+    final url = "${Endpoints.notifications}?device_id=$deviceId";
 
     final response = await _client.get(
       url,
@@ -52,7 +52,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     final headers = {
       'Authorization': 'Bearer $token',
     };
-    final url = "${AppConstants.notifications}/$notificationId/read";
+    final url = "${Endpoints.notifications}/$notificationId/read";
     final data = {'device_id': deviceId, 'is_read': isRead};
 
     final response = await _client.post(

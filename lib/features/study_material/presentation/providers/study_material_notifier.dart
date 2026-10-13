@@ -69,7 +69,7 @@ class CurrentAffairsNotifier extends Notifier<CurrentAffairsState> {
     state = state.copyWith(isLoading: true, search: search, selectedDate: date);
     final dateParam = (date != null && date.isNotEmpty) ? '&date=$date' : '';
     final baseUrl =
-        isInternational ? AppConstants.internationalCA : AppConstants.nationalCA;
+        isInternational ? Endpoints.internationalCA : Endpoints.nationalCA;
     final url = '$baseUrl?search=$search&page=$page$dateParam';
 
     final token = MySharedPref.getUserToken();
@@ -224,7 +224,7 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
 
   Future<void> fetchVocabulary({bool refresh = false}) async {
     state = state.copyWith(isLoading: true);
-    final url = AppConstants.vocabularies;
+    final url = Endpoints.vocabularies;
 
     final data = <String, dynamic>{
       'alphabet': state.selectedAlphabet.toUpperCase(),
@@ -411,7 +411,7 @@ class SubSecSetTimeNotifier extends Notifier<SubSecSetTimeState> {
           MaterialPageRoute(
             builder: (_) => WebExamView(
               title: "Exam",
-              url: AppConstants.webTestExamStart,
+              url: Endpoints.webTestExamStart,
               body: data,
             ),
           ),

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/home/home.dart';
@@ -60,7 +60,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<User?> getProfile() async {
     try {
-      final response = await _client.get(AppConstants.v1UserProfile);
+      final response = await _client.get(Endpoints.v1UserProfile);
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         if (data['data'] is Map) {
@@ -124,7 +124,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
       final formData = FormData.fromMap(formMap);
       final response = await _client.post(
-        AppConstants.v1UserProfileUpdate,
+        Endpoints.v1UserProfileUpdate,
         data: formData,
       );
 
@@ -146,7 +146,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }) async {
     try {
       final response = await _client.post(
-        AppConstants.v1UserChangePassword,
+        Endpoints.v1UserChangePassword,
         data: {
           'current_password': currentPassword,
           'password': newPassword,
@@ -167,7 +167,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<UserDevicesData?> getDevices() async {
     try {
-      final response = await _client.get(AppConstants.v1UserDevices);
+      final response = await _client.get(Endpoints.v1UserDevices);
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         if (data['data'] is Map) {
@@ -185,7 +185,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<Map<String, dynamic>> terminateDevice(int deviceId) async {
     try {
       final response = await _client.delete(
-        '${AppConstants.v1UserDevices}/$deviceId',
+        '${Endpoints.v1UserDevices}/$deviceId',
       );
       if (response.data is Map) {
         return response.data as Map<String, dynamic>;
@@ -201,7 +201,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<Map<String, dynamic>> logoutOtherDevices() async {
     try {
       final response = await _client.post(
-        AppConstants.v1UserDevicesLogoutOthers,
+        Endpoints.v1UserDevicesLogoutOthers,
       );
       if (response.data is Map) {
         return response.data as Map<String, dynamic>;
@@ -216,7 +216,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<DashboardOverviewModel?> getDashboardOverview() async {
     try {
-      final response = await _client.get(AppConstants.v1DashboardOverview);
+      final response = await _client.get(Endpoints.v1DashboardOverview);
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> data = response.data is Map
             ? response.data as Map<String, dynamic>
@@ -233,7 +233,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<ExamHistoryResponseModel> getExamHistory({int page = 1}) async {
     try {
       final response = await _client.get(
-        '${AppConstants.v1UserExamHistory}?page=$page',
+        '${Endpoints.v1UserExamHistory}?page=$page',
       );
       if (response.data is Map<String, dynamic>) {
         return ExamHistoryResponseModel.fromJson(
@@ -255,7 +255,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     try {
       final cleanId = id.toString().replaceAll('#', '');
       final response = await _client.get(
-        '${AppConstants.v1UserExamHistory}/$cleanId',
+        '${Endpoints.v1UserExamHistory}/$cleanId',
       );
       return ExamReviewDetailModel.fromJson(
         response.data,
@@ -295,7 +295,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       }
 
       final response = await _client.get(
-        AppConstants.v1UserOrders,
+        Endpoints.v1UserOrders,
         queryParameters: queryParams,
       );
 
@@ -314,7 +314,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     try {
       final cleanId = id.toString().replaceAll('#', '');
       final response = await _client.get(
-        '${AppConstants.v1UserOrders}/$cleanId',
+        '${Endpoints.v1UserOrders}/$cleanId',
       );
 
       if (response.data is Map<String, dynamic>) {

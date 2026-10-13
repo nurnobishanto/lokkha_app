@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/contest.dart' hide Contest;
@@ -189,7 +189,7 @@ class _ContestDetailsViewState extends ConsumerState<ContestDetailsView> {
                 child: Stack(
                   children: [
                     Image.network(
-                      AppConstants.resolveUrl(contest.sponsorImage.toString()),
+                      Endpoints.resolveUrl(contest.sponsorImage.toString()),
                       height: 110.0.h,
                       width: double.infinity,
                       fit: BoxFit.fitWidth,
@@ -243,7 +243,7 @@ class _ContestDetailsViewState extends ConsumerState<ContestDetailsView> {
                     }
                   },
                   child: Image.network(
-                    AppConstants.storageUrl + contest.sponsorImage!,
+                    Endpoints.storageUrl + contest.sponsorImage!,
                   ),
                 ),
               ],

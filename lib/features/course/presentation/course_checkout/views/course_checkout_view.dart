@@ -350,7 +350,7 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                                             MaterialPageRoute(
                                               builder: (_) => BaseWebView(
                                                 title: 'Privacy Policy',
-                                                url: AppConstants.privacyPolicy,
+                                                url: Endpoints.privacyPolicy,
                                               ),
                                             ),
                                           );
@@ -370,7 +370,7 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                                             MaterialPageRoute(
                                               builder: (_) => BaseWebView(
                                                 title: 'Terms & Conditions',
-                                                url: AppConstants.termsPolicy,
+                                                url: Endpoints.termsPolicy,
                                               ),
                                             ),
                                           );
@@ -390,7 +390,7 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                                             MaterialPageRoute(
                                               builder: (_) => BaseWebView(
                                                 title: 'Refund Policy',
-                                                url: AppConstants.refundPolicy,
+                                                url: Endpoints.refundPolicy,
                                               ),
                                             ),
                                           );

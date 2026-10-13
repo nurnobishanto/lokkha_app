@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/profile/data/models/my_packages_model.dart';
@@ -53,7 +53,7 @@ class MyPackagesNotifier extends Notifier<MyPackagesState> {
   Future<void> fetchMyPackages() async {
     state = state.copyWith(isLoading: true, hasError: false);
     String? token = MySharedPref.getUserToken();
-    String url = AppConstants.myPackages;
+    String url = Endpoints.myPackages;
 
     final headers = {
       'Content-Type': 'application/json',

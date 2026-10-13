@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -62,14 +62,14 @@ class NotificationDetailsPage extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => ImagePreviewPage(
-                            url: AppConstants.storageUrl + image!,
+                            url: Endpoints.storageUrl + image!,
                           ),
                         ),
                       );
                     }
                   },
                   child: Image.network(
-                    AppConstants.storageUrl + image!,
+                    Endpoints.storageUrl + image!,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => Container(
                       color: context.isDark ? context.surfaceColor : Colors.grey.shade200,

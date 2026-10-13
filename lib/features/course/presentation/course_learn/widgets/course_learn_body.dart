@@ -48,7 +48,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                 child: Stack(
                   children: [
                     SfPdfViewer.network(
-                      AppConstants.storageUrl + currentItem.pdf!,
+                      Endpoints.storageUrl + currentItem.pdf!,
                       canShowScrollStatus: false,
                       canShowScrollHead: false,
                       enableDoubleTapZooming: false,
@@ -65,7 +65,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                               MaterialPageRoute(
                                 builder: (_) => PdfViewerScreen(
                                   title: currentItem.title.toString(),
-                                  file: AppConstants.storageUrl +
+                                  file: Endpoints.storageUrl +
                                       currentItem.pdf!,
                                 ),
                               ),
@@ -105,7 +105,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                 child: Stack(
                   children: [
                     CachedNetworkImage(
-                      imageUrl: AppConstants.storageUrl + currentItem.image!,
+                      imageUrl: Endpoints.storageUrl + currentItem.image!,
                       fit: BoxFit.cover, // Makes image cover the area nicely
                       width: double.infinity, // Expand to full width of parent
                       height: 200, // Set fixed height or flexible as needed
@@ -123,7 +123,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => FullscreenImageView(
-                                  imageUrl: AppConstants.storageUrl +
+                                  imageUrl: Endpoints.storageUrl +
                                       currentItem.image!,
                                 ),
                               ),
@@ -205,7 +205,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                         MaterialPageRoute(
                           builder: (_) => FullscreenImageView(
                             imageUrl:
-                                AppConstants.storageUrl + currentItem.image!,
+                                Endpoints.storageUrl + currentItem.image!,
                           ),
                         ),
                       );
@@ -232,7 +232,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                         MaterialPageRoute(
                           builder: (_) => PdfViewerScreen(
                             title: currentItem.title.toString(),
-                            file: AppConstants.storageUrl + currentItem.pdf!,
+                            file: Endpoints.storageUrl + currentItem.pdf!,
                           ),
                         ),
                       );
@@ -256,7 +256,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                   ElevatedButton.icon(
                     onPressed: () {
                       launchUrl(Uri.parse(
-                          AppConstants.storageUrl + currentItem.file!));
+                          Endpoints.storageUrl + currentItem.file!));
                     },
                     icon: const Icon(Icons.insert_drive_file),
                     label: Text("Download File"),
@@ -276,7 +276,7 @@ class _CourseLearnBodyState extends State<CourseLearnBody> {
                     currentItem.youtubePlaylist!.isNotEmpty) ...[
                   ElevatedButton.icon(
                     onPressed: () {
-                      launchUrl(Uri.parse(AppConstants.storageUrl +
+                      launchUrl(Uri.parse(Endpoints.storageUrl +
                           currentItem.youtubePlaylist!));
                     },
                     icon: const Icon(Icons.list),

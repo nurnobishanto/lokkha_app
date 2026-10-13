@@ -42,7 +42,7 @@ class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
   Future<void> fetchPremiumPackages() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final response = await _client.get(AppConstants.premiumPackage);
+      final response = await _client.get(Endpoints.premiumPackage);
       if (response.data['status'] == true) {
         final model = PremiumPackageModel.fromJson(response.data);
         state = state.copyWith(

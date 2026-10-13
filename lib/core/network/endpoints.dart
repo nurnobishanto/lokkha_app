@@ -1,65 +1,209 @@
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-/// Central API Endpoints definition following Clean Architecture
+/// Central API Endpoints and Base URL configuration following Clean Architecture.
 class Endpoints {
   Endpoints._();
 
-  static String get baseUrl => AppConstants.baseUrl;
-  static String get appUrl => AppConstants.appUrl;
-  static String get apiV1BaseUrl => AppConstants.apiV1BaseUrl;
-  static String get imageBaseUrl => AppConstants.imageBaseUrl;
+  // ─── Base URLs (Configurable via .env) ─────────────────────────────────────
+  static String get baseUrl {
+    try {
+      if (dotenv.isInitialized) {
+        return dotenv.env['API_BASE_URL'] ?? 'https://lokkha.com';
+      }
+    } catch (_) {}
+    return 'https://lokkha.com';
+  }
 
-  // Timeouts & Headers
+  static String get appUrl => '$baseUrl/api';
+  static String get apiV1BaseUrl => '$baseUrl/api/v1';
+
+  /// Image & File Storage Base URL (default: https://lokkha.com/uploads/)
+  static String get imageBaseUrl {
+    try {
+      if (dotenv.isInitialized) {
+        final envUrl = dotenv.env['IMAGE_BASE_URL'];
+        if (envUrl != null && envUrl.isNotEmpty) {
+          return envUrl.endsWith('/') ? envUrl : '$envUrl/';
+        }
+      }
+    } catch (_) {}
+    return 'https://lokkha.com/uploads/';
+  }
+
+  static String get storageUrl => imageBaseUrl;
+  static const String sponsorAds = 'https://bdtaxation.com/api/app-ads';
+
+  /// Safely resolves any relative or absolute image/file URL.
+  /// Automatically ensures images from lokkha.com include the /uploads/ storage path.
+  static String resolveUrl(String? path) {
+    if (path == null) return '';
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return '';
+
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      final uri = Uri.tryParse(trimmed);
+      if (uri != null &&
+          (uri.host == 'lokkha.com' || uri.host == 'www.lokkha.com')) {
+        if (!uri.path.startsWith('/uploads/') &&
+            !uri.path.startsWith('/api/') &&
+            uri.path.isNotEmpty) {
+          final cleanPath = uri.path.startsWith('/') ? uri.path : '/${uri.path}';
+          return 'https://${uri.host}/uploads$cleanPath';
+        }
+      }
+      return trimmed;
+    }
+
+    final base = imageBaseUrl.endsWith('/') ? imageBaseUrl : '$imageBaseUrl/';
+    final cleanPath = trimmed.startsWith('/') ? trimmed.substring(1) : trimmed;
+    if (cleanPath.startsWith('uploads/')) {
+      return '$baseUrl/$cleanPath';
+    }
+    return '$base$cleanPath';
+  }
+
+  static String resolveImageUrl(String? path) => resolveUrl(path);
+
+  // ─── Network Settings ───────────────────────────────────────────────────────
   static const Duration connectTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
   static const Duration sendTimeout = Duration(seconds: 30);
   static const String xApiKey = '';
 
-  // V1 Authentication
-  static const String checkPhone = '/auth/check-phone';
-  static const String sendOtp = '/auth/send-otp';
-  static const String verifyOtp = '/auth/verify-otp';
-  static const String login = '/auth/login';
-  static const String register = '/auth/register';
-  static const String me = '/auth/me';
-  static const String logout = '/auth/logout';
-  static const String forgetPassword = '/auth/forget-password';
+  // ─── V1 Authentication ─────────────────────────────────────────────────────
+  static const String checkPhone = '/api/v1/auth/check-phone';
+  static const String sendOtp = '/api/v1/auth/send-otp';
+  static const String verifyOtp = '/api/v1/auth/verify-otp';
+  static const String login = '/api/v1/auth/login';
+  static const String register = '/api/v1/auth/register';
+  static const String me = '/api/v1/auth/me';
+  static const String logout = '/api/v1/auth/logout';
+  static const String forgetPassword = '/api/v1/auth/forget-password';
 
-  // Dashboard & Profile
-  static const String dashboardOverview = '/dashboard/overview';
-  static const String profile = '/profile';
-  static const String profileUpdate = '/profile/update';
-  static const String changePassword = '/profile/change-password';
-  static const String devices = '/user/devices';
-  static const String logoutOtherDevices = '/user/devices/logout-others';
+  // ─── Dashboard & Profile ───────────────────────────────────────────────────
+  static const String dashboardOverview = '/api/v1/dashboard/overview';
+  static const String profile = '/api/v1/profile';
+  static const String profileUpdate = '/api/v1/profile/update';
+  static const String changePassword = '/api/v1/profile/change-password';
+  static const String devices = '/api/v1/user/devices';
+  static const String logoutOtherDevices = '/api/v1/user/devices/logout-others';
 
-  // Orders, Exams, History & Analytics
-  static const String userOrders = '/user/orders';
-  static const String userExams = '/user/exams';
-  static const String userCourses = '/user/courses';
-  static const String userSelfAcademyHistory = '/user/self-academy-history';
-  static const String userExamHistory = '/user/exam-history';
-  static const String accuracy = '/user/accuracy';
-  static const String rewardPoints = '/user/reward-points';
-  static const String rewardTransactions = '/user/reward-points/transactions';
-  static const String referrals = '/user/referrals';
-  static const String savedQuestions = '/user/content-history/saved-questions';
-  static const String toggleSaveQuestion = '/user/content-history/toggle-save-question';
+  // ─── Orders, Exams, History & Analytics ────────────────────────────────────
+  static const String userOrders = '/api/v1/user/orders';
+  static const String userExams = '/api/v1/user/exams';
+  static const String userCourses = '/api/v1/user/courses';
+  static const String userSelfAcademyHistory = '/api/v1/user/self-academy-history';
+  static const String userExamHistory = '/api/v1/user/exam-history';
+  static const String accuracy = '/api/v1/user/accuracy';
+  static const String rewardPoints = '/api/v1/user/reward-points';
+  static const String rewardTransactions = '/api/v1/user/reward-points/transactions';
+  static const String referrals = '/api/v1/user/referrals';
+  static const String savedQuestions = '/api/v1/user/content-history/saved-questions';
+  static const String toggleSaveQuestion = '/api/v1/user/content-history/toggle-save-question';
 
-  // Packages & Subscriptions
-  static const String packages = '/packages';
-  static const String userPackages = '/user/packages';
-  static const String couponApply = '/packages/coupon-apply';
+  // ─── Packages & Subscriptions ──────────────────────────────────────────────
+  static const String packages = '/api/v1/packages';
+  static const String userPackages = '/api/v1/user/packages';
+  static const String couponApply = '/api/v1/packages/coupon-apply';
 
-  // Public Dynamic Content
-  static const String sliders = '/sliders';
-  static const String contact = '/contact';
-  static const String contactSubmit = '/contact/submit';
-  static const String about = '/about';
-  static const String appInfo = '/app-info';
-  static const String checkUpdate = '/app-info/check-update';
-  static const String currentAffairs = '/current-affairs/feed';
-  static const String blogs = '/blog';
+  // ─── Public Dynamic Content ────────────────────────────────────────────────
+  static const String sliders = '/api/v1/sliders';
+  static const String contact = '/api/v1/contact';
+  static const String contactSubmit = '/api/v1/contact/submit';
+  static const String about = '/api/v1/about';
+  static const String appInfo = '/api/v1/app-info';
+  static const String checkUpdate = '/api/v1/app-info/check-update';
+  static const String currentAffairs = '/api/v1/current-affairs/feed';
+  static const String currentAffairsMonthlyDigest = '/api/v1/current-affairs/monthly-digest';
+  static const String currentAffairsMonths = '/api/v1/current-affairs/months';
+  static const String currentAffairsCategories = '/api/v1/current-affairs/categories';
+  static const String currentAffairsLatest = '/api/v1/current-affairs/latest';
+  static const String blogs = '/api/v1/blog';
+  static const String blog = '/api/v1/blog';
+
+  // ─── Aliases for compatibility ────────────────────────────────────────────
+  static const String v1AuthCheckPhone = checkPhone;
+  static const String v1AuthSendOtp = sendOtp;
+  static const String v1AuthVerifyOtp = verifyOtp;
+  static const String v1AuthLogin = login;
+  static const String v1AuthRegister = register;
+  static const String v1AuthMe = me;
+  static const String v1AuthLogout = logout;
+  static const String v1AuthForgetPassword = forgetPassword;
+  static const String v1DashboardOverview = dashboardOverview;
+  static const String v1UserProfile = profile;
+  static const String v1UserProfileUpdate = profileUpdate;
+  static const String v1UserChangePassword = changePassword;
+  static const String v1UserDevices = devices;
+  static const String v1UserDevicesLogout = logoutOtherDevices;
+  static const String v1UserDevicesLogoutOthers = logoutOtherDevices;
+  static const String v1UserOrders = userOrders;
+  static const String v1UserExams = userExams;
+  static const String v1UserCourses = userCourses;
+  static const String v1UserSelfAcademyHistory = userSelfAcademyHistory;
+  static const String v1UserExamHistory = userExamHistory;
+  static const String v1ContentHistory = '/api/v1/user/content-history';
+  static const String v1SavedQuestions = savedQuestions;
+  static const String v1Bookmarks = savedQuestions;
+  static const String v1ToggleSaveQuestion = toggleSaveQuestion;
+  static const String v1BookmarkToggle = toggleSaveQuestion;
+  static const String v1UserAccuracy = accuracy;
+  static const String v1RewardPoints = rewardPoints;
+  static const String v1RewardTransactions = rewardTransactions;
+  static const String v1Referrals = referrals;
+  static const String v1Packages = packages;
+  static const String v1PackagesCouponApply = couponApply;
+  static const String v1UserPackages = userPackages;
+  static const String v1Sliders = sliders;
+  static const String v1Contact = contact;
+  static const String v1ContactSubmit = contactSubmit;
+  static const String v1About = about;
+  static const String v1AppInfo = appInfo;
+  static const String v1AppInfoCheckUpdate = checkUpdate;
+  static const String v1CurrentAffairsFeed = currentAffairs;
+  static const String v1Blogs = blogs;
+
+  // ─── Legacy Web & App Routes ───────────────────────────────────────────────
+  static final String appVersionCheck = '$appUrl/app/update';
+  static final String updateProfileInfo = '$appUrl/update-profile-info';
+  static final String getSubjects = '$appUrl/get-subjects';
+  static final String webTestExamStart = '$appUrl/web-test-exam/start';
+  static final String randomQuestion = '$appUrl/random-question';
+  static final String myQuestions = '$appUrl/my-questions';
+  static final String jobsList = '$appUrl/jobs';
+  static final String job = '$appUrl/job';
+  static final String internationalCA = '$appUrl/current-affairs/international';
+  static final String nationalCA = '$appUrl/current-affairs/national';
+  static final String privacyPolicy = '$appUrl/page/privacy-policy';
+  static final String termsPolicy = '$appUrl/page/terms-and-conditions';
+  static final String refundPolicy = '$appUrl/page/refund-policy';
+  static final String contestPolicy = '$appUrl/page/contest-policy';
+  static final String premiumPackage = '$appUrl/packages';
+  static final String packageOrder = '$appUrl/package/order';
+  static final String latestContest = '$appUrl/latest-contest';
+  static final String startContest = '$appUrl/contest/';
+  static final String latestContestResult = '$appUrl/latest-contest-result';
+  static final String allContestList = '$appUrl/contest-list';
+  static final String subjectSections = '$appUrl/subject-sections';
+  static final String myPackages = '$appUrl/my-packages';
+  static final String myOrders = '$appUrl/my-orders';
+  static final String myOrderDetails = '$appUrl/order-details';
+  static final String latestExam = '$appUrl/latest-exams';
+  static final String vocabularies = '$appUrl/vocabularies';
+  static final String webExamRead = '$appUrl/web-exam-read';
+  static final String webExamStart = '$appUrl/web-exam-start';
+  static final String lectureSheetCategories = '$appUrl/lecturesheet-categories';
+  static final String lectureSheet = '$appUrl/lecturesheets';
+  static final String examsCategories = '$appUrl/exam-categories';
+  static final String examsCategory = '$appUrl/exam-category';
+  static final String examList = '$appUrl/exam-list';
+  static final String courseCategories = '$appUrl/course-categories';
+  static final String courses = '$appUrl/courses';
+  static final String courseDetails = '$appUrl/course';
+  static final String courseLearn = '$appUrl/course-learn';
+  static final String courseEnroll = '$appUrl/course-enroll';
+  static final String notifications = '$appUrl/notifications';
+  static final String myCourses = '$appUrl/my-courses';
 }
 
 /// Typedef alias for backward compatibility

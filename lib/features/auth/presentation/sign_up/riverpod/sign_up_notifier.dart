@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/di/auth_provider.dart';
+import 'package:lokkha/features/auth/data/models/auth_response_model.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class SignUpState {
   final bool isLoading;
   final String? errorMessage;
+  final AuthResponseModel? response;
 
   const SignUpState({
     this.isLoading = false,
     this.errorMessage,
+    this.response,
   });
 
   SignUpState copyWith({
     bool? isLoading,
     String? errorMessage,
+    AuthResponseModel? response,
   }) {
     return SignUpState(
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      response: response ?? this.response,
     );
   }
 }
@@ -30,24 +36,37 @@ class SignUpNotifier extends Notifier<SignUpState> {
   SignUpState build() => const SignUpState();
 
   Future<void> checkPhoneNumber(String rawPhone, BuildContext context) async {
-    final phone = rawPhone.trim();
-    if (phone.isEmpty || phone.length < 10) {
+    final l10n = context.l10n;
+    final sanitized = PhoneUtils.sanitize(rawPhone);
+
+    if (sanitized.isEmpty) {
       CustomSnackBar.showCustomErrorSnackBar(
-        title: "সতর্কতা",
-        message: "সঠিক ফোন নম্বর প্রদান করুন।",
+        title: l10n.warningTitle,
+        message: l10n.providePhoneNumber,
       );
       return;
     }
+
+    if (!PhoneUtils.isValidBdMobile(sanitized)) {
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: l10n.warningTitle,
+        message: l10n.invalidPhoneNumber,
+      );
+      return;
+    }
+
+    final localPhone = PhoneUtils.toLocal11Digit(sanitized);
 
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final checkPhoneUseCase = ref.read(checkPhoneUseCaseProvider);
-      final res = await checkPhoneUseCase(phone);
-      state = state.copyWith(isLoading: false);
+      final res = await checkPhoneUseCase(localPhone);
+      state = state.copyWith(isLoading: false, response: res);
 
       if (res.status) {
-        final targetPhone = res.canonicalPhone ?? phone;
+        // Retrieve normalized phone number from API canonical data or fallback to local format
+        final targetPhone = res.canonicalPhone ?? localPhone;
         final isRegistration = !res.isRegistered || res.suggestedStep == 'register';
 
         if (context.mounted) {
@@ -62,22 +81,21 @@ class SignUpNotifier extends Notifier<SignUpState> {
           }
         }
       } else {
-        state = state.copyWith(
-          errorMessage: res.message ?? "ফোন নম্বরটি যাচাই করা সম্ভব হয়নি।",
-        );
+        final errorMsg = res.message ?? l10n.invalidPhoneNumber;
+        state = state.copyWith(errorMessage: errorMsg);
         CustomSnackBar.showCustomErrorSnackBar(
-          title: "সতর্কতা",
-          message: res.message ?? "ফোন নম্বরটি যাচাই করা সম্ভব হয়নি।",
+          title: l10n.warningTitle,
+          message: errorMsg,
         );
       }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: "সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।",
+        errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
       );
       CustomSnackBar.showCustomErrorSnackBar(
-        title: "সতর্কতা",
-        message: "সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।",
+        title: l10n.warningTitle,
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করুন।',
       );
     }
   }

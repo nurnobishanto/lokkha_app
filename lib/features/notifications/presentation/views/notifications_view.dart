@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import '../providers/notifications_notifier.dart';
 import '../widgets/notification_card.dart';
@@ -93,7 +93,7 @@ class NotificationsView extends ConsumerWidget {
                     body: notification.body.toString(),
                     image: (notification.image != null &&
                             notification.image!.isNotEmpty)
-                        ? AppConstants.storageUrl + notification.image!
+                        ? Endpoints.storageUrl + notification.image!
                         : null,
                     isRead: notification.isRead ?? false,
                     humanTime: notification.timeHuman.toString(),

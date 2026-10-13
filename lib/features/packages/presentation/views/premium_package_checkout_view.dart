@@ -89,7 +89,7 @@ class _PremiumPackageCheckoutViewState
 
     try {
       final response = await ref.read(restClientProvider).post(
-        AppConstants.couponApply,
+        Endpoints.couponApply,
         headers: headers,
         data: data,
       );
@@ -150,7 +150,7 @@ class _PremiumPackageCheckoutViewState
     final email = _mailController.text.trim();
     final token = MySharedPref.getUserToken();
     final orderPlaceUrl =
-        "${AppConstants.packageOrder}/${widget.packagesModel.id}";
+        "${Endpoints.packageOrder}/${widget.packagesModel.id}";
 
     final headers = {
       'Content-Type': 'application/json',
@@ -425,7 +425,7 @@ class _PremiumPackageCheckoutViewState
                                               builder: (_) => BaseWebView(
                                                 title: 'Privacy Policy',
                                                 url:
-                                                    AppConstants.privacyPolicy,
+                                                    Endpoints.privacyPolicy,
                                               ),
                                             ),
                                           );
@@ -446,7 +446,7 @@ class _PremiumPackageCheckoutViewState
                                               builder: (_) => BaseWebView(
                                                 title: 'Terms & Conditions',
                                                 url:
-                                                    AppConstants.termsPolicy,
+                                                    Endpoints.termsPolicy,
                                               ),
                                             ),
                                           );
@@ -466,7 +466,7 @@ class _PremiumPackageCheckoutViewState
                                             MaterialPageRoute(
                                               builder: (_) => BaseWebView(
                                                 title: 'Refund Policy',
-                                                url: AppConstants
+                                                url: Endpoints
                                                     .refundPolicy,
                                               ),
                                             ),

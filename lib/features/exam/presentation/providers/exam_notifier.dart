@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
@@ -82,7 +82,7 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
 
     final deviceID = await getDeviceId();
     final url =
-        '${AppConstants.randomQuestion}?forceNew=$forceNew&deviceID=$deviceID';
+        '${Endpoints.randomQuestion}?forceNew=$forceNew&deviceID=$deviceID';
     try {
       final response = await _client.get(url);
       if (response.data != null && response.data['status'] == true) {
@@ -124,7 +124,7 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
     }
 
     final token = await SecureStorageService.getToken();
-    final url = AppConstants.v1UserProfile;
+    final url = Endpoints.v1UserProfile;
     try {
       final response = await _client.get(
         url,
@@ -215,7 +215,7 @@ class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
 
   Future<void> fetchExamCategories() async {
     state = state.copyWith(isExamLoading: true, isExamError: false);
-    final url = AppConstants.examsCategories;
+    final url = Endpoints.examsCategories;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
@@ -234,7 +234,7 @@ class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
 
   Future<void> fetchCourseCategories() async {
     state = state.copyWith(isCourseLoading: true, isCourseError: false);
-    final url = AppConstants.courseCategories;
+    final url = Endpoints.courseCategories;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
@@ -315,7 +315,7 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
       hasError: false,
     );
     final url =
-        "${AppConstants.latestExam}?search=$search&page=$page&date=$date";
+        "${Endpoints.latestExam}?search=$search&page=$page&date=$date";
 
     try {
       final response = await _client.get(url);
@@ -375,7 +375,7 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
         MaterialPageRoute(
           builder: (_) => WebExamView(
             title: "Exam",
-            url: AppConstants.webTestExamStart,
+            url: Endpoints.webTestExamStart,
             body: data,
           ),
         ),
@@ -458,7 +458,7 @@ class ExamCategoryDetailsNotifier
   Future<void> fetchExamCategoryDetails(int id) async {
     state = state.copyWith(isLoading: true, hasError: false);
     final url =
-        '${AppConstants.examsCategory}/$id?page=${state.currentPage}';
+        '${Endpoints.examsCategory}/$id?page=${state.currentPage}';
 
     try {
       final response = await _client.get(url);
@@ -482,7 +482,7 @@ class ExamCategoryDetailsNotifier
   }
 
   Future<void> fetchExamCategoriesWithParentID(int parentId) async {
-    final url = '${AppConstants.examsCategories}?parent_id=$parentId';
+    final url = '${Endpoints.examsCategories}?parent_id=$parentId';
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {

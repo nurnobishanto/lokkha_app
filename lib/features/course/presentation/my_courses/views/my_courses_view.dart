@@ -147,7 +147,7 @@ class _CourseCard extends StatelessWidget {
                     Positioned.fill(
                       child: course.image != null
                           ? Image.network(
-                              '${AppConstants.storageUrl}/${course.image}',
+                              '${Endpoints.storageUrl}/${course.image}',
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
                                   _placeholderImage(),

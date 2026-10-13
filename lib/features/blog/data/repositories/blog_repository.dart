@@ -16,7 +16,7 @@ class BlogRepository {
       }
 
       final response = await _client.get(
-        AppConstants.v1Blogs,
+        Endpoints.v1Blogs,
         queryParameters: query.isNotEmpty ? query : null,
       );
 
@@ -43,7 +43,7 @@ class BlogRepository {
   /// Fetch single blog detail by slug or ID
   Future<BlogPost?> getBlogDetail(String idOrSlug) async {
     try {
-      final response = await _client.get('${AppConstants.v1Blogs}/$idOrSlug');
+      final response = await _client.get('${Endpoints.v1Blogs}/$idOrSlug');
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data is Map && response.data['data'] != null
             ? response.data['data'] as Map<String, dynamic>

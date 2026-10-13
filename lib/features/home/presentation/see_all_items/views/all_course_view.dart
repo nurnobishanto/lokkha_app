@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
 
@@ -61,7 +61,7 @@ class AllCourseView extends ConsumerWidget {
                   final course = courses[index];
                   return CustomCourseCard(
                     imageUrl:
-                        AppConstants.storageUrl + course.image.toString(),
+                        Endpoints.storageUrl + course.image.toString(),
                     title: course.title ?? "",
                     regularPrice: course.regularPrice.toString(),
                     salePrice: course.salePrice.toString(),

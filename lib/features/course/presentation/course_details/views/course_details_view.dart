@@ -56,7 +56,7 @@ class CourseDetailsView extends ConsumerWidget {
                   const SizedBox(height: 8.0),
                   if ((course.image ?? '').isNotEmpty) ...[
                     CourseImageViewer(
-                      imageUrl: AppConstants.storageUrl + course.image!,
+                      imageUrl: Endpoints.storageUrl + course.image!,
                     ),
                     const SizedBox(height: 20),
                   ],

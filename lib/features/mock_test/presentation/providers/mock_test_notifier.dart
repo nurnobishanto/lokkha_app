@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
@@ -54,7 +54,7 @@ class MockTestNotifier extends Notifier<MockTestState> {
       hasError: false,
     );
 
-    final url = AppConstants.getSubjects;
+    final url = Endpoints.getSubjects;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
@@ -130,7 +130,7 @@ class TopicSelectionNotifier extends Notifier<TopicSelectionState> {
 
   Future<void> getSubjectTopics() async {
     state = state.copyWith(isLoading: true);
-    final url = '${AppConstants.getSubjects}?parent_id=$parentId';
+    final url = '${Endpoints.getSubjects}?parent_id=$parentId';
 
     try {
       final response = await _client.get(url);
@@ -263,7 +263,7 @@ class MockTestSetTimeNotifier extends Notifier<MockTestSetTimeState> {
           MaterialPageRoute(
             builder: (_) => WebExamView(
               title: "Exam",
-              url: AppConstants.webTestExamStart,
+              url: Endpoints.webTestExamStart,
               body: data,
             ),
           ),

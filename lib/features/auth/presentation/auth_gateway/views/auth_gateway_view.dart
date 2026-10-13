@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/constants/app_images.dart';
+import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/features/auth/presentation/sign_up/riverpod/sign_up_notifier.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_action_button.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_divider.dart';
@@ -45,7 +46,7 @@ class _AuthGatewayViewState extends ConsumerState<AuthGatewayView> {
       );
       return;
     }
-    if (text.length < 11) {
+    if (!PhoneUtils.isValidBdMobile(text)) {
       CustomSnackBar.showCustomErrorSnackBar(
         title: l10n.warningTitle,
         message: l10n.invalidPhoneNumber,

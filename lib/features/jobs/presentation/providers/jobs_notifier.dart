@@ -58,7 +58,7 @@ class JobsNotifier extends Notifier<JobsState> {
     }
 
     state = state.copyWith(isLoading: true, search: search);
-    String url = "${AppConstants.jobsList}?search=$search&page=$page";
+    String url = "${Endpoints.jobsList}?search=$search&page=$page";
 
     try {
       final response = await _client.get(url);
@@ -135,7 +135,7 @@ class JobDetailsNotifier extends Notifier<JobDetailsState> {
 
   Future<void> fetchSingleJob() async {
     state = state.copyWith(isLoading: true, error: null);
-    String url = "${AppConstants.job}/$jobId";
+    String url = "${Endpoints.job}/$jobId";
 
     try {
       final response = await _client.get(url);

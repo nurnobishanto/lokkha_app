@@ -46,7 +46,7 @@ class CustomDrawer extends ConsumerWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => BaseWebView(
-                        title: "আমাদের সম্পর্কে", url: AppConstants.about),
+                        title: "আমাদের সম্পর্কে", url: Endpoints.about),
                   ),
                 );
               },
@@ -103,7 +103,7 @@ class CustomDrawer extends ConsumerWidget {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => BaseWebView(
-                      title: "প্রাইভেসি পলিসি", url: AppConstants.privacyPolicy),
+                      title: "প্রাইভেসি পলিসি", url: Endpoints.privacyPolicy),
                 ),
               ),
             ),
@@ -117,7 +117,7 @@ class CustomDrawer extends ConsumerWidget {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => BaseWebView(
-                      title: "রিফান্ড পলিসি", url: AppConstants.refundPolicy),
+                      title: "রিফান্ড পলিসি", url: Endpoints.refundPolicy),
                 ),
               ),
             ),
@@ -130,7 +130,7 @@ class CustomDrawer extends ConsumerWidget {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => BaseWebView(
-                      title: "কন্টেস্ট পলিসি", url: AppConstants.contestPolicy),
+                      title: "কন্টেস্ট পলিসি", url: Endpoints.contestPolicy),
                 ),
               ),
             ),
@@ -144,7 +144,7 @@ class CustomDrawer extends ConsumerWidget {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => BaseWebView(
-                      title: "টার্মস এন্ড কন্ডিশন", url: AppConstants.termsPolicy),
+                      title: "টার্মস এন্ড কন্ডিশন", url: Endpoints.termsPolicy),
                 ),
               ),
             ),

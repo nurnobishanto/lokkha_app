@@ -72,7 +72,7 @@ class LectureSheetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPdf = fileUrl.toLowerCase().endsWith('.pdf');
-    final fullFileUrl = AppConstants.storageUrl + fileUrl;
+    final fullFileUrl = Endpoints.storageUrl + fileUrl;
     final theme = Theme.of(context);
 
     return LayoutBuilder(

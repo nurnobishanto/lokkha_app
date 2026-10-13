@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
@@ -223,13 +223,13 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchContest() async {
     state = state.copyWith(isLoading: true);
-    final url = AppConstants.latestContest;
+    final url = Endpoints.latestContest;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
         final model = LatestContestModel.fromJson(response.data);
         final img = model.contest?.image != null
-            ? '${AppConstants.storageUrl}${model.contest!.image}'
+            ? '${Endpoints.storageUrl}${model.contest!.image}'
             : state.imageUrl;
         state = state.copyWith(
           isLoading: false,
@@ -247,7 +247,7 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchAllContest() async {
     state = state.copyWith(isLoading: true);
-    final url = AppConstants.allContestList;
+    final url = Endpoints.allContestList;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
@@ -267,7 +267,7 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchContestResult() async {
     state = state.copyWith(isResultLoading: true);
-    final url = AppConstants.latestContestResult;
+    final url = Endpoints.latestContestResult;
     try {
       final response = await _client.get(url);
       if (response.data['status'] == true) {
@@ -283,7 +283,7 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
               : i == 1
                   ? 0
                   : i;
-          final userImg = AppConstants.resolveUrl(
+          final userImg = Endpoints.resolveUrl(
               result.user!.image ?? result.user!.avatar);
           list.add(
             RankCardUser(
@@ -326,7 +326,7 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
     try {
       final response = await _client.post(
-        '${AppConstants.startContest}$id/start',
+        '${Endpoints.startContest}$id/start',
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -481,7 +481,7 @@ class ContestExamNotifier extends Notifier<ContestExamState> {
       if (token.isNotEmpty) 'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
     };
-    final url = '${AppConstants.startContest}${exam.contest?.id}/submit';
+    final url = '${Endpoints.startContest}${exam.contest?.id}/submit';
 
     final userAnswersArray =
         state.userAnswers.values.map((u) => u.toJson()).toList();

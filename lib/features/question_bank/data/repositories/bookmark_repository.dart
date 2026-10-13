@@ -16,7 +16,7 @@ class BookmarkRepository {
       }
 
       final response = await _client.get(
-        AppConstants.v1Bookmarks,
+        Endpoints.v1Bookmarks,
         queryParameters: query.isNotEmpty ? query : null,
       );
 
@@ -42,7 +42,7 @@ class BookmarkRepository {
   Future<bool> toggleBookmark(int questionId) async {
     try {
       final response = await _client.post(
-        AppConstants.v1BookmarkToggle,
+        Endpoints.v1BookmarkToggle,
         data: {'question_id': questionId},
       );
       return response.statusCode == 200;

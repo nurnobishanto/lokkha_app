@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/constants/app_strings.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -84,7 +84,7 @@ void printAppInfo() {
   if (!enableLogging) return;
   debugPrint("🧾 App Info:");
   debugPrint("📱 $appName v${appVersion.value} by $appAuthor");
-  debugPrint("🌐 API: ${AppConstants.baseUrl}");
+  debugPrint("🌐 API: ${Endpoints.baseUrl}");
   debugPrint("🔧 Debug: $isDebugMode");
   debugPrint("👤 Logged In: ${isLoggedIn.value}");
 }
@@ -251,7 +251,7 @@ class NameAvatar extends StatelessWidget {
 
 Widget buildAvatar(User user, {double radius = 26.0}) {
   final rawPath = user.photoUrl ?? user.avatar ?? user.image;
-  final fullUrl = AppConstants.resolveUrl(rawPath);
+  final fullUrl = Endpoints.resolveUrl(rawPath);
 
   if (fullUrl.isNotEmpty) {
     return CachedNetworkImage(

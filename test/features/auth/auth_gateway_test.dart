@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/localization/app_localizations.dart';
 import 'package:lokkha/features/auth/presentation/auth_gateway/views/auth_gateway_view.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_action_button.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_divider.dart';

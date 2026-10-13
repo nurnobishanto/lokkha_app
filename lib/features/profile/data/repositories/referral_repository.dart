@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 
 class ReferralStats {
@@ -39,7 +39,7 @@ class ReferralRepository {
   /// Fetch Referral statistics and rewards from V1 API
   Future<ReferralStats?> getReferralStats() async {
     try {
-      final response = await _client.get(AppConstants.v1Referrals);
+      final response = await _client.get(Endpoints.v1Referrals);
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data is Map && response.data['data'] != null
             ? response.data['data'] as Map<String, dynamic>

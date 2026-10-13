@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/home/data/models/dashboard_overview_model.dart';
 import 'package:lokkha/shared/models/user.dart';
@@ -198,29 +198,29 @@ void main() {
       expect(d.rewards?.balance, 140);
     });
 
-    test('AppConstants.resolveUrl handles full URLs, relative paths, and UI avatars safely', () {
+    test('Endpoints.resolveUrl handles full URLs, relative paths, and UI avatars safely', () {
       expect(
-        AppConstants.resolveUrl("https://ui-avatars.com/api/?name=was&color=7F9CF5&background=EBF4FF"),
+        Endpoints.resolveUrl("https://ui-avatars.com/api/?name=was&color=7F9CF5&background=EBF4FF"),
         "https://ui-avatars.com/api/?name=was&color=7F9CF5&background=EBF4FF",
       );
       expect(
-        AppConstants.resolveUrl("http://example.com/avatar.png"),
+        Endpoints.resolveUrl("http://example.com/avatar.png"),
         "http://example.com/avatar.png",
       );
       expect(
-        AppConstants.resolveUrl("uploads/profile/user_123.jpg"),
+        Endpoints.resolveUrl("uploads/profile/user_123.jpg"),
         "https://lokkha.com/uploads/profile/user_123.jpg",
       );
       expect(
-        AppConstants.resolveUrl("/uploads/profile/user_123.jpg"),
+        Endpoints.resolveUrl("/uploads/profile/user_123.jpg"),
         "https://lokkha.com/uploads/profile/user_123.jpg",
       );
       expect(
-        AppConstants.resolveUrl("profile/user_123.jpg"),
+        Endpoints.resolveUrl("profile/user_123.jpg"),
         "https://lokkha.com/uploads/profile/user_123.jpg",
       );
-      expect(AppConstants.resolveUrl(null), "");
-      expect(AppConstants.resolveUrl(""), "");
+      expect(Endpoints.resolveUrl(null), "");
+      expect(Endpoints.resolveUrl(""), "");
     });
 
     test('ExamHistoryResponseModel and ExamHistoryModel parse V1 Exam History JSON correctly', () {

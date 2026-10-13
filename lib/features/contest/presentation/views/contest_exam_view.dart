@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/shared/models/question.dart';
 import 'package:lokkha/shared/widgets/custom_action_button.dart';
@@ -163,7 +163,7 @@ class ContestExamView extends ConsumerWidget {
                         children: [
                           if (question.questionImage != null)
                             Image.network(
-                              "${AppConstants.storageUrl}${question.questionImage}",
+                              "${Endpoints.storageUrl}${question.questionImage}",
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.error, color: Colors.red),
                             ),

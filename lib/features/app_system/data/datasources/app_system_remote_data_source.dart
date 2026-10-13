@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import '../models/app_info_model.dart';
 
@@ -28,14 +28,14 @@ class AppSystemRemoteDataSourceImpl implements AppSystemRemoteDataSource {
       }
 
       final response = await _client.get(
-        AppConstants.v1AppInfo,
+        Endpoints.v1AppInfo,
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
 
       if (response.data is Map<String, dynamic>) {
         return AppInfoModel.fromJson(response.data as Map<String, dynamic>);
       } else {
-        throw Exception('Invalid response format from ${AppConstants.v1AppInfo}');
+        throw Exception('Invalid response format from ${Endpoints.v1AppInfo}');
       }
     } catch (e) {
       debugPrint('[AppSystemRemoteDataSource] getAppInfo error: $e');
@@ -50,7 +50,7 @@ class AppSystemRemoteDataSourceImpl implements AppSystemRemoteDataSource {
   }) async {
     try {
       final response = await _client.post(
-        AppConstants.v1AppInfoCheckUpdate,
+        Endpoints.v1AppInfoCheckUpdate,
         data: {
           'platform': platform,
           'version_code': versionCode.toString(),

@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import '../models/user_exam_v1_model.dart';
 
@@ -40,14 +40,14 @@ class ExamRemoteDataSourceImpl implements ExamRemoteDataSource {
       }
 
       final response = await _client.get(
-        AppConstants.v1UserExams,
+        Endpoints.v1UserExams,
         queryParameters: queryParams,
       );
 
       if (response.data is Map<String, dynamic>) {
         return UserExamsV1Response.fromJson(response.data as Map<String, dynamic>);
       }
-      throw Exception('Invalid user exams response format from ${AppConstants.v1UserExams}');
+      throw Exception('Invalid user exams response format from ${Endpoints.v1UserExams}');
     } catch (e) {
       debugPrint('[ExamRemoteDataSource] getUserExams error: $e');
       rethrow;

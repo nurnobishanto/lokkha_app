@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/shared/models/category.dart';
@@ -61,7 +61,7 @@ class CoursesNotifier extends Notifier<CoursesState> {
     if (_disposed) return;
     state = state.copyWith(isLoading: true, hasError: false);
     final url =
-        id == null ? AppConstants.courses : '${AppConstants.courses}?category_id=$id';
+        id == null ? Endpoints.courses : '${Endpoints.courses}?category_id=$id';
 
     try {
       final response = await _client.get(url);
@@ -142,7 +142,7 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
     final headers = {
       'Authorization': 'Bearer $token',
     };
-    final url = '${AppConstants.courseDetails}/$id';
+    final url = '${Endpoints.courseDetails}/$id';
 
     try {
       final response = await _client.get(url, headers: headers);
@@ -214,7 +214,7 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
   Future<void> fetchMyCourses() async {
     state = state.copyWith(isLoading: true, hasError: false);
     final token = MySharedPref.getUserToken();
-    final url = AppConstants.myCourses;
+    final url = Endpoints.myCourses;
 
     final headers = {
       'Content-Type': 'application/json',
@@ -359,7 +359,7 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
   Future<void> couponApply(String couponCode, String price) async {
     state = state.copyWith(isCouponLoading: true);
     final token = MySharedPref.getUserToken();
-    final url = AppConstants.couponApply;
+    final url = Endpoints.couponApply;
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -416,7 +416,7 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
   }) async {
     state = state.copyWith(isLoading: true);
     final token = MySharedPref.getUserToken();
-    final orderPlaceUrl = '${AppConstants.courseEnroll}/$id';
+    final orderPlaceUrl = '${Endpoints.courseEnroll}/$id';
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
@@ -513,7 +513,7 @@ class LectureSheetListNotifier extends Notifier<LectureSheetListState> {
       hasError: false,
     );
 
-    final url = '${AppConstants.lectureSheetCategories}?page=${state.currentPage}';
+    final url = '${Endpoints.lectureSheetCategories}?page=${state.currentPage}';
     try {
       final response = await _client.get(url);
       if (response.data != null && response.data['status'] == true) {
@@ -582,7 +582,7 @@ class SheetDetailsNotifier extends Notifier<SheetDetailsState> {
 
   Future<void> fetchSheetDetails(int id) async {
     state = state.copyWith(isLoading: true, hasError: false);
-    final url = '${AppConstants.lectureSheet}/$id';
+    final url = '${Endpoints.lectureSheet}/$id';
     try {
       final response = await _client.get(url);
       final data = response.data;
@@ -665,7 +665,7 @@ class LectureSheetListDetailsNotifier
       hasError: false,
     );
     final url =
-        '${AppConstants.lectureSheetCategories}/$id?page=${state.currentPage}';
+        '${Endpoints.lectureSheetCategories}/$id?page=${state.currentPage}';
 
     try {
       final response = await _client.get(url);
@@ -773,9 +773,9 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
     }
 
     try {
-      String fetchUrl = "${AppConstants.courseLearn}/$cId";
+      String fetchUrl = "${Endpoints.courseLearn}/$cId";
       if (itemID != null) {
-        fetchUrl = "${AppConstants.courseLearn}/$cId?item=$itemID";
+        fetchUrl = "${Endpoints.courseLearn}/$cId?item=$itemID";
       }
 
       final response = await _client.get(

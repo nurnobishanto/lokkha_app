@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/auth/auth.dart';
 
@@ -33,7 +32,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<AuthResponseModel> checkPhone(String phone) async {
     try {
       final response = await _client.post(
-        AppConstants.v1AuthCheckPhone,
+        Endpoints.checkPhone,
         data: {'phone': phone},
       );
       if (response.data is Map) {
@@ -54,7 +53,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<AuthResponseModel> sendOtp(String phone, {String type = 'Login'}) async {
     try {
       final response = await _client.post(
-        AppConstants.v1AuthSendOtp,
+        Endpoints.sendOtp,
         data: {'phone': phone, 'type': type},
       );
       if (response.data is Map) {
@@ -78,7 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await _client.post(
-        AppConstants.v1AuthVerifyOtp,
+        Endpoints.verifyOtp,
         data: {'phone': phone, 'otp': otp},
       );
       if (response.data is Map) {
@@ -116,7 +115,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     try {
       final response = await _client.post(
-        AppConstants.v1AuthLogin,
+        Endpoints.login,
         data: payload,
       );
       if (response.data is Map) {
@@ -152,7 +151,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     try {
       final response = await _client.post(
-        AppConstants.v1AuthRegister,
+        Endpoints.register,
         data: payload,
       );
       if (response.data is Map) {
@@ -172,7 +171,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel?> getCurrentUser() async {
     try {
-      final response = await _client.get(AppConstants.v1AuthMe);
+      final response = await _client.get(Endpoints.me);
       if (response.statusCode == 200 && response.data is Map) {
         return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
       }

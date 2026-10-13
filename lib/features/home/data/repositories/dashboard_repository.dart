@@ -16,7 +16,7 @@ class DashboardRepository {
 
     // 1. Try fetching from V1 API
     try {
-      final response = await _client.get(AppConstants.v1DashboardOverview);
+      final response = await _client.get(Endpoints.v1DashboardOverview);
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> data = response.data is String
             ? jsonDecode(response.data as String) as Map<String, dynamic>

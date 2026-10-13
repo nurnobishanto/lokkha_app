@@ -68,7 +68,7 @@ class CoursesView extends ConsumerWidget {
                     itemBuilder: (_, index) {
                       final course = courses[index];
                       return CustomCourseCard(
-                        imageUrl: AppConstants.resolveUrl(course.image),
+                        imageUrl: Endpoints.resolveUrl(course.image),
                         title: course.title ?? '',
                         regularPrice: course.regularPrice?.toString() ?? '0',
                         salePrice: course.salePrice?.toString() ?? '0',

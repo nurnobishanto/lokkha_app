@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
@@ -66,7 +66,7 @@ class NavbarNotifier extends Notifier<NavbarState> {
     state = state.copyWith(isProfileLoading: true);
 
     try {
-      final response = await RestClient().get(AppConstants.v1UserProfile);
+      final response = await RestClient().get(Endpoints.v1UserProfile);
       if (response.statusCode == 200 && response.data is Map) {
         final profile = ProfileDataModel.fromJson(response.data as Map<String, dynamic>);
         if (profile.status == true && profile.user != null) {

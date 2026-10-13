@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 
@@ -11,7 +11,7 @@ class DeviceSessionRepository {
   /// Fetch all active devices for the authenticated student (GET /api/v1/user/devices)
   Future<List<DeviceSessionModel>> getActiveDevices() async {
     try {
-      final response = await _client.get(AppConstants.v1UserDevices);
+      final response = await _client.get(Endpoints.v1UserDevices);
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         final list = (data is Map && data['data'] != null && data['data']['active_devices'] is List)
@@ -34,7 +34,7 @@ class DeviceSessionRepository {
   Future<bool> logoutDevice(int deviceId) async {
     try {
       final response = await _client.delete(
-        '${AppConstants.v1UserDevices}/$deviceId',
+        '${Endpoints.v1UserDevices}/$deviceId',
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -47,7 +47,7 @@ class DeviceSessionRepository {
   Future<bool> logoutOtherDevices() async {
     try {
       final response = await _client.post(
-        AppConstants.v1UserDevicesLogoutOthers,
+        Endpoints.v1UserDevicesLogoutOthers,
       );
       return response.statusCode == 200;
     } catch (e) {

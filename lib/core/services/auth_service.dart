@@ -9,7 +9,7 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -228,7 +228,7 @@ class AuthService {
       final token = await SecureStorageService.getToken();
       if (token != null && token.isNotEmpty) {
         try {
-          await RestClient().post(AppConstants.v1AuthLogout);
+          await RestClient().post(Endpoints.v1AuthLogout);
         } catch (e) {
           debugPrint('[AuthService.logout] Remote API logout warning: $e');
         }
