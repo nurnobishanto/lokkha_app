@@ -6,8 +6,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'rx.dart';
-export 'rx.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/constants/app_strings.dart';
@@ -18,13 +16,13 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
 
-///GLOBAL CONFIG: shared across the entire app.
+/// GLOBAL CONFIG: shared across the entire app.
 
 /// App Info
 String appName = AppStrings.appName;
-RxString appVersion = ''.obs;
-RxString appVersionCode = ''.obs;
-RxString appPackage = ''.obs;
+final ValueNotifier<String> appVersion = ValueNotifier<String>('');
+final ValueNotifier<String> appVersionCode = ValueNotifier<String>('');
+final ValueNotifier<String> appPackage = ValueNotifier<String>('');
 String appAuthor = "Techyfo";
 
 /// Environment
@@ -32,61 +30,60 @@ bool isDebugMode = true;
 bool isProduction = false;
 bool enableLogging = true;
 
-///  API & Headers
+/// API & Headers
 Map<String, String> defaultHeaders = {
   "Content-Type": "application/json",
   "Accept": "application/json",
 };
 
-///  Authentication / User Info (Reactive)
-RxString? currentUserId = ''.obs;
-RxString? userName = ''.obs;
-RxString? userEmail = ''.obs;
-RxString? userPhone = ''.obs;
-RxString? userRole = ''.obs;
-RxBool isLoggedIn = false.obs;
-RxBool havePackage = false.obs;
-RxInt unReadNotificationCount = 0.obs;
+/// Authentication / User Info (Standard Flutter ValueNotifier)
+final ValueNotifier<String?> currentUserId = ValueNotifier<String?>('');
+final ValueNotifier<String?> userName = ValueNotifier<String?>('');
+final ValueNotifier<String?> userEmail = ValueNotifier<String?>('');
+final ValueNotifier<String?> userPhone = ValueNotifier<String?>('');
+final ValueNotifier<String?> userRole = ValueNotifier<String?>('');
+final ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
+final ValueNotifier<bool> havePackage = ValueNotifier<bool>(false);
+final ValueNotifier<int> unReadNotificationCount = ValueNotifier<int>(0);
 
-
-/// ✅ Device Info
+/// Device Info
 String? deviceId;
 String? deviceOS;
 String? deviceBrand;
 String? deviceModel;
 //Size? screenSize;
 
-/// ✅ Theme Settings
-RxBool isDarkMode = false.obs;
-Rx<ThemeMode> currentThemeMode = ThemeMode.system.obs;
+/// Theme Settings
+final ValueNotifier<bool> isDarkMode = ValueNotifier<bool>(false);
+final ValueNotifier<ThemeMode> currentThemeMode = ValueNotifier<ThemeMode>(ThemeMode.system);
 Color primaryColor = Colors.blue;
 
-/// ✅ Feature Toggles
-RxBool isNewFeatureEnabled = true.obs;
-RxBool isMaintenanceMode = false.obs;
+/// Feature Toggles
+final ValueNotifier<bool> isNewFeatureEnabled = ValueNotifier<bool>(true);
+final ValueNotifier<bool> isMaintenanceMode = ValueNotifier<bool>(false);
 
-/// ✅ Flags / App State
-RxBool isLoading = false.obs;
-RxBool hasNetwork = true.obs;
-RxBool showIntro = true.obs;
-RxBool isKeyboardOpen = false.obs;
+/// Flags / App State
+final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+final ValueNotifier<bool> hasNetwork = ValueNotifier<bool>(true);
+final ValueNotifier<bool> showIntro = ValueNotifier<bool>(true);
+final ValueNotifier<bool> isKeyboardOpen = ValueNotifier<bool>(false);
 
-/// ✅ UI & Layout
+/// UI & Layout
 double defaultPaddingHorizontal = 8.0.w;
 double defaultRadius = 12.0;
 EdgeInsets defaultMargin = EdgeInsets.all(8.0.r);
 
 /// File & Media
-RxString? imageUploadPath = ''.obs;
-RxString? downloadedFilePath = ''.obs;
+final ValueNotifier<String?> imageUploadPath = ValueNotifier<String?>('');
+final ValueNotifier<String?> downloadedFilePath = ValueNotifier<String?>('');
 List<String> supportedImageTypes = ["jpg", "png", "jpeg"];
 
-///  Helper Methods
+/// Helper Methods
 
 void printAppInfo() {
   if (!enableLogging) return;
   debugPrint("🧾 App Info:");
-  debugPrint("📱 $appName v$appVersion by $appAuthor");
+  debugPrint("📱 $appName v${appVersion.value} by $appAuthor");
   debugPrint("🌐 API: ${AppConstants.baseUrl}");
   debugPrint("🔧 Debug: $isDebugMode");
   debugPrint("👤 Logged In: ${isLoggedIn.value}");
