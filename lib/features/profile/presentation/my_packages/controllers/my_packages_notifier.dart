@@ -32,6 +32,10 @@ class MyPackagesState {
 }
 
 class MyPackagesNotifier extends Notifier<MyPackagesState> {
+  final RestClient _client;
+
+  MyPackagesNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   MyPackagesState build() {
     Future.microtask(() => fetchMyPackages());
@@ -51,31 +55,29 @@ class MyPackagesNotifier extends Notifier<MyPackagesState> {
       'Authorization': 'Bearer $token',
     };
 
-    await BaseClient.safeApiCall(
-      url,
-      headers: headers,
-      RequestType.post,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          state = state.copyWith(
-            model: MyPackagesModel.fromJson(response.data),
-            apiCallStatus: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(apiCallStatus: ApiCallStatus.error);
-          CustomSnackBar.showCustomErrorToast(
-            message: response.data['message'] ?? "প্যাকেজ লোড করতে ব্যর্থ",
-          );
-        }
-      },
-      onError: (error) {
-        state = state.copyWith(apiCallStatus: ApiCallStatus.error);
-        debugPrint("MyPackages API Error: $error");
-        CustomSnackBar.showCustomErrorToast(
-          message: "সার্ভার সংযোগে সমস্যা হয়েছে",
+    try {
+      final response = await _client.post(
+        url,
+        headers: headers,
+      );
+      if (response.data['status'] == true) {
+        state = state.copyWith(
+          model: MyPackagesModel.fromJson(response.data),
+          apiCallStatus: ApiCallStatus.success,
         );
-      },
-    );
+      } else {
+        state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+        CustomSnackBar.showCustomErrorToast(
+          message: response.data['message'] ?? "প্যাকেজ লোড করতে ব্যর্থ",
+        );
+      }
+    } catch (error) {
+      state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+      debugPrint("MyPackages API Error: $error");
+      CustomSnackBar.showCustomErrorToast(
+        message: "সার্ভার সংযোগে সমস্যা হয়েছে",
+      );
+    }
   }
 }
 

@@ -4,10 +4,14 @@ import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 
 class DeviceSessionRepository {
+  final RestClient _client;
+
+  DeviceSessionRepository({RestClient? client}) : _client = client ?? RestClient();
+
   /// Fetch all active devices for the authenticated student (GET /api/v1/user/devices)
   Future<List<DeviceSessionModel>> getActiveDevices() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1UserDevices);
+      final response = await _client.get(AppConstants.v1UserDevices);
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         final list = (data is Map && data['data'] != null && data['data']['active_devices'] is List)
@@ -29,7 +33,7 @@ class DeviceSessionRepository {
   /// Terminate a specific device session (DELETE /api/v1/user/devices/{id})
   Future<bool> logoutDevice(int deviceId) async {
     try {
-      final response = await ApiClient.delete(
+      final response = await _client.delete(
         '${AppConstants.v1UserDevices}/$deviceId',
       );
       return response.statusCode == 200;
@@ -42,7 +46,7 @@ class DeviceSessionRepository {
   /// Logout all devices except the current one (POST /api/v1/user/devices/logout-others)
   Future<bool> logoutOtherDevices() async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1UserDevicesLogoutOthers,
       );
       return response.statusCode == 200;

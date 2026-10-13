@@ -55,6 +55,7 @@ class HomeState {
 
 class HomeNotifier extends Notifier<HomeState> {
   final DashboardRepository _dashboardRepository = DashboardRepository();
+  final RestClient _client = RestClient();
 
   @override
   HomeState build() {
@@ -105,27 +106,16 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<void> fetchSliders() async {
     state = state.copyWith(sliderStatus: ApiCallStatus.loading);
     try {
-      await BaseClient.safeApiCall(
-        AppConstants.sliders,
-        RequestType.get,
-        onSuccess: (response) {
-          if (response.data != null && response.data['status'] == true) {
-            final model = SliderModel.fromJson(response.data as Map<String, dynamic>);
-            state = state.copyWith(
-              sliderModel: model,
-              sliderStatus: ApiCallStatus.success,
-            );
-          } else {
-            state = state.copyWith(sliderStatus: ApiCallStatus.error);
-          }
-        },
-        onError: (err) {
-          state = state.copyWith(sliderStatus: ApiCallStatus.error);
-        },
-        onLoading: () {
-          state = state.copyWith(sliderStatus: ApiCallStatus.loading);
-        },
-      );
+      final response = await _client.get(AppConstants.sliders);
+      if (response.data != null && response.data['status'] == true) {
+        final model = SliderModel.fromJson(response.data as Map<String, dynamic>);
+        state = state.copyWith(
+          sliderModel: model,
+          sliderStatus: ApiCallStatus.success,
+        );
+      } else {
+        state = state.copyWith(sliderStatus: ApiCallStatus.error);
+      }
     } catch (e) {
       state = state.copyWith(sliderStatus: ApiCallStatus.error);
     }
@@ -134,27 +124,16 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<void> fetchSubjectSections() async {
     state = state.copyWith(subjectSectionStatus: ApiCallStatus.loading);
     try {
-      await BaseClient.safeApiCall(
-        AppConstants.subjectSections,
-        RequestType.get,
-        onSuccess: (response) {
-          if (response.data != null && response.data['status'] == true) {
-            final model = SubjectSectionModel.fromJson(response.data as Map<String, dynamic>);
-            state = state.copyWith(
-              subjectSectionModel: model,
-              subjectSectionStatus: ApiCallStatus.success,
-            );
-          } else {
-            state = state.copyWith(subjectSectionStatus: ApiCallStatus.error);
-          }
-        },
-        onError: (_) {
-          state = state.copyWith(subjectSectionStatus: ApiCallStatus.error);
-        },
-        onLoading: () {
-          state = state.copyWith(subjectSectionStatus: ApiCallStatus.loading);
-        },
-      );
+      final response = await _client.get(AppConstants.subjectSections);
+      if (response.data != null && response.data['status'] == true) {
+        final model = SubjectSectionModel.fromJson(response.data as Map<String, dynamic>);
+        state = state.copyWith(
+          subjectSectionModel: model,
+          subjectSectionStatus: ApiCallStatus.success,
+        );
+      } else {
+        state = state.copyWith(subjectSectionStatus: ApiCallStatus.error);
+      }
     } catch (e) {
       state = state.copyWith(subjectSectionStatus: ApiCallStatus.error);
     }

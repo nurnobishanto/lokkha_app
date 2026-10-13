@@ -25,10 +25,14 @@ abstract class AuthRemoteDataSource {
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  final RestClient _client;
+
+  AuthRemoteDataSourceImpl({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   Future<AuthResponseModel> checkPhone(String phone) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AuthCheckPhone,
         data: {'phone': phone},
       );
@@ -49,7 +53,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel> sendOtp(String phone, {String type = 'Login'}) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AuthSendOtp,
         data: {'phone': phone, 'type': type},
       );
@@ -73,7 +77,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String otp,
   }) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AuthVerifyOtp,
         data: {'phone': phone, 'otp': otp},
       );
@@ -111,7 +115,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     };
 
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AuthLogin,
         data: payload,
       );
@@ -147,7 +151,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     };
 
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AuthRegister,
         data: payload,
       );
@@ -168,7 +172,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthResponseModel?> getCurrentUser() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1AuthMe);
+      final response = await _client.get(AppConstants.v1AuthMe);
       if (response.statusCode == 200 && response.data is Map) {
         return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
       }

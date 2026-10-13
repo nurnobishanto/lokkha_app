@@ -85,7 +85,7 @@ class ProfileUpdateRequiredNotifier extends Notifier<ProfileUpdateRequiredState>
     };
 
     try {
-      final response = await ApiClient.post(
+      final response = await RestClient().post(
         AppConstants.v1UserProfileUpdate,
         data: data,
       );

@@ -13,6 +13,10 @@ abstract class ExamRemoteDataSource {
 }
 
 class ExamRemoteDataSourceImpl implements ExamRemoteDataSource {
+  final RestClient _client;
+
+  ExamRemoteDataSourceImpl({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   Future<UserExamsV1Response> getUserExams({
     int page = 1,
@@ -35,7 +39,7 @@ class ExamRemoteDataSourceImpl implements ExamRemoteDataSource {
         queryParams['search'] = search.trim();
       }
 
-      final response = await ApiClient.get(
+      final response = await _client.get(
         AppConstants.v1UserExams,
         queryParameters: queryParams,
       );

@@ -76,9 +76,13 @@ class SeeAllItemsState {
 
 class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
   final GetUserExamsUseCase _getUserExamsUseCase;
+  final RestClient _client;
 
-  SeeAllItemsNotifier({GetUserExamsUseCase? getUserExamsUseCase})
-      : _getUserExamsUseCase = getUserExamsUseCase ?? GetUserExamsUseCase();
+  SeeAllItemsNotifier({
+    GetUserExamsUseCase? getUserExamsUseCase,
+    RestClient? client,
+  })  : _getUserExamsUseCase = getUserExamsUseCase ?? GetUserExamsUseCase(),
+        _client = client ?? RestClient();
 
   @override
   SeeAllItemsState build() {
@@ -141,60 +145,58 @@ class SeeAllItemsNotifier extends Notifier<SeeAllItemsState> {
       courseApiCallStatus: ApiCallStatus.loading,
       isLoading: true,
     );
-    final url = AppConstants.courses;
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      queryParameters: {'page': page},
-      onSuccess: (response) {
-        if (response.data["status"] == true) {
-          final modelData = AllCourseModel.fromJson(response.data);
+    try {
+      final response = await _client.get(
+        AppConstants.courses,
+        queryParameters: {'page': page},
+      );
 
-          if (page > 1 && state.allCourseModel.courses?.data != null) {
-            final combinedList =
-                List.of(state.allCourseModel.courses!.data!)
-                  ..addAll(modelData.courses?.data ?? []);
-            final updatedCourses = Courses(
-              currentPage: modelData.courses?.currentPage,
-              lastPage: modelData.courses?.lastPage,
-              perPage: modelData.courses?.perPage,
-              total: modelData.courses?.total,
-              data: combinedList,
-            );
-            state = state.copyWith(
-              allCourseModel: AllCourseModel(
-                status: modelData.status,
-                courses: updatedCourses,
-              ),
-              currentCoursePage: page,
-              totalCoursePages: modelData.courses?.lastPage ?? 1,
-              courseApiCallStatus: ApiCallStatus.success,
-              isLoading: false,
-            );
-          } else {
-            state = state.copyWith(
-              allCourseModel: modelData,
-              currentCoursePage: page,
-              totalCoursePages: modelData.courses?.lastPage ?? 1,
-              courseApiCallStatus: ApiCallStatus.success,
-              isLoading: false,
-            );
-          }
+      if (response.data != null && response.data["status"] == true) {
+        final modelData = AllCourseModel.fromJson(response.data as Map<String, dynamic>);
+
+        if (page > 1 && state.allCourseModel.courses?.data != null) {
+          final combinedList =
+              List.of(state.allCourseModel.courses!.data!)
+                ..addAll(modelData.courses?.data ?? []);
+          final updatedCourses = Courses(
+            currentPage: modelData.courses?.currentPage,
+            lastPage: modelData.courses?.lastPage,
+            perPage: modelData.courses?.perPage,
+            total: modelData.courses?.total,
+            data: combinedList,
+          );
+          state = state.copyWith(
+            allCourseModel: AllCourseModel(
+              status: modelData.status,
+              courses: updatedCourses,
+            ),
+            currentCoursePage: page,
+            totalCoursePages: modelData.courses?.lastPage ?? 1,
+            courseApiCallStatus: ApiCallStatus.success,
+            isLoading: false,
+          );
         } else {
           state = state.copyWith(
-            courseApiCallStatus: ApiCallStatus.error,
+            allCourseModel: modelData,
+            currentCoursePage: page,
+            totalCoursePages: modelData.courses?.lastPage ?? 1,
+            courseApiCallStatus: ApiCallStatus.success,
             isLoading: false,
           );
         }
-      },
-      onError: (err) {
+      } else {
         state = state.copyWith(
           courseApiCallStatus: ApiCallStatus.error,
           isLoading: false,
         );
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(
+        courseApiCallStatus: ApiCallStatus.error,
+        isLoading: false,
+      );
+    }
   }
 
   void goToExamPage(int page) => fetchAllExams(page: page);

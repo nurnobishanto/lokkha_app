@@ -6,6 +6,9 @@ import 'package:lokkha/features/home/home.dart';
 
 class DashboardRepository {
   static const String _cacheKey = 'dashboard_overview_cache';
+  final RestClient _client;
+
+  DashboardRepository({RestClient? client}) : _client = client ?? RestClient();
 
   /// Get Dashboard Overview with automatic offline cache fallback
   Future<DashboardOverviewModel?> getOverview({bool forceRefresh = false}) async {
@@ -13,7 +16,7 @@ class DashboardRepository {
 
     // 1. Try fetching from V1 API
     try {
-      final response = await ApiClient.get(AppConstants.v1DashboardOverview);
+      final response = await _client.get(AppConstants.v1DashboardOverview);
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> data = response.data is String
             ? jsonDecode(response.data as String) as Map<String, dynamic>

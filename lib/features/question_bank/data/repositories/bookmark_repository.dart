@@ -3,6 +3,10 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/question_bank/question_bank.dart';
 
 class BookmarkRepository {
+  final RestClient _client;
+
+  BookmarkRepository({RestClient? client}) : _client = client ?? RestClient();
+
   /// Fetch all saved/bookmarked questions
   Future<List<BookmarkedQuestion>> getBookmarks({String? subject}) async {
     try {
@@ -11,7 +15,7 @@ class BookmarkRepository {
         query['subject'] = subject;
       }
 
-      final response = await ApiClient.get(
+      final response = await _client.get(
         AppConstants.v1Bookmarks,
         queryParameters: query.isNotEmpty ? query : null,
       );
@@ -22,9 +26,11 @@ class BookmarkRepository {
             ? data['data'] as List
             : (data is List ? data : []);
 
-        return list
-            .map((item) => BookmarkedQuestion.fromJson(item as Map<String, dynamic>))
-            .toList();
+        if (list.isNotEmpty) {
+          return list
+              .map((item) => BookmarkedQuestion.fromJson(item as Map<String, dynamic>))
+              .toList();
+        }
       }
     } catch (e) {
       debugPrint('[BookmarkRepository] Error fetching bookmarks: $e');
@@ -35,7 +41,7 @@ class BookmarkRepository {
   /// Toggle bookmark status for a question (Add / Remove)
   Future<bool> toggleBookmark(int questionId) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1BookmarkToggle,
         data: {'question_id': questionId},
       );

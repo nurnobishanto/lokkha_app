@@ -16,8 +16,6 @@ Future<void> main() async {
     debugPrint(".env load failed: $e");
   }
 
-  // Init ApiClient
-  ApiClient.init();
 
   // Init SharedPreferences safely
   try {

@@ -32,6 +32,10 @@ class JobsState {
 }
 
 class JobsNotifier extends Notifier<JobsState> {
+  final RestClient _client;
+
+  JobsNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   JobsState build() {
     Future.microtask(() => fetchJobs(""));
@@ -56,39 +60,35 @@ class JobsNotifier extends Notifier<JobsState> {
     state = state.copyWith(isLoading: true, search: search);
     String url = "${AppConstants.jobsList}?search=$search&page=$page";
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data["status"] == true) {
-          JobListModel modelData = JobListModel.fromJson(response.data);
-          MyGetStorage.writeCacheData(MyGetStorage.jobKey, response.data);
+    try {
+      final response = await _client.get(url);
+      if (response.data["status"] == true) {
+        JobListModel modelData = JobListModel.fromJson(response.data);
+        MyGetStorage.writeCacheData(MyGetStorage.jobKey, response.data);
 
-          if (page > 1 && state.model.jobs != null) {
-            final existing = List<Job>.from(state.model.jobs?.data ?? []);
-            existing.addAll(modelData.jobs?.data ?? []);
-            final updatedJobs = state.model.jobs?.copyWith(data: existing);
-            state = state.copyWith(
-              model: state.model.copyWith(jobs: updatedJobs),
-              currentPage: page,
-              isLoading: false,
-            );
-          } else {
-            state = state.copyWith(
-              model: modelData,
-              currentPage: page,
-              isLoading: false,
-            );
-          }
+        if (page > 1 && state.model.jobs != null) {
+          final existing = List<Job>.from(state.model.jobs?.data ?? []);
+          existing.addAll(modelData.jobs?.data ?? []);
+          final updatedJobs = state.model.jobs?.copyWith(data: existing);
+          state = state.copyWith(
+            model: state.model.copyWith(jobs: updatedJobs),
+            currentPage: page,
+            isLoading: false,
+          );
         } else {
-          state = state.copyWith(isLoading: false);
+          state = state.copyWith(
+            model: modelData,
+            currentPage: page,
+            isLoading: false,
+          );
         }
-      },
-      onError: (error) {
-        debugPrint("Error fetching jobs: $error");
+      } else {
         state = state.copyWith(isLoading: false);
-      },
-    );
+      }
+    } catch (error) {
+      debugPrint("Error fetching jobs: $error");
+      state = state.copyWith(isLoading: false);
+    }
   }
 }
 
@@ -122,7 +122,10 @@ class JobDetailsState {
 
 class JobDetailsNotifier extends Notifier<JobDetailsState> {
   final int jobId;
-  JobDetailsNotifier(this.jobId);
+  final RestClient _client;
+
+  JobDetailsNotifier(this.jobId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   JobDetailsState build() {
@@ -134,30 +137,26 @@ class JobDetailsNotifier extends Notifier<JobDetailsState> {
     state = state.copyWith(isLoading: true, error: null);
     String url = "${AppConstants.job}/$jobId";
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data["status"] == true) {
-          Job modelData = Job.fromJson(response.data['job']);
-          state = state.copyWith(
-            job: modelData,
-            isLoading: false,
-          );
-        } else {
-          state = state.copyWith(
-            isLoading: false,
-            error: response.data["message"]?.toString() ?? "Error",
-          );
-        }
-      },
-      onError: (error) {
+    try {
+      final response = await _client.get(url);
+      if (response.data["status"] == true) {
+        Job modelData = Job.fromJson(response.data['job']);
+        state = state.copyWith(
+          job: modelData,
+          isLoading: false,
+        );
+      } else {
         state = state.copyWith(
           isLoading: false,
-          error: error.toString(),
+          error: response.data["message"]?.toString() ?? "Error",
         );
-      },
-    );
+      }
+    } catch (error) {
+      state = state.copyWith(
+        isLoading: false,
+        error: error.toString(),
+      );
+    }
   }
 }
 

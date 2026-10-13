@@ -50,7 +50,10 @@ class CurrentAffairsState {
 
 class CurrentAffairsNotifier extends Notifier<CurrentAffairsState> {
   final bool isInternational;
-  CurrentAffairsNotifier(this.isInternational);
+  final RestClient _client;
+
+  CurrentAffairsNotifier(this.isInternational, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   CurrentAffairsState build() {
@@ -76,27 +79,25 @@ class CurrentAffairsNotifier extends Notifier<CurrentAffairsState> {
       'Content-Type': 'application/json',
     };
 
-    BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      headers: headers,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final model = CurrentAffairsModel.fromJson(response.data);
-          state = state.copyWith(
-            isLoading: false,
-            model: model,
-            currentPage: page,
-            totalPages: model.currentAffairs?.lastPage ?? 1,
-          );
-        } else {
-          state = state.copyWith(isLoading: false);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(
+        url,
+        headers: headers,
+      );
+      if (response.data['status'] == true) {
+        final model = CurrentAffairsModel.fromJson(response.data);
+        state = state.copyWith(
+          isLoading: false,
+          model: model,
+          currentPage: page,
+          totalPages: model.currentAffairs?.lastPage ?? 1,
+        );
+      } else {
         state = state.copyWith(isLoading: false);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   void goToPage(int page) {
@@ -174,6 +175,10 @@ class VocabularyState {
 }
 
 class VocabularyNotifier extends Notifier<VocabularyState> {
+  final RestClient _client;
+
+  VocabularyNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   VocabularyState build() {
     Future.microtask(() => fetchVocabulary());
@@ -238,50 +243,48 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
       data['category_ids[]'] = [state.selectedCategory!.id!];
     }
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      queryParameters: data,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final modelData = VocabularyModel.fromJson(response.data);
-          final rawList = modelData.vocabularies?.data ?? [];
-          final lastPage = modelData.vocabularies?.lastPage ?? 1;
-          final curPage = modelData.vocabularies?.currentPage ?? 1;
+    try {
+      final response = await _client.get(
+        url,
+        queryParameters: data,
+      );
+      if (response.data['status'] == true) {
+        final modelData = VocabularyModel.fromJson(response.data);
+        final rawList = modelData.vocabularies?.data ?? [];
+        final lastPage = modelData.vocabularies?.lastPage ?? 1;
+        final curPage = modelData.vocabularies?.currentPage ?? 1;
 
-          List<Vocabulary> filtered = rawList;
-          if (state.search.trim().isNotEmpty) {
-            final q = state.search.toLowerCase();
-            filtered = rawList
-                .where((v) => (v.word ?? '').toLowerCase().contains(q))
-                .toList();
-          }
-
-          state = state.copyWith(
-            isLoading: false,
-            model: modelData,
-            selectedAlphabet:
-                modelData.selectedAlphabet?.toUpperCase() ?? state.selectedAlphabet,
-            totalPages: lastPage,
-            isLastPage: curPage >= lastPage,
-            filteredVocab: filtered,
-            apiCallStatus: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(
-            isLoading: false,
-            apiCallStatus: ApiCallStatus.error,
-            filteredVocab: [],
-          );
+        List<Vocabulary> filtered = rawList;
+        if (state.search.trim().isNotEmpty) {
+          final q = state.search.toLowerCase();
+          filtered = rawList
+              .where((v) => (v.word ?? '').toLowerCase().contains(q))
+              .toList();
         }
-      },
-      onError: (err) {
+
+        state = state.copyWith(
+          isLoading: false,
+          model: modelData,
+          selectedAlphabet:
+              modelData.selectedAlphabet?.toUpperCase() ?? state.selectedAlphabet,
+          totalPages: lastPage,
+          isLastPage: curPage >= lastPage,
+          filteredVocab: filtered,
+          apiCallStatus: ApiCallStatus.success,
+        );
+      } else {
         state = state.copyWith(
           isLoading: false,
           apiCallStatus: ApiCallStatus.error,
+          filteredVocab: [],
         );
-      },
-    );
+      }
+    } catch (err) {
+      state = state.copyWith(
+        isLoading: false,
+        apiCallStatus: ApiCallStatus.error,
+      );
+    }
   }
 
   void goToPage(int page) {

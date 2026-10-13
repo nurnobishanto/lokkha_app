@@ -53,10 +53,14 @@ abstract class ProfileRemoteDataSource {
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
+  final RestClient _client;
+
+  ProfileRemoteDataSourceImpl({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   Future<User?> getProfile() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1UserProfile);
+      final response = await _client.get(AppConstants.v1UserProfile);
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         if (data['data'] is Map) {
@@ -119,7 +123,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       };
 
       final formData = FormData.fromMap(formMap);
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1UserProfileUpdate,
         data: formData,
       );
@@ -141,7 +145,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     required String confirmPassword,
   }) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1UserChangePassword,
         data: {
           'current_password': currentPassword,
@@ -163,7 +167,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<UserDevicesData?> getDevices() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1UserDevices);
+      final response = await _client.get(AppConstants.v1UserDevices);
       if (response.statusCode == 200 && response.data is Map) {
         final data = response.data as Map<String, dynamic>;
         if (data['data'] is Map) {
@@ -180,7 +184,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<Map<String, dynamic>> terminateDevice(int deviceId) async {
     try {
-      final response = await ApiClient.delete(
+      final response = await _client.delete(
         '${AppConstants.v1UserDevices}/$deviceId',
       );
       if (response.data is Map) {
@@ -196,7 +200,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<Map<String, dynamic>> logoutOtherDevices() async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1UserDevicesLogoutOthers,
       );
       if (response.data is Map) {
@@ -212,7 +216,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<DashboardOverviewModel?> getDashboardOverview() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1DashboardOverview);
+      final response = await _client.get(AppConstants.v1DashboardOverview);
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> data = response.data is Map
             ? response.data as Map<String, dynamic>
@@ -228,7 +232,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   @override
   Future<ExamHistoryResponseModel> getExamHistory({int page = 1}) async {
     try {
-      final response = await ApiClient.get(
+      final response = await _client.get(
         '${AppConstants.v1UserExamHistory}?page=$page',
       );
       if (response.data is Map<String, dynamic>) {
@@ -250,7 +254,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }) async {
     try {
       final cleanId = id.toString().replaceAll('#', '');
-      final response = await ApiClient.get(
+      final response = await _client.get(
         '${AppConstants.v1UserExamHistory}/$cleanId',
       );
       return ExamReviewDetailModel.fromJson(
@@ -290,7 +294,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         queryParams['search'] = search.trim();
       }
 
-      final response = await ApiClient.get(
+      final response = await _client.get(
         AppConstants.v1UserOrders,
         queryParameters: queryParams,
       );
@@ -309,7 +313,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   Future<OrderDetailV1Data> getOrderDetails(dynamic id) async {
     try {
       final cleanId = id.toString().replaceAll('#', '');
-      final response = await ApiClient.get(
+      final response = await _client.get(
         '${AppConstants.v1UserOrders}/$cleanId',
       );
 

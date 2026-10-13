@@ -232,7 +232,7 @@ class AuthService {
       final token = await SecureStorageService.getToken();
       if (token != null && token.isNotEmpty) {
         try {
-          await ApiClient.post(AppConstants.v1AuthLogout);
+          await RestClient().post(AppConstants.v1AuthLogout);
         } catch (e) {
           debugPrint('[AuthService.logout] Remote API logout warning: $e');
         }

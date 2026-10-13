@@ -9,9 +9,12 @@ import 'package:lokkha/features/auth/domain/usecases/register_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/verify_otp_usecase.dart';
 
+import 'package:lokkha/di/network_provider.dart';
+
 /// Data Source Provider
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  return AuthRemoteDataSourceImpl();
+  final client = ref.watch(restClientProvider);
+  return AuthRemoteDataSourceImpl(client: client);
 });
 
 /// Repository Provider

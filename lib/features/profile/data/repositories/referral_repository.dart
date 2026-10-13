@@ -32,10 +32,14 @@ class ReferralStats {
 }
 
 class ReferralRepository {
+  final RestClient _client;
+
+  ReferralRepository({RestClient? client}) : _client = client ?? RestClient();
+
   /// Fetch Referral statistics and rewards from V1 API
   Future<ReferralStats?> getReferralStats() async {
     try {
-      final response = await ApiClient.get(AppConstants.v1Referrals);
+      final response = await _client.get(AppConstants.v1Referrals);
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data is Map && response.data['data'] != null
             ? response.data['data'] as Map<String, dynamic>

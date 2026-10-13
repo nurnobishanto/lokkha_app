@@ -40,7 +40,10 @@ class CoursesState {
 
 class CoursesNotifier extends Notifier<CoursesState> {
   final int? categoryId;
-  CoursesNotifier(this.categoryId);
+  final RestClient _client;
+
+  CoursesNotifier(this.categoryId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   CoursesState build() {
@@ -56,24 +59,15 @@ class CoursesNotifier extends Notifier<CoursesState> {
           ? '${AppConstants.courses}?course_category_id=$id'
           : AppConstants.courses;
 
-      await BaseClient.safeApiCall(
-        url,
-        RequestType.get,
-        onSuccess: (response) {
-          if (response.data != null && response.data['status'] == true) {
-            state = state.copyWith(
-              model: CoursesModel.fromJson(response.data),
-              status: ApiCallStatus.success,
-            );
-          } else {
-            state = state.copyWith(status: ApiCallStatus.error);
-          }
-        },
-        onError: (err) {
-          state = state.copyWith(status: ApiCallStatus.error);
-          debugPrint('error from fetchCourses $err');
-        },
-      );
+      final response = await _client.get(url);
+      if (response.data != null && response.data['status'] == true) {
+        state = state.copyWith(
+          model: CoursesModel.fromJson(response.data as Map<String, dynamic>),
+          status: ApiCallStatus.success,
+        );
+      } else {
+        state = state.copyWith(status: ApiCallStatus.error);
+      }
     } catch (e) {
       state = state.copyWith(status: ApiCallStatus.error);
       debugPrint('exception in fetchCourses $e');
@@ -119,7 +113,10 @@ class CourseDetailsState {
 
 class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
   final int courseId;
-  CourseDetailsNotifier(this.courseId);
+  final RestClient _client;
+
+  CourseDetailsNotifier(this.courseId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   CourseDetailsState build() {
@@ -143,32 +140,19 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
     final url = '${AppConstants.courseDetails}/$id';
 
     try {
-      await BaseClient.safeApiCall(
-        url,
-        RequestType.get,
-        headers: headers,
-        onSuccess: (response) {
-          if (response.data != null && response.data['status'] == true) {
-            state = state.copyWith(
-              status: ApiCallStatus.success,
-              isLoading: false,
-              model: CourseDetailsModel.fromJson(response.data),
-            );
-          } else {
-            state = state.copyWith(
-              status: ApiCallStatus.error,
-              isLoading: false,
-            );
-          }
-        },
-        onError: (err) {
-          state = state.copyWith(
-            status: ApiCallStatus.error,
-            isLoading: false,
-          );
-          if (kDebugMode) debugPrint('Error fetching course Details: $err');
-        },
-      );
+      final response = await _client.get(url, headers: headers);
+      if (response.data != null && response.data['status'] == true) {
+        state = state.copyWith(
+          status: ApiCallStatus.success,
+          isLoading: false,
+          model: CourseDetailsModel.fromJson(response.data),
+        );
+      } else {
+        state = state.copyWith(
+          status: ApiCallStatus.error,
+          isLoading: false,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         status: ApiCallStatus.error,
@@ -208,6 +192,10 @@ class MyCoursesState {
 }
 
 class MyCoursesNotifier extends Notifier<MyCoursesState> {
+  final RestClient _client;
+
+  MyCoursesNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   MyCoursesState build() {
     Future.microtask(fetchMyCourses);
@@ -224,31 +212,26 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
       'Authorization': 'Bearer $token',
     };
 
-    await BaseClient.safeApiCall(
-      url,
-      headers: headers,
-      RequestType.post,
-      onSuccess: (response) {
-        if (response.data != null && response.data['status'] == true) {
-          state = state.copyWith(
-            model: MyCourseModel.fromJson(response.data),
-            status: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(status: ApiCallStatus.error);
-          CustomSnackBar.showCustomErrorToast(
-            message: response.data?['message']?.toString() ?? 'কোর্স লোড করতে ব্যর্থ',
-          );
-        }
-      },
-      onError: (error) {
-        state = state.copyWith(status: ApiCallStatus.error);
-        debugPrint('MyCourses API Error: $error');
-        CustomSnackBar.showCustomErrorToast(
-          message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
+    try {
+      final response = await _client.post(url, headers: headers);
+      if (response.data != null && response.data['status'] == true) {
+        state = state.copyWith(
+          model: MyCourseModel.fromJson(response.data),
+          status: ApiCallStatus.success,
         );
-      },
-    );
+      } else {
+        state = state.copyWith(status: ApiCallStatus.error);
+        CustomSnackBar.showCustomErrorToast(
+          message: response.data?['message']?.toString() ?? 'কোর্স লোড করতে ব্যর্থ',
+        );
+      }
+    } catch (error) {
+      state = state.copyWith(status: ApiCallStatus.error);
+      debugPrint('MyCourses API Error: $error');
+      CustomSnackBar.showCustomErrorToast(
+        message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
+      );
+    }
   }
 }
 
@@ -313,6 +296,10 @@ class CourseCheckoutState {
 }
 
 class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
+  final RestClient _client;
+
+  CourseCheckoutNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   CourseCheckoutState build() {
     return CourseCheckoutState(dataModel: CourseCheckoutModel());
@@ -376,31 +363,29 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
     };
 
     String? paymentUrl;
-    await BaseClient.safeApiCall(
-      orderPlaceUrl,
-      RequestType.post,
-      data: data,
-      headers: headers,
-      onSuccess: (response) {
-        state = state.copyWith(isLoading: false);
-        if (response.data != null && response.data['status'] == true) {
-          final checkoutModel = CourseCheckoutModel.fromJson(response.data);
-          state = state.copyWith(dataModel: checkoutModel);
-          paymentUrl = checkoutModel.paymentUrl?.toString();
-        } else {
-          CustomSnackBar.showCustomToast(
-            title: 'Something Went Wrong!',
-            message: response.data?['message']?.toString() ?? '',
-          );
-        }
-      },
-      onError: (err) {
-        state = state.copyWith(isLoading: false);
-        CustomSnackBar.showCustomErrorToast(
-          message: 'পেমেন্ট প্রসেসিং ব্যর্থ হয়েছে',
+    try {
+      final response = await _client.post(
+        orderPlaceUrl,
+        data: data,
+        headers: headers,
+      );
+      state = state.copyWith(isLoading: false);
+      if (response.data != null && response.data['status'] == true) {
+        final checkoutModel = CourseCheckoutModel.fromJson(response.data);
+        state = state.copyWith(dataModel: checkoutModel);
+        paymentUrl = checkoutModel.paymentUrl?.toString();
+      } else {
+        CustomSnackBar.showCustomToast(
+          title: 'Something Went Wrong!',
+          message: response.data?['message']?.toString() ?? '',
         );
-      },
-    );
+      }
+    } catch (err) {
+      state = state.copyWith(isLoading: false);
+      CustomSnackBar.showCustomErrorToast(
+        message: 'পেমেন্ট প্রসেসিং ব্যর্থ হয়েছে',
+      );
+    }
     return paymentUrl;
   }
 
@@ -417,46 +402,44 @@ class CourseCheckoutNotifier extends Notifier<CourseCheckoutState> {
       'price': price,
     };
 
-    await BaseClient.safeApiCall(
-      url,
-      headers: headers,
-      RequestType.post,
-      data: data,
-      onSuccess: (response) {
-        final status = response.data['status'];
-        final message = response.data['message']?.toString() ?? '';
+    try {
+      final response = await _client.post(
+        url,
+        headers: headers,
+        data: data,
+      );
+      final status = response.data['status'];
+      final message = response.data['message']?.toString() ?? '';
 
-        if (status == true) {
-          final discount = int.tryParse(response.data['discount']?.toString() ?? '') ?? -1;
-          final total = int.tryParse(response.data['discount_price']?.toString() ?? '') ?? -1;
-          state = state.copyWith(
-            couponStatus: ApiCallStatus.success,
-            appliedCouponMessage: message,
-            discountAmount: discount,
-            totalAmount: total,
-          );
-          CustomSnackBar.showCustomToast(message: message);
-        } else {
-          state = state.copyWith(
-            couponStatus: ApiCallStatus.error,
-            appliedCouponMessage: '',
-            discountAmount: -1,
-            totalAmount: -1,
-          );
-          CustomSnackBar.showCustomErrorToast(message: message);
-        }
-      },
-      onError: (error) {
+      if (status == true) {
+        final discount = int.tryParse(response.data['discount']?.toString() ?? '') ?? -1;
+        final total = int.tryParse(response.data['discount_price']?.toString() ?? '') ?? -1;
+        state = state.copyWith(
+          couponStatus: ApiCallStatus.success,
+          appliedCouponMessage: message,
+          discountAmount: discount,
+          totalAmount: total,
+        );
+        CustomSnackBar.showCustomToast(message: message);
+      } else {
         state = state.copyWith(
           couponStatus: ApiCallStatus.error,
           appliedCouponMessage: '',
           discountAmount: -1,
           totalAmount: -1,
         );
-        debugPrint('Coupon API error: $error');
-        CustomSnackBar.showCustomErrorToast(message: 'সার্ভারে সমস্যা হয়েছে');
-      },
-    );
+        CustomSnackBar.showCustomErrorToast(message: message);
+      }
+    } catch (error) {
+      state = state.copyWith(
+        couponStatus: ApiCallStatus.error,
+        appliedCouponMessage: '',
+        discountAmount: -1,
+        totalAmount: -1,
+      );
+      debugPrint('Coupon API error: $error');
+      CustomSnackBar.showCustomErrorToast(message: 'সার্ভারে সমস্যা হয়েছে');
+    }
   }
 }
 
@@ -501,6 +484,11 @@ class LectureSheetListState {
 }
 
 class LectureSheetListNotifier extends Notifier<LectureSheetListState> {
+  final RestClient _client;
+
+  LectureSheetListNotifier({RestClient? client})
+      : _client = client ?? RestClient();
+
   @override
   LectureSheetListState build() {
     Future.microtask(fetchCategories);
@@ -515,31 +503,27 @@ class LectureSheetListNotifier extends Notifier<LectureSheetListState> {
     );
 
     final url = '${AppConstants.lectureSheetCategories}?page=${state.currentPage}';
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data != null && response.data['status'] == true) {
-          final model = LectureSheetListCategoriesModel.fromJson(response.data);
-          final newCategories = model.categories?.data ?? [];
-          final isLast = model.categories?.currentPage == model.categories?.lastPage;
+    try {
+      final response = await _client.get(url);
+      if (response.data != null && response.data['status'] == true) {
+        final model = LectureSheetListCategoriesModel.fromJson(response.data);
+        final newCategories = model.categories?.data ?? [];
+        final isLast = model.categories?.currentPage == model.categories?.lastPage;
 
-          state = state.copyWith(
-            categories: [...state.categories, ...newCategories],
-            currentPage: state.currentPage + (newCategories.isNotEmpty ? 1 : 0),
-            isLastPage: newCategories.isEmpty || isLast,
-            status: ApiCallStatus.success,
-            isLoading: false,
-          );
-        } else {
-          state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
-        }
-      },
-      onError: (error) {
+        state = state.copyWith(
+          categories: [...state.categories, ...newCategories],
+          currentPage: state.currentPage + (newCategories.isNotEmpty ? 1 : 0),
+          isLastPage: newCategories.isEmpty || isLast,
+          status: ApiCallStatus.success,
+          isLoading: false,
+        );
+      } else {
         state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
-        debugPrint('Pagination Error: $error');
-      },
-    );
+      }
+    } catch (error) {
+      state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+      debugPrint('Pagination Error: $error');
+    }
   }
 }
 
@@ -570,7 +554,10 @@ class SheetDetailsState {
 
 class SheetDetailsNotifier extends Notifier<SheetDetailsState> {
   final int sheetId;
-  SheetDetailsNotifier(this.sheetId);
+  final RestClient _client;
+
+  SheetDetailsNotifier(this.sheetId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   SheetDetailsState build() {
@@ -581,25 +568,21 @@ class SheetDetailsNotifier extends Notifier<SheetDetailsState> {
   Future<void> fetchSheetDetails(int id) async {
     state = state.copyWith(status: ApiCallStatus.loading);
     final url = '${AppConstants.lectureSheet}/$id';
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (dynamic response) {
-        final data = response.data;
-        if (data != null && data['status'] == true) {
-          state = state.copyWith(
-            model: LectureSheetDetailsModel.fromJson(data),
-            status: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(status: ApiCallStatus.error);
-        }
-      },
-      onError: (error) {
+    try {
+      final response = await _client.get(url);
+      final data = response.data;
+      if (data != null && data['status'] == true) {
+        state = state.copyWith(
+          model: LectureSheetDetailsModel.fromJson(data),
+          status: ApiCallStatus.success,
+        );
+      } else {
         state = state.copyWith(status: ApiCallStatus.error);
-        debugPrint('Error: $error');
-      },
-    );
+      }
+    } catch (error) {
+      state = state.copyWith(status: ApiCallStatus.error);
+      debugPrint('Error: $error');
+    }
   }
 }
 
@@ -647,7 +630,10 @@ class LectureSheetListDetailsState {
 class LectureSheetListDetailsNotifier
     extends Notifier<LectureSheetListDetailsState> {
   final int categoryId;
-  LectureSheetListDetailsNotifier(this.categoryId);
+  final RestClient _client;
+
+  LectureSheetListDetailsNotifier(this.categoryId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   LectureSheetListDetailsState build() {
@@ -665,33 +651,29 @@ class LectureSheetListDetailsNotifier
     final url =
         '${AppConstants.lectureSheetCategories}/$id?page=${state.currentPage}';
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        final data = response.data;
-        if (data != null && data['status'] == true) {
-          final model = LectureSheetCategory.fromJson(data);
-          final sheets = model.lecturesheets?.data ?? [];
-          final isLast = model.lecturesheets?.currentPage == model.lecturesheets?.lastPage;
+    try {
+      final response = await _client.get(url);
+      final data = response.data;
+      if (data != null && data['status'] == true) {
+        final model = LectureSheetCategory.fromJson(data);
+        final sheets = model.lecturesheets?.data ?? [];
+        final isLast = model.lecturesheets?.currentPage == model.lecturesheets?.lastPage;
 
-          state = state.copyWith(
-            detailsModel: model,
-            lectureSheets: [...state.lectureSheets, ...sheets],
-            currentPage: state.currentPage + (sheets.isNotEmpty ? 1 : 0),
-            isLastPage: sheets.isEmpty || isLast,
-            status: ApiCallStatus.success,
-            isLoading: false,
-          );
-        } else {
-          state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
-        }
-      },
-      onError: (error) {
+        state = state.copyWith(
+          detailsModel: model,
+          lectureSheets: [...state.lectureSheets, ...sheets],
+          currentPage: state.currentPage + (sheets.isNotEmpty ? 1 : 0),
+          isLastPage: sheets.isEmpty || isLast,
+          status: ApiCallStatus.success,
+          isLoading: false,
+        );
+      } else {
         state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
-        debugPrint('Error: $error');
-      },
-    );
+      }
+    } catch (error) {
+      state = state.copyWith(status: ApiCallStatus.error, isLoading: false);
+      debugPrint('Error: $error');
+    }
   }
 }
 
@@ -746,7 +728,10 @@ class CourseLearnState {
 
 class CourseLearnNotifier extends Notifier<CourseLearnState> {
   final int courseId;
-  CourseLearnNotifier(this.courseId);
+  final RestClient _client;
+
+  CourseLearnNotifier(this.courseId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   CourseLearnState build() {
@@ -782,54 +767,44 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
         fetchUrl = "${AppConstants.courseLearn}/$cId?item=$itemID";
       }
 
-      await BaseClient.safeApiCall(
+      final response = await _client.get(
         fetchUrl,
-        RequestType.get,
         headers: {'Authorization': 'Bearer $token'},
-        onSuccess: (response) {
-          if (response.data != null && response.data["status"] == true) {
-            final data = CourseLearningModel.fromJson(response.data);
-            final currentVideoUrl = data.data?.currentItem?.youtubeVideo ?? '';
-            String? extractedId;
-            if (currentVideoUrl.isNotEmpty) {
-              final uri = Uri.tryParse(currentVideoUrl);
-              if (uri != null) {
-                if (uri.host.contains('youtu.be') && uri.pathSegments.isNotEmpty) {
-                  extractedId = uri.pathSegments.first;
-                } else if (uri.host.contains('youtube.com')) {
-                  extractedId = uri.queryParameters['v'];
-                }
-              }
-            }
-
-            state = state.copyWith(
-              model: data,
-              videoId: extractedId,
-              isLoading: false,
-              status: ApiCallStatus.success,
-            );
-            if (onVideoReady != null) {
-              onVideoReady(extractedId);
-            }
-          } else {
-            final msg = response.data?['message']?.toString() ?? 'Something went wrong';
-            state = state.copyWith(
-              isLoading: false,
-              status: ApiCallStatus.error,
-              errorMessage: msg,
-            );
-            if (onError != null) onError(msg);
-          }
-        },
-        onError: (err) {
-          state = state.copyWith(
-            isLoading: false,
-            status: ApiCallStatus.error,
-            errorMessage: err.message,
-          );
-          if (onError != null) onError(err.message);
-        },
       );
+
+      if (response.data != null && response.data["status"] == true) {
+        final data = CourseLearningModel.fromJson(response.data);
+        final currentVideoUrl = data.data?.currentItem?.youtubeVideo ?? '';
+        String? extractedId;
+        if (currentVideoUrl.isNotEmpty) {
+          final uri = Uri.tryParse(currentVideoUrl);
+          if (uri != null) {
+            if (uri.host.contains('youtu.be') && uri.pathSegments.isNotEmpty) {
+              extractedId = uri.pathSegments.first;
+            } else if (uri.host.contains('youtube.com')) {
+              extractedId = uri.queryParameters['v'];
+            }
+          }
+        }
+
+        state = state.copyWith(
+          model: data,
+          videoId: extractedId,
+          isLoading: false,
+          status: ApiCallStatus.success,
+        );
+        if (onVideoReady != null) {
+          onVideoReady(extractedId);
+        }
+      } else {
+        final msg = response.data?['message']?.toString() ?? 'Something went wrong';
+        state = state.copyWith(
+          isLoading: false,
+          status: ApiCallStatus.error,
+          errorMessage: msg,
+        );
+        if (onError != null) onError(msg);
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

@@ -3,6 +3,10 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/blog/blog.dart';
 
 class BlogRepository {
+  final RestClient _client;
+
+  BlogRepository({RestClient? client}) : _client = client ?? RestClient();
+
   /// Fetch list of blog articles with optional category filter
   Future<List<BlogPost>> getBlogs({String? category}) async {
     try {
@@ -11,7 +15,7 @@ class BlogRepository {
         query['category'] = category;
       }
 
-      final response = await ApiClient.get(
+      final response = await _client.get(
         AppConstants.v1Blogs,
         queryParameters: query.isNotEmpty ? query : null,
       );
@@ -39,7 +43,7 @@ class BlogRepository {
   /// Fetch single blog detail by slug or ID
   Future<BlogPost?> getBlogDetail(String idOrSlug) async {
     try {
-      final response = await ApiClient.get('${AppConstants.v1Blogs}/$idOrSlug');
+      final response = await _client.get('${AppConstants.v1Blogs}/$idOrSlug');
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data is Map && response.data['data'] != null
             ? response.data['data'] as Map<String, dynamic>

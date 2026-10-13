@@ -7,6 +7,7 @@ import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/di/network_provider.dart';
 import 'package:lokkha/shared/models/package.dart';
 
 class PremiumPackageCheckoutView extends ConsumerStatefulWidget {
@@ -86,45 +87,43 @@ class _PremiumPackageCheckoutViewState
       'price': widget.packagesModel.regularPrice.toString(),
     };
 
-    await BaseClient.safeApiCall(
-      AppConstants.couponApply,
-      headers: headers,
-      RequestType.post,
-      data: data,
-      onSuccess: (response) {
-        if (!mounted) return;
-        final status = response.data["status"];
-        final message = response.data["message"]?.toString() ?? '';
+    try {
+      final response = await ref.read(restClientProvider).post(
+        AppConstants.couponApply,
+        headers: headers,
+        data: data,
+      );
+      if (!mounted) return;
+      final status = response.data["status"];
+      final message = response.data["message"]?.toString() ?? '';
 
-        if (status == true) {
-          setState(() {
-            _isApplyingCoupon = false;
-            _discountAmount =
-                int.tryParse(response.data["discount"].toString()) ?? -1;
-            _totalAmount =
-                int.tryParse(response.data["discount_price"].toString()) ?? -1;
-          });
-          CustomSnackBar.showCustomToast(message: message);
-        } else {
-          setState(() {
-            _isApplyingCoupon = false;
-            _discountAmount = -1;
-            _totalAmount = -1;
-          });
-          CustomSnackBar.showCustomErrorToast(message: message);
-        }
-      },
-      onError: (error) {
-        if (!mounted) return;
+      if (status == true) {
+        setState(() {
+          _isApplyingCoupon = false;
+          _discountAmount =
+              int.tryParse(response.data["discount"].toString()) ?? -1;
+          _totalAmount =
+              int.tryParse(response.data["discount_price"].toString()) ?? -1;
+        });
+        CustomSnackBar.showCustomToast(message: message);
+      } else {
         setState(() {
           _isApplyingCoupon = false;
           _discountAmount = -1;
           _totalAmount = -1;
         });
-        debugPrint("Coupon API error: $error");
-        CustomSnackBar.showCustomErrorToast(message: "সার্ভারে সমস্যা হয়েছে");
-      },
-    );
+        CustomSnackBar.showCustomErrorToast(message: message);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isApplyingCoupon = false;
+        _discountAmount = -1;
+        _totalAmount = -1;
+      });
+      debugPrint("Coupon API error: $error");
+      CustomSnackBar.showCustomErrorToast(message: "সার্ভারে সমস্যা হয়েছে");
+    }
   }
 
   void _onToggleCoupon(bool? value) {
@@ -164,38 +163,36 @@ class _PremiumPackageCheckoutViewState
       'payment_method': _selectedPaymentMethod,
     };
 
-    await BaseClient.safeApiCall(
-      orderPlaceUrl,
-      RequestType.post,
-      data: data,
-      headers: headers,
-      onSuccess: (response) {
-        if (!mounted) return;
-        setState(() => _isLoadingPayment = false);
+    try {
+      final response = await ref.read(restClientProvider).post(
+        orderPlaceUrl,
+        data: data,
+        headers: headers,
+      );
+      if (!mounted) return;
+      setState(() => _isLoadingPayment = false);
 
-        if (response.data["status"] == true) {
-          final checkoutData = PackageCheckoutModel.fromJson(response.data);
-          final paymentUrl = checkoutData.paymentUrl.toString();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PaymentWebView(url: paymentUrl),
-            ),
-          );
-        } else {
-          CustomSnackBar.showCustomToast(
-            title: "Something Went Wrong!",
-            message: response.data["message"]?.toString() ?? '',
-          );
-        }
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() => _isLoadingPayment = false);
-        CustomSnackBar.showCustomErrorToast(
-          message: 'পেমেন্ট প্রক্রিয়া সম্পন্ন করা যায়নি।',
+      if (response.data["status"] == true) {
+        final checkoutData = PackageCheckoutModel.fromJson(response.data);
+        final paymentUrl = checkoutData.paymentUrl.toString();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => PaymentWebView(url: paymentUrl),
+          ),
         );
-      },
-    );
+      } else {
+        CustomSnackBar.showCustomToast(
+          title: "Something Went Wrong!",
+          message: response.data["message"]?.toString() ?? '',
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isLoadingPayment = false);
+      CustomSnackBar.showCustomErrorToast(
+        message: 'পেমেন্ট প্রক্রিয়া সম্পন্ন করা যায়নি।',
+      );
+    }
   }
 
   @override

@@ -29,6 +29,10 @@ class PremiumPackagesState {
 }
 
 class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
+  final RestClient _client;
+
+  PremiumPackagesNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   PremiumPackagesState build() {
     Future.microtask(fetchPremiumPackages);
@@ -37,31 +41,27 @@ class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
 
   Future<void> fetchPremiumPackages() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
-    await BaseClient.safeApiCall(
-      AppConstants.premiumPackage,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final model = PremiumPackageModel.fromJson(response.data);
-          state = state.copyWith(
-            isLoading: false,
-            packages: model.packages ?? [],
-          );
-        } else {
-          state = state.copyWith(
-            isLoading: false,
-            errorMessage: response.data['message']?.toString(),
-          );
-        }
-      },
-      onError: (error) {
-        debugPrint("Error fetching packages: $error");
+    try {
+      final response = await _client.get(AppConstants.premiumPackage);
+      if (response.data['status'] == true) {
+        final model = PremiumPackageModel.fromJson(response.data);
         state = state.copyWith(
           isLoading: false,
-          errorMessage: error.toString(),
+          packages: model.packages ?? [],
         );
-      },
-    );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: response.data['message']?.toString(),
+        );
+      }
+    } catch (error) {
+      debugPrint("Error fetching packages: $error");
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: error.toString(),
+      );
+    }
   }
 }
 

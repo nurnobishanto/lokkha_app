@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/constants/app_strings.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 import '../errors/exceptions.dart';
 import '../storage/secure_storage_service.dart';
@@ -63,13 +59,25 @@ class RestClient {
   Dio get rawDio => _dio;
   Dio get client => _dio;
 
+  Options? _mergeOptions(Options? options, Map<String, dynamic>? headers) {
+    if (headers == null || headers.isEmpty) return options;
+    final merged = options ?? Options();
+    merged.headers = {...?merged.headers, ...headers};
+    return merged;
+  }
+
   Future<Response<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
     Options? options,
   }) async {
     try {
-      return await _dio.get<T>(path, queryParameters: queryParameters, options: options);
+      return await _dio.get<T>(
+        path,
+        queryParameters: queryParameters,
+        options: _mergeOptions(options, headers),
+      );
     } on DioException catch (e) {
       throw _unwrapException(e);
     } catch (e) {
@@ -81,10 +89,16 @@ class RestClient {
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
     Options? options,
   }) async {
     try {
-      return await _dio.post<T>(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.post<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _mergeOptions(options, headers),
+      );
     } on DioException catch (e) {
       throw _unwrapException(e);
     } catch (e) {
@@ -96,10 +110,16 @@ class RestClient {
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
     Options? options,
   }) async {
     try {
-      return await _dio.put<T>(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.put<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _mergeOptions(options, headers),
+      );
     } on DioException catch (e) {
       throw _unwrapException(e);
     } catch (e) {
@@ -111,10 +131,16 @@ class RestClient {
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
     Options? options,
   }) async {
     try {
-      return await _dio.patch<T>(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.patch<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _mergeOptions(options, headers),
+      );
     } on DioException catch (e) {
       throw _unwrapException(e);
     } catch (e) {
@@ -126,10 +152,16 @@ class RestClient {
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
     Options? options,
   }) async {
     try {
-      return await _dio.delete<T>(path, data: data, queryParameters: queryParameters, options: options);
+      return await _dio.delete<T>(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: _mergeOptions(options, headers),
+      );
     } on DioException catch (e) {
       throw _unwrapException(e);
     } catch (e) {
@@ -197,319 +229,3 @@ class RestClient {
   }
 }
 
-/// Backward compatibility alias
-typedef DioClient = RestClient;
-
-/// Static facade and BaseClient adapter for Clean Architecture data sources and legacy controllers
-class ApiClient {
-  ApiClient._();
-  factory ApiClient() => _shared;
-  static final ApiClient _shared = ApiClient._();
-
-  static RestClient? _customClient;
-  static RestClient get instance => _customClient ??= RestClient();
-  static set customClient(RestClient client) => _customClient = client;
-
-  static Dio get dio => instance.rawDio;
-
-  static void init({Dio? customDio}) {
-    if (customDio != null) {
-      _customClient = RestClient(dio: customDio);
-    }
-  }
-
-  static Future<Response<T>> get<T>(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onReceiveProgress,
-  }) =>
-      instance.get<T>(path, queryParameters: queryParameters, options: options);
-
-  static Future<Response<T>> post<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) =>
-      instance.post<T>(path, data: data, queryParameters: queryParameters, options: options);
-
-  static Future<Response<T>> put<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) =>
-      instance.put<T>(path, data: data, queryParameters: queryParameters, options: options);
-
-  static Future<Response<T>> patch<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) =>
-      instance.patch<T>(path, data: data, queryParameters: queryParameters, options: options);
-
-  static Future<Response<T>> delete<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) =>
-      instance.delete<T>(path, data: data, queryParameters: queryParameters, options: options);
-
-  static Future<Response> download(
-    String urlPath,
-    dynamic savePath, {
-    ProgressCallback? onReceiveProgress,
-    Map<String, dynamic>? queryParameters,
-    CancelToken? cancelToken,
-    bool deleteOnError = true,
-    String lengthHeader = Headers.contentLengthHeader,
-    Object? data,
-    Options? options,
-  }) =>
-      instance.download(
-        urlPath,
-        savePath,
-        onReceiveProgress: onReceiveProgress,
-        queryParameters: queryParameters,
-        cancelToken: cancelToken,
-        deleteOnError: deleteOnError,
-        lengthHeader: lengthHeader,
-        data: data,
-        options: options,
-      );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legacy BaseClient Adapter
-// ─────────────────────────────────────────────────────────────────────────────
-
-enum RequestType {
-  get,
-  post,
-  put,
-  delete,
-}
-
-class BaseClient {
-  static Dio get dio => ApiClient.dio;
-  static Dio get _dio => ApiClient.dio;
-
-  static Future<void> safeApiCall(
-    String url,
-    RequestType requestType, {
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? queryParameters,
-    required Function(Response response) onSuccess,
-    Function(ApiException)? onError,
-    Function(int value, int progress)? onReceiveProgress,
-    Function(int total, int progress)? onSendProgress,
-    Function? onLoading,
-    dynamic data,
-  }) async {
-    try {
-      await onLoading?.call();
-
-      final options = headers != null ? Options(headers: headers) : null;
-      late Response response;
-
-      switch (requestType) {
-        case RequestType.get:
-          response = await _dio.get(
-            url,
-            onReceiveProgress: onReceiveProgress,
-            queryParameters: queryParameters,
-            options: options,
-          );
-          break;
-        case RequestType.post:
-          response = await _dio.post(
-            url,
-            data: data,
-            onReceiveProgress: onReceiveProgress,
-            onSendProgress: onSendProgress,
-            queryParameters: queryParameters,
-            options: options,
-          );
-          break;
-        case RequestType.put:
-          response = await _dio.put(
-            url,
-            data: data,
-            onReceiveProgress: onReceiveProgress,
-            onSendProgress: onSendProgress,
-            queryParameters: queryParameters,
-            options: options,
-          );
-          break;
-        case RequestType.delete:
-          response = await _dio.delete(
-            url,
-            data: data,
-            queryParameters: queryParameters,
-            options: options,
-          );
-          break;
-      }
-
-      await onSuccess(response);
-    } on DioException catch (error) {
-      _handleDioError(error: error, url: url, onError: onError);
-    } on SocketException {
-      _handleSocketException(url: url, onError: onError);
-    } on TimeoutException {
-      _handleTimeoutException(url: url, onError: onError);
-    } catch (error) {
-      _handleUnexpectedException(url: url, onError: onError, error: error);
-    }
-  }
-
-  static Future<void> download({
-    required String url,
-    required String savePath,
-    Function(ApiException)? onError,
-    Function(int value, int progress)? onReceiveProgress,
-    required Function onSuccess,
-  }) async {
-    try {
-      await _dio.download(
-        url,
-        savePath,
-        options: Options(
-          receiveTimeout: const Duration(milliseconds: 9999),
-          sendTimeout: const Duration(milliseconds: 9999),
-        ),
-        onReceiveProgress: onReceiveProgress,
-      );
-      onSuccess();
-    } catch (error) {
-      final exception = ApiException(url: url, message: error.toString());
-      onError?.call(exception) ?? _handleError(error.toString());
-    }
-  }
-
-  static void _handleUnexpectedException({
-    Function(ApiException)? onError,
-    required String url,
-    required Object error,
-  }) {
-    if (kDebugMode) debugPrint("[BaseClient] Unexpected error: $error");
-    final message = Strings.somethingWentWrong;
-    if (onError != null) {
-      onError(ApiException(message: message, url: url));
-    } else {
-      _handleError(message);
-    }
-  }
-
-  static void _handleTimeoutException({
-    Function(ApiException)? onError,
-    required String url,
-  }) {
-    if (kDebugMode) debugPrint("[BaseClient] Timeout error on $url");
-    final message = Strings.serverNotResponding;
-    if (onError != null) {
-      onError(ApiException(message: message, url: url));
-    } else {
-      _handleError(message);
-    }
-  }
-
-  static void _handleSocketException({
-    Function(ApiException)? onError,
-    required String url,
-  }) {
-    if (kDebugMode) debugPrint("[BaseClient] No internet connection for $url");
-    final message = Strings.noInternetConnection;
-    if (onError != null) {
-      onError(ApiException(message: message, url: url));
-    } else {
-      _handleError(message);
-    }
-  }
-
-  static void _handleDioError({
-    required DioException error,
-    Function(ApiException)? onError,
-    required String url,
-  }) {
-    if (kDebugMode) debugPrint("[BaseClient] Dio error on $url: ${error.message}");
-
-    final statusCode = error.response?.statusCode;
-
-    if (statusCode == 401) {
-      final isAuthEndpoint = url.contains('/auth/') ||
-          url.contains('login') ||
-          url.contains('send-otp') ||
-          url.contains('check-phone');
-
-      if (!isAuthEndpoint) {
-        String? serverMsg;
-        if (error.response?.data is Map) {
-          serverMsg = error.response?.data['message']?.toString();
-        }
-        final exception = ApiException(
-          message: serverMsg ?? 'আপনার সেশনের মেয়াদ শেষ হয়ে গেছে। অনুগ্রহ করে পুনরায় লগইন করুন।',
-          url: url,
-          statusCode: 401,
-          response: error.response,
-        );
-        if (onError != null) {
-          return onError(exception);
-        }
-        return;
-      }
-    }
-
-    if (statusCode == 404) {
-      final message = Strings.urlNotFound;
-      final exception = ApiException(message: message, url: url, statusCode: 404);
-      if (onError != null) {
-        return onError(exception);
-      } else {
-        _handleError(message);
-      }
-      return;
-    }
-
-    if (statusCode != null && statusCode >= 500) {
-      final message = Strings.serverNotResponding;
-      final exception = ApiException(message: message, url: url, statusCode: statusCode);
-      if (onError != null) {
-        return onError(exception);
-      } else {
-        _handleError(message);
-      }
-      return;
-    }
-
-    var exception = ApiException(
-      url: url,
-      message: error.message ?? Strings.somethingWentWrong,
-      response: error.response,
-      statusCode: statusCode,
-    );
-    if (onError != null) {
-      return onError(exception);
-    } else {
-      _handleError(exception.message);
-    }
-  }
-
-  static void _handleError(String msg) {
-    CustomSnackBar.showCustomErrorToast(message: msg);
-  }
-}

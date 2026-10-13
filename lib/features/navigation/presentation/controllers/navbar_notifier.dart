@@ -67,7 +67,7 @@ class NavbarNotifier extends Notifier<NavbarState> {
     state = state.copyWith(profileStatus: ApiCallStatus.loading);
 
     try {
-      final response = await ApiClient.get(AppConstants.v1UserProfile);
+      final response = await RestClient().get(AppConstants.v1UserProfile);
       if (response.statusCode == 200 && response.data is Map) {
         final profile = ProfileDataModel.fromJson(response.data as Map<String, dynamic>);
         if (profile.status == true && profile.user != null) {

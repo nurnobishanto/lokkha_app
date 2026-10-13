@@ -123,6 +123,10 @@ class LatestContestState {
 
 class LatestContestNotifier extends Notifier<LatestContestState> {
   Timer? _tickerTimer;
+  final RestClient _client;
+
+  LatestContestNotifier({RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   LatestContestState build() {
@@ -227,105 +231,93 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
   Future<void> fetchContest() async {
     state = state.copyWith(isLoading: true);
     final url = AppConstants.latestContest;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final model = LatestContestModel.fromJson(response.data);
-          final img = model.contest?.image != null
-              ? '${AppConstants.storageUrl}${model.contest!.image}'
-              : state.imageUrl;
-          state = state.copyWith(
-            isLoading: false,
-            contestModel: model,
-            imageUrl: img,
-          );
-          _updateAllTimers();
-        } else {
-          state = state.copyWith(isLoading: false);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final model = LatestContestModel.fromJson(response.data);
+        final img = model.contest?.image != null
+            ? '${AppConstants.storageUrl}${model.contest!.image}'
+            : state.imageUrl;
+        state = state.copyWith(
+          isLoading: false,
+          contestModel: model,
+          imageUrl: img,
+        );
+        _updateAllTimers();
+      } else {
         state = state.copyWith(isLoading: false);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> fetchAllContest() async {
     state = state.copyWith(isLoading: true);
     final url = AppConstants.allContestList;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final model = AllContestModel.fromJson(response.data);
-          state = state.copyWith(
-            isLoading: false,
-            allContestModel: model,
-          );
-          _updateAllTimers();
-        } else {
-          state = state.copyWith(isLoading: false);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final model = AllContestModel.fromJson(response.data);
+        state = state.copyWith(
+          isLoading: false,
+          allContestModel: model,
+        );
+        _updateAllTimers();
+      } else {
         state = state.copyWith(isLoading: false);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> fetchContestResult() async {
     state = state.copyWith(isResultLoading: true);
     final url = AppConstants.latestContestResult;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final model = ContestResultModel.fromJson(response.data);
-          final results = model.contestResults ?? [];
-          final List<RankCardUser> list = [];
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final model = ContestResultModel.fromJson(response.data);
+        final results = model.contestResults ?? [];
+        final List<RankCardUser> list = [];
 
-          for (int i = 0; i < results.length; i++) {
-            final result = results[i];
-            if (result.user == null) continue;
-            final sl = i == 0
-                ? 1
-                : i == 1
-                    ? 0
-                    : i;
-            final userImg = AppConstants.resolveUrl(
-                result.user!.image ?? result.user!.avatar);
-            list.add(
-              RankCardUser(
-                userId: result.user!.userId?.toString() ?? '',
-                rank: i + 1,
-                image: userImg.isNotEmpty
-                    ? userImg
-                    : 'https://lokkha.com/uploads/files/shares/app/avatar.png',
-                sl: sl,
-                resultId: result.id?.toInt() ?? 0,
-                user: result.user!,
-              ),
-            );
-          }
-          list.sort((a, b) => a.sl.compareTo(b.sl));
-
-          state = state.copyWith(
-            isResultLoading: false,
-            lastContestResultModel: model,
-            rankUsers: list,
+        for (int i = 0; i < results.length; i++) {
+          final result = results[i];
+          if (result.user == null) continue;
+          final sl = i == 0
+              ? 1
+              : i == 1
+                  ? 0
+                  : i;
+          final userImg = AppConstants.resolveUrl(
+              result.user!.image ?? result.user!.avatar);
+          list.add(
+            RankCardUser(
+              userId: result.user!.userId?.toString() ?? '',
+              rank: i + 1,
+              image: userImg.isNotEmpty
+                  ? userImg
+                  : 'https://lokkha.com/uploads/files/shares/app/avatar.png',
+              sl: sl,
+              resultId: result.id?.toInt() ?? 0,
+              user: result.user!,
+            ),
           );
-        } else {
-          state = state.copyWith(isResultLoading: false);
         }
-      },
-      onError: (_) {
+        list.sort((a, b) => a.sl.compareTo(b.sl));
+
+        state = state.copyWith(
+          isResultLoading: false,
+          lastContestResultModel: model,
+          rankUsers: list,
+        );
+      } else {
         state = state.copyWith(isResultLoading: false);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(isResultLoading: false);
+    }
   }
 
   Future<void> startContest(BuildContext context, int id) async {
@@ -339,38 +331,37 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
       return;
     }
 
-    await BaseClient.safeApiCall(
-      '${AppConstants.startContest}$id/start',
-      RequestType.post,
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final data = ContestStartModel.fromJson(response.data);
+    try {
+      final response = await _client.post(
+        '${AppConstants.startContest}$id/start',
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.data['status'] == true) {
+        final data = ContestStartModel.fromJson(response.data);
+        if (context.mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ContestExamView(examStartModel: data),
+            ),
+          );
+        }
+      } else if (response.data['status'] == false) {
+        if (response.data['package_required'] == true) {
           if (context.mounted) {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ContestExamView(examStartModel: data),
+                builder: (_) => const PremiumPackagesView(),
               ),
             );
           }
-        } else if (response.data['status'] == false) {
-          if (response.data['package_required'] == true) {
-            if (context.mounted) {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const PremiumPackagesView(),
-                ),
-              );
-            }
-          }
-          CustomSnackBar.showCustomErrorToast(
-            message: response.data['message']?.toString() ?? '',
-          );
         }
-      },
-    );
+        CustomSnackBar.showCustomErrorToast(
+          message: response.data['message']?.toString() ?? '',
+        );
+      }
+    } catch (_) {}
   }
 }
 
@@ -420,9 +411,11 @@ class ContestExamState {
 
 class ContestExamNotifier extends Notifier<ContestExamState> {
   final ContestStartModel exam;
+  final RestClient _client;
   Timer? _timer;
 
-  ContestExamNotifier(this.exam);
+  ContestExamNotifier(this.exam, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   ContestExamState build() {
@@ -503,31 +496,29 @@ class ContestExamNotifier extends Notifier<ContestExamState> {
       'user_answers': userAnswersArray,
     };
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.post,
-      headers: headers,
-      data: data,
-      onSuccess: (response) async {
-        if (response.data['status'] == true) {
-          await MySharedPref.clearMockSubjects();
-          final modelData = ContestSubmitModel.fromJson(response.data);
-          state = state.copyWith(isLoading: false);
-          if (context != null && context.mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => ContestSubmitView(model: modelData),
-              ),
-            );
-          }
-        } else {
-          state = state.copyWith(isLoading: false);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.post(
+        url,
+        headers: headers,
+        data: data,
+      );
+      if (response.data['status'] == true) {
+        await MySharedPref.clearMockSubjects();
+        final modelData = ContestSubmitModel.fromJson(response.data);
         state = state.copyWith(isLoading: false);
-      },
-    );
+        if (context != null && context.mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => ContestSubmitView(model: modelData),
+            ),
+          );
+        }
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 }
 

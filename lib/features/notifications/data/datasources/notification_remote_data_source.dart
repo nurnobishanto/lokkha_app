@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:lokkha/core/constants/app_constants.dart';
+import 'package:lokkha/core/errors/exceptions.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import '../models/notification_model.dart';
@@ -14,34 +15,31 @@ abstract class NotificationRemoteDataSource {
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
+  final RestClient _client;
+
+  NotificationRemoteDataSourceImpl({RestClient? client})
+      : _client = client ?? RestClient();
+
   @override
   Future<NotificationModel> fetchNotifications({required String? deviceId}) async {
-    final completer = Completer<NotificationModel>();
     final token = MySharedPref.getUserToken();
     final headers = {
       'Authorization': 'Bearer $token',
     };
     final url = "${AppConstants.notifications}?device_id=$deviceId";
 
-    BaseClient.safeApiCall(
+    final response = await _client.get(
       url,
-      RequestType.get,
       headers: headers,
-      onSuccess: (response) {
-        if (response.data["status"] == true) {
-          completer.complete(NotificationModel.fromJson(response.data));
-        } else {
-          completer.completeError(
-            response.data["message"] ?? "Failed to fetch notifications",
-          );
-        }
-      },
-      onError: (err) {
-        completer.completeError(err);
-      },
     );
 
-    return completer.future;
+    if (response.data["status"] == true) {
+      return NotificationModel.fromJson(response.data);
+    } else {
+      throw AppException(
+        response.data["message"]?.toString() ?? "Failed to fetch notifications",
+      );
+    }
   }
 
   @override
@@ -50,7 +48,6 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     required String? deviceId,
     required bool isRead,
   }) async {
-    final completer = Completer<bool>();
     final token = MySharedPref.getUserToken();
     final headers = {
       'Authorization': 'Bearer $token',
@@ -58,23 +55,12 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     final url = "${AppConstants.notifications}/$notificationId/read";
     final data = {'device_id': deviceId, 'is_read': isRead};
 
-    BaseClient.safeApiCall(
+    final response = await _client.post(
       url,
-      RequestType.post,
       headers: headers,
       data: data,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          completer.complete(true);
-        } else {
-          completer.complete(false);
-        }
-      },
-      onError: (err) {
-        completer.completeError(err);
-      },
     );
 
-    return completer.future;
+    return response.data['status'] == true;
   }
 }

@@ -39,6 +39,10 @@ class MockTestState {
 }
 
 class MockTestNotifier extends Notifier<MockTestState> {
+  final RestClient _client;
+
+  MockTestNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   MockTestState build() {
     Future.microtask(() => getRootSubjects());
@@ -52,31 +56,27 @@ class MockTestNotifier extends Notifier<MockTestState> {
     );
 
     final url = AppConstants.getSubjects;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final data = GetSubjectsModel.fromJson(response.data);
-          state = state.copyWith(
-            apiCallStatus: ApiCallStatus.success,
-            model: data,
-            isLoading: false,
-          );
-        } else {
-          state = state.copyWith(
-            apiCallStatus: ApiCallStatus.error,
-            isLoading: false,
-          );
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final data = GetSubjectsModel.fromJson(response.data);
+        state = state.copyWith(
+          apiCallStatus: ApiCallStatus.success,
+          model: data,
+          isLoading: false,
+        );
+      } else {
         state = state.copyWith(
           apiCallStatus: ApiCallStatus.error,
           isLoading: false,
         );
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(
+        apiCallStatus: ApiCallStatus.error,
+        isLoading: false,
+      );
+    }
   }
 }
 
@@ -115,8 +115,10 @@ class TopicSelectionState {
 
 class TopicSelectionNotifier extends Notifier<TopicSelectionState> {
   final int parentId;
+  final RestClient _client;
 
-  TopicSelectionNotifier(this.parentId);
+  TopicSelectionNotifier(this.parentId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   TopicSelectionState build() {
@@ -131,24 +133,20 @@ class TopicSelectionNotifier extends Notifier<TopicSelectionState> {
     state = state.copyWith(isLoading: true);
     final url = '${AppConstants.getSubjects}?parent_id=$parentId';
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final data = GetSubjectsModel.fromJson(response.data);
-          state = state.copyWith(
-            topics: data,
-            isLoading: false,
-          );
-        } else {
-          state = state.copyWith(isLoading: false);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final data = GetSubjectsModel.fromJson(response.data);
+        state = state.copyWith(
+          topics: data,
+          isLoading: false,
+        );
+      } else {
         state = state.copyWith(isLoading: false);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   Future<void> loadSelectedSubjects() async {

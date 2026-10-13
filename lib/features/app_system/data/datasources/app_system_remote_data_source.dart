@@ -12,6 +12,10 @@ abstract class AppSystemRemoteDataSource {
 }
 
 class AppSystemRemoteDataSourceImpl implements AppSystemRemoteDataSource {
+  final RestClient _client;
+
+  AppSystemRemoteDataSourceImpl({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   Future<AppInfoModel> getAppInfo({String? platform, dynamic versionCode}) async {
     try {
@@ -23,7 +27,7 @@ class AppSystemRemoteDataSourceImpl implements AppSystemRemoteDataSource {
         queryParams['version_code'] = versionCode.toString();
       }
 
-      final response = await ApiClient.get(
+      final response = await _client.get(
         AppConstants.v1AppInfo,
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
@@ -45,7 +49,7 @@ class AppSystemRemoteDataSourceImpl implements AppSystemRemoteDataSource {
     required dynamic versionCode,
   }) async {
     try {
-      final response = await ApiClient.post(
+      final response = await _client.post(
         AppConstants.v1AppInfoCheckUpdate,
         data: {
           'platform': platform,

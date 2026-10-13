@@ -46,6 +46,11 @@ class RandomQuestionState {
 }
 
 class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
+  final RestClient _client;
+
+  RandomQuestionNotifier({RestClient? client})
+      : _client = client ?? RestClient();
+
   @override
   RandomQuestionState build() {
     Future.microtask(() => getRandomQuestion());
@@ -74,30 +79,26 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
     final url =
         "${AppConstants.randomQuestion}?forceNew=$forceNew&deviceID=$deviceID";
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final data = RandomQuestionModel.fromJson(response.data);
-          MyGetStorage.writeCacheData(
-              MyGetStorage.randomQuestionKey, response.data);
-          state = state.copyWith(
-            randomQuestionModel: data,
-            isLoading: false,
-            randomQuestionPackage: response.data['package_required'] == true,
-          );
-        } else {
-          state = state.copyWith(
-            isLoading: false,
-            randomQuestionPackage: response.data['package_required'] == true,
-          );
-        }
-      },
-      onError: (_) {
-        state = state.copyWith(isLoading: false);
-      },
-    );
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final data = RandomQuestionModel.fromJson(response.data);
+        MyGetStorage.writeCacheData(
+            MyGetStorage.randomQuestionKey, response.data);
+        state = state.copyWith(
+          randomQuestionModel: data,
+          isLoading: false,
+          randomQuestionPackage: response.data['package_required'] == true,
+        );
+      } else {
+        state = state.copyWith(
+          isLoading: false,
+          randomQuestionPackage: response.data['package_required'] == true,
+        );
+      }
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
+    }
   }
 
   void setIsAnswerSelected(bool value) {
@@ -144,6 +145,11 @@ class ExamCategoriesState {
 }
 
 class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
+  final RestClient _client;
+
+  ExamCategoriesNotifier({RestClient? client})
+      : _client = client ?? RestClient();
+
   @override
   ExamCategoriesState build() {
     Future.microtask(() {
@@ -156,46 +162,38 @@ class ExamCategoriesNotifier extends Notifier<ExamCategoriesState> {
   Future<void> fetchExamCategories() async {
     state = state.copyWith(examApiStatus: ApiCallStatus.loading);
     final url = AppConstants.examsCategories;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          state = state.copyWith(
-            examCategoriesModel: ExamCategoriesModel.fromJson(response.data),
-            examApiStatus: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(examApiStatus: ApiCallStatus.error);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        state = state.copyWith(
+          examCategoriesModel: ExamCategoriesModel.fromJson(response.data),
+          examApiStatus: ApiCallStatus.success,
+        );
+      } else {
         state = state.copyWith(examApiStatus: ApiCallStatus.error);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(examApiStatus: ApiCallStatus.error);
+    }
   }
 
   Future<void> fetchCourseCategories() async {
     state = state.copyWith(courseApiStatus: ApiCallStatus.loading);
     final url = AppConstants.courseCategories;
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          state = state.copyWith(
-            courseCategoriesModel:
-                CourseCategoriesModel.fromJson(response.data),
-            courseApiStatus: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(courseApiStatus: ApiCallStatus.error);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        state = state.copyWith(
+          courseCategoriesModel:
+              CourseCategoriesModel.fromJson(response.data),
+          courseApiStatus: ApiCallStatus.success,
+        );
+      } else {
         state = state.copyWith(courseApiStatus: ApiCallStatus.error);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(courseApiStatus: ApiCallStatus.error);
+    }
   }
 }
 
@@ -241,6 +239,10 @@ class LatestExamState {
 }
 
 class LatestExamNotifier extends Notifier<LatestExamState> {
+  final RestClient _client;
+
+  LatestExamNotifier({RestClient? client}) : _client = client ?? RestClient();
+
   @override
   LatestExamState build() {
     Future.microtask(() => fetchLatestExam());
@@ -259,41 +261,33 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
     final url =
         "${AppConstants.latestExam}?search=$search&page=$page&date=$date";
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final modelData = LatestExamModel.fromJson(response.data);
-          if (page > 1 && state.model?.latestExams?.data != null) {
-            final combinedList = List.of(state.model!.latestExams!.data!)
-              ..addAll(modelData.latestExams?.data ?? []);
-            final updatedExams = state.model!.latestExams;
-            // update existing data
-            state = state.copyWith(
-              currentPage: page,
-              isLoading: false,
-              apiCallStatus: ApiCallStatus.success,
-            );
-          } else {
-            state = state.copyWith(
-              model: modelData,
-              currentPage: page,
-              isLoading: false,
-              apiCallStatus: ApiCallStatus.success,
-            );
-          }
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final modelData = LatestExamModel.fromJson(response.data);
+        if (page > 1 && state.model?.latestExams?.data != null) {
+          state = state.copyWith(
+            currentPage: page,
+            isLoading: false,
+            apiCallStatus: ApiCallStatus.success,
+          );
         } else {
-          state = state.copyWith(isLoading: false);
+          state = state.copyWith(
+            model: modelData,
+            currentPage: page,
+            isLoading: false,
+            apiCallStatus: ApiCallStatus.success,
+          );
         }
-      },
-      onError: (_) {
-        state = state.copyWith(
-          apiCallStatus: ApiCallStatus.error,
-          isLoading: false,
-        );
-      },
-    );
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (_) {
+      state = state.copyWith(
+        apiCallStatus: ApiCallStatus.error,
+        isLoading: false,
+      );
+    }
   }
 
   Future<void> fetchTagQuestions({
@@ -387,8 +381,10 @@ class ExamCategoryDetailsState {
 class ExamCategoryDetailsNotifier
     extends Notifier<ExamCategoryDetailsState> {
   final int categoryId;
+  final RestClient _client;
 
-  ExamCategoryDetailsNotifier(this.categoryId);
+  ExamCategoryDetailsNotifier(this.categoryId, {RestClient? client})
+      : _client = client ?? RestClient();
 
   @override
   ExamCategoryDetailsState build() {
@@ -404,45 +400,37 @@ class ExamCategoryDetailsNotifier
     final url =
         '${AppConstants.examsCategory}/$id?page=${state.currentPage}';
 
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          final modelData =
-              ExamCategoryDetailsModel.fromJson(response.data);
-          state = state.copyWith(
-            examCategoryDetailsModel: modelData,
-            totalPages: modelData.freeExams?.lastPage ?? 1,
-            isLastPage: modelData.freeExams?.currentPage ==
-                modelData.freeExams?.lastPage,
-            apiCallStatus: ApiCallStatus.success,
-          );
-        } else {
-          state = state.copyWith(apiCallStatus: ApiCallStatus.error);
-        }
-      },
-      onError: (_) {
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        final modelData =
+            ExamCategoryDetailsModel.fromJson(response.data);
+        state = state.copyWith(
+          examCategoryDetailsModel: modelData,
+          totalPages: modelData.freeExams?.lastPage ?? 1,
+          isLastPage: modelData.freeExams?.currentPage ==
+              modelData.freeExams?.lastPage,
+          apiCallStatus: ApiCallStatus.success,
+        );
+      } else {
         state = state.copyWith(apiCallStatus: ApiCallStatus.error);
-      },
-    );
+      }
+    } catch (_) {
+      state = state.copyWith(apiCallStatus: ApiCallStatus.error);
+    }
   }
 
   Future<void> fetchExamCategoriesWithParentID(int parentId) async {
     final url = '${AppConstants.examsCategories}?parent_id=$parentId';
-    await BaseClient.safeApiCall(
-      url,
-      RequestType.get,
-      onSuccess: (response) {
-        if (response.data['status'] == true) {
-          state = state.copyWith(
-            categoriesWithParentID:
-                ExamCategoriesModel.fromJson(response.data),
-          );
-        }
-      },
-      onError: (_) {},
-    );
+    try {
+      final response = await _client.get(url);
+      if (response.data['status'] == true) {
+        state = state.copyWith(
+          categoriesWithParentID:
+              ExamCategoriesModel.fromJson(response.data),
+        );
+      }
+    } catch (_) {}
   }
 
   void goToPage(int page) {
