@@ -24,3 +24,8 @@ export 'presentation/sign_up/views/sign_up_view.dart';
 export 'presentation/verify_otp/views/verify_otp_view.dart';
 export 'presentation/forget_password/views/forget_password_view.dart';
 export 'presentation/terms_condition/views/terms_condition_view.dart';
+
+// Presentation - Reusable Widgets
+export 'presentation/widgets/auth_action_button.dart';
+export 'presentation/widgets/auth_divider.dart';
+export 'presentation/widgets/auth_phone_field.dart';

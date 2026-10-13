@@ -79,5 +79,53 @@
   "ok": "OK",
   "@ok": {
     "description": "OK action label"
+  },
+  "authGatewayTagline": "On the right path, in less time",
+  "@authGatewayTagline": {
+    "description": "Tagline on the authentication gateway screen"
+  },
+  "authGatewaySubtitle": "No registration required, directly log in",
+  "@authGatewaySubtitle": {
+    "description": "Subtitle explaining direct login on the auth gateway screen"
+  },
+  "enterPhoneNumber": "Enter your 11-digit phone number",
+  "@enterPhoneNumber": {
+    "description": "Hint text for the phone input field"
+  },
+  "proceed": "Proceed",
+  "@proceed": {
+    "description": "Button to continue with phone authentication"
+  },
+  "or": "Or",
+  "@or": {
+    "description": "Divider text separating phone and social login"
+  },
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Button label for Google OAuth sign-in"
+  },
+  "termsAgreementNotice": "By logging in, you agree to our\n",
+  "@termsAgreementNotice": {
+    "description": "Prefix text for legal terms agreement"
+  },
+  "termsAndConditions": "Terms & Conditions",
+  "@termsAndConditions": {
+    "description": "Link label for terms of service and privacy policy"
+  },
+  "warningTitle": "Warning",
+  "@warningTitle": {
+    "description": "Title for validation alert dialogs/snackbars"
+  },
+  "providePhoneNumber": "Please provide your phone number.",
+  "@providePhoneNumber": {
+    "description": "Error message when phone field is empty"
+  },
+  "invalidPhoneNumber": "Please provide a valid 11-digit phone number.",
+  "@invalidPhoneNumber": {
+    "description": "Error message when phone number is less than 11 digits"
+  },
+  "googleSignInComingSoon": "Google sign-in service is coming soon...",
+  "@googleSignInComingSoon": {
+    "description": "Notice when Google sign-in is pressed before backend integration"
   }
 }

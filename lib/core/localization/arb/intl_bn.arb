@@ -19,5 +19,17 @@
   "retry": "পুনরায় চেষ্টা করুন",
   "cancel": "বাতিল",
   "confirm": "নিশ্চিত করুন",
-  "ok": "ঠিক আছে"
+  "ok": "ঠিক আছে",
+  "authGatewayTagline": "সঠিক পথে, স্বল্প সময়ে",
+  "authGatewaySubtitle": "কোনো রেজিস্ট্রেশন এর প্রয়োজন নেই, সরাসরি লগইন করুন",
+  "enterPhoneNumber": "আপনার ১১ সংখ্যার ফোন নম্বর লিখুন",
+  "proceed": "এগিয়ে যান",
+  "or": "অথবা",
+  "continueWithGoogle": "Google দিয়ে চালিয়ে যান",
+  "termsAgreementNotice": "লগ ইন করে, আপনি আমাদের সাথে সম্মত হন।\n",
+  "termsAndConditions": "শর্তাবলী ও নীতিমালা",
+  "warningTitle": "সতর্কতা",
+  "providePhoneNumber": "অনুগ্রহ করে আপনার ফোন নম্বরটি লিখুন।",
+  "invalidPhoneNumber": "১১ সংখ্যার সঠিক ফোন নম্বর প্রদান করুন।",
+  "googleSignInComingSoon": "গুগল সাইন-ইন সেবাটি খুব শীঘ্রই আসছে..."
 }

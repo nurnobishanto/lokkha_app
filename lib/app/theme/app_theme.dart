@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/localization/app_localizations.dart';
 import 'app_colors.dart';
 
 export 'app_colors.dart';
@@ -128,6 +127,7 @@ class AppTextStyles {
     Color? color,
     TextDecoration? decoration,
     double? letterSpacing,
+    double? height,
   }) {
     return MyFonts.bodyTextStyle.copyWith(
       fontSize: fontSize ?? MyFonts.body2TextSize,
@@ -135,6 +135,7 @@ class AppTextStyles {
       color: color ?? _textTheme.bodyMedium?.color,
       decoration: decoration,
       letterSpacing: letterSpacing,
+      height: height,
     );
   }
 }

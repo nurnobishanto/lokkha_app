@@ -29,6 +29,7 @@ class AssetVectorPaths {
   static String get splashIcon => getFullPath('splash_icon');
   static String get logo => getFullPath('logo');
   static String get phoneCall => getFullPath('phone_call');
+  static String get google => getFullPath('google_logo');
 }
 
 class OnlineImagePaths {

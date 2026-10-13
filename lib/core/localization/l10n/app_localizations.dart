@@ -217,6 +217,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// Tagline on the authentication gateway screen
+  ///
+  /// In en, this message translates to:
+  /// **'On the right path, in less time'**
+  String get authGatewayTagline;
+
+  /// Subtitle explaining direct login on the auth gateway screen
+  ///
+  /// In en, this message translates to:
+  /// **'No registration required, directly log in'**
+  String get authGatewaySubtitle;
+
+  /// Hint text for the phone input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 11-digit phone number'**
+  String get enterPhoneNumber;
+
+  /// Button to continue with phone authentication
+  ///
+  /// In en, this message translates to:
+  /// **'Proceed'**
+  String get proceed;
+
+  /// Divider text separating phone and social login
+  ///
+  /// In en, this message translates to:
+  /// **'Or'**
+  String get or;
+
+  /// Button label for Google OAuth sign-in
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// Prefix text for legal terms agreement
+  ///
+  /// In en, this message translates to:
+  /// **'By logging in, you agree to our\n'**
+  String get termsAgreementNotice;
+
+  /// Link label for terms of service and privacy policy
+  ///
+  /// In en, this message translates to:
+  /// **'Terms & Conditions'**
+  String get termsAndConditions;
+
+  /// Title for validation alert dialogs/snackbars
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warningTitle;
+
+  /// Error message when phone field is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide your phone number.'**
+  String get providePhoneNumber;
+
+  /// Error message when phone number is less than 11 digits
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a valid 11-digit phone number.'**
+  String get invalidPhoneNumber;
+
+  /// Notice when Google sign-in is pressed before backend integration
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in service is coming soon...'**
+  String get googleSignInComingSoon;
 }
 
 class _AppLocalizationsDelegate

@@ -69,4 +69,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get authGatewayTagline => 'On the right path, in less time';
+
+  @override
+  String get authGatewaySubtitle => 'No registration required, directly log in';
+
+  @override
+  String get enterPhoneNumber => 'Enter your 11-digit phone number';
+
+  @override
+  String get proceed => 'Proceed';
+
+  @override
+  String get or => 'Or';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get termsAgreementNotice => 'By logging in, you agree to our\n';
+
+  @override
+  String get termsAndConditions => 'Terms & Conditions';
+
+  @override
+  String get warningTitle => 'Warning';
+
+  @override
+  String get providePhoneNumber => 'Please provide your phone number.';
+
+  @override
+  String get invalidPhoneNumber =>
+      'Please provide a valid 11-digit phone number.';
+
+  @override
+  String get googleSignInComingSoon =>
+      'Google sign-in service is coming soon...';
 }

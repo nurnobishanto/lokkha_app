@@ -56,12 +56,16 @@ class MySharedPref {
   }
 
   static bool getThemeIsLight() {
-    final mode = _prefs.getString(_themeModeKey);
-    if (mode != null) {
-      if (mode == 'dark') return false;
-      if (mode == 'light') return true;
+    try {
+      final mode = _prefs.getString(_themeModeKey);
+      if (mode != null) {
+        if (mode == 'dark') return false;
+        if (mode == 'light') return true;
+      }
+      return _prefs.getBool(_lightThemeKey) ?? true;
+    } catch (_) {
+      return true;
     }
-    return _prefs.getBool(_lightThemeKey) ?? true;
   }
 
   static Future<void> setThemeMode(String mode) async {
@@ -73,16 +77,26 @@ class MySharedPref {
     }
   }
 
-  static String getThemeMode() => _prefs.getString(_themeModeKey) ?? 'light';
+  static String getThemeMode() {
+    try {
+      return _prefs.getString(_themeModeKey) ?? 'light';
+    } catch (_) {
+      return 'light';
+    }
+  }
 
   // ───── Language ─────
   static Future<void> setCurrentLanguage(String languageCode) async =>
       await _prefs.setString(_currentLocalKey, languageCode);
 
   static Locale getCurrentLocal() {
-    final langCode = _prefs.getString(_currentLocalKey);
-    return LocalizationService.supportedLanguages[langCode] ??
-        LocalizationService.defaultLanguage;
+    try {
+      final langCode = _prefs.getString(_currentLocalKey);
+      return LocalizationService.supportedLanguages[langCode] ??
+          LocalizationService.defaultLanguage;
+    } catch (_) {
+      return LocalizationService.defaultLanguage;
+    }
   }
 
   // ───── FCM Token ─────

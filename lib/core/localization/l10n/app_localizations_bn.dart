@@ -71,4 +71,41 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get ok => 'ঠিক আছে';
+
+  @override
+  String get authGatewayTagline => 'সঠিক পথে, স্বল্প সময়ে';
+
+  @override
+  String get authGatewaySubtitle =>
+      'কোনো রেজিস্ট্রেশন এর প্রয়োজন নেই, সরাসরি লগইন করুন';
+
+  @override
+  String get enterPhoneNumber => 'আপনার ১১ সংখ্যার ফোন নম্বর লিখুন';
+
+  @override
+  String get proceed => 'এগিয়ে যান';
+
+  @override
+  String get or => 'অথবা';
+
+  @override
+  String get continueWithGoogle => 'Google দিয়ে চালিয়ে যান';
+
+  @override
+  String get termsAgreementNotice => 'লগ ইন করে, আপনি আমাদের সাথে সম্মত হন।\n';
+
+  @override
+  String get termsAndConditions => 'শর্তাবলী ও নীতিমালা';
+
+  @override
+  String get warningTitle => 'সতর্কতা';
+
+  @override
+  String get providePhoneNumber => 'অনুগ্রহ করে আপনার ফোন নম্বরটি লিখুন।';
+
+  @override
+  String get invalidPhoneNumber => '১১ সংখ্যার সঠিক ফোন নম্বর প্রদান করুন।';
+
+  @override
+  String get googleSignInComingSoon => 'গুগল সাইন-ইন সেবাটি খুব শীঘ্রই আসছে...';
 }
