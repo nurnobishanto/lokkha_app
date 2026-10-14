@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="career_case" x1="10" y1="16" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="50%" stop-color="#0369A1"/>
+      <stop offset="100%" stop-color="#075985"/>
+    </linearGradient>
+    <linearGradient id="career_flap" x1="10" y1="18" x2="54" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="career_gold" x1="26" y1="26" x2="38" y2="36" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="career_handle" x1="22" y1="8" x2="42" y2="18" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="badge_emerald" x1="42" y1="38" x2="56" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Briefcase Top Handle -->
+  <path d="M24 18V12C24 10.3431 25.3431 9 27 9H37C38.6569 9 40 10.3431 40 12V18H36V13C36 12.4477 35.5523 12 35 12H29C28.4477 12 28 12.4477 28 13V18H24Z" fill="url(#career_handle)"/>
+
+  <!-- Briefcase Main Body -->
+  <rect x="8" y="18" width="48" height="38" rx="8" fill="url(#career_case)"/>
+
+  <!-- Job Document Peeking Top-Right -->
+  <path d="M37 12H47C48.1046 12 49 12.8954 49 14V22H35V14C35 12.8954 35.8954 12 37 12Z" fill="#F8FAFC"/>
+  <line x1="38" y1="15" x2="46" y2="15" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="38" y1="18" x2="44" y2="18" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Briefcase Front Flap -->
+  <path d="M8 22C8 19.7909 9.79086 18 12 18H52C54.2091 18 56 19.7909 56 22V31C56 31 46 36 32 36C18 36 8 31 8 31V22Z" fill="url(#career_flap)"/>
+
+  <!-- Flap Edge Highlight -->
+  <path d="M8 30.5C18 35.5 32 35.5 32 35.5C32 35.5 46 35.5 56 30.5" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" fill="none"/>
+
+  <!-- Center Gold Metallic Lock / Clasp -->
+  <rect x="28" y="29" width="8" height="9" rx="2" fill="url(#career_gold)"/>
+  <circle cx="32" cy="32.5" r="1.5" fill="#451A03"/>
+  <rect x="31" y="32.5" width="2" height="3.5" rx="0.5" fill="#451A03"/>
+
+  <!-- Corner Protectors in Gold -->
+  <path d="M8 48C8 52.4183 11.5817 56 16 56H18V52H12V46H8V48Z" fill="url(#career_gold)"/>
+  <path d="M56 48C56 52.4183 52.4183 56 48 56H46V52H52V46H56V48Z" fill="url(#career_gold)"/>
+
+  <!-- Verified Job / New Circular Badge Bottom-Right -->
+  <circle cx="48" cy="46" r="9" fill="url(#badge_emerald)"/>
+  <circle cx="48" cy="46" r="8" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1" fill="none"/>
+  <!-- White Checkmark / Star in Badge -->
+  <path d="M44.5 46L47 48.5L51.5 43.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

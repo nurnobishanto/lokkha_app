@@ -14,6 +14,12 @@ class AssetImagePaths {
   static String get seamlessImg => getFullPath('seamless_pattern');
   static String get splashBg => getFullPath('splash_background');
   static String get splashIcon => getFullPath('splash_icon');
+  static String get icVocabulary => getFullPath('ic_vocabulary');
+  static String get icGk => getFullPath('ic_gk');
+  static String get icMath => getFullPath('ic_math');
+  static String get icVideoClass => getFullPath('ic_video_class');
+  static String get icQuestionBank => getFullPath('ic_question_bank');
+  static String get icQuickPractice => getFullPath('ic_quick_practice');
 }
 
 class AssetVectorPaths {
@@ -30,6 +36,21 @@ class AssetVectorPaths {
   static String get logo => getFullPath('logo');
   static String get phoneCall => getFullPath('phone_call');
   static String get google => getFullPath('google_logo');
+  static String get icVocabulary => getFullPath('ic_vocabulary');
+  static String get icGk => getFullPath('ic_gk');
+  static String get icMath => getFullPath('ic_math');
+  static String get icVideoClass => getFullPath('ic_video_class');
+  static String get icQuestionBank => getFullPath('ic_question_bank');
+  static String get icQuickPractice => getFullPath('ic_quick_practice');
+  static String get icCareerUpdates => getFullPath('ic_career_updates');
+  static String get catBookRed => getFullPath('cat_book_red');
+  static String get catBookBlue => getFullPath('cat_book_blue');
+  static String get catSchool => getFullPath('cat_school');
+  static String get catBank => getFullPath('cat_bank');
+  static String get catTeacher => getFullPath('cat_teacher');
+  static String get catCap => getFullPath('cat_cap');
+  static String get catCurrentAffairs => getFullPath('cat_current_affairs');
+  static String get catUniversity => getFullPath('cat_university');
 }
 
 class OnlineImagePaths {

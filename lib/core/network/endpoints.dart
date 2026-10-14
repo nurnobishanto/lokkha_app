@@ -106,7 +106,15 @@ class Endpoints {
   static const String userPackages = '/api/v1/user/packages';
   static const String couponApply = '/api/v1/packages/coupon-apply';
 
-  // ─── Public Dynamic Content ────────────────────────────────────────────────
+  // ─── Module 23: Home Feed & Landing Hub (8 Endpoints) ──────────────────────
+  static const String homeFeed = '/api/v1/home';
+  static const String homeFeedAlias = '/api/v1/home/feed';
+  static const String homeContests = '/api/v1/home/contests';
+  static const String homeQuestionBanks = '/api/v1/home/question-banks';
+  static const String homeJobsExams = '/api/v1/home/jobs-exams';
+  static const String homeStats = '/api/v1/home/stats';
+  static const String homeVocabulary = '/api/v1/home/vocabulary';
+  static const String homeTestimonials = '/api/v1/home/testimonials';
   static const String sliders = '/api/v1/sliders';
   static const String contact = '/api/v1/contact';
   static const String contactSubmit = '/api/v1/contact/submit';

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="qp_dial_ring" x1="14" y1="14" x2="50" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="qp_crown" x1="28" y1="4" x2="36" y2="14" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#94A3B8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="qp_lightning" x1="26" y1="20" x2="38" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="40%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top Crown / Push Button -->
+  <rect x="29" y="5" width="6" height="6" rx="1.5" fill="url(#qp_crown)"/>
+  <rect x="27" y="10" width="10" height="3" rx="1" fill="url(#qp_crown)"/>
+
+  <!-- Top-Right Lap Button -->
+  <rect x="46" y="11" width="5" height="4" rx="1" transform="rotate(40 46 11)" fill="url(#qp_crown)"/>
+
+  <!-- Outer Stopwatch Ring -->
+  <circle cx="32" cy="36" r="22" fill="url(#qp_dial_ring)"/>
+
+  <!-- Inner Watch Face -->
+  <circle cx="32" cy="36" r="17.5" fill="#F0F9FF"/>
+
+  <!-- Tick Marks around Dial -->
+  <line x1="32" y1="20" x2="32" y2="22.5" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="32" y1="49.5" x2="32" y2="52" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="16" y1="36" x2="18.5" y2="36" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="45.5" y1="36" x2="48" y2="36" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Subtle Speed Motion Arc on Left -->
+  <path d="M19 28C20.5 24 24 21 28 20" stroke="#38BDF8" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+
+  <!-- Dynamic Electric Lightning Bolt in Center -->
+  <path d="M34 22L24.5 35H32L28.5 48L40 33H32.5L34 22Z" fill="url(#qp_lightning)"/>
+  <path d="M34 22L24.5 35H32L28.5 48L40 33H32.5L34 22Z" stroke="#B45309" stroke-width="0.8" stroke-linejoin="round" fill="none"/>
+</svg>

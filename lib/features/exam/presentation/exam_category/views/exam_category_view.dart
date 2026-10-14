@@ -75,6 +75,8 @@ class ExamCategoryView extends ConsumerWidget {
                     final course = courses[x];
                     return ExamCategoryCard(
                       title: course.title ?? "",
+                      slug: course.slug,
+                      imageUrl: course.image,
                       onTap: () {
                         context.push(
                           Routes.courses,
@@ -116,6 +118,8 @@ class ExamCategoryView extends ConsumerWidget {
                     final exam = exams[x];
                     return ExamCategoryCard(
                       title: exam.name ?? "",
+                      slug: exam.slug,
+                      imageUrl: exam.image,
                       onTap: () {
                         if (exam.id != null) {
                           context.push(

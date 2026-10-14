@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="gk_stand" x1="16" y1="12" x2="48" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="gk_ocean" x1="18" y1="12" x2="48" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="60%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+    <linearGradient id="gk_land" x1="20" y1="16" x2="44" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Globe Stand Base -->
+  <ellipse cx="32" cy="56" rx="14" ry="4" fill="url(#gk_stand)"/>
+  <rect x="29.5" y="46" width="5" height="9" rx="1.5" fill="url(#gk_stand)"/>
+
+  <!-- Meridian Arc Ring -->
+  <path d="M32 9C20.9543 9 12 17.9543 12 29C12 39.5 20 48.2 30.2 48.9V45.8C21.8 45.1 15.2 37.9 15.2 29C15.2 19.7 22.7 12.2 32 12.2C41.3 12.2 48.8 19.7 48.8 29C48.8 34.2 46.4 38.8 42.8 41.9L44.8 44.2C49.1 40.4 52 35 52 29C52 17.9543 43.0457 9 32 9Z" fill="url(#gk_stand)"/>
+
+  <!-- Axis Pins -->
+  <circle cx="32" cy="10" r="2.5" fill="#FBBF24"/>
+  <circle cx="32" cy="48" r="2.5" fill="#FBBF24"/>
+
+  <!-- Globe Ocean Sphere -->
+  <circle cx="32" cy="29" r="16" fill="url(#gk_ocean)"/>
+
+  <!-- Clip Path for Continents -->
+  <g clip-path="url(#globe_clip)">
+    <!-- Latitude / Longitude grid lines -->
+    <ellipse cx="32" cy="29" rx="16" ry="6" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1" fill="none"/>
+    <ellipse cx="32" cy="29" rx="7" ry="16" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="1" fill="none"/>
+
+    <!-- Continents Landmasses -->
+    <!-- Eurasia / Asia -->
+    <path d="M26 18C28 17 31 16 35 17C38 18 42 16 44 20C46 24 43 28 40 28C37 28 35 25 33 26C31 27 29 25 28 23C27 21 24 20 26 18Z" fill="url(#gk_land)"/>
+    <!-- Africa -->
+    <path d="M30 28C33 28 36 30 35 34C34 38 32 41 30 42C28 41 27 38 28 35C29 32 27 30 30 28Z" fill="url(#gk_land)"/>
+    <!-- Americas Left Edge -->
+    <path d="M16 22C18 21 20 24 19 28C18 31 16 33 16 35C15 33 14 26 16 22Z" fill="url(#gk_land)"/>
+    <!-- Australia Bottom Right -->
+    <path d="M43 35C45 35 46 37 45 39C43 40 41 39 41 37C41 36 42 35 43 35Z" fill="url(#gk_land)"/>
+
+    <!-- Subtle Sphere Highlight -->
+    <path d="M19 19C23 15 29 14 35 15C31 17 24 20 21 26C20 24 19 22 19 19Z" fill="#FFFFFF" fill-opacity="0.35"/>
+  </g>
+
+  <!-- Clip definition -->
+  <clipPath id="globe_clip">
+    <circle cx="32" cy="29" r="16"/>
+  </clipPath>
+</svg>

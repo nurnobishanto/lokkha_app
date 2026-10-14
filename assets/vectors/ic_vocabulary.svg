@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="vocab_bg" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF7547"/>
+      <stop offset="100%" stop-color="#FF2E56"/>
+    </linearGradient>
+    <linearGradient id="vocab_inner" x1="12" y1="10" x2="52" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="letter_grad" x1="24" y1="18" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FDE8EC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow & Main Card -->
+  <rect x="7" y="7" width="50" height="50" rx="14" fill="url(#vocab_bg)"/>
+  <rect x="7" y="7" width="50" height="50" rx="14" fill="url(#vocab_inner)"/>
+
+  <!-- Subtle Top Highlight -->
+  <path d="M12 11C12 9.89543 12.8954 9 14 9H50C51.1046 9 52 9.89543 52 11V22C52 22 41 24 32 24C23 24 12 22 12 22V11Z" fill="white" fill-opacity="0.18"/>
+
+  <!-- Large Stylized Letter 'A' -->
+  <path d="M25.4 18H29.6L38.2 43H33.8L31.8 37H23.2L21.2 43H16.8L25.4 18ZM27.5 24.2L24.5 33.2H30.5L27.5 24.2Z" fill="url(#letter_grad)"/>
+
+  <!-- Small Letter 'a' bubble on bottom-right -->
+  <circle cx="45" cy="41" r="9" fill="#FFFFFF"/>
+  <text x="45" y="45" font-family="Arial, sans-serif" font-weight="900" font-size="11" fill="#FF2E56" text-anchor="middle">a</text>
+
+  <!-- Sparkle Accent at top right -->
+  <path d="M47 13L48.2 16.8L52 18L48.2 19.2L47 23L45.8 19.2L42 18L45.8 16.8L47 13Z" fill="#FFF275"/>
+</svg>
