@@ -68,6 +68,8 @@ class InAppPopupDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedImageUrl = Endpoints.resolveImageUrl(popup.imageUrl);
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.of(context, rootNavigator: true)
@@ -86,8 +88,9 @@ class InAppPopupDialog extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16.r),
                 child: Container(
                   constraints: BoxConstraints(
-                    maxWidth: 380.w,
-                    maxHeight: 520.h,
+                    maxWidth: 380.w.clamp(300.0, 420.0),
+                    maxHeight: (MediaQuery.sizeOf(context).height * 0.82)
+                        .clamp(480.0, 720.0),
                   ),
                   decoration: BoxDecoration(
                     color: context.cardColor,
@@ -108,31 +111,33 @@ class InAppPopupDialog extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Banner Image (if available)
-                            if (popup.imageUrl.isNotEmpty)
+                            // Banner Image (Full uncropped display)
+                            if (resolvedImageUrl.isNotEmpty)
                               GestureDetector(
                                 onTap: () => _handleAction(context),
-                                child: AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: CachedNetworkImage(
-                                    imageUrl: popup.imageUrl,
-                                    fit: BoxFit.cover,
-                                    placeholder: (_, __) => Container(
-                                      color: context.isDark
-                                          ? const Color(0xFF1E293B)
-                                          : Colors.grey.shade100,
-                                      child: const Center(
-                                        child: SizedBox(
-                                          width: 28,
-                                          height: 28,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2),
-                                        ),
+                                child: CachedNetworkImage(
+                                  imageUrl: resolvedImageUrl,
+                                  width: double.infinity,
+                                  fit: BoxFit.fitWidth,
+                                  placeholder: (_, __) => Container(
+                                    height: 180.h,
+                                    color: context.isDark
+                                        ? const Color(0xFF1E293B)
+                                        : Colors.grey.shade100,
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
                                       ),
                                     ),
-                                    errorWidget: (_, __, ___) =>
-                                        const SizedBox.shrink(),
                                   ),
+                                  errorWidget: (context, url, error) {
+                                    debugPrint(
+                                        '[InAppPopupDialog] Failed to load image from $url: $error');
+                                    return const SizedBox.shrink();
+                                  },
                                 ),
                               ),
 
@@ -140,7 +145,7 @@ class InAppPopupDialog extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.fromLTRB(
                                 18.w,
-                                popup.imageUrl.isNotEmpty ? 14.h : 28.h,
+                                resolvedImageUrl.isNotEmpty ? 14.h : 28.h,
                                 18.w,
                                 18.h,
                               ),

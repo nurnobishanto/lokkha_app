@@ -143,6 +143,10 @@ void main() {
       expect(model.data.announcements.inAppPopup.enabled, true);
       expect(model.data.announcements.inAppPopup.heading, "১৯তম নিবন্ধন- ২০২৬");
       expect(model.data.announcements.inAppPopup.targetUrl, "/courses");
+      expect(
+        model.data.announcements.inAppPopup.imageUrl,
+        "https://lokkha.com/uploads/popups/popup_1788085489_506.jpg",
+      );
 
       // Smart on-the-fly client version check
       expect(model.data.clientVersionCheck, isNotNull);
@@ -170,6 +174,22 @@ void main() {
       expect(result.hasUpdate, false);
       expect(result.updateRequired, false);
       expect(result.downloadUrl, isNull);
+    });
+
+    test('InAppPopupModel resolves popups image URL to uploads/popups/', () {
+      final json = {
+        "enabled": true,
+        "heading": "১৯তম নিবন্ধন- ২০২৬",
+        "details": null,
+        "image_url": "https://lokkha.com/popups/01KP8ACA9QR6HD0FH87MXV0E39.jpeg",
+        "button_text": "👉 কোর্সে যুক্ত হোন",
+        "target_url": "https://lokkha.com/courses?course_category_id=5"
+      };
+
+      final popup = InAppPopupModel.fromJson(json);
+      expect(popup.enabled, isTrue);
+      expect(popup.imageUrl,
+          "https://lokkha.com/uploads/popups/01KP8ACA9QR6HD0FH87MXV0E39.jpeg");
     });
 
     test('AppInfoModel handles empty or null json gracefully', () {

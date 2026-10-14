@@ -1,3 +1,5 @@
+import 'package:lokkha/core/network/endpoints.dart';
+
 class AppInfoModel {
   final bool success;
   final String message;
@@ -643,7 +645,7 @@ class InAppPopupModel {
             json['enabled'] == 'true',
         heading: json['heading']?.toString() ?? '',
         details: json['details']?.toString(),
-        imageUrl: json['image_url']?.toString() ?? '',
+        imageUrl: Endpoints.resolveImageUrl(json['image_url']?.toString()),
         buttonText: json['button_text']?.toString() ?? '',
         targetUrl: json['target_url']?.toString() ?? '',
       );
