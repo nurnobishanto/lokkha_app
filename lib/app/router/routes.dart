@@ -12,6 +12,7 @@ class Routes {
   static const String signIn = '/signin';
   static const String verifyOtp = '/verify-otp';
   static const String forgetPassword = '/forget-password';
+  static const String resetPassword = '/reset-password';
   static const String termsCondition = '/terms-condition';
 
   // Navigation & Shell

@@ -78,6 +78,21 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthResponseModel> forgetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+  }) {
+    return remoteDataSource.forgetPassword(
+      phone: phone,
+      otp: otp,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+    );
+  }
+
+  @override
   Future<AuthResponseModel?> getCurrentUser() async {
     final token = await SecureStorageService.getToken();
     if (token == null || token.isEmpty) {

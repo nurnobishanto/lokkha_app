@@ -155,4 +155,43 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get codeResentSuccess => 'যাচাইকরণ কোড সফলভাবে পাঠানো হয়েছে।';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'ভেরিফিকেশন কোড পেতে আপনার ফোন নম্বর লিখুন';
+
+  @override
+  String get createNewPassword => 'নতুন পাসওয়ার্ড তৈরি করুন';
+
+  @override
+  String get createNewPasswordSubtitle =>
+      'কমপক্ষে ৮ অক্ষরের একটি শক্তিশালী পাসওয়ার্ড তৈরি করুন';
+
+  @override
+  String get newPassword => 'নতুন পাসওয়ার্ড';
+
+  @override
+  String get confirmPassword => 'পাসওয়ার্ড নিশ্চিত করুন';
+
+  @override
+  String get passwordsDoNotMatch => 'পাসওয়ার্ড দুটি মিলছে না';
+
+  @override
+  String get updatePassword => 'পাসওয়ার্ড আপডেট করুন';
+
+  @override
+  String get passwordResetSuccessTitle => 'অভিনন্দন!';
+
+  @override
+  String get passwordResetSuccessMessage =>
+      'আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে। এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।';
+
+  @override
+  String get goToLogin => 'লগইন করুন';
+
+  @override
+  String get sendOtpAction => 'ওটিপি পাঠান';
+
+  @override
+  String get loginWithOtp => 'OTP দিয়ে লগইন';
 }

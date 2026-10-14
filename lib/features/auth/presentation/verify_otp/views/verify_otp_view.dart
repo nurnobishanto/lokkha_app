@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_action_button.dart';
@@ -117,14 +119,40 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
       return;
     }
 
+    final isForgetPassword =
+        widget.type.toLowerCase().contains('forget') ||
+            widget.type.toLowerCase().contains('reset');
+
     if (widget.type == 'Registration') {
       ref
           .read(verifyOtpNotifierProvider.notifier)
           .register(widget.phoneNumber, context);
+    } else if (isForgetPassword) {
+      ref
+          .read(verifyOtpNotifierProvider.notifier)
+          .verifyOtpForReset(widget.phoneNumber, context);
     } else {
       ref
           .read(verifyOtpNotifierProvider.notifier)
           .loginWithOtp(widget.phoneNumber, context);
+    }
+  }
+
+  void _handleBack() {
+    final router = GoRouter.maybeOf(context);
+    if (router != null && router.canPop()) {
+      router.pop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else if (router != null) {
+      final isForgetPassword =
+          widget.type.toLowerCase().contains('forget') ||
+              widget.type.toLowerCase().contains('reset');
+      if (isForgetPassword) {
+        router.go(Routes.forgetPassword);
+      } else {
+        router.go(Routes.signIn);
+      }
     }
   }
 
@@ -235,7 +263,7 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
                             children: [
                               InkWell(
                                 borderRadius: BorderRadius.circular(12.r),
-                                onTap: () => Navigator.of(context).maybePop(),
+                                onTap: _handleBack,
                                 child: Container(
                                   width: 40.r,
                                   height: 40.r,
@@ -367,8 +395,7 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
                                   ),
                                   InkWell(
                                     borderRadius: BorderRadius.circular(8.r),
-                                    onTap: () =>
-                                        Navigator.of(context).maybePop(),
+                                    onTap: _handleBack,
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
                                         horizontal: 6.w.clamp(4.0, 8.0),

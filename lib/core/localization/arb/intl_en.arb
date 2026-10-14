@@ -192,5 +192,53 @@
   "codeResentSuccess": "Verification code resent successfully.",
   "@codeResentSuccess": {
     "description": "Toast message when OTP is successfully resent"
+  },
+  "forgotPasswordSubtitle": "Enter your phone number to receive the verification code.",
+  "@forgotPasswordSubtitle": {
+    "description": "Subtitle on forgot password screen"
+  },
+  "createNewPassword": "Create New Password",
+  "@createNewPassword": {
+    "description": "Header title on create new password screen"
+  },
+  "createNewPasswordSubtitle": "Use at least 8 characters with numbers and symbols.",
+  "@createNewPasswordSubtitle": {
+    "description": "Subtitle explaining password requirements"
+  },
+  "newPassword": "New Password",
+  "@newPassword": {
+    "description": "Label for new password input field"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Label for confirm password input field"
+  },
+  "passwordsDoNotMatch": "Passwords don't match",
+  "@passwordsDoNotMatch": {
+    "description": "Error displayed when new and confirm passwords do not match"
+  },
+  "updatePassword": "Update Password",
+  "@updatePassword": {
+    "description": "Button to submit new password"
+  },
+  "passwordResetSuccessTitle": "Congratulations !",
+  "@passwordResetSuccessTitle": {
+    "description": "Title of success dialog after password reset"
+  },
+  "passwordResetSuccessMessage": "Password Reset successful. You can now sign in with your new password",
+  "@passwordResetSuccessMessage": {
+    "description": "Message of success dialog after password reset"
+  },
+  "goToLogin": "Go to Login",
+  "@goToLogin": {
+    "description": "Action button in dialog to navigate to login screen"
+  },
+  "sendOtpAction": "Send OTP",
+  "@sendOtpAction": {
+    "description": "Action button to send OTP"
+  },
+  "loginWithOtp": "Log in with OTP",
+  "@loginWithOtp": {
+    "description": "Action link to log in using OTP"
   }
 }

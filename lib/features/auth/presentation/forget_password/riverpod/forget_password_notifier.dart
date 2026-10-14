@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/core/utils/phone_utils.dart';
+import 'package:lokkha/di/auth_provider.dart';
+import 'package:lokkha/shared/widgets/custom_snackbar.dart';
+
+class ForgetPasswordState {
+  final String phone;
+  final bool isLoading;
+  final String? errorMessage;
+
+  const ForgetPasswordState({
+    this.phone = '',
+    this.isLoading = false,
+    this.errorMessage,
+  });
+
+  ForgetPasswordState copyWith({
+    String? phone,
+    bool? isLoading,
+    String? errorMessage,
+  }) {
+    return ForgetPasswordState(
+      phone: phone ?? this.phone,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
+    );
+  }
+}
+
+class ForgetPasswordNotifier extends Notifier<ForgetPasswordState> {
+  @override
+  ForgetPasswordState build() => const ForgetPasswordState();
+
+  void setPhone(String phone) {
+    state = state.copyWith(phone: phone, errorMessage: null);
+  }
+
+  Future<void> sendOtp({
+    required BuildContext context,
+    String? phoneOverride,
+  }) async {
+    final rawPhone = (phoneOverride ?? state.phone).trim();
+    final cleanPhone = PhoneUtils.toLocal11Digit(rawPhone);
+
+    if (cleanPhone.length != 11) {
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'ভুল নম্বর',
+        message: 'দয়া করে একটি সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন।',
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      final sendOtpUseCase = ref.read(sendOtpUseCaseProvider);
+      final res = await sendOtpUseCase(cleanPhone, type: 'ForgetPassword');
+
+      state = state.copyWith(isLoading: false);
+
+      if (res.status) {
+        CustomSnackBar.showCustomToast(
+          message: res.message ?? 'ওটিপি সফলভাবে পাঠানো হয়েছে।',
+        );
+
+        if (context.mounted) {
+          context.push(
+            Routes.verifyOtp,
+            extra: {
+              'phoneNumber': cleanPhone,
+              'type': 'ForgetPassword',
+              'initialExpiresIn': res.expiresIn ?? 300,
+            },
+          );
+        }
+      } else {
+        state = state.copyWith(
+          errorMessage: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে।',
+        );
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: 'OTP Error',
+          message: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+      );
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Error',
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। দয়া করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।',
+      );
+    }
+  }
+}
+
+final forgetPasswordNotifierProvider =
+    NotifierProvider<ForgetPasswordNotifier, ForgetPasswordState>(
+  ForgetPasswordNotifier.new,
+);

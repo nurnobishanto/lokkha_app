@@ -128,6 +128,57 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     }
   }
 
+  Future<void> verifyOtpForReset(String phone, BuildContext context) async {
+    if (state.otp.trim().length < 6) {
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Please Fill the pin',
+        message: 'OTP must be 6 digits.',
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      final verifyOtpUseCase = ref.read(verifyOtpUseCaseProvider);
+      final res = await verifyOtpUseCase(
+        phone: phone,
+        otp: state.otp.trim(),
+      );
+
+      state = state.copyWith(isLoading: false);
+
+      if (res.status) {
+        if (context.mounted) {
+          context.push(
+            Routes.resetPassword,
+            extra: {
+              'phoneNumber': phone,
+              'otp': state.otp.trim(),
+            },
+          );
+        }
+      } else {
+        state = state.copyWith(
+          errorMessage: res.message ?? 'ওটিপি যাচাই করা সম্ভব হয়নি।',
+        );
+        CustomSnackBar.showCustomErrorSnackBar(
+          title: 'OTP Error',
+          message: res.message ?? 'সঠিক ওটিপি প্রদান করুন।',
+        );
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+      );
+      CustomSnackBar.showCustomErrorSnackBar(
+        title: 'Error',
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+      );
+    }
+  }
+
   Future<void> loginWithOtp(String phone, BuildContext context) async {
     if (state.otp.trim().length < 6) {
       CustomSnackBar.showCustomErrorSnackBar(

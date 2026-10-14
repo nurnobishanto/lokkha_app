@@ -220,7 +220,21 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.forgetPassword,
         name: Routes.forgetPassword,
-        builder: (context, state) => const ForgetPasswordView(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final phone = extra['phoneNumber'] as String? ?? '';
+          return ForgetPasswordView(initialPhoneNumber: phone);
+        },
+      ),
+      GoRoute(
+        path: Routes.resetPassword,
+        name: Routes.resetPassword,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          final phone = extra['phoneNumber'] as String? ?? '';
+          final otp = extra['otp'] as String? ?? '';
+          return ResetPasswordView(phoneNumber: phone, otp: otp);
+        },
       ),
       GoRoute(
         path: Routes.signUp,

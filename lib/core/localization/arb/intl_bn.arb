@@ -46,5 +46,17 @@
   "didNotReceiveCode": "কোড পাননি? ",
   "verify": "যাচাই করুন",
   "otpRequired": "অনুগ্রহ করে ৬-সংখ্যার ওটিপি কোডটি লিখুন।",
-  "codeResentSuccess": "যাচাইকরণ কোড সফলভাবে পাঠানো হয়েছে।"
+  "codeResentSuccess": "যাচাইকরণ কোড সফলভাবে পাঠানো হয়েছে।",
+  "forgotPasswordSubtitle": "ভেরিফিকেশন কোড পেতে আপনার ফোন নম্বর লিখুন",
+  "createNewPassword": "নতুন পাসওয়ার্ড তৈরি করুন",
+  "createNewPasswordSubtitle": "কমপক্ষে ৮ অক্ষরের একটি শক্তিশালী পাসওয়ার্ড তৈরি করুন",
+  "newPassword": "নতুন পাসওয়ার্ড",
+  "confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+  "passwordsDoNotMatch": "পাসওয়ার্ড দুটি মিলছে না",
+  "updatePassword": "পাসওয়ার্ড আপডেট করুন",
+  "passwordResetSuccessTitle": "অভিনন্দন!",
+  "passwordResetSuccessMessage": "আপনার পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে। এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।",
+  "goToLogin": "লগইন করুন",
+  "sendOtpAction": "ওটিপি পাঠান",
+  "loginWithOtp": "OTP দিয়ে লগইন"
 }

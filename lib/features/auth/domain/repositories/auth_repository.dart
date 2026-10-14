@@ -26,6 +26,12 @@ abstract class AuthRepository {
     String? referralCode,
     String? deviceName,
   });
+  Future<AuthResponseModel> forgetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+  });
   Future<AuthResponseModel?> getCurrentUser();
   Future<bool> logout();
 }

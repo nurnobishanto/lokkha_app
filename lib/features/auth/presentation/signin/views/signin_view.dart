@@ -59,6 +59,15 @@ class _SignInViewState extends ConsumerState<SignInView> {
         );
   }
 
+  void _handleNavigateToForgotPassword() {
+    context.push(
+      Routes.forgetPassword,
+      extra: {
+        'phoneNumber': widget.phoneNumber,
+      },
+    );
+  }
+
   void _handleNavigateToOtp() {
     context.push(
       Routes.verifyOtp,
@@ -67,6 +76,17 @@ class _SignInViewState extends ConsumerState<SignInView> {
         'type': 'Login',
       },
     );
+  }
+
+  void _handleBack() {
+    final router = GoRouter.maybeOf(context);
+    if (router != null && router.canPop()) {
+      router.pop();
+    } else if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else if (router != null) {
+      router.go(Routes.authGateway);
+    }
   }
 
   @override
@@ -118,7 +138,7 @@ class _SignInViewState extends ConsumerState<SignInView> {
                             children: [
                               InkWell(
                                 borderRadius: BorderRadius.circular(12.r),
-                                onTap: () => Navigator.of(context).maybePop(),
+                                onTap: _handleBack,
                                 child: Container(
                                   width: 40.r,
                                   height: 40.r,
@@ -260,8 +280,7 @@ class _SignInViewState extends ConsumerState<SignInView> {
                                     ),
                                     InkWell(
                                       borderRadius: BorderRadius.circular(8.r),
-                                      onTap: () =>
-                                          Navigator.of(context).maybePop(),
+                                      onTap: _handleBack,
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                           horizontal: 6.w,
@@ -291,27 +310,58 @@ class _SignInViewState extends ConsumerState<SignInView> {
                               ),
                               10.verticalSpace,
 
-                              // ─── Forgot Password / OTP Option ───────────
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(6.r),
-                                  onTap: _handleNavigateToOtp,
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 4.h,
-                                      horizontal: 2.w,
-                                    ),
-                                    child: Text(
-                                      l10n.forgotPasswordOrOtp,
-                                      style: AppTextStyles.custom(
-                                        fontSize: 12.sp.clamp(11.0, 13.0),
-                                        fontWeight: FontWeight.w600,
-                                        color: primary,
+                              // ─── Forgot Password / OTP Options ──────────
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      onTap: _handleNavigateToForgotPassword,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 4.h,
+                                          horizontal: 2.w,
+                                        ),
+                                        child: Text(
+                                          l10n.forgotPassword,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppTextStyles.custom(
+                                            fontSize: 12.sp.clamp(11.0, 13.0),
+                                            fontWeight: FontWeight.w600,
+                                            color: textMuted,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                  8.horizontalSpace,
+                                  Flexible(
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(6.r),
+                                      onTap: _handleNavigateToOtp,
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 4.h,
+                                          horizontal: 2.w,
+                                        ),
+                                        child: Text(
+                                          l10n.loginWithOtp,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.end,
+                                          style: AppTextStyles.custom(
+                                            fontSize: 12.sp.clamp(11.0, 13.0),
+                                            fontWeight: FontWeight.w600,
+                                            color: primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               20.verticalSpace,
 

@@ -154,4 +154,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get codeResentSuccess => 'Verification code resent successfully.';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Enter your phone number to receive the verification code.';
+
+  @override
+  String get createNewPassword => 'Create New Password';
+
+  @override
+  String get createNewPasswordSubtitle =>
+      'Use at least 8 characters with numbers and symbols.';
+
+  @override
+  String get newPassword => 'New Password';
+
+  @override
+  String get confirmPassword => 'Confirm Password';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords don\'t match';
+
+  @override
+  String get updatePassword => 'Update Password';
+
+  @override
+  String get passwordResetSuccessTitle => 'Congratulations !';
+
+  @override
+  String get passwordResetSuccessMessage =>
+      'Password Reset successful. You can now sign in with your new password';
+
+  @override
+  String get goToLogin => 'Go to Login';
+
+  @override
+  String get sendOtpAction => 'Send OTP';
+
+  @override
+  String get loginWithOtp => 'Log in with OTP';
 }

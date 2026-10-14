@@ -5,8 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/device_utils.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/features/auth/presentation/signin/views/signin_view.dart';
-import 'package:lokkha/features/auth/presentation/widgets/auth_password_field.dart';
 
 void main() {
   Widget buildTestableWidget(
@@ -74,7 +72,8 @@ void main() {
       expect(find.text('01712345678'), findsOneWidget);
       expect(find.text('আপনার ফোন নম্বর দিয়ে লগইন করুন'), findsOneWidget);
       expect(find.byType(AuthPasswordField), findsOneWidget);
-      expect(find.text('পাসওয়ার্ড মনে নেই? OTP দিয়ে লগইন করুন!'), findsOneWidget);
+      expect(find.text('পাসওয়ার্ড ভুলে গেছেন?'), findsOneWidget);
+      expect(find.text('OTP দিয়ে লগইন'), findsOneWidget);
       expect(find.text('এগিয়ে যান'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
@@ -109,7 +108,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Log in with your phone number'), findsOneWidget);
-      expect(find.text('Forgot password? Log in with OTP!'), findsOneWidget);
+      expect(find.text('Forgot Password'), findsOneWidget);
+      expect(find.text('Log in with OTP'), findsOneWidget);
       expect(find.text('Proceed'), findsOneWidget);
       expect(find.text('Change'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -281,4 +281,13 @@ class _MockAuthRepository implements AuthRepository {
     required String otp,
   }) async =>
       AuthResponseModel(status: true);
+
+  @override
+  Future<AuthResponseModel> forgetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+  }) async =>
+      AuthResponseModel(status: true, message: 'Password reset successful');
 }

@@ -24,6 +24,12 @@ abstract class AuthRemoteDataSource {
     String? referralCode,
     String? deviceName,
   });
+  Future<AuthResponseModel> forgetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+  });
   Future<AuthResponseModel?> getCurrentUser();
 }
 
@@ -180,6 +186,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return AuthResponseModel(
         status: false,
         message: 'রেজিস্ট্রেশন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
+      );
+    }
+  }
+
+  @override
+  Future<AuthResponseModel> forgetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+  }) async {
+    final cleanPhone = PhoneUtils.toLocal11Digit(phone).isNotEmpty
+        ? PhoneUtils.toLocal11Digit(phone)
+        : PhoneUtils.sanitize(phone);
+
+    final payload = <String, dynamic>{
+      'phone': cleanPhone,
+      'otp': otp,
+      'password': password,
+      'password_confirmation': passwordConfirmation ?? password,
+    };
+
+    try {
+      final response = await _client.post(
+        Endpoints.forgetPassword,
+        data: payload,
+      );
+      if (response.data is Map) {
+        return AuthResponseModel.fromJson(response.data as Map<String, dynamic>);
+      }
+      return AuthResponseModel(
+        status: false,
+        message: 'পাসওয়ার্ড পরিবর্তন করতে ব্যর্থ হয়েছে।',
+      );
+    } on DioException catch (e) {
+      return _handleDioError(e);
+    } catch (e) {
+      return AuthResponseModel(
+        status: false,
+        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
       );
     }
   }

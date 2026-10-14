@@ -379,6 +379,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verification code resent successfully.'**
   String get codeResentSuccess;
+
+  /// Subtitle on forgot password screen
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number to receive the verification code.'**
+  String get forgotPasswordSubtitle;
+
+  /// Header title on create new password screen
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Password'**
+  String get createNewPassword;
+
+  /// Subtitle explaining password requirements
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 8 characters with numbers and symbols.'**
+  String get createNewPasswordSubtitle;
+
+  /// Label for new password input field
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPassword;
+
+  /// Label for confirm password input field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// Error displayed when new and confirm passwords do not match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords don\'t match'**
+  String get passwordsDoNotMatch;
+
+  /// Button to submit new password
+  ///
+  /// In en, this message translates to:
+  /// **'Update Password'**
+  String get updatePassword;
+
+  /// Title of success dialog after password reset
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations !'**
+  String get passwordResetSuccessTitle;
+
+  /// Message of success dialog after password reset
+  ///
+  /// In en, this message translates to:
+  /// **'Password Reset successful. You can now sign in with your new password'**
+  String get passwordResetSuccessMessage;
+
+  /// Action button in dialog to navigate to login screen
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Login'**
+  String get goToLogin;
+
+  /// Action button to send OTP
+  ///
+  /// In en, this message translates to:
+  /// **'Send OTP'**
+  String get sendOtpAction;
+
+  /// Action link to log in using OTP
+  ///
+  /// In en, this message translates to:
+  /// **'Log in with OTP'**
+  String get loginWithOtp;
 }
 
 class _AppLocalizationsDelegate
