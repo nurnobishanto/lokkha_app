@@ -331,6 +331,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login failed. Please try again.'**
   String get loginFailed;
+
+  /// Header title on OTP verification screen
+  ///
+  /// In en, this message translates to:
+  /// **'OTP Verification'**
+  String get otpVerification;
+
+  /// Subtitle explaining OTP was sent to user phone number
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ve sent a 6-digit verification code to'**
+  String get otpSubtitle;
+
+  /// Action link to resend OTP
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendOtp;
+
+  /// Countdown timer message before resend is enabled
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in ({seconds})'**
+  String resendCodeIn(String seconds);
+
+  /// Prompt question if OTP was not received
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive the code? '**
+  String get didNotReceiveCode;
+
+  /// Button to confirm and verify OTP
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// Validation message when OTP field is incomplete
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the 6-digit verification code.'**
+  String get otpRequired;
+
+  /// Toast message when OTP is successfully resent
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code resent successfully.'**
+  String get codeResentSuccess;
 }
 
 class _AppLocalizationsDelegate

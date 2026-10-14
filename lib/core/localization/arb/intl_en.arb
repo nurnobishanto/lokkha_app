@@ -155,5 +155,42 @@
   "loginFailed": "Login failed. Please try again.",
   "@loginFailed": {
     "description": "Message displayed when login fails"
+  },
+  "otpVerification": "OTP Verification",
+  "@otpVerification": {
+    "description": "Header title on OTP verification screen"
+  },
+  "otpSubtitle": "We've sent a 6-digit verification code to",
+  "@otpSubtitle": {
+    "description": "Subtitle explaining OTP was sent to user phone number"
+  },
+  "resendOtp": "Resend Code",
+  "@resendOtp": {
+    "description": "Action link to resend OTP"
+  },
+  "resendCodeIn": "Resend code in ({seconds})",
+  "@resendCodeIn": {
+    "description": "Countdown timer message before resend is enabled",
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "didNotReceiveCode": "Didn't receive the code? ",
+  "@didNotReceiveCode": {
+    "description": "Prompt question if OTP was not received"
+  },
+  "verify": "Verify",
+  "@verify": {
+    "description": "Button to confirm and verify OTP"
+  },
+  "otpRequired": "Please enter the 6-digit verification code.",
+  "@otpRequired": {
+    "description": "Validation message when OTP field is incomplete"
+  },
+  "codeResentSuccess": "Verification code resent successfully.",
+  "@codeResentSuccess": {
+    "description": "Toast message when OTP is successfully resent"
   }
 }

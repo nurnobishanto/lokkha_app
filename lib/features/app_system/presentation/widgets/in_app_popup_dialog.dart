@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -13,18 +12,18 @@ class InAppPopupDialog extends StatelessWidget {
 
   const InAppPopupDialog({super.key, required this.popup});
 
-  static void show(InAppPopupModel popup) {
+  static void show(InAppPopupModel popup, {BuildContext? context}) {
     if (!popup.enabled || isShowing) return;
     isShowing = true;
 
-    final context = rootNavigatorKey.currentContext;
-    if (context == null) {
+    final targetContext = context ?? rootNavigatorKey.currentContext;
+    if (targetContext == null || !targetContext.mounted) {
       isShowing = false;
       return;
     }
 
     showDialog(
-      context: context,
+      context: targetContext,
       barrierDismissible: true,
       barrierColor: Colors.black.withValues(alpha: 0.65),
       builder: (_) => InAppPopupDialog(popup: popup),

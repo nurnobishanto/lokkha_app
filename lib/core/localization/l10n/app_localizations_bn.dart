@@ -129,4 +129,30 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get loginFailed => 'লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+
+  @override
+  String get otpVerification => 'ওটিপি যাচাইকরণ';
+
+  @override
+  String get otpSubtitle => 'আপনার নম্বরে ৬-সংখ্যার যাচাইকরণ কোড পাঠানো হয়েছে';
+
+  @override
+  String get resendOtp => 'পুনরায় কোড পাঠান';
+
+  @override
+  String resendCodeIn(String seconds) {
+    return 'পুনরায় কোড পাঠান ($seconds)';
+  }
+
+  @override
+  String get didNotReceiveCode => 'কোড পাননি? ';
+
+  @override
+  String get verify => 'যাচাই করুন';
+
+  @override
+  String get otpRequired => 'অনুগ্রহ করে ৬-সংখ্যার ওটিপি কোডটি লিখুন।';
+
+  @override
+  String get codeResentSuccess => 'যাচাইকরণ কোড সফলভাবে পাঠানো হয়েছে।';
 }

@@ -10,22 +10,26 @@ class VerifyOtpState {
   final bool isLoading;
   final String otp;
   final String? errorMessage;
+  final int expiresIn;
 
   const VerifyOtpState({
     this.isLoading = false,
     this.otp = '',
     this.errorMessage,
+    this.expiresIn = 300,
   });
 
   VerifyOtpState copyWith({
     bool? isLoading,
     String? otp,
     String? errorMessage,
+    int? expiresIn,
   }) {
     return VerifyOtpState(
       isLoading: isLoading ?? this.isLoading,
       otp: otp ?? this.otp,
       errorMessage: errorMessage ?? this.errorMessage,
+      expiresIn: expiresIn ?? this.expiresIn,
     );
   }
 }
@@ -44,7 +48,8 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     try {
       final sendOtpUseCase = ref.read(sendOtpUseCaseProvider);
       final res = await sendOtpUseCase(phone, type: type);
-      state = state.copyWith(isLoading: false);
+      final newExpiresIn = res.expiresIn ?? 300;
+      state = state.copyWith(isLoading: false, expiresIn: newExpiresIn);
       if (res.status) {
         CustomSnackBar.showCustomToast(
           message: res.message ?? "ওটিপি সফলভাবে পাঠানো হয়েছে।",

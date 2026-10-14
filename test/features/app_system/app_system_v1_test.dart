@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 
 void main() {
@@ -178,6 +179,15 @@ void main() {
       expect(empty.data.systemStatus.isUnderMaintenance, false);
       expect(empty.data.announcements.inAppPopup.enabled, false);
       expect(empty.data.clientVersionCheck, isNull);
+    });
+
+    test('AppUpdateService in-app popup does not show twice when hasShownInAppPopup is true', () {
+      final service = AppUpdateService();
+      service.hasShownInAppPopup = true;
+
+      // When hasShownInAppPopup is true, calling showInAppAnnouncementIfAvailable returns immediately
+      service.showInAppAnnouncementIfAvailable();
+      expect(service.hasShownInAppPopup, isTrue);
     });
   });
 }

@@ -128,4 +128,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginFailed => 'Login failed. Please try again.';
+
+  @override
+  String get otpVerification => 'OTP Verification';
+
+  @override
+  String get otpSubtitle => 'We\'ve sent a 6-digit verification code to';
+
+  @override
+  String get resendOtp => 'Resend Code';
+
+  @override
+  String resendCodeIn(String seconds) {
+    return 'Resend code in ($seconds)';
+  }
+
+  @override
+  String get didNotReceiveCode => 'Didn\'t receive the code? ';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get otpRequired => 'Please enter the 6-digit verification code.';
+
+  @override
+  String get codeResentSuccess => 'Verification code resent successfully.';
 }

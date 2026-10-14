@@ -12,6 +12,7 @@ class AuthResponseModel {
   final String? suggestedStep;
   final String? authMethod;
   final String? canonicalPhone;
+  final int? expiresIn;
   final Map<String, dynamic>? rawData;
 
   AuthResponseModel({
@@ -26,6 +27,7 @@ class AuthResponseModel {
     this.suggestedStep,
     this.authMethod,
     this.canonicalPhone,
+    this.expiresIn,
     this.rawData,
   });
 
@@ -131,6 +133,18 @@ class AuthResponseModel {
       isRegistered = false;
     }
 
+    // Flexible extraction for expiresIn (e.g. 300 seconds for OTP expiry)
+    int? expiresIn;
+    if (json['expires_in'] is num) {
+      expiresIn = (json['expires_in'] as num).toInt();
+    } else if (json['data'] is Map && json['data']['expires_in'] is num) {
+      expiresIn = (json['data']['expires_in'] as num).toInt();
+    } else if (json['expires_in'] != null) {
+      expiresIn = int.tryParse(json['expires_in'].toString());
+    } else if (json['data'] is Map && json['data']['expires_in'] != null) {
+      expiresIn = int.tryParse(json['data']['expires_in'].toString());
+    }
+
     return AuthResponseModel(
       status: status,
       message: message,
@@ -143,6 +157,7 @@ class AuthResponseModel {
       suggestedStep: suggestedStep,
       authMethod: authMethod,
       canonicalPhone: canonicalPhone,
+      expiresIn: expiresIn,
       rawData: json,
     );
   }

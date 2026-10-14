@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -150,7 +149,6 @@ class HomeNotifier extends Notifier<HomeState> {
   Future<void> refreshHomeViewData() async {
     await fetchInitialData();
     await AppUpdateService().fetchAppInfoAndCheckVersion();
-    AppUpdateService().showInAppAnnouncementIfAvailable(force: true);
   }
 }
 

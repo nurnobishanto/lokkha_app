@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +21,9 @@ import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/settings/settings.dart';
 import 'package:lokkha/shared/shared.dart';
+import 'route_observer.dart';
 import 'routes.dart';
+export 'route_observer.dart';
 export 'routes.dart';
 
 /// Central Navigation & Messenger Keys
@@ -33,6 +36,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: Routes.splash,
+    debugLogDiagnostics: kDebugMode,
+    observers: [
+      AppRouteObserver(),
+    ],
     routes: [
       GoRoute(
         path: Routes.initial,

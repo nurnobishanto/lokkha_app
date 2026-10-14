@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
+import 'package:flutter/foundation.dart';
+
 import '../errors/exceptions.dart';
 import '../storage/secure_storage_service.dart';
 import 'endpoints.dart';
+import 'interceptor/app_dio_logger.dart';
+import 'interceptor/token_manager.dart';
 
 export 'endpoints.dart';
+export 'interceptor/app_dio_logger.dart';
 export 'interceptor/token_manager.dart';
 
 /// Production-ready REST HTTP client with interceptors and typed error mapping.
@@ -30,6 +35,7 @@ class RestClient {
                 },
               ),
             ) {
+    // 1. Auth & Token Injection
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -53,6 +59,14 @@ class RestClient {
         },
       ),
     );
+
+    // 2. Token Manager for Session expiration & standard headers
+    _dio.interceptors.add(TokenManager());
+
+    // 3. Developer Console Logger
+    if (kDebugMode) {
+      _dio.interceptors.add(AppDioLogger());
+    }
   }
 
   Dio get rawDio => _dio;

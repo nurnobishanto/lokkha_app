@@ -85,9 +85,6 @@ class AppUpdateService {
       updateRequiredCheck.value = updateRequired;
       isChecking.value = false;
 
-      if (!maintenanceMode && !updateRequired) {
-        showInAppAnnouncementIfAvailable();
-      }
       return result;
     } catch (e) {
       debugPrint('[AppUpdateService] Failed to fetch v1 app-info: $e');
@@ -221,26 +218,41 @@ class AppUpdateService {
     );
   }
 
-  /// Displays the dynamic In-App Announcement popup if enabled and not yet shown
-  void showInAppAnnouncementIfAvailable({bool force = false}) {
+  /// Displays the dynamic In-App Announcement popup if enabled, not yet shown,
+  /// and the user is on the Home screen.
+  void showInAppAnnouncementIfAvailable({BuildContext? context, bool force = false}) {
+    if (hasShownInAppPopup && !force) return;
+
+    if (appInfo.value == null) {
+      fetchAppInfoAndCheckVersion().then((_) {
+        _displayPopupIfEligible(force: force);
+      });
+      return;
+    }
+
+    _displayPopupIfEligible(context: context, force: force);
+  }
+
+  void _displayPopupIfEligible({BuildContext? context, bool force = false}) {
     if (hasShownInAppPopup && !force) return;
     final popup = appInfo.value?.data.announcements.inAppPopup;
     if (popup == null || !popup.enabled) return;
     if (InAppPopupDialog.isShowing) return;
 
-    // Immediately mark as shown to prevent race condition when multiple callers trigger simultaneously
+    final targetContext = context ?? rootNavigatorKey.currentContext;
+    if (targetContext == null) return;
+
+    // Immediately mark as shown to prevent duplicate triggers across the app session
     hasShownInAppPopup = true;
     debugPrint(
-        '[AppUpdateService] showInAppAnnouncementIfAvailable: popup=${popup.heading}, enabled=${popup.enabled}, force=$force');
+        '[AppUpdateService] showInAppAnnouncementIfAvailable: popup=${popup.heading}, enabled=${popup.enabled}');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (rootNavigatorKey.currentContext != null && !InAppPopupDialog.isShowing) {
-          debugPrint(
-              '[AppUpdateService] Displaying InAppPopupDialog: ${popup.heading}');
-          InAppPopupDialog.show(popup);
-        }
-      });
+      if (targetContext.mounted && !InAppPopupDialog.isShowing) {
+        debugPrint(
+            '[AppUpdateService] Displaying InAppPopupDialog on Home screen: ${popup.heading}');
+        InAppPopupDialog.show(popup, context: targetContext);
+      }
     });
   }
 

@@ -6,10 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/services/app_update_service.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/course/course.dart';
@@ -33,7 +31,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(homeNotifierProvider.notifier).fetchInitialData();
-      AppUpdateService().showInAppAnnouncementIfAvailable();
+      if (mounted) {
+        AppUpdateService().showInAppAnnouncementIfAvailable(context: context);
+      }
     });
   }
 
