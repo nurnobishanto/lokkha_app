@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/date_formatter.dart';
 import 'package:lokkha/app/router/router.dart';
 import '../providers/jobs_notifier.dart';
 
@@ -33,90 +31,114 @@ class JobsView extends ConsumerWidget {
                   children: [
                     state.isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : (state.model.jobs?.data?.isEmpty ?? true)
+                        : (state.currentJobs.isEmpty)
                             ? const Center(
                                 child: Text('তথ্য পাওয়া যায়নি'),
                               )
                             : Expanded(
-                                child: ListView.separated(
-                                  itemCount:
-                                      (state.model.jobs?.data?.length ?? 0) + 1,
-                                  shrinkWrap: true,
-                                  itemBuilder: (_, index) {
-                                    final dataList =
-                                        state.model.jobs?.data ?? [];
-                                    if (index == dataList.length) {
-                                      final lastPage =
-                                          state.model.jobs?.lastPage ?? 1;
-                                      return (lastPage > state.currentPage)
-                                          ? Column(
-                                              children: [
-                                                const SizedBox(height: 5.0),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    notifier.fetchJobs(
-                                                      "",
-                                                      page:
-                                                          state.currentPage + 1,
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    height: 30,
-                                                    width: MediaQuery.sizeOf(
-                                                                context)
-                                                            .width /
-                                                        2,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              15.0),
-                                                      border: Border.all(
-                                                        color: LightThemeColors
-                                                            .primaryColor,
-                                                        width: 1,
-                                                      ),
-                                                    ),
-                                                    child: const Center(
-                                                      child: Text(
-                                                        'আরও দেখুন',
-                                                        style: TextStyle(
-                                                          color:
-                                                              LightThemeColors
-                                                                  .primaryColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
+                                child: RefreshIndicator(
+                                  onRefresh: () => notifier.fetchJobs(
+                                    "",
+                                    page: 1,
+                                    refresh: true,
+                                  ),
+                                  child: ListView.separated(
+                                    itemCount: state.currentJobs.length + 1,
+                                    shrinkWrap: true,
+                                    itemBuilder: (_, index) {
+                                      final dataList = state.currentJobs;
+                                      if (index == dataList.length) {
+                                        final lastPage =
+                                            state.model.jobs?.lastPage ?? 1;
+                                        return (lastPage > state.currentPage)
+                                            ? Column(
+                                                children: [
+                                                  const SizedBox(height: 5.0),
+                                                  GestureDetector(
+                                                    onTap: state.isLoadingMore
+                                                        ? null
+                                                        : () {
+                                                            notifier.fetchJobs(
+                                                              "",
+                                                              page: state
+                                                                      .currentPage +
+                                                                  1,
+                                                            );
+                                                          },
+                                                    child: Container(
+                                                      height: 30,
+                                                      width: MediaQuery.sizeOf(
+                                                                  context)
+                                                              .width /
+                                                          2,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15.0),
+                                                        border: Border.all(
+                                                          color: LightThemeColors
+                                                              .primaryColor,
+                                                          width: 1,
                                                         ),
+                                                      ),
+                                                      child: Center(
+                                                        child: state
+                                                                .isLoadingMore
+                                                            ? const SizedBox(
+                                                                height: 16,
+                                                                width: 16,
+                                                                child:
+                                                                    CircularProgressIndicator(
+                                                                  strokeWidth: 2,
+                                                                  valueColor:
+                                                                      AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                    LightThemeColors
+                                                                        .primaryColor,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : const Text(
+                                                                'আরও দেখুন',
+                                                                style: TextStyle(
+                                                                  color: LightThemeColors
+                                                                      .primaryColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            )
-                                          : const SizedBox.shrink();
-                                    }
+                                                ],
+                                              )
+                                            : const SizedBox.shrink();
+                                      }
 
-                                    var data = dataList[index];
-                                    final jobTitle = (data.title != null &&
-                                            data.title!.trim().isNotEmpty)
-                                        ? data.title!.trim()
-                                        : (data.companyName?.trim().isNotEmpty ==
-                                                true
-                                            ? data.companyName!.trim()
-                                            : "");
-                                    return GovJobCard(
-                                      title: jobTitle,
-                                      onTap: () {
-                                        debugPrint("1x. ${data.id}");
-                                        context.pushNamed(
-                                          Routes.jobDetails,
-                                          extra: data.id,
-                                        );
-                                      },
-                                      deadline: data.deadline,
-                                    );
-                                  },
-                                  separatorBuilder: (x, i) =>
-                                      const SizedBox(height: 5.0),
+                                      var data = dataList[index];
+                                      final jobTitle = (data.title != null &&
+                                              data.title!.trim().isNotEmpty)
+                                          ? data.title!.trim()
+                                          : (data.companyName?.trim().isNotEmpty ==
+                                                  true
+                                              ? data.companyName!.trim()
+                                              : "");
+                                      return GovJobCard(
+                                        title: jobTitle,
+                                        onTap: () {
+                                          debugPrint("1x. ${data.id}");
+                                          context.pushNamed(
+                                            Routes.jobDetails,
+                                            extra: data.id,
+                                          );
+                                        },
+                                        deadline: data.deadline,
+                                      );
+                                    },
+                                    separatorBuilder: (x, i) =>
+                                        const SizedBox(height: 5.0),
+                                  ),
                                 ),
                               ),
                   ],
@@ -132,7 +154,7 @@ class JobsView extends ConsumerWidget {
 
 String displayDeadline(DateTime? deadline) {
   if (deadline == null) {
-    return 'unknown';
+    return '';
   }
   return DateFormatter.formatJobDeadline(deadline);
 }

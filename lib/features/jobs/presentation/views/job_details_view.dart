@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:lokkha/core/utils/date_formatter.dart';
-import '../providers/jobs_notifier.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailsScreen extends ConsumerWidget {
   final int id;
@@ -41,6 +40,14 @@ class JobDetailsScreen extends ConsumerWidget {
 
           final isDeadlineOver = jobData.deadline != null &&
               DateTime.now().isAfter(jobData.deadline!);
+
+          final rawFile = (jobData.imageUrl != null &&
+                  jobData.imageUrl!.trim().isNotEmpty)
+              ? jobData.imageUrl!.trim()
+              : (jobData.sourceFile != null &&
+                      jobData.sourceFile!.trim().isNotEmpty
+                  ? jobData.sourceFile!.trim()
+                  : '');
 
           return Column(
             children: [
@@ -122,48 +129,138 @@ class JobDetailsScreen extends ConsumerWidget {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 5.0),
-                            Text(
-                              "সোর্স: ${jobData.source ?? ''}",
-                              style: AppTextStyles.heading5
-                                  .copyWith(color: context.textSecondary),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            if (jobData.source != null &&
+                                jobData.source!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 5.0),
+                              Text(
+                                "সোর্স: ${jobData.source!.trim()}",
+                                style: AppTextStyles.heading5
+                                    .copyWith(color: context.textSecondary),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            if (jobData.vacancy != null &&
+                                jobData.vacancy!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 5.0),
+                              Text(
+                                "পদসংখ্যা: ${jobData.vacancy!.trim()}",
+                                style: AppTextStyles.heading5
+                                    .copyWith(color: context.textSecondary),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            if (jobData.salary != null &&
+                                jobData.salary!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 5.0),
+                              Text(
+                                "বেতন: ${jobData.salary!.trim()}",
+                                style: AppTextStyles.heading5
+                                    .copyWith(color: context.textSecondary),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            if (jobData.ageLimit != null &&
+                                jobData.ageLimit!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 5.0),
+                              Text(
+                                "বয়সসীমা: ${jobData.ageLimit!.trim()}",
+                                style: AppTextStyles.heading5
+                                    .copyWith(color: context.textSecondary),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                            if (jobData.details != null &&
+                                jobData.details!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 10.0),
+                              Text(
+                                jobData.details!.trim(),
+                                style: TextStyle(
+                                  color: context.textPrimary,
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ],
+                            if (jobData.applicationLink != null &&
+                                jobData.applicationLink!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 12.0),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final uri = Uri.tryParse(
+                                        jobData.applicationLink!.trim());
+                                    if (uri != null &&
+                                        await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.externalApplication,
+                                      );
+                                    }
+                                  },
+                                  icon: const Icon(Icons.open_in_new, size: 18),
+                                  label: const Text(
+                                    "আবেদন করুন",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        LightThemeColors.primaryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 10.0),
 
                             // PDF or Image Viewer
-                            if (jobData.sourceFile != null &&
-                                jobData.sourceFile!.isNotEmpty)
-                              jobData.sourceFile!.contains("pdf")
-                                  ? SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.6,
-                                      child: SfPdfViewer.network(
-                                        "${Endpoints.storageUrl}${jobData.sourceFile}",
+                            if (rawFile.isNotEmpty) ...[
+                              if (rawFile.toLowerCase().contains("pdf"))
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.6,
+                                  child: SfPdfViewer.network(
+                                    (rawFile.startsWith("http://") ||
+                                            rawFile.startsWith("https://"))
+                                        ? rawFile
+                                        : "${Endpoints.storageUrl}$rawFile",
+                                  ),
+                                )
+                              else
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: InteractiveViewer(
+                                    panEnabled: true,
+                                    minScale: 0.5,
+                                    maxScale: 4.5,
+                                    child: CachedNetworkImage(
+                                      imageUrl: (rawFile.startsWith("http://") ||
+                                              rawFile.startsWith("https://"))
+                                          ? rawFile
+                                          : "${Endpoints.storageUrl}$rawFile",
+                                      fit: BoxFit.fitHeight,
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                        child: CircularProgressIndicator(),
                                       ),
-                                    )
-                                  : SizedBox(
-                                      width: double.infinity,
-                                      child: InteractiveViewer(
-                                        panEnabled: true,
-                                        minScale: 0.5,
-                                        maxScale: 4.5,
-                                        child: CachedNetworkImage(
-                                          imageUrl:
-                                              "${Endpoints.storageUrl}${jobData.sourceFile.toString()}",
-                                          fit: BoxFit.fitHeight,
-                                          placeholder: (context, url) =>
-                                              const Center(
-                                            child:
-                                                CircularProgressIndicator(),
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(Icons.error),
-                                        ),
-                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
                                     ),
+                                  ),
+                                ),
+                            ],
                           ],
                         ),
                       ),
