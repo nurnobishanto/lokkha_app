@@ -26,6 +26,15 @@ abstract class AuthRepository {
     String? referralCode,
     String? deviceName,
   });
+  Future<AuthResponseModel> forgotPassword(String phone);
+  Future<AuthResponseModel> resetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+    String? deviceName,
+    String? platform,
+  });
   Future<AuthResponseModel> forgetPassword({
     required String phone,
     required String otp,

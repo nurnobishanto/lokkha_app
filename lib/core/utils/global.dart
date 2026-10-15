@@ -13,7 +13,6 @@ import 'package:lokkha/core/network/endpoints.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
 
 /// GLOBAL CONFIG: shared across the entire app.
@@ -314,6 +313,7 @@ bool isAppRoute(String path) {
     Routes.onBoarding,
     Routes.verifyOtp,
     Routes.forgetPassword,
+    Routes.resetPassword,
     Routes.signUp,
     Routes.authGateway,
     Routes.profileUpdate,

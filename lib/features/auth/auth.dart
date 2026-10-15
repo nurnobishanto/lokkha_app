@@ -11,6 +11,8 @@ export 'domain/usecases/verify_otp_usecase.dart';
 export 'domain/usecases/login_usecase.dart';
 export 'domain/usecases/register_usecase.dart';
 export 'domain/usecases/forget_password_usecase.dart';
+export 'domain/usecases/forgot_password_usecase.dart';
+export 'domain/usecases/reset_password_usecase.dart';
 export 'domain/usecases/logout_usecase.dart';
 
 // Presentation - Riverpod Notifiers

@@ -30,31 +30,41 @@ class Subject {
   });
 
   factory Subject.fromJson(Map<String, dynamic> json) => Subject(
-        id: json["id"],
-        name: json["name"],
-        slug: json["slug"],
-        description: json["description"],
+        id: json["id"] is num
+            ? (json["id"] as num).toInt()
+            : int.tryParse(json["id"]?.toString() ?? ''),
+        name: (json["name"] ?? json["title"])?.toString(),
+        slug: json["slug"]?.toString(),
+        description: json["description"]?.toString(),
         status: json["status"] == null
             ? null
             : (json["status"] is bool
                 ? json["status"]
-                : (json["status"] == 1 || json["status"] == "1" || json["status"] == "true")),
+                : (json["status"] == 1 ||
+                    json["status"] == "1" ||
+                    json["status"] == "true")),
         questions: json["questions"] == null
             ? []
             : List<Question>.from(
                 json["questions"]!.map((x) => Question.fromJson(x))),
-        parentId: json["parent_id"],
-        questionCount: json["question_count"],
+        parentId: json["parent_id"] is num
+            ? (json["parent_id"] as num).toInt()
+            : int.tryParse(json["parent_id"]?.toString() ?? ''),
+        questionCount: json["question_count"] is num
+            ? (json["question_count"] as num).toInt()
+            : (int.tryParse(json["question_count"]?.toString() ?? '') ?? 0),
         children: json["children"] == null
             ? []
             : List<Subject>.from(
                 json["children"]!.map((x) => Subject.fromJson(x))),
-        image: json["image"],
+        image: json["image"]?.toString(),
         showApp: json["show_app"] == null
             ? null
             : (json["show_app"] is bool
                 ? json["show_app"]
-                : (json["show_app"] == 1 || json["show_app"] == "1" || json["show_app"] == "true")),
+                : (json["show_app"] == 1 ||
+                    json["show_app"] == "1" ||
+                    json["show_app"] == "true")),
         pivot:
             json["pivot"] == null ? null : SubjectPivot.fromJson(json["pivot"]),
       );

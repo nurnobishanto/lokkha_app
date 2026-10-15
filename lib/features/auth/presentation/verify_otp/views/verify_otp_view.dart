@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/phone_utils.dart';
@@ -17,6 +16,7 @@ class VerifyOtpView extends ConsumerStatefulWidget {
   final bool autoStartTimer;
   final bool autoSendOtp;
   final int initialExpiresIn;
+  final String? serverOtp;
 
   const VerifyOtpView({
     super.key,
@@ -25,6 +25,7 @@ class VerifyOtpView extends ConsumerStatefulWidget {
     this.autoStartTimer = true,
     this.autoSendOtp = true,
     this.initialExpiresIn = 300,
+    this.serverOtp,
   });
 
   @override
@@ -45,15 +46,18 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
       _startResendTimer(widget.initialExpiresIn);
     }
 
-    if (widget.autoSendOtp) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (widget.phoneNumber.isNotEmpty) {
-          ref
-              .read(verifyOtpNotifierProvider.notifier)
-              .sendOtp(widget.phoneNumber, widget.type);
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.serverOtp != null && widget.serverOtp!.isNotEmpty) {
+        ref
+            .read(verifyOtpNotifierProvider.notifier)
+            .setServerOtp(widget.serverOtp);
+      }
+      if (widget.autoSendOtp && widget.phoneNumber.isNotEmpty) {
+        ref
+            .read(verifyOtpNotifierProvider.notifier)
+            .sendOtp(widget.phoneNumber, widget.type);
+      }
+    });
   }
 
   @override
@@ -121,7 +125,10 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
 
     final isForgetPassword =
         widget.type.toLowerCase().contains('forget') ||
-            widget.type.toLowerCase().contains('reset');
+        widget.type.toLowerCase().contains('forgot') ||
+        widget.type.toLowerCase().contains('reset');
+
+    ref.read(verifyOtpNotifierProvider.notifier).setOtp(otp);
 
     if (widget.type == 'Registration') {
       ref
@@ -130,7 +137,7 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
     } else if (isForgetPassword) {
       ref
           .read(verifyOtpNotifierProvider.notifier)
-          .verifyOtpForReset(widget.phoneNumber, context);
+          .verifyOtpForReset(widget.phoneNumber, context, otp: otp);
     } else {
       ref
           .read(verifyOtpNotifierProvider.notifier)
@@ -147,7 +154,8 @@ class _VerifyOtpViewState extends ConsumerState<VerifyOtpView> {
     } else if (router != null) {
       final isForgetPassword =
           widget.type.toLowerCase().contains('forget') ||
-              widget.type.toLowerCase().contains('reset');
+          widget.type.toLowerCase().contains('forgot') ||
+          widget.type.toLowerCase().contains('reset');
       if (isForgetPassword) {
         router.go(Routes.forgetPassword);
       } else {

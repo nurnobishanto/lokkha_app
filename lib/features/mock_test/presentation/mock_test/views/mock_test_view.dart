@@ -18,83 +18,115 @@ class MockTestView extends ConsumerWidget {
     }
 
     if (state.hasError) {
-      return const Center(child: Text("Failed to load data. Try again."));
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "ডেটা লোড করা যায়নি, আবার চেষ্টা করুন",
+              style: TextStyle(color: context.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ref
+                  .read(mockTestNotifierProvider.notifier)
+                  .getRootSubjects(isRefresh: true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.primaryColor,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text("আবার চেষ্টা করুন"),
+            ),
+          ],
+        ),
+      );
     }
 
     final subjects = state.model?.subjects ?? [];
-        return SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 16.0,
-              bottom: 8.0.h,
-              left: 8.0.h,
-              right: 8.0.h,
-            ),
-            child: Center(
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: List.generate(subjects.length, (index) {
-                  final subject = subjects[index];
-                  return InkWell(
-                    onTap: () async {
-                      MySharedPref.clearMockSubjects();
-                      MockSubjectSelect newSubject = MockSubjectSelect(
-                        id: subject.id,
-                        name: subject.name,
-                        quantity: min(15, subject.questionCount?.toInt() ?? 0),
-                        max: subject.questionCount?.toInt(),
-                      );
-                      await MySharedPref.addOrUpdateMockSubjectSelect(
-                          newSubject);
+    return RefreshIndicator(
+      color: context.primaryColor,
+      onRefresh: () => ref
+          .read(mockTestNotifierProvider.notifier)
+          .getRootSubjects(isRefresh: true),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 16.0,
+            bottom: 24.0.h,
+            left: 10.0.w,
+            right: 10.0.w,
+          ),
+          child: Center(
+            child: Wrap(
+              spacing: 10.w,
+              runSpacing: 10.h,
+              alignment: WrapAlignment.center,
+              children: List.generate(subjects.length, (index) {
+                final subject = subjects[index];
+                final qCount = subject.questionCount ?? 0;
+                return InkWell(
+                  onTap: () async {
+                    MySharedPref.clearMockSubjects();
+                    MockSubjectSelect newSubject = MockSubjectSelect(
+                      id: subject.id,
+                      name: subject.name,
+                      quantity: min(15, qCount > 0 ? qCount : 15),
+                      max: qCount > 0 ? qCount : null,
+                    );
+                    await MySharedPref.addOrUpdateMockSubjectSelect(
+                        newSubject);
 
-                      if (context.mounted) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                TopicSelectionView(subject: subject),
-                          ),
-                        );
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.00.w, vertical: 8.00.h),
-                      decoration: BoxDecoration(
-                        color: context.cardColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: context.isDark
-                              ? context.borderColor
-                              : context.primaryColor.withValues(alpha: 0.3),
-                          width: context.isDark ? 0.8 : 0.4,
+                    if (context.mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              TopicSelectionView(subject: subject),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: context.isDark
-                                ? Colors.black.withValues(alpha: 0.2)
-                                : Colors.black.withValues(alpha: 0.05),
-                            spreadRadius: 1,
-                            blurRadius: 5,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 12.0.w, vertical: 9.0.h),
+                    decoration: BoxDecoration(
+                      color: context.cardColor,
+                      borderRadius: BorderRadius.circular(10.r),
+                      border: Border.all(
+                        color: context.isDark
+                            ? context.borderColor
+                            : context.primaryColor.withValues(alpha: 0.25),
+                        width: context.isDark ? 0.8 : 0.6,
                       ),
-                      child: Text(
-                        subject.name.toString(),
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.body2.copyWith(
-                          color: context.textPrimary,
-                          fontWeight: FontWeight.w500,
+                      boxShadow: [
+                        BoxShadow(
+                          color: context.isDark
+                              ? Colors.black.withValues(alpha: 0.2)
+                              : Colors.black.withValues(alpha: 0.04),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 1.5),
                         ),
+                      ],
+                    ),
+                    child: Text(
+                      qCount > 0
+                          ? '${subject.name} (${qCount > 999 ? '${(qCount / 1000).toStringAsFixed(1)}k' : '$qCount'})'
+                          : subject.name.toString(),
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.body2.copyWith(
+                        color: context.textPrimary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
-        );
+        ),
+      ),
+    );
   }
 }

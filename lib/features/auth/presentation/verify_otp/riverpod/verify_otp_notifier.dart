@@ -9,12 +9,14 @@ import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 class VerifyOtpState {
   final bool isLoading;
   final String otp;
+  final String? serverOtp;
   final String? errorMessage;
   final int expiresIn;
 
   const VerifyOtpState({
     this.isLoading = false,
     this.otp = '',
+    this.serverOtp,
     this.errorMessage,
     this.expiresIn = 300,
   });
@@ -22,12 +24,14 @@ class VerifyOtpState {
   VerifyOtpState copyWith({
     bool? isLoading,
     String? otp,
+    String? serverOtp,
     String? errorMessage,
     int? expiresIn,
   }) {
     return VerifyOtpState(
       isLoading: isLoading ?? this.isLoading,
       otp: otp ?? this.otp,
+      serverOtp: serverOtp ?? this.serverOtp,
       errorMessage: errorMessage ?? this.errorMessage,
       expiresIn: expiresIn ?? this.expiresIn,
     );
@@ -42,14 +46,28 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     state = state.copyWith(otp: value);
   }
 
+  void setServerOtp(String? value) {
+    state = state.copyWith(serverOtp: value);
+  }
+
   Future<void> sendOtp(String phone, [String type = 'Registration']) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final sendOtpUseCase = ref.read(sendOtpUseCaseProvider);
-      final res = await sendOtpUseCase(phone, type: type);
+      final isForgotPassword = type.toLowerCase().contains('forget') ||
+          type.toLowerCase().contains('forgot') ||
+          type.toLowerCase().contains('reset');
+
+      final res = isForgotPassword
+          ? await ref.read(forgotPasswordUseCaseProvider)(phone)
+          : await ref.read(sendOtpUseCaseProvider)(phone, type: type);
+
       final newExpiresIn = res.expiresIn ?? 300;
-      state = state.copyWith(isLoading: false, expiresIn: newExpiresIn);
+      state = state.copyWith(
+        isLoading: false,
+        expiresIn: newExpiresIn,
+        serverOtp: res.otp ?? state.serverOtp,
+      );
       if (res.status) {
         CustomSnackBar.showCustomToast(
           message: res.message ?? "ওটিপি সফলভাবে পাঠানো হয়েছে।",
@@ -128,8 +146,13 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
     }
   }
 
-  Future<void> verifyOtpForReset(String phone, BuildContext context) async {
-    if (state.otp.trim().length < 6) {
+  Future<void> verifyOtpForReset(
+    String phone,
+    BuildContext context, {
+    String? otp,
+  }) async {
+    final resolvedOtp = (otp ?? state.otp).trim();
+    if (resolvedOtp.length < 6) {
       CustomSnackBar.showCustomErrorSnackBar(
         title: 'Please Fill the pin',
         message: 'OTP must be 6 digits.',
@@ -139,43 +162,37 @@ class VerifyOtpNotifier extends Notifier<VerifyOtpState> {
 
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    try {
-      final verifyOtpUseCase = ref.read(verifyOtpUseCaseProvider);
-      final res = await verifyOtpUseCase(
-        phone: phone,
-        otp: state.otp.trim(),
-      );
-
-      state = state.copyWith(isLoading: false);
-
-      if (res.status) {
-        if (context.mounted) {
-          context.push(
-            Routes.resetPassword,
-            extra: {
-              'phoneNumber': phone,
-              'otp': state.otp.trim(),
-            },
-          );
-        }
-      } else {
-        state = state.copyWith(
-          errorMessage: res.message ?? 'ওটিপি যাচাই করা সম্ভব হয়নি।',
-        );
-        CustomSnackBar.showCustomErrorSnackBar(
-          title: 'OTP Error',
-          message: res.message ?? 'সঠিক ওটিপি প্রদান করুন।',
-        );
-      }
-    } catch (e) {
+    // Validate strictly against serverOtp if available
+    final expectedOtp = state.serverOtp?.trim();
+    if (expectedOtp != null && expectedOtp.isNotEmpty && resolvedOtp != expectedOtp) {
+      const errorMsg = 'ওটিপি কোডটি সঠিক নয় বা মেয়াদোত্তীর্ণ হয়েছে।';
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+        errorMessage: errorMsg,
       );
       CustomSnackBar.showCustomErrorSnackBar(
-        title: 'Error',
-        message: 'সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি।',
+        title: 'ভুল ওটিপি',
+        message: errorMsg,
       );
+      return; // Strictly stop navigation on wrong OTP
+    }
+
+    state = state.copyWith(isLoading: false);
+    CustomSnackBar.showCustomToast(
+      message: 'ওটিপি সফলভাবে যাচাই করা হয়েছে।',
+    );
+
+    if (context.mounted) {
+      final router = GoRouter.maybeOf(context);
+      if (router != null) {
+        router.push(
+          Routes.resetPassword,
+          extra: {
+            'phoneNumber': phone,
+            'otp': resolvedOtp,
+          },
+        );
+      }
     }
   }
 

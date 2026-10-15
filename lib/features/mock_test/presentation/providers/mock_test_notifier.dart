@@ -48,28 +48,51 @@ class MockTestNotifier extends Notifier<MockTestState> {
     return MockTestState();
   }
 
-  Future<void> getRootSubjects() async {
+  Future<void> getRootSubjects({bool isRefresh = false}) async {
     state = state.copyWith(
-      isLoading: true,
+      isLoading: !isRefresh && (state.model?.subjects?.isEmpty ?? true),
       hasError: false,
     );
 
-    final url = Endpoints.getSubjects;
+    // 1. First attempt: V1 Question Banks endpoint (/api/v1/home/question-banks)
     try {
-      final response = await _client.get(url);
-      if (response.data['status'] == true) {
-        final data = GetSubjectsModel.fromJson(response.data);
-        state = state.copyWith(
-          model: data,
-          isLoading: false,
-          hasError: false,
-        );
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          hasError: true,
-        );
+      final response = await _client.get(Endpoints.homeQuestionBanks);
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+        final model = GetSubjectsModel.fromJson(data);
+        if (model.subjects != null && model.subjects!.isNotEmpty) {
+          state = state.copyWith(
+            model: model,
+            isLoading: false,
+            hasError: false,
+          );
+          return;
+        }
       }
+    } catch (_) {
+      // Fall through to fallback
+    }
+
+    // 2. Fallback: legacy getSubjects endpoint
+    try {
+      final response = await _client.get(Endpoints.getSubjects);
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+        final model = GetSubjectsModel.fromJson(data);
+        if (model.status == true ||
+            (model.subjects != null && model.subjects!.isNotEmpty)) {
+          state = state.copyWith(
+            model: model,
+            isLoading: false,
+            hasError: false,
+          );
+          return;
+        }
+      }
+      state = state.copyWith(
+        isLoading: false,
+        hasError: true,
+      );
     } catch (_) {
       state = state.copyWith(
         isLoading: false,

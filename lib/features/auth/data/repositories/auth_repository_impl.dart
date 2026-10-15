@@ -78,13 +78,40 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AuthResponseModel> forgotPassword(String phone) {
+    return remoteDataSource.forgotPassword(phone);
+  }
+
+  @override
+  Future<AuthResponseModel> resetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+    String? deviceName,
+    String? platform,
+  }) async {
+    final res = await remoteDataSource.resetPassword(
+      phone: phone,
+      otp: otp,
+      password: password,
+      passwordConfirmation: passwordConfirmation,
+      deviceName: deviceName,
+      platform: platform,
+    );
+    // Note: Do not auto-login or call _saveSession(res) here.
+    // The user must be redirected to the SignIn screen to log in with their new password.
+    return res;
+  }
+
+  @override
   Future<AuthResponseModel> forgetPassword({
     required String phone,
     required String otp,
     required String password,
     String? passwordConfirmation,
   }) {
-    return remoteDataSource.forgetPassword(
+    return resetPassword(
       phone: phone,
       otp: otp,
       password: password,

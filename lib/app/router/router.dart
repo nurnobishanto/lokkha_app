@@ -214,7 +214,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           final phone = extra['phoneNumber'] as String? ?? '';
           final type = extra['type'] as String? ?? 'Registration';
-          return VerifyOtpView(phoneNumber: phone, type: type);
+          final autoSendOtp = extra['autoSendOtp'] as bool? ??
+              (!type.toLowerCase().contains('forget') &&
+                  !type.toLowerCase().contains('forgot') &&
+                  !type.toLowerCase().contains('reset'));
+          final initialExpiresIn = extra['initialExpiresIn'] as int? ?? 300;
+          final serverOtp = extra['serverOtp'] as String? ?? extra['otp'] as String?;
+          return VerifyOtpView(
+            phoneNumber: phone,
+            type: type,
+            autoSendOtp: autoSendOtp,
+            initialExpiresIn: initialExpiresIn,
+            serverOtp: serverOtp,
+          );
         },
       ),
       GoRoute(

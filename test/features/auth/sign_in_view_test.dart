@@ -283,6 +283,21 @@ class _MockAuthRepository implements AuthRepository {
       AuthResponseModel(status: true);
 
   @override
+  Future<AuthResponseModel> forgotPassword(String phone) async =>
+      AuthResponseModel(status: true, message: 'OTP sent');
+
+  @override
+  Future<AuthResponseModel> resetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+    String? deviceName,
+    String? platform,
+  }) async =>
+      AuthResponseModel(status: true, message: 'Password reset successful');
+
+  @override
   Future<AuthResponseModel> forgetPassword({
     required String phone,
     required String otp,

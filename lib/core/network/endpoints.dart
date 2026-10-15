@@ -78,7 +78,9 @@ class Endpoints {
   static const String register = '/api/v1/auth/register';
   static const String me = '/api/v1/auth/me';
   static const String logout = '/api/v1/auth/logout';
-  static const String forgetPassword = '/api/v1/auth/forget-password';
+  static const String forgotPassword = '/api/v1/auth/forgot-password';
+  static const String resetPassword = '/api/v1/auth/reset-password';
+  static const String forgetPassword = forgotPassword;
 
   // ─── Dashboard & Profile ───────────────────────────────────────────────────
   static const String dashboardOverview = '/api/v1/dashboard/overview';
@@ -108,9 +110,10 @@ class Endpoints {
 
   // ─── Module 23: Home Feed & Landing Hub (8 Endpoints) ──────────────────────
   static const String homeFeed = '/api/v1/home';
-  static const String homeFeedAlias = '/api/v1/home/feed';
   static const String homeContests = '/api/v1/home/contests';
   static const String homeQuestionBanks = '/api/v1/home/question-banks';
+  static const String subjectWiseBanks = homeQuestionBanks;
+  static const String quickPracticeSubjects = homeQuestionBanks;
   static const String homeJobsExams = '/api/v1/home/jobs-exams';
   static const String homeStats = '/api/v1/home/stats';
   static const String homeVocabulary = '/api/v1/home/vocabulary';
@@ -140,6 +143,8 @@ class Endpoints {
   static const String v1AuthMe = me;
   static const String v1AuthLogout = logout;
   static const String v1AuthForgetPassword = forgetPassword;
+  static const String v1AuthForgotPassword = forgotPassword;
+  static const String v1AuthResetPassword = resetPassword;
   static const String v1DashboardOverview = dashboardOverview;
   static const String v1UserProfile = profile;
   static const String v1UserProfileUpdate = profileUpdate;

@@ -10,22 +10,30 @@ class ForgetPasswordState {
   final String phone;
   final bool isLoading;
   final String? errorMessage;
+  final String? otp;
+  final int expiresIn;
 
   const ForgetPasswordState({
     this.phone = '',
     this.isLoading = false,
     this.errorMessage,
+    this.otp,
+    this.expiresIn = 300,
   });
 
   ForgetPasswordState copyWith({
     String? phone,
     bool? isLoading,
     String? errorMessage,
+    String? otp,
+    int? expiresIn,
   }) {
     return ForgetPasswordState(
       phone: phone ?? this.phone,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      otp: otp ?? this.otp,
+      expiresIn: expiresIn ?? this.expiresIn,
     );
   }
 }
@@ -43,7 +51,9 @@ class ForgetPasswordNotifier extends Notifier<ForgetPasswordState> {
     String? phoneOverride,
   }) async {
     final rawPhone = (phoneOverride ?? state.phone).trim();
-    final cleanPhone = PhoneUtils.toLocal11Digit(rawPhone);
+    final cleanPhone = PhoneUtils.toLocal11Digit(rawPhone).isNotEmpty
+        ? PhoneUtils.toLocal11Digit(rawPhone)
+        : PhoneUtils.sanitize(rawPhone);
 
     if (cleanPhone.length != 11) {
       CustomSnackBar.showCustomErrorSnackBar(
@@ -56,10 +66,15 @@ class ForgetPasswordNotifier extends Notifier<ForgetPasswordState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final sendOtpUseCase = ref.read(sendOtpUseCaseProvider);
-      final res = await sendOtpUseCase(cleanPhone, type: 'ForgetPassword');
+      final forgotPasswordUseCase = ref.read(forgotPasswordUseCaseProvider);
+      final res = await forgotPasswordUseCase(cleanPhone);
 
-      state = state.copyWith(isLoading: false);
+      final newExpiresIn = res.expiresIn ?? 300;
+      state = state.copyWith(
+        isLoading: false,
+        otp: res.otp,
+        expiresIn: newExpiresIn,
+      );
 
       if (res.status) {
         CustomSnackBar.showCustomToast(
@@ -71,8 +86,11 @@ class ForgetPasswordNotifier extends Notifier<ForgetPasswordState> {
             Routes.verifyOtp,
             extra: {
               'phoneNumber': cleanPhone,
-              'type': 'ForgetPassword',
-              'initialExpiresIn': res.expiresIn ?? 300,
+              'type': 'ForgotPassword',
+              'initialExpiresIn': newExpiresIn,
+              'autoSendOtp': false,
+              'serverOtp': res.otp,
+              'otp': res.otp,
             },
           );
         }
@@ -81,7 +99,7 @@ class ForgetPasswordNotifier extends Notifier<ForgetPasswordState> {
           errorMessage: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে।',
         );
         CustomSnackBar.showCustomErrorSnackBar(
-          title: 'OTP Error',
+          title: 'ব্যর্থ হয়েছে',
           message: res.message ?? 'ওটিপি পাঠাতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।',
         );
       }

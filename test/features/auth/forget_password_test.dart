@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/core/localization/l10n/app_localizations.dart';
 import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/features/auth/presentation/forget_password/widgets/password_reset_success_dialog.dart';
 
 class _MockAuthRepository implements AuthRepository {
   String? lastPhone;
@@ -18,6 +17,38 @@ class _MockAuthRepository implements AuthRepository {
 
   bool shouldSucceed = true;
   String successMessage = 'Password reset successful.';
+
+  @override
+  Future<AuthResponseModel> forgotPassword(String phone) async {
+    lastPhone = phone;
+    return AuthResponseModel(
+      status: shouldSucceed,
+      message: shouldSucceed ? 'OTP sent successfully' : 'Account does not exist.',
+      otp: '452821',
+      expiresIn: 300,
+    );
+  }
+
+  @override
+  Future<AuthResponseModel> resetPassword({
+    required String phone,
+    required String otp,
+    required String password,
+    String? passwordConfirmation,
+    String? deviceName,
+    String? platform,
+  }) async {
+    lastPhone = phone;
+    lastOtp = otp;
+    lastPassword = password;
+    lastPasswordConfirmation = passwordConfirmation;
+
+    return AuthResponseModel(
+      status: shouldSucceed,
+      message: shouldSucceed ? successMessage : 'Reset failed',
+      token: shouldSucceed ? 'mock_jwt_token' : null,
+    );
+  }
 
   @override
   Future<AuthResponseModel> forgetPassword({

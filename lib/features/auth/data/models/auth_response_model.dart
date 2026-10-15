@@ -13,6 +13,7 @@ class AuthResponseModel {
   final String? authMethod;
   final String? canonicalPhone;
   final int? expiresIn;
+  final String? otp;
   final Map<String, dynamic>? rawData;
 
   AuthResponseModel({
@@ -28,6 +29,7 @@ class AuthResponseModel {
     this.authMethod,
     this.canonicalPhone,
     this.expiresIn,
+    this.otp,
     this.rawData,
   });
 
@@ -49,14 +51,22 @@ class AuthResponseModel {
           message = firstVal.toString();
         }
       }
-    } else if (json['errors'] is Map) {
-      final errMap = json['errors'] as Map;
-      if (errMap.values.isNotEmpty) {
-        final firstVal = errMap.values.first;
-        if (firstVal is List && firstVal.isNotEmpty) {
-          message = firstVal.first.toString();
-        } else {
-          message = firstVal.toString();
+    }
+
+    // If message is missing or generic validation error, extract detailed message from errors map
+    if (message == null ||
+        message.isEmpty ||
+        message == 'Validation Error' ||
+        message == 'The given data was invalid.') {
+      if (json['errors'] is Map) {
+        final errMap = json['errors'] as Map;
+        if (errMap.values.isNotEmpty) {
+          final firstVal = errMap.values.first;
+          if (firstVal is List && firstVal.isNotEmpty) {
+            message = firstVal.first.toString();
+          } else if (firstVal != null) {
+            message = firstVal.toString();
+          }
         }
       }
     }
@@ -145,6 +155,14 @@ class AuthResponseModel {
       expiresIn = int.tryParse(json['data']['expires_in'].toString());
     }
 
+    // Flexible extraction for otp (e.g. from forgot-password response)
+    String? otp;
+    if (json['otp'] != null) {
+      otp = json['otp'].toString();
+    } else if (json['data'] is Map && json['data']['otp'] != null) {
+      otp = json['data']['otp'].toString();
+    }
+
     return AuthResponseModel(
       status: status,
       message: message,
@@ -158,6 +176,7 @@ class AuthResponseModel {
       authMethod: authMethod,
       canonicalPhone: canonicalPhone,
       expiresIn: expiresIn,
+      otp: otp,
       rawData: json,
     );
   }

@@ -4,6 +4,8 @@ import 'package:lokkha/features/auth/data/repositories/auth_repository_impl.dart
 import 'package:lokkha/features/auth/domain/repositories/auth_repository.dart';
 import 'package:lokkha/features/auth/domain/usecases/check_phone_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/forget_password_usecase.dart';
+import 'package:lokkha/features/auth/domain/usecases/forgot_password_usecase.dart';
+import 'package:lokkha/features/auth/domain/usecases/reset_password_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/login_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:lokkha/features/auth/domain/usecases/register_usecase.dart';
@@ -53,6 +55,16 @@ final registerUseCaseProvider = Provider<RegisterUseCase>((ref) {
 final forgetPasswordUseCaseProvider = Provider<ForgetPasswordUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return ForgetPasswordUseCase(repository);
+});
+
+final forgotPasswordUseCaseProvider = Provider<ForgotPasswordUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return ForgotPasswordUseCase(repository);
+});
+
+final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return ResetPasswordUseCase(repository);
 });
 
 final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {

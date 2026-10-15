@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/di/auth_provider.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_action_button.dart';
 
 class PasswordResetSuccessDialog extends ConsumerWidget {
@@ -134,6 +134,7 @@ class PasswordResetSuccessDialog extends ConsumerWidget {
                   color: Colors.white,
                 ),
                 onPressed: () {
+                  ref.read(authRepositoryProvider).logout();
                   Navigator.of(context, rootNavigator: true).pop();
                   context.go(
                     Routes.signIn,

@@ -92,8 +92,8 @@ class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final forgetPasswordUseCase = ref.read(forgetPasswordUseCaseProvider);
-      final res = await forgetPasswordUseCase(
+      final resetPasswordUseCase = ref.read(resetPasswordUseCaseProvider);
+      final res = await resetPasswordUseCase(
         phone: cleanPhone,
         otp: otp.trim(),
         password: password,
@@ -104,6 +104,9 @@ class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
 
       if (res.status) {
         state = state.copyWith(isSuccess: true);
+        CustomSnackBar.showCustomToast(
+          message: res.message ?? 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।',
+        );
         if (context.mounted) {
           PasswordResetSuccessDialog.show(context, phoneNumber: cleanPhone);
         }

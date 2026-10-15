@@ -14,7 +14,7 @@ class MockTestTabView extends StatelessWidget {
       child: Scaffold(
         backgroundColor: LightThemeColors.primaryColor,
         appBar: const CustomAppBar(
-          title: "বিষয়ভিত্তিক পরীক্ষা",
+          title: "কুইক প্র্যাকটিস",
           centerTitle: true,
           fontSize: 18.0,
         ),
