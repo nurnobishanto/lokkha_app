@@ -126,6 +126,8 @@ class Endpoints {
   static const String currentAffairsMonths = '/api/v1/current-affairs/months';
   static const String currentAffairsCategories = '/api/v1/current-affairs/categories';
   static const String currentAffairsLatest = '/api/v1/current-affairs/latest';
+  static String currentAffairsDetails(dynamic id) => '/api/v1/current-affairs/$id';
+  static String currentAffairsToggleBookmark(dynamic id) => '/api/v1/current-affairs/$id/toggle-bookmark';
   static const String blogs = '/api/v1/blog';
   static const String blog = '/api/v1/blog';
 
