@@ -6,6 +6,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/vocabulary_model.dart';
 import 'package:lokkha/features/study_material/presentation/providers/study_material_notifier.dart';
 import 'package:lokkha/features/study_material/presentation/vocabulary/views/vocabulary_view.dart';
+import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/shared/models/vocabulary.dart';
 
@@ -62,13 +63,49 @@ const Map<String, dynamic> sampleV1VocabularyJson = {
   }
 };
 
+class FakeVocabularyRepository implements VocabularyRepository {
+  final VocabularyModel model;
+  FakeVocabularyRepository(this.model);
+
+  @override
+  Future<VocabularyModel> getVocabularies({
+    int page = 1,
+    int perPage = 30,
+    String? alphabet,
+    int? typeId,
+    int? categoryId,
+    String? search,
+  }) async =>
+      model;
+
+  @override
+  Future<List<String>> getAlphabets() async => model.alphabets ?? [];
+
+  @override
+  Future<List<Category>> getCategories() async => model.categories ?? [];
+
+  @override
+  Future<List<Category>> getTypes() async => model.types ?? [];
+
+  @override
+  Future<Vocabulary?> getVocabularyDetail(int id) async {
+    return model.vocabularies?.data?.firstWhere((v) => v.id == id);
+  }
+}
+
 class FakeVocabularyNotifier extends VocabularyNotifier {
   final VocabularyState initialState;
-  FakeVocabularyNotifier(this.initialState);
+  FakeVocabularyNotifier(this.initialState, {VocabularyRepository? repo})
+      : super(repository: repo);
 
   @override
   VocabularyState build() {
     return initialState;
+  }
+
+  @override
+  Future<void> fetchVocabulary({bool refresh = false}) async {
+    state = state.copyWith(filteredVocab: applyFilters(state.rawVocab));
   }
 }
 
@@ -150,15 +187,19 @@ void main() {
     test('Filtering by alphabet, type, category, and search works accurately', () {
       final model = VocabularyModel.fromJson(sampleV1VocabularyJson);
       final rawList = model.vocabularies?.data ?? [];
+      final repo = FakeVocabularyRepository(model);
       final container = ProviderContainer(
         overrides: [
+          vocabularyRepositoryProvider.overrideWithValue(repo),
           vocabularyNotifierProvider.overrideWith(
             () => FakeVocabularyNotifier(
               VocabularyState(
                 isLoading: false,
                 model: model,
+                rawVocab: rawList,
                 filteredVocab: rawList,
               ),
+              repo: repo,
             ),
           ),
         ],
@@ -199,21 +240,25 @@ void main() {
     testWidgets('VocabularyView renders search, dropdowns, alphabets and word cards', (tester) async {
       havePackage.value = true;
       final model = VocabularyModel.fromJson(sampleV1VocabularyJson);
+      final repo = FakeVocabularyRepository(model);
 
       await tester.pumpWidget(
         ScreenUtilInit(
           designSize: const Size(375, 812),
           builder: (context, child) => ProviderScope(
             overrides: [
+              vocabularyRepositoryProvider.overrideWithValue(repo),
               vocabularyNotifierProvider.overrideWith(
                 () => FakeVocabularyNotifier(
                   VocabularyState(
                     isLoading: false,
                     model: model,
+                    rawVocab: model.vocabularies?.data ?? [],
                     filteredVocab: model.vocabularies?.data ?? [],
                     totalPages: 1,
                     currentPage: 1,
                   ),
+                  repo: repo,
                 ),
               ),
             ],

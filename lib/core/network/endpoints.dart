@@ -177,7 +177,15 @@ class Endpoints {
   static const String v1AppInfoCheckUpdate = checkUpdate;
   static const String v1CurrentAffairsFeed = currentAffairs;
   static const String v1Blogs = blogs;
-  static const String v1Vocabulary = homeVocabulary;
+  static const String v1Vocabulary = '/api/v1/vocabularies';
+  static const String v1Vocabularies = '/api/v1/vocabularies';
+  static const String v1VocabularyAlphabets = '/api/v1/vocabularies/alphabets';
+  static const String v1VocabularyCategories = '/api/v1/vocabularies/categories';
+  static const String v1VocabularyTypes = '/api/v1/vocabularies/types';
+  static String v1VocabularyDetail(dynamic id) => '/api/v1/vocabularies/$id';
+  static const String v1Jobs = '/api/v1/jobs';
+  static const String v1JobDepartments = '/api/v1/jobs/departments';
+  static String v1JobDetail(dynamic id) => '/api/v1/jobs/$id';
 
   // ─── Legacy Web & App Routes ───────────────────────────────────────────────
   static final String appVersionCheck = '$appUrl/app/update';
@@ -186,8 +194,8 @@ class Endpoints {
   static final String webTestExamStart = '$appUrl/web-test-exam/start';
   static final String randomQuestion = '$appUrl/random-question';
   static final String myQuestions = '$appUrl/my-questions';
-  static final String jobsList = '$appUrl/jobs';
-  static final String job = '$appUrl/job';
+  static const String jobsList = v1Jobs;
+  static const String job = v1Jobs;
   static final String internationalCA = '$appUrl/current-affairs/international';
   static final String nationalCA = '$appUrl/current-affairs/national';
   static final String privacyPolicy = '$appUrl/page/privacy-policy';

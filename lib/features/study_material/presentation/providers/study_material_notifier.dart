@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
@@ -116,120 +115,202 @@ final currentAffairsNotifierProvider =
 
 class VocabularyState {
   final bool isLoading;
+  final bool isDetailLoading;
   final String search;
   final String selectedAlphabet;
+  final List<Vocabulary> rawVocab;
   final List<Vocabulary> filteredVocab;
   final int currentPage;
   final int totalPages;
+  final int totalCount;
   final bool isLastPage;
   final Category? selectedType;
   final Category? selectedCategory;
   final VocabularyModel? model;
+  final List<String> alphabets;
+  final List<Category> types;
+  final List<Category> categories;
+  final Vocabulary? selectedVocabularyDetail;
 
   VocabularyState({
     this.isLoading = true,
+    this.isDetailLoading = false,
     this.search = '',
     this.selectedAlphabet = '',
+    this.rawVocab = const [],
     this.filteredVocab = const [],
     this.currentPage = 1,
     this.totalPages = 1,
+    this.totalCount = 0,
     this.isLastPage = false,
     this.selectedType,
     this.selectedCategory,
     this.model,
+    this.alphabets = const [],
+    this.types = const [],
+    this.categories = const [],
+    this.selectedVocabularyDetail,
   });
 
   VocabularyState copyWith({
     bool? isLoading,
+    bool? isDetailLoading,
     String? search,
     String? selectedAlphabet,
+    List<Vocabulary>? rawVocab,
     List<Vocabulary>? filteredVocab,
     int? currentPage,
     int? totalPages,
+    int? totalCount,
     bool? isLastPage,
     Category? selectedType,
     Category? selectedCategory,
     VocabularyModel? model,
+    List<String>? alphabets,
+    List<Category>? types,
+    List<Category>? categories,
+    Vocabulary? selectedVocabularyDetail,
     bool clearType = false,
     bool clearCategory = false,
+    bool clearDetail = false,
   }) {
     return VocabularyState(
       isLoading: isLoading ?? this.isLoading,
+      isDetailLoading: isDetailLoading ?? this.isDetailLoading,
       search: search ?? this.search,
       selectedAlphabet: selectedAlphabet ?? this.selectedAlphabet,
+      rawVocab: rawVocab ?? this.rawVocab,
       filteredVocab: filteredVocab ?? this.filteredVocab,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
+      totalCount: totalCount ?? this.totalCount,
       isLastPage: isLastPage ?? this.isLastPage,
       selectedType: clearType ? null : (selectedType ?? this.selectedType),
       selectedCategory:
           clearCategory ? null : (selectedCategory ?? this.selectedCategory),
       model: model ?? this.model,
+      alphabets: alphabets ?? this.alphabets,
+      types: types ?? this.types,
+      categories: categories ?? this.categories,
+      selectedVocabularyDetail: clearDetail
+          ? null
+          : (selectedVocabularyDetail ?? this.selectedVocabularyDetail),
     );
   }
 }
 
 class VocabularyNotifier extends Notifier<VocabularyState> {
-  final RestClient _client;
+  final VocabularyRepository? _injectedRepository;
 
-  VocabularyNotifier({RestClient? client}) : _client = client ?? RestClient();
+  VocabularyNotifier({VocabularyRepository? repository})
+      : _injectedRepository = repository;
+
+  VocabularyRepository get _repo =>
+      _injectedRepository ?? ref.read(vocabularyRepositoryProvider);
 
   @override
   VocabularyState build() {
-    Future.microtask(() => fetchVocabulary());
+    Future.microtask(() => init());
     return VocabularyState();
   }
 
-  void setType(Category? type) {
-    state = state.copyWith(
-      selectedType: type,
-      clearType: type == null,
-      currentPage: 1,
-    );
-    final allVocabs = state.model?.vocabularies?.data ?? [];
-    if (allVocabs.isNotEmpty) {
-      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
-    } else {
-      fetchVocabulary();
+  Future<void> init() async {
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final results = await Future.wait([
+        _repo.getAlphabets(),
+        _repo.getCategories(),
+        _repo.getTypes(),
+        _repo.getVocabularies(
+          page: 1,
+          alphabet:
+              state.selectedAlphabet.isNotEmpty ? state.selectedAlphabet : null,
+          typeId: state.selectedType?.id,
+          categoryId: state.selectedCategory?.id,
+        ),
+      ]);
+
+      final alphabets = results[0] as List<String>;
+      final categories = results[1] as List<Category>;
+      final types = results[2] as List<Category>;
+      final vocabModel = results[3] as VocabularyModel;
+
+      final combinedModel = vocabModel.copyWith(
+        alphabets: alphabets,
+        categories: categories,
+        types: types,
+      );
+
+      final rawList = combinedModel.vocabularies?.data ?? [];
+      final lastPage = combinedModel.vocabularies?.lastPage ?? 1;
+      final curPage = combinedModel.vocabularies?.currentPage ?? 1;
+      final total = combinedModel.vocabularies?.total ?? rawList.length;
+
+      final filtered = applyFilters(rawList);
+
+      state = state.copyWith(
+        isLoading: false,
+        model: combinedModel,
+        alphabets: alphabets,
+        categories: categories,
+        types: types,
+        rawVocab: rawList,
+        filteredVocab: filtered,
+        currentPage: curPage,
+        totalPages: lastPage,
+        totalCount: total,
+        isLastPage: curPage >= lastPage,
+      );
+    } catch (e) {
+      debugPrint('[VocabularyNotifier.init] Error: $e');
+      state = state.copyWith(isLoading: false);
     }
   }
 
-  void setCategory(Category? category) {
+  Future<void> setType(Category? type) async {
+    final newType =
+        (type != null && state.selectedType?.id == type.id) ? null : type;
     state = state.copyWith(
-      selectedCategory: category,
-      clearCategory: category == null,
+      selectedType: newType,
+      clearType: newType == null,
       currentPage: 1,
     );
-    final allVocabs = state.model?.vocabularies?.data ?? [];
-    if (allVocabs.isNotEmpty) {
-      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
-    } else {
-      fetchVocabulary();
-    }
+    state = state.copyWith(filteredVocab: applyFilters(state.rawVocab));
+    await fetchVocabulary();
   }
 
-  void setAlphabet(String char) {
+  Future<void> setCategory(Category? category) async {
+    final newCategory =
+        (category != null && state.selectedCategory?.id == category.id)
+            ? null
+            : category;
+    state = state.copyWith(
+      selectedCategory: newCategory,
+      clearCategory: newCategory == null,
+      currentPage: 1,
+    );
+    state = state.copyWith(filteredVocab: applyFilters(state.rawVocab));
+    await fetchVocabulary();
+  }
+
+  Future<void> setAlphabet(String char) async {
     final newChar =
         state.selectedAlphabet.toUpperCase() == char.toUpperCase() ? '' : char;
     state = state.copyWith(
       selectedAlphabet: newChar,
       currentPage: 1,
     );
-    final allVocabs = state.model?.vocabularies?.data ?? [];
-    if (allVocabs.isNotEmpty) {
-      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
-    } else {
-      fetchVocabulary();
-    }
+    state = state.copyWith(filteredVocab: applyFilters(state.rawVocab));
+    await fetchVocabulary();
   }
 
   void setSearch(String query) {
     state = state.copyWith(search: query);
-    final allVocabs = state.model?.vocabularies?.data ?? [];
-    state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
+    state = state.copyWith(filteredVocab: applyFilters(state.rawVocab));
   }
 
-  List<Vocabulary> _applyFilters(List<Vocabulary> rawList) {
+  List<Vocabulary> applyFilters(List<Vocabulary> rawList) {
     List<Vocabulary> filtered = rawList;
 
     // Filter by Alphabet
@@ -241,44 +322,63 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
     }
 
     // Filter by Type
-    if (state.selectedType != null && state.selectedType!.name != null) {
-      final tName = state.selectedType!.name!.toLowerCase();
+    if (state.selectedType != null) {
+      final tId = state.selectedType!.id;
+      final tName = state.selectedType!.name?.toLowerCase();
       filtered = filtered.where((v) {
-        if (v.typeName != null && v.typeName!.toLowerCase() == tName) return true;
-        if (v.types != null &&
-            v.types!.any((t) =>
-                t.id == state.selectedType!.id ||
-                (t.name?.toLowerCase() == tName))) {
+        if (tId != null &&
+            v.types != null &&
+            v.types!.any((t) => t.id == tId)) {
           return true;
+        }
+        if (tName != null) {
+          if (v.typeName != null &&
+              v.typeName!.toLowerCase().contains(tName)) {
+            return true;
+          }
+          if (v.types != null &&
+              v.types!.any((t) => t.name?.toLowerCase() == tName)) {
+            return true;
+          }
         }
         return false;
       }).toList();
     }
 
     // Filter by Category
-    if (state.selectedCategory != null && state.selectedCategory!.name != null) {
-      final cName = state.selectedCategory!.name!.toLowerCase();
+    if (state.selectedCategory != null) {
+      final cId = state.selectedCategory!.id;
+      final cName = state.selectedCategory!.name?.toLowerCase();
       filtered = filtered.where((v) {
-        if (v.categoryName != null && v.categoryName!.toLowerCase() == cName) {
+        if (cId != null &&
+            v.categories != null &&
+            v.categories!.any((c) => c.id == cId)) {
           return true;
         }
-        if (v.categories != null &&
-            v.categories!.any((c) =>
-                c.id == state.selectedCategory!.id ||
-                (c.name?.toLowerCase() == cName))) {
-          return true;
+        if (cName != null) {
+          if (v.categoryName != null &&
+              v.categoryName!.toLowerCase().contains(cName)) {
+            return true;
+          }
+          if (v.categories != null &&
+              v.categories!.any((c) => c.name?.toLowerCase() == cName)) {
+            return true;
+          }
         }
         return false;
       }).toList();
     }
 
-    // Filter by Search
+    // Filter by Search text
     if (state.search.trim().isNotEmpty) {
       final q = state.search.toLowerCase();
       filtered = filtered
           .where((v) =>
               (v.word ?? '').toLowerCase().contains(q) ||
-              (v.details ?? '').toLowerCase().contains(q))
+              (v.displayMeaning ?? '').toLowerCase().contains(q) ||
+              (v.details ?? '').toLowerCase().contains(q) ||
+              (v.meaning ?? '').toLowerCase().contains(q) ||
+              (v.banglaMeaning ?? '').toLowerCase().contains(q))
           .toList();
     }
 
@@ -288,75 +388,55 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
   Future<void> fetchVocabulary({bool refresh = false}) async {
     state = state.copyWith(isLoading: true);
 
-    final data = <String, dynamic>{
-      'alphabet': state.selectedAlphabet.toUpperCase(),
-      'page': state.currentPage,
-      'search': state.search,
-    };
-    if (state.selectedType?.id != null) {
-      data['type_ids[]'] = [state.selectedType!.id!];
-      data['type_id'] = state.selectedType!.id!;
-      data['type'] = state.selectedType!.name ?? '';
-    }
-    if (state.selectedCategory?.id != null) {
-      data['category_ids[]'] = [state.selectedCategory!.id!];
-      data['category_id'] = state.selectedCategory!.id!;
-      data['category'] = state.selectedCategory!.name ?? '';
-    }
-
     try {
-      dynamic responseData;
-      try {
-        final res = await _client.get(
-          Endpoints.v1Vocabulary,
-          queryParameters: data,
-        );
-        responseData = res.data;
-      } catch (_) {
-        final res = await _client.get(
-          Endpoints.vocabularies,
-          queryParameters: data,
-        );
-        responseData = res.data;
-      }
+      final vocabModel = await _repo.getVocabularies(
+        page: state.currentPage,
+        alphabet:
+            state.selectedAlphabet.isNotEmpty ? state.selectedAlphabet : null,
+        typeId: state.selectedType?.id,
+        categoryId: state.selectedCategory?.id,
+      );
 
-      final isSuccess = responseData is Map &&
-          (responseData['success'] == true ||
-              responseData['status'] == true ||
-              responseData['data'] != null);
+      final combinedModel = vocabModel.copyWith(
+        alphabets: state.alphabets.isNotEmpty
+            ? state.alphabets
+            : vocabModel.alphabets,
+        categories: state.categories.isNotEmpty
+            ? state.categories
+            : vocabModel.categories,
+        types: state.types.isNotEmpty ? state.types : vocabModel.types,
+      );
 
-      if (isSuccess) {
-        final Map<String, dynamic> responseJson = responseData is Map<String, dynamic>
-            ? responseData as Map<String, dynamic>
-            : Map<String, dynamic>.from(responseData as Map);
+      final rawList = combinedModel.vocabularies?.data ?? [];
+      final lastPage = combinedModel.vocabularies?.lastPage ?? 1;
+      final curPage = combinedModel.vocabularies?.currentPage ?? 1;
+      final total = combinedModel.vocabularies?.total ?? rawList.length;
 
-        final modelData = VocabularyModel.fromJson(responseJson);
-        final rawList = modelData.vocabularies?.data ?? [];
-        final lastPage = modelData.vocabularies?.lastPage ?? 1;
-        final curPage = modelData.vocabularies?.currentPage ?? 1;
+      final filtered = applyFilters(rawList);
 
-        final filtered = _applyFilters(rawList);
-
-        state = state.copyWith(
-          isLoading: false,
-          model: modelData,
-          selectedAlphabet:
-              modelData.selectedAlphabet?.toUpperCase() ?? state.selectedAlphabet,
-          totalPages: lastPage,
-          isLastPage: curPage >= lastPage,
-          filteredVocab: filtered,
-        );
-      } else {
-        state = state.copyWith(
-          isLoading: false,
-          filteredVocab: [],
-        );
-      }
-    } catch (err) {
       state = state.copyWith(
         isLoading: false,
+        model: combinedModel,
+        rawVocab: rawList,
+        filteredVocab: filtered,
+        totalPages: lastPage,
+        totalCount: total,
+        isLastPage: curPage >= lastPage,
       );
+    } catch (err) {
+      debugPrint('[VocabularyNotifier.fetchVocabulary] Error: $err');
+      state = state.copyWith(isLoading: false);
     }
+  }
+
+  Future<Vocabulary?> getVocabularyDetail(int id) async {
+    state = state.copyWith(isDetailLoading: true);
+    final detail = await _repo.getVocabularyDetail(id);
+    state = state.copyWith(
+      isDetailLoading: false,
+      selectedVocabularyDetail: detail,
+    );
+    return detail;
   }
 
   void goToPage(int page) {

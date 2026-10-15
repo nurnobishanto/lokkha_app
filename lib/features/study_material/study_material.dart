@@ -6,6 +6,7 @@ export 'data/models/sub_sec_select_model.dart';
 
 // Repositories
 export 'data/repositories/current_affairs_repository.dart';
+export 'data/repositories/vocabulary_repository.dart';
 
 // Providers
 export 'presentation/providers/study_material_notifier.dart';

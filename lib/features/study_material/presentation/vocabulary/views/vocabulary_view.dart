@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/shared/shared.dart';
 
 class VocabularyView extends ConsumerStatefulWidget {
@@ -66,7 +65,10 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                           spacing: 4,
                           runSpacing: 4,
                           alignment: WrapAlignment.center,
-                          children: vocabState.model?.alphabets?.map((char) {
+                          children: (vocabState.alphabets.isNotEmpty
+                                  ? vocabState.alphabets
+                                  : (vocabState.model?.alphabets ?? []))
+                              .map((char) {
                                 final isSelected =
                                     char == vocabState.selectedAlphabet;
                                 return InkWell(
@@ -98,8 +100,7 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                                     ),
                                   ),
                                 );
-                              }).toList() ??
-                              [],
+                              }).toList(),
                         ),
                       ),
                       5.h.height,
@@ -118,80 +119,8 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                               if (havePackage.value) {
                                 showDialog(
                                   context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: Text(vocab.word ?? 'No Word'),
-                                    content: SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          if (vocab.details != null &&
-                                              vocab.details!.isNotEmpty) ...[
-                                            Text("Details: ${vocab.details}"),
-                                            const SizedBox(height: 6),
-                                          ],
-                                          if (vocab.typeName != null &&
-                                              vocab.typeName!.isNotEmpty) ...[
-                                            Text("Type: ${vocab.typeName}",
-                                                style: TextStyle(
-                                                    color: context.textMuted,
-                                                    fontSize: 13)),
-                                            const SizedBox(height: 4),
-                                          ],
-                                          if (vocab.categoryName != null &&
-                                              vocab.categoryName!.isNotEmpty) ...[
-                                            Text("Category: ${vocab.categoryName}",
-                                                style: TextStyle(
-                                                    color: context.textMuted,
-                                                    fontSize: 13)),
-                                            const SizedBox(height: 6),
-                                          ],
-                                          const SizedBox(height: 10),
-                                          if (vocab.synonym != null &&
-                                              vocab.synonym!.isNotEmpty)
-                                            popupList(
-                                                "Synonyms",
-                                                vocab.synonym,
-                                                LightThemeColors.primaryColor)
-                                          else
-                                            const Text("No synonyms found"),
-                                          if (vocab.antonym != null &&
-                                              vocab.antonym!.isNotEmpty)
-                                            popupList(
-                                                "Antonyms",
-                                                vocab.antonym,
-                                                LightThemeColors.primaryColor)
-                                          else
-                                            const Text("No antonyms found"),
-                                          if (vocab.wrongSynonym != null &&
-                                              vocab.wrongSynonym!.isNotEmpty)
-                                            popupList(
-                                                "Wrong Synonyms",
-                                                vocab.wrongSynonym,
-                                                Colors.red)
-                                          else
-                                            const Text(
-                                                "No wrong synonyms found"),
-                                          if (vocab.wrongAntonym != null &&
-                                              vocab.wrongAntonym!.isNotEmpty)
-                                            popupList(
-                                                "Wrong Antonyms",
-                                                vocab.wrongAntonym,
-                                                Colors.red)
-                                          else
-                                            const Text(
-                                                "No wrong antonyms found"),
-                                        ],
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
-                                        child: const Text("Close"),
-                                      )
-                                    ],
-                                  ),
+                                  builder: (_) => VocabularyDetailDialog(
+                                      vocabulary: vocab),
                                 );
                               } else {
                                 showDialog(
@@ -338,7 +267,9 @@ class FilterRow extends ConsumerWidget {
     final vocabState = ref.watch(vocabularyNotifierProvider);
     final notifier = ref.read(vocabularyNotifierProvider.notifier);
 
-    final types = vocabState.model?.types ?? [];
+    final types = vocabState.types.isNotEmpty
+        ? vocabState.types
+        : (vocabState.model?.types ?? []);
     final selectedType = vocabState.selectedType;
     final safeType = types.any((t) =>
             (t.id != null && t.id == selectedType?.id) ||
@@ -348,7 +279,9 @@ class FilterRow extends ConsumerWidget {
             (t.name != null && t.name == selectedType?.name))
         : null;
 
-    final categories = vocabState.model?.categories ?? [];
+    final categories = vocabState.categories.isNotEmpty
+        ? vocabState.categories
+        : (vocabState.model?.categories ?? []);
     final selectedCategory = vocabState.selectedCategory;
     final safeCategory = categories.any((c) =>
             (c.id != null && c.id == selectedCategory?.id) ||
@@ -435,6 +368,175 @@ class FilterRow extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class VocabularyDetailDialog extends ConsumerStatefulWidget {
+  final Vocabulary vocabulary;
+  const VocabularyDetailDialog({super.key, required this.vocabulary});
+
+  @override
+  ConsumerState<VocabularyDetailDialog> createState() =>
+      _VocabularyDetailDialogState();
+}
+
+class _VocabularyDetailDialogState
+    extends ConsumerState<VocabularyDetailDialog> {
+  late Vocabulary _detail;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _detail = widget.vocabulary;
+    final hasExtendedDetails = (_detail.synonym != null &&
+            _detail.synonym!.isNotEmpty) ||
+        (_detail.antonym != null && _detail.antonym!.isNotEmpty) ||
+        (_detail.sentenceExample != null &&
+            _detail.sentenceExample!.isNotEmpty) ||
+        (_detail.notes != null && _detail.notes!.isNotEmpty);
+
+    if (!hasExtendedDetails && widget.vocabulary.id != null) {
+      _fetchFullDetail();
+    }
+  }
+
+  Future<void> _fetchFullDetail() async {
+    setState(() => _isLoading = true);
+    try {
+      final detail = await ref
+          .read(vocabularyRepositoryProvider)
+          .getVocabularyDetail(widget.vocabulary.id!);
+      if (mounted && detail != null) {
+        setState(() {
+          _detail = detail;
+          _isLoading = false;
+        });
+        return;
+      }
+    } catch (e) {
+      debugPrint('[VocabularyDetailDialog] Error fetching detail: $e');
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vocab = _detail;
+    final meaningText = vocab.displayMeaning;
+
+    return AlertDialog(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(vocab.word ?? 'No Word',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          if (vocab.pronunciation != null &&
+              vocab.pronunciation!.trim().isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              "/${vocab.pronunciation!.trim()}/",
+              style: TextStyle(
+                fontSize: 14,
+                color: context.textMuted,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (_isLoading) ...[
+              const LinearProgressIndicator(),
+              const SizedBox(height: 10),
+            ],
+            if (meaningText != null && meaningText.trim().isNotEmpty) ...[
+              Text("Details: $meaningText"),
+              const SizedBox(height: 6),
+            ],
+            if (vocab.meaning != null &&
+                vocab.meaning!.trim().isNotEmpty &&
+                vocab.banglaMeaning != null &&
+                vocab.banglaMeaning!.trim().isNotEmpty &&
+                vocab.meaning != vocab.banglaMeaning) ...[
+              Text("Meaning: ${vocab.meaning}"),
+              const SizedBox(height: 6),
+            ],
+            if (vocab.typeName != null && vocab.typeName!.isNotEmpty) ...[
+              Text("Type: ${vocab.typeName}",
+                  style: TextStyle(color: context.textMuted, fontSize: 13)),
+              const SizedBox(height: 4),
+            ],
+            if (vocab.categoryName != null &&
+                vocab.categoryName!.isNotEmpty) ...[
+              Text("Category: ${vocab.categoryName}",
+                  style: TextStyle(color: context.textMuted, fontSize: 13)),
+              const SizedBox(height: 6),
+            ],
+            if (vocab.sentenceExample != null &&
+                vocab.sentenceExample!.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                "Example: ${vocab.sentenceExample}",
+                style: TextStyle(
+                  color: context.textPrimary,
+                  fontStyle: FontStyle.italic,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+            if (vocab.notes != null && vocab.notes!.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                "Note: ${vocab.notes}",
+                style: TextStyle(
+                  color: context.textMuted,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 6),
+            ],
+            const SizedBox(height: 10),
+            if (vocab.synonym != null && vocab.synonym!.isNotEmpty)
+              popupList(
+                  "Synonyms", vocab.synonym, LightThemeColors.primaryColor)
+            else if (!_isLoading)
+              const Text("No synonyms found"),
+            if (vocab.antonym != null && vocab.antonym!.isNotEmpty)
+              popupList(
+                  "Antonyms", vocab.antonym, LightThemeColors.primaryColor)
+            else if (!_isLoading)
+              const Text("No antonyms found"),
+            if (vocab.wrongSynonym != null &&
+                vocab.wrongSynonym!.isNotEmpty)
+              popupList("Wrong Synonyms", vocab.wrongSynonym, Colors.red)
+            else if (!_isLoading &&
+                (widget.vocabulary.wrongSynonym == null ||
+                    widget.vocabulary.wrongSynonym!.isEmpty))
+              const Text("No wrong synonyms found"),
+            if (vocab.wrongAntonym != null &&
+                vocab.wrongAntonym!.isNotEmpty)
+              popupList("Wrong Antonyms", vocab.wrongAntonym, Colors.red)
+            else if (!_isLoading &&
+                (widget.vocabulary.wrongAntonym == null ||
+                    widget.vocabulary.wrongAntonym!.isEmpty))
+              const Text("No wrong antonyms found"),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Close"),
+        )
+      ],
     );
   }
 }

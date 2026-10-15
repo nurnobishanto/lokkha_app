@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
 import 'package:lokkha/features/study_material/presentation/current_affairs/views/current_affairs_reader_view.dart';
 

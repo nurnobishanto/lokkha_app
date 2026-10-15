@@ -28,6 +28,28 @@ class VocabularyModel {
     this.selectedAlphabet,
   });
 
+  VocabularyModel copyWith({
+    bool? status,
+    bool? success,
+    String? message,
+    Vocabularies? vocabularies,
+    List<Category>? types,
+    List<Category>? categories,
+    List<String>? alphabets,
+    String? selectedAlphabet,
+  }) {
+    return VocabularyModel(
+      status: status ?? this.status,
+      success: success ?? this.success,
+      message: message ?? this.message,
+      vocabularies: vocabularies ?? this.vocabularies,
+      types: types ?? this.types,
+      categories: categories ?? this.categories,
+      alphabets: alphabets ?? this.alphabets,
+      selectedAlphabet: selectedAlphabet ?? this.selectedAlphabet,
+    );
+  }
+
   factory VocabularyModel.fromJson(Map<String, dynamic> json) {
     // Check if response is wrapped in standard v1 `data` envelope
     final Map<String, dynamic> rootData = (json["data"] is Map<String, dynamic>)
