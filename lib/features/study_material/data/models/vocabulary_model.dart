@@ -9,6 +9,8 @@ String vocabularyModelToJson(VocabularyModel data) =>
 
 class VocabularyModel {
   final bool? status;
+  final bool? success;
+  final String? message;
   final Vocabularies? vocabularies;
   final List<Category>? types;
   final List<Category>? categories;
@@ -17,6 +19,8 @@ class VocabularyModel {
 
   VocabularyModel({
     this.status,
+    this.success,
+    this.message,
     this.vocabularies,
     this.types,
     this.categories,
@@ -24,38 +28,119 @@ class VocabularyModel {
     this.selectedAlphabet,
   });
 
-  factory VocabularyModel.fromJson(Map<String, dynamic> json) =>
-      VocabularyModel(
-        status: json["status"],
-        vocabularies: json["vocabularies"] == null
-            ? null
-            : Vocabularies.fromJson(json["vocabularies"]),
-        types: json["types"] == null
-            ? []
-            : List<Category>.from(
-                json["types"]!.map((x) => Category.fromJson(x))),
-        categories: json["categories"] == null
-            ? []
-            : List<Category>.from(
-                json["categories"]!.map((x) => Category.fromJson(x))),
-        alphabets: json["alphabets"] == null
-            ? []
-            : List<String>.from(json["alphabets"]!.map((x) => x)),
-        selectedAlphabet: json["selected_alphabet"],
+  factory VocabularyModel.fromJson(Map<String, dynamic> json) {
+    // Check if response is wrapped in standard v1 `data` envelope
+    final Map<String, dynamic> rootData = (json["data"] is Map<String, dynamic>)
+        ? json["data"] as Map<String, dynamic>
+        : (json["data"] is Map ? Map<String, dynamic>.from(json["data"] as Map) : json);
+
+    final bool statusVal = json["success"] == true ||
+        json["status"] == true ||
+        rootData["status"] == true;
+
+    // Vocabularies extraction
+    Vocabularies? vocabulariesObj;
+    if (json["vocabularies"] != null && json["vocabularies"] is Map) {
+      vocabulariesObj = Vocabularies.fromJson(
+        json["vocabularies"] is Map<String, dynamic>
+            ? json["vocabularies"] as Map<String, dynamic>
+            : Map<String, dynamic>.from(json["vocabularies"] as Map),
       );
+    } else if (rootData["vocabularies"] != null && rootData["vocabularies"] is Map) {
+      vocabulariesObj = Vocabularies.fromJson(
+        rootData["vocabularies"] is Map<String, dynamic>
+            ? rootData["vocabularies"] as Map<String, dynamic>
+            : Map<String, dynamic>.from(rootData["vocabularies"] as Map),
+      );
+    } else {
+      // V1 API puts items in `items`
+      final rawItems = rootData["items"] ?? json["items"];
+      List<Vocabulary> parsedItems = [];
+      if (rawItems is List) {
+        parsedItems = rawItems
+            .whereType<Map>()
+            .map((x) => Vocabulary.fromJson(
+                  x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x),
+                ))
+            .toList();
+      }
+
+      final pagination = json["meta"] ?? json["pagination"] ?? rootData["pagination"] ?? rootData["meta"];
+      int curPage = 1;
+      int lastPage = 1;
+      int totalCount = parsedItems.length;
+      int perPage = 20;
+
+      if (pagination is Map) {
+        curPage = int.tryParse(pagination["current_page"]?.toString() ?? '') ?? 1;
+        lastPage = int.tryParse(pagination["last_page"]?.toString() ?? pagination["total_pages"]?.toString() ?? '') ?? 1;
+        totalCount = int.tryParse(pagination["total"]?.toString() ?? '') ?? parsedItems.length;
+        perPage = int.tryParse(pagination["per_page"]?.toString() ?? '') ?? 20;
+      }
+
+      vocabulariesObj = Vocabularies(
+        currentPage: curPage,
+        lastPage: lastPage,
+        total: totalCount,
+        perPage: perPage,
+        data: parsedItems,
+      );
+    }
+
+    // Types extraction
+    final rawTypes = rootData["types"] ?? json["types"];
+    List<Category> parsedTypes = [];
+    if (rawTypes is List) {
+      parsedTypes = rawTypes
+          .whereType<Map>()
+          .map((x) => Category.fromJson(
+                x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x),
+              ))
+          .toList();
+    }
+
+    // Categories extraction
+    final rawCategories = rootData["categories"] ?? json["categories"];
+    List<Category> parsedCategories = [];
+    if (rawCategories is List) {
+      parsedCategories = rawCategories
+          .whereType<Map>()
+          .map((x) => Category.fromJson(
+                x is Map<String, dynamic> ? x : Map<String, dynamic>.from(x),
+              ))
+          .toList();
+    }
+
+    // Alphabets extraction
+    final rawAlphabets = rootData["alphabets"] ?? json["alphabets"];
+    List<String> parsedAlphabets = [];
+    if (rawAlphabets is List) {
+      parsedAlphabets = rawAlphabets.map((x) => x.toString()).toList();
+    }
+
+    final selectedAlpha =
+        (rootData["selected_alphabet"] ?? json["selected_alphabet"])?.toString();
+
+    return VocabularyModel(
+      status: statusVal,
+      success: json["success"] == true || statusVal,
+      message: json["message"]?.toString() ?? '',
+      vocabularies: vocabulariesObj,
+      types: parsedTypes,
+      categories: parsedCategories,
+      alphabets: parsedAlphabets,
+      selectedAlphabet: selectedAlpha,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "status": status,
+        "success": success,
+        "message": message,
         "vocabularies": vocabularies?.toJson(),
-        "types": types == null
-            ? []
-            : List<dynamic>.from(types!.map((x) => x.toJson())),
-        "categories": categories == null
-            ? []
-            : List<dynamic>.from(categories!.map((x) => x.toJson())),
-        "alphabets": alphabets == null
-            ? []
-            : List<dynamic>.from(alphabets!.map((x) => x)),
+        "types": types?.map((x) => x.toJson()).toList() ?? [],
+        "categories": categories?.map((x) => x.toJson()).toList() ?? [],
+        "alphabets": alphabets ?? [],
         "selected_alphabet": selectedAlphabet,
       };
 }

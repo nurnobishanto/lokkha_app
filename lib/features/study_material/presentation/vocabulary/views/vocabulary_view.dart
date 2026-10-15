@@ -126,8 +126,26 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           if (vocab.details != null &&
-                                              vocab.details!.isNotEmpty)
+                                              vocab.details!.isNotEmpty) ...[
                                             Text("Details: ${vocab.details}"),
+                                            const SizedBox(height: 6),
+                                          ],
+                                          if (vocab.typeName != null &&
+                                              vocab.typeName!.isNotEmpty) ...[
+                                            Text("Type: ${vocab.typeName}",
+                                                style: TextStyle(
+                                                    color: context.textMuted,
+                                                    fontSize: 13)),
+                                            const SizedBox(height: 4),
+                                          ],
+                                          if (vocab.categoryName != null &&
+                                              vocab.categoryName!.isNotEmpty) ...[
+                                            Text("Category: ${vocab.categoryName}",
+                                                style: TextStyle(
+                                                    color: context.textMuted,
+                                                    fontSize: 13)),
+                                            const SizedBox(height: 6),
+                                          ],
                                           const SizedBox(height: 10),
                                           if (vocab.synonym != null &&
                                               vocab.synonym!.isNotEmpty)
@@ -322,12 +340,23 @@ class FilterRow extends ConsumerWidget {
 
     final types = vocabState.model?.types ?? [];
     final selectedType = vocabState.selectedType;
-    final safeType = types.contains(selectedType) ? selectedType : null;
+    final safeType = types.any((t) =>
+            (t.id != null && t.id == selectedType?.id) ||
+            (t.name != null && t.name == selectedType?.name))
+        ? types.firstWhere((t) =>
+            (t.id != null && t.id == selectedType?.id) ||
+            (t.name != null && t.name == selectedType?.name))
+        : null;
 
     final categories = vocabState.model?.categories ?? [];
     final selectedCategory = vocabState.selectedCategory;
-    final safeCategory =
-        categories.contains(selectedCategory) ? selectedCategory : null;
+    final safeCategory = categories.any((c) =>
+            (c.id != null && c.id == selectedCategory?.id) ||
+            (c.name != null && c.name == selectedCategory?.name))
+        ? categories.firstWhere((c) =>
+            (c.id != null && c.id == selectedCategory?.id) ||
+            (c.name != null && c.name == selectedCategory?.name))
+        : null;
 
     final width = MediaQuery.of(context).size.width * 0.45;
 

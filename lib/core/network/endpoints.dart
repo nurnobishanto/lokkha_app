@@ -172,6 +172,7 @@ class Endpoints {
   static const String v1AppInfoCheckUpdate = checkUpdate;
   static const String v1CurrentAffairsFeed = currentAffairs;
   static const String v1Blogs = blogs;
+  static const String v1Vocabulary = homeVocabulary;
 
   // ─── Legacy Web & App Routes ───────────────────────────────────────────────
   static final String appVersionCheck = '$appUrl/app/update';

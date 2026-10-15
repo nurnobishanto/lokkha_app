@@ -185,9 +185,13 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
       selectedType: type,
       clearType: type == null,
       currentPage: 1,
-      selectedAlphabet: '',
     );
-    fetchVocabulary();
+    final allVocabs = state.model?.vocabularies?.data ?? [];
+    if (allVocabs.isNotEmpty) {
+      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
+    } else {
+      fetchVocabulary();
+    }
   }
 
   void setCategory(Category? category) {
@@ -195,36 +199,94 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
       selectedCategory: category,
       clearCategory: category == null,
       currentPage: 1,
-      selectedAlphabet: '',
     );
-    fetchVocabulary();
+    final allVocabs = state.model?.vocabularies?.data ?? [];
+    if (allVocabs.isNotEmpty) {
+      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
+    } else {
+      fetchVocabulary();
+    }
   }
 
   void setAlphabet(String char) {
+    final newChar =
+        state.selectedAlphabet.toUpperCase() == char.toUpperCase() ? '' : char;
     state = state.copyWith(
-      selectedAlphabet: char,
+      selectedAlphabet: newChar,
       currentPage: 1,
     );
-    fetchVocabulary();
+    final allVocabs = state.model?.vocabularies?.data ?? [];
+    if (allVocabs.isNotEmpty) {
+      state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
+    } else {
+      fetchVocabulary();
+    }
   }
 
   void setSearch(String query) {
+    state = state.copyWith(search: query);
     final allVocabs = state.model?.vocabularies?.data ?? [];
-    List<Vocabulary> filtered;
-    if (query.trim().isEmpty) {
-      filtered = allVocabs;
-    } else {
-      final q = query.toLowerCase();
-      filtered = allVocabs
-          .where((v) => (v.word ?? '').toLowerCase().contains(q))
+    state = state.copyWith(filteredVocab: _applyFilters(allVocabs));
+  }
+
+  List<Vocabulary> _applyFilters(List<Vocabulary> rawList) {
+    List<Vocabulary> filtered = rawList;
+
+    // Filter by Alphabet
+    if (state.selectedAlphabet.isNotEmpty) {
+      final alpha = state.selectedAlphabet.toUpperCase();
+      filtered = filtered
+          .where((v) => (v.word ?? '').toUpperCase().startsWith(alpha))
           .toList();
     }
-    state = state.copyWith(search: query, filteredVocab: filtered);
+
+    // Filter by Type
+    if (state.selectedType != null && state.selectedType!.name != null) {
+      final tName = state.selectedType!.name!.toLowerCase();
+      filtered = filtered.where((v) {
+        if (v.typeName != null && v.typeName!.toLowerCase() == tName) return true;
+        if (v.types != null &&
+            v.types!.any((t) =>
+                t.id == state.selectedType!.id ||
+                (t.name?.toLowerCase() == tName))) {
+          return true;
+        }
+        return false;
+      }).toList();
+    }
+
+    // Filter by Category
+    if (state.selectedCategory != null && state.selectedCategory!.name != null) {
+      final cName = state.selectedCategory!.name!.toLowerCase();
+      filtered = filtered.where((v) {
+        if (v.categoryName != null && v.categoryName!.toLowerCase() == cName) {
+          return true;
+        }
+        if (v.categories != null &&
+            v.categories!.any((c) =>
+                c.id == state.selectedCategory!.id ||
+                (c.name?.toLowerCase() == cName))) {
+          return true;
+        }
+        return false;
+      }).toList();
+    }
+
+    // Filter by Search
+    if (state.search.trim().isNotEmpty) {
+      final q = state.search.toLowerCase();
+      filtered = filtered
+          .where((v) =>
+              (v.word ?? '').toLowerCase().contains(q) ||
+              (v.details ?? '').toLowerCase().contains(q))
+          .toList();
+    }
+
+    return filtered;
   }
 
   Future<void> fetchVocabulary({bool refresh = false}) async {
     state = state.copyWith(isLoading: true);
-    final url = Endpoints.vocabularies;
 
     final data = <String, dynamic>{
       'alphabet': state.selectedAlphabet.toUpperCase(),
@@ -233,29 +295,47 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
     };
     if (state.selectedType?.id != null) {
       data['type_ids[]'] = [state.selectedType!.id!];
+      data['type_id'] = state.selectedType!.id!;
+      data['type'] = state.selectedType!.name ?? '';
     }
     if (state.selectedCategory?.id != null) {
       data['category_ids[]'] = [state.selectedCategory!.id!];
+      data['category_id'] = state.selectedCategory!.id!;
+      data['category'] = state.selectedCategory!.name ?? '';
     }
 
     try {
-      final response = await _client.get(
-        url,
-        queryParameters: data,
-      );
-      if (response.data['status'] == true) {
-        final modelData = VocabularyModel.fromJson(response.data);
+      dynamic responseData;
+      try {
+        final res = await _client.get(
+          Endpoints.v1Vocabulary,
+          queryParameters: data,
+        );
+        responseData = res.data;
+      } catch (_) {
+        final res = await _client.get(
+          Endpoints.vocabularies,
+          queryParameters: data,
+        );
+        responseData = res.data;
+      }
+
+      final isSuccess = responseData is Map &&
+          (responseData['success'] == true ||
+              responseData['status'] == true ||
+              responseData['data'] != null);
+
+      if (isSuccess) {
+        final Map<String, dynamic> responseJson = responseData is Map<String, dynamic>
+            ? responseData as Map<String, dynamic>
+            : Map<String, dynamic>.from(responseData as Map);
+
+        final modelData = VocabularyModel.fromJson(responseJson);
         final rawList = modelData.vocabularies?.data ?? [];
         final lastPage = modelData.vocabularies?.lastPage ?? 1;
         final curPage = modelData.vocabularies?.currentPage ?? 1;
 
-        List<Vocabulary> filtered = rawList;
-        if (state.search.trim().isNotEmpty) {
-          final q = state.search.toLowerCase();
-          filtered = rawList
-              .where((v) => (v.word ?? '').toLowerCase().contains(q))
-              .toList();
-        }
+        final filtered = _applyFilters(rawList);
 
         state = state.copyWith(
           isLoading: false,
