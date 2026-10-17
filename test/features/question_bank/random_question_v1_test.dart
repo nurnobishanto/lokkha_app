@@ -3,8 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/core/localization/l10n/app_localizations.dart';
-import 'package:lokkha/core/network/endpoints.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/di/question_bank_provider.dart';
 import 'package:lokkha/features/home/presentation/home/components/home_mcq_section.dart';
 import 'package:lokkha/features/question_bank/question_bank.dart';
@@ -20,6 +19,16 @@ class _MockQuestionBankRepository implements QuestionBankRepository {
     callCount++;
     return questionToReturn;
   }
+}
+
+Finder findTextOrRich(String pattern) {
+  return find.byWidgetPredicate(
+    (widget) =>
+        (widget is Text &&
+            ((widget.data?.contains(pattern) ?? false) ||
+                (widget.textSpan?.toPlainText().contains(pattern) ?? false))) ||
+        (widget is RichText && widget.text.toPlainText().contains(pattern)),
+  );
 }
 
 void main() {
@@ -218,7 +227,7 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const Scaffold(
+            home: Scaffold(
               body: SingleChildScrollView(
                 child: HomeMcqSection(),
               ),
@@ -252,17 +261,17 @@ void main() {
       expect(find.text('MCQ'), findsOneWidget);
       expect(find.text('English Language'), findsOneWidget);
 
-      // Question Title (cleaned from HTML)
-      expect(find.text("'Belle' শব্দটি কোন Gender?"), findsOneWidget);
+      // Question Title (rendered via HtmlWidget)
+      expect(findTextOrRich("'Belle' শব্দটি কোন Gender?"), findsOneWidget);
 
       // 4 Dynamic Options
-      expect(find.text('A) Neuter Gender'), findsOneWidget);
-      expect(find.text('B) Common Gender'), findsOneWidget);
-      expect(find.text('C) Masculine Gender'), findsOneWidget);
-      expect(find.text('D) Feminine Gender'), findsOneWidget);
+      expect(findTextOrRich('A) Neuter Gender'), findsOneWidget);
+      expect(findTextOrRich('B) Common Gender'), findsOneWidget);
+      expect(findTextOrRich('C) Masculine Gender'), findsOneWidget);
+      expect(findTextOrRich('D) Feminine Gender'), findsOneWidget);
 
       // Tap on correct option (D)
-      await tester.tap(find.text('D) Feminine Gender'));
+      await tester.tap(findTextOrRich('D) Feminine Gender'));
       await tester.pumpAndSettle();
 
       // Checkmark icon appears
@@ -292,12 +301,155 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap wrong option (A)
-      await tester.tap(find.text('A) Neuter Gender'));
+      await tester.tap(findTextOrRich('A) Neuter Gender'));
       await tester.pumpAndSettle();
 
       // Both Cancel icon (for wrong option) and Check icon (for correct answer) appear
       expect(find.byIcon(Icons.cancel_rounded), findsOneWidget);
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+    });
+  });
+
+  group('HtmlSanitizer & MathML Tests', () {
+    test('converts MathML into readable HTML superscripts and subscripts', () {
+      const raw =
+          '0) 24 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>c</mi><msup><mi>m</mi><mn>2</mn></msup></math>';
+      expect(HtmlSanitizer.convertMathMlToHtml(raw), '0) 24 cm<sup>2</sup>');
+
+      const raw2 =
+          '1) 12√7 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>c</mi><msup><mi>m</mi>2</msup></math>';
+      expect(HtmlSanitizer.convertMathMlToHtml(raw2), '1) 12√7 cm<sup>2</sup>');
+    });
+
+    testWidgets('HomeMcqSection renders MathML option cleanly without raw math tags', (tester) async {
+      final mathPayload = {
+        "id": 88001,
+        "title": "Find the area of an isosceles triangle if its perimeter is 28 cm",
+        "question_type": "single_choice",
+        "options": [
+          {
+            "key": "0",
+            "value": '24 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>c</mi><msup><mi>m</mi><mn>2</mn></msup></math>',
+            "is_correct": true,
+          },
+          {
+            "key": "1",
+            "value": '12√7 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>c</mi><msup><mi>m</mi><mn>2</mn></msup></math>',
+            "is_correct": false,
+          },
+        ],
+        "is_favorite": false,
+        "subjects": [
+          {"id": 10, "name": "Bank Math"}
+        ],
+      };
+
+      final model = RandomQuestionModel.fromJson(mathPayload);
+      final mockRepo = _MockQuestionBankRepository(model);
+      final container = ProviderContainer(
+        overrides: [
+          questionBankRepositoryProvider.overrideWithValue(mockRepo),
+        ],
+      );
+
+      Widget buildTestWidget({required ProviderContainer container}) {
+        return UncontrolledProviderScope(
+          container: container,
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            builder: (context, _) => const MaterialApp(
+              localizationsDelegates: [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: HomeMcqSection(),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      await container.read(randomQuestionNotifierProvider.notifier).fetchRandomQuestion();
+      await tester.pumpWidget(buildTestWidget(container: container));
+      await tester.pumpAndSettle();
+
+      // Verify no raw <math> or <msup> tags appear
+      expect(find.textContaining('<math'), findsNothing);
+      expect(find.textContaining('<msup'), findsNothing);
+      expect(find.textContaining('xmlns='), findsNothing);
+
+      // Verify rendered math text is found
+      expect(findTextOrRich('24'), findsWidgets);
+      expect(findTextOrRich('cm'), findsWidgets);
+    });
+
+    testWidgets('HomeMcqSection handles extremely long subject badge without horizontal overflow',
+        (tester) async {
+      final longBadgePayload = {
+        "id": 88002,
+        "title": "ব্যতিহারিক সর্বনাম কোনটি?",
+        "question_type": "single_choice",
+        "options": [
+          {"key": "A", "value": "ইহারা", "is_correct": false},
+          {"key": "B", "value": "যিনি", "is_correct": false},
+          {"key": "C", "value": "নিজে নিজে", "is_correct": true},
+          {"key": "D", "value": "কেহ", "is_correct": false},
+        ],
+        "is_favorite": false,
+        "subjects": [
+          {
+            "id": 99,
+            "name": "দুর্নীতি দমন কমিশন পদের নাম: উপ-সহকারী পরিচালক পরীক্ষার তারিখ: ০৩.০৫.২০২৪",
+          }
+        ],
+      };
+
+      final model = RandomQuestionModel.fromJson(longBadgePayload);
+      final mockRepo = _MockQuestionBankRepository(model);
+      final container = ProviderContainer(
+        overrides: [
+          questionBankRepositoryProvider.overrideWithValue(mockRepo),
+        ],
+      );
+
+      Widget buildTestWidget({required ProviderContainer container}) {
+        return UncontrolledProviderScope(
+          container: container,
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            builder: (context, _) => const MaterialApp(
+              localizationsDelegates: [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: HomeMcqSection(),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      await container.read(randomQuestionNotifierProvider.notifier).fetchRandomQuestion();
+      await tester.pumpWidget(buildTestWidget(container: container));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('কারেন্ট অ্যাফেয়ার্স'), findsOneWidget);
+      expect(findTextOrRich('ব্যতিহারিক সর্বনাম কোনটি?'), findsOneWidget);
     });
   });
 }

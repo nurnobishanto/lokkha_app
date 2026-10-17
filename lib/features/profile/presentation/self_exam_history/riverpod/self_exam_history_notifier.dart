@@ -38,12 +38,16 @@ class SelfExamHistoryState {
 class SelfExamHistoryNotifier extends Notifier<SelfExamHistoryState> {
   @override
   SelfExamHistoryState build() {
-    final initialState = const SelfExamHistoryState();
-    loadExamHistory(page: 1);
-    return initialState;
+    return SelfExamHistoryState(
+      currentPage: 1,
+      totalPages: 3,
+      totalRecords: 25,
+      isLoading: false,
+      examList: _getItemsForPage(1),
+    );
   }
 
-  void loadExamHistory({required int page}) {
+  List<SelfExamModel> _getItemsForPage(int page) {
     List<SelfExamModel> items = [];
     if (page == 1) {
       items = const [
@@ -134,7 +138,11 @@ class SelfExamHistoryNotifier extends Notifier<SelfExamHistoryState> {
         ),
       ];
     }
+    return items;
+  }
 
+  void loadExamHistory({required int page}) {
+    final items = _getItemsForPage(page);
     state = state.copyWith(
       currentPage: page,
       examList: items,

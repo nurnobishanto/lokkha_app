@@ -35,6 +35,8 @@ export 'utils/utils.dart';
 export 'utils/phone_utils.dart';
 export 'utils/global.dart';
 export 'utils/date_formatter.dart';
+export 'utils/share_helper.dart';
+export 'utils/html_sanitizer.dart';
 
 // Localization
 export 'localization/app_localizations.dart';

@@ -64,5 +64,6 @@ class Routes {
   static const String allExam = '/all-exam';
   static const String myCourses = '/my-courses';
   static const String subjectSection = '/subject-section';
+  static const String about = '/about';
   static const String myApp = '/my-app';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
@@ -66,14 +67,16 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
     final String? subjectBadge;
 
     if (question != null && question.options.isNotEmpty) {
-      questionText = question.cleanTitle.isNotEmpty
-          ? question.cleanTitle
-          : 'দুদক-এর পূর্ণরূপ কী?';
+      questionText = question.title.trim().isNotEmpty
+          ? question.title
+          : (question.cleanTitle.isNotEmpty
+              ? question.cleanTitle
+              : 'দুদক-এর পূর্ণরূপ কী?');
       options = question.options.map((e) => e.displayOption).toList();
       rightAnswerIndex = question.rightAnswerIndex ?? 0;
       selectedOptionIndex = randomState.selectedOptionIndex;
       isAnswerRevealed = randomState.isAnswerRevealed;
-      explanationText = _stripHtml(question.explanation);
+      explanationText = question.explanation;
       subjectBadge = question.primarySubject;
     } else {
       questionText = (affairItem?.question != null &&
@@ -103,7 +106,7 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
           : 0;
       selectedOptionIndex = _fallbackSelectedIndex;
       isAnswerRevealed = _fallbackSelectedIndex != null;
-      explanationText = _stripHtml(affairItem?.explanation);
+      explanationText = affairItem?.explanation;
       subjectBadge = null;
     }
 
@@ -150,25 +153,27 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                       ),
                     ),
                     if (subjectBadge != null && subjectBadge.isNotEmpty) ...[
-                      SizedBox(width: 8.w),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8.w,
-                          vertical: 2.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: context.primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        child: Text(
-                          subjectBadge,
-                          style: TextStyle(
-                            fontSize: 10.5.sp,
-                            fontWeight: FontWeight.w600,
-                            color: context.primaryColor,
+                      SizedBox(width: 6.w),
+                      Flexible(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 2.h,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          decoration: BoxDecoration(
+                            color: context.primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Text(
+                            subjectBadge,
+                            style: TextStyle(
+                              fontSize: 10.5.sp,
+                              fontWeight: FontWeight.w600,
+                              color: context.primaryColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],
@@ -239,14 +244,23 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
           SizedBox(height: 10.h),
 
           // ─── Question Text ─────────────────────────────────────────────────
-          Text(
-            questionText,
-            style: TextStyle(
+          HtmlWidget(
+            HtmlSanitizer.formatForDisplay(
+              questionText,
+              isDark: context.isDark,
+            ),
+            textStyle: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
               color: context.textPrimary,
               height: 1.35,
             ),
+            customStylesBuilder: (element) {
+              if (element.localName == 'p') {
+                return {'margin': '0', 'padding': '0'};
+              }
+              return null;
+            },
           ),
 
           SizedBox(height: 12.h),
@@ -308,28 +322,43 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: Text(
-                          options[index],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
+                        child: HtmlWidget(
+                          HtmlSanitizer.formatForDisplay(
+                            options[index],
+                            isDark: context.isDark,
+                          ),
+                          textStyle: TextStyle(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w500,
                             color: textColor,
                           ),
+                          customStylesBuilder: (element) {
+                            final styles = <String, String>{
+                              'text-align': 'center',
+                            };
+                            if (element.localName == 'p') {
+                              styles['margin'] = '0';
+                              styles['padding'] = '0';
+                            }
+                            return styles;
+                          },
                         ),
                       ),
-                      if (isAnswerRevealed && isCorrect)
+                      if (isAnswerRevealed && isCorrect) ...[
+                        SizedBox(width: 8.w),
                         Icon(
                           Icons.check_circle_rounded,
                           size: 16.sp,
                           color: const Color(0xFF10B981),
-                        )
-                      else if (isAnswerRevealed && isSelected && !isCorrect)
+                        ),
+                      ] else if (isAnswerRevealed && isSelected && !isCorrect) ...[
+                        SizedBox(width: 8.w),
                         Icon(
                           Icons.cancel_rounded,
                           size: 16.sp,
                           color: const Color(0xFFEF4444),
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -377,13 +406,22 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                     ],
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    explanationText,
-                    style: TextStyle(
+                  HtmlWidget(
+                    HtmlSanitizer.formatForDisplay(
+                      explanationText,
+                      isDark: context.isDark,
+                    ),
+                    textStyle: TextStyle(
                       fontSize: 11.5.sp,
                       color: context.textSecondary,
                       height: 1.35,
                     ),
+                    customStylesBuilder: (element) {
+                      if (element.localName == 'p') {
+                        return {'margin': '0', 'padding': '0'};
+                      }
+                      return null;
+                    },
                   ),
                 ],
               ),

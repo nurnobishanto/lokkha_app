@@ -676,6 +676,16 @@ void main() {
       );
     }
 
+    Finder findTextOrRich(String pattern) {
+      return find.byWidgetPredicate(
+        (widget) =>
+            (widget is Text &&
+                ((widget.data?.contains(pattern) ?? false) ||
+                    (widget.textSpan?.toPlainText().contains(pattern) ?? false))) ||
+            (widget is RichText && widget.text.toPlainText().contains(pattern)),
+      );
+    }
+
     testWidgets('HomeTopActionsGrid renders 6 action items correctly',
         (tester) async {
       await tester.pumpWidget(createWidgetForTesting(const HomeTopActionsGrid()));
@@ -696,10 +706,10 @@ void main() {
 
       expect(find.text('কারেন্ট অ্যাফেয়ার্স'), findsOneWidget);
       expect(find.text('MCQ'), findsOneWidget);
-      expect(find.text('A) দুর্নীতি দমন কমিশন'), findsOneWidget);
+      expect(findTextOrRich('A) দুর্নীতি দমন কমিশন'), findsOneWidget);
 
       // Tap on an option
-      await tester.tap(find.text('A) দুর্নীতি দমন কমিশন'));
+      await tester.tap(findTextOrRich('A) দুর্নীতি দমন কমিশন'));
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
     });

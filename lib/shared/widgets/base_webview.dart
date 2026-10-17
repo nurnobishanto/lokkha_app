@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 
 class BaseWebView extends StatefulWidget {
   final String title;
@@ -21,10 +22,15 @@ class _BaseWebViewState extends State<BaseWebView> {
   @override
   void initState() {
     super.initState();
-    // Initialize WebView and enable logging
-    // WebViewPlatform.setLoggingEnabled(true);
+    String targetUrl = widget.url.trim();
+    if (targetUrl.startsWith('/')) {
+      targetUrl = '${Endpoints.baseUrl}$targetUrl';
+    } else if (!targetUrl.startsWith('http://') &&
+        !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://$targetUrl';
+    }
     _controller = WebViewController();
-    _controller.loadRequest(Uri.parse(widget.url));
+    _controller.loadRequest(Uri.parse(targetUrl));
   }
 
   @override

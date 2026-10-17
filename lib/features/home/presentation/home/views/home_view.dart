@@ -60,53 +60,15 @@ class _HomeViewState extends ConsumerState<HomeView> {
         backgroundColor: const Color(0xFF006A4E),
         elevation: 0,
         centerTitle: true,
-        leading: Stack(
-          alignment: Alignment.center,
-          children: [
-            IconButton(
-              onPressed: () {
-                if (GoRouter.maybeOf(context) != null) {
-                  context.push(Routes.notifications);
-                }
-              },
-              icon: const Icon(
-                Icons.notifications,
-                color: Colors.white,
-                size: 26,
-              ),
-            ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: ValueListenableBuilder<int>(
-                valueListenable: unReadNotificationCount,
-                builder: (context, count, _) {
-                  if (count <= 0) return const SizedBox.shrink();
-                  return Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      count > 99 ? '99+' : count.toString(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.bold,
-                        height: 1.0,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+        leading: IconButton(
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
+          icon: const Icon(
+            Icons.menu_rounded,
+            color: Colors.white,
+            size: 26,
+          ),
         ),
         title: Column(
           mainAxisSize: MainAxisSize.min,
@@ -136,15 +98,53 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ],
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              _scaffoldKey.currentState?.openDrawer();
-            },
-            icon: const Icon(
-              Icons.menu_rounded,
-              color: Colors.white,
-              size: 26,
-            ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                onPressed: () {
+                  if (GoRouter.maybeOf(context) != null) {
+                    context.push(Routes.notifications);
+                  }
+                },
+                icon: const Icon(
+                  Icons.notifications,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: unReadNotificationCount,
+                  builder: (context, count, _) {
+                    if (count <= 0) return const SizedBox.shrink();
+                    return Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        count > 99 ? '99+' : count.toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          height: 1.0,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           SizedBox(width: 4.w),
         ],

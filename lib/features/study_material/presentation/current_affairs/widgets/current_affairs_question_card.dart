@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
@@ -191,7 +190,7 @@ ${item.displayTitle}
 ${item.explanation != null && item.explanation!.isNotEmpty ? "ব্যাখ্যা: ${item.explanation}\n" : ""}
 লক্ষ্য অ্যাপে আরও জানুন: https://lokkha.com
 ''';
-                  Share.share(shareText.trim());
+                  ShareHelper.share(shareText.trim(), context: context);
                 },
               ),
             ],

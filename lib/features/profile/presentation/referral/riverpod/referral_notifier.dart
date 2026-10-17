@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:lokkha/core/utils/share_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/utils/global.dart';
@@ -93,7 +93,7 @@ class ReferralNotifier extends Notifier<ReferralState> {
   Future<void> shareReferral() async {
     final message = "লক্ষ্য অ্যাপে আমার রেফারেল কোড: ${state.referralCode} ব্যবহার করে "
         "রেজিস্ট্রেশন করুন এবং এক্সক্লুসিভ বেনিফিট পান!\n\nলিংক: ${state.referralLink}";
-    await Share.share(message, subject: "লক্ষ্য অ্যাপ রেফারেল");
+    await ShareHelper.share(message, subject: "লক্ষ্য অ্যাপ রেফারেল");
   }
 
   Future<void> shareWhatsApp() async {
@@ -104,7 +104,7 @@ class ReferralNotifier extends Notifier<ReferralState> {
 
   void shareFacebook() {
     final link = state.referralLink;
-    Share.share("Join Lokkha: $link");
+    ShareHelper.share("Join Lokkha: $link");
   }
 
   Future<void> shareTelegram() async {
@@ -115,7 +115,7 @@ class ReferralNotifier extends Notifier<ReferralState> {
 
   void shareGeneric() {
     final link = state.referralLink;
-    Share.share("Join Lokkha: $link");
+    ShareHelper.share("Join Lokkha: $link");
   }
 
   Future<void> _launchURL(String url) async {
@@ -124,10 +124,10 @@ class ReferralNotifier extends Notifier<ReferralState> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        Share.share("Join Lokkha: ${state.referralLink}");
+        ShareHelper.share("Join Lokkha: ${state.referralLink}");
       }
     } catch (_) {
-      Share.share("Join Lokkha: ${state.referralLink}");
+      ShareHelper.share("Join Lokkha: ${state.referralLink}");
     }
   }
 }

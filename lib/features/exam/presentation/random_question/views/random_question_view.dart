@@ -56,7 +56,10 @@ class _RandomQuestionSelectorState
           child: Column(
             children: [
               HtmlWidget(
-                question.title ?? '',
+                HtmlSanitizer.formatForDisplay(
+                  question.title ?? '',
+                  isDark: context.isDark,
+                ),
                 textStyle: AppTextStyles.heading4.copyWith(
                   fontWeight: FontWeight.w500,
                   fontSize: 13.sp,
@@ -112,7 +115,10 @@ class _RandomQuestionSelectorState
                             children: [
                               Expanded(
                                 child: HtmlWidget(
-                                  option.value ?? '',
+                                  HtmlSanitizer.formatForDisplay(
+                                    option.value ?? '',
+                                    isDark: context.isDark,
+                                  ),
                                   textStyle: AppTextStyles.body1.copyWith(
                                     color: isSelected
                                         ? (option.isCorrect == true

@@ -20,6 +20,7 @@ import 'package:lokkha/features/notifications/notifications.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/settings/settings.dart';
+import 'package:lokkha/features/about/about.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'route_observer.dart';
 import 'routes.dart';
@@ -532,6 +533,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             latestVersion: extra['latestVersion'] as String?,
           );
         },
+      ),
+      GoRoute(
+        path: Routes.about,
+        name: Routes.about,
+        builder: (context, state) => const AboutUsView(),
       ),
     ],
   );

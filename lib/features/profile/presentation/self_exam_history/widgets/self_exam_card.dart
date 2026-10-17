@@ -33,7 +33,10 @@ class SelfExamCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Header Row (ID Chip, Date, Duration Pill, Status Badge)
-          Row(
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
             children: [
               // ID Chip
               Container(
@@ -86,16 +89,12 @@ class SelfExamCard extends StatelessWidget {
                 color: context.textSecondary,
               ),
               SizedBox(width: 4.w),
-              Expanded(
-                child: Text(
-                  item.date,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: context.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
+              Text(
+                item.date,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  color: context.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
 
@@ -173,6 +172,7 @@ class SelfExamCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
 
           SizedBox(height: 12.h),
 
@@ -216,52 +216,55 @@ class SelfExamCard extends StatelessWidget {
                         color: context.textPrimary,
                       ),
                     ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Text(
-                          "মোট প্রশ্ন: ${item.totalQuestions}",
-                          style: TextStyle(
-                            fontSize: 11.5.sp,
-                            color: context.textSecondary,
-                            fontWeight: FontWeight.w500,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          Text(
+                            "মোট প্রশ্ন: ${item.totalQuestions}",
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              color: context.textSecondary,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Text("•", style: TextStyle(color: context.textMuted, fontSize: 11.sp)),
-                        SizedBox(width: 4.w),
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 13.sp,
-                          color: const Color(0xFF10B981),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          "${item.correctCount} সঠিক",
-                          style: TextStyle(
-                            fontSize: 11.5.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF059669),
+                          SizedBox(width: 4.w),
+                          Text("•", style: TextStyle(color: context.textMuted, fontSize: 11.sp)),
+                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.check_circle_rounded,
+                            size: 13.sp,
+                            color: const Color(0xFF10B981),
                           ),
-                        ),
-                        SizedBox(width: 4.w),
-                        Text("•", style: TextStyle(color: context.textMuted, fontSize: 11.sp)),
-                        SizedBox(width: 4.w),
-                        Icon(
-                          Icons.cancel_rounded,
-                          size: 13.sp,
-                          color: const Color(0xFFEF4444),
-                        ),
-                        SizedBox(width: 2.w),
-                        Text(
-                          "${item.wrongCount} ভুল",
-                          style: TextStyle(
-                            fontSize: 11.5.sp,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFFDC2626),
+                          SizedBox(width: 2.w),
+                          Text(
+                            "${item.correctCount} সঠিক",
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF059669),
+                            ),
                           ),
-                        ),
-                      ],
+                          SizedBox(width: 4.w),
+                          Text("•", style: TextStyle(color: context.textMuted, fontSize: 11.sp)),
+                          SizedBox(width: 4.w),
+                          Icon(
+                            Icons.cancel_rounded,
+                            size: 13.sp,
+                            color: const Color(0xFFEF4444),
+                          ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            "${item.wrongCount} ভুল",
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFFDC2626),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -279,26 +282,33 @@ class SelfExamCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    "অর্জিত মার্ক: ",
-                    style: TextStyle(
-                      fontSize: 12.5.sp,
-                      color: context.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Text(
+                        "অর্জিত মার্ক: ",
+                        style: TextStyle(
+                          fontSize: 12.5.sp,
+                          color: context.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        item.obtainedMark,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w900,
+                          color: const Color(0xFF059669),
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    item.obtainedMark,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF059669),
-                    ),
-                  ),
-                ],
+                ),
               ),
+              SizedBox(width: 8.w),
 
               // ফলাফল দেখুন Button
               InkWell(

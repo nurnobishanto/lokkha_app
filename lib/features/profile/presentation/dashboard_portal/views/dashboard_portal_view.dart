@@ -11,7 +11,6 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/theme/theme_mode_selector_sheet.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../riverpod/dashboard_portal_notifier.dart';
 
@@ -1558,8 +1557,9 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
                 icon: const FaIcon(FontAwesomeIcons.facebookF,
                     color: Colors.white, size: 13),
                 bgColor: const Color(0xFF1877F2),
-                onTap: () => SharePlus.instance.share(
-                  ShareParams(text: "Join Lokkha: $referralLink"),
+                onTap: () => ShareHelper.share(
+                  "Join Lokkha: $referralLink",
+                  context: context,
                 ),
               ),
               SizedBox(width: 8.w),
@@ -1575,8 +1575,9 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
                 icon: const Icon(Icons.share_rounded,
                     color: Colors.white, size: 15),
                 bgColor: Colors.white.withValues(alpha: 0.25),
-                onTap: () => SharePlus.instance.share(
-                  ShareParams(text: "Join Lokkha: $referralLink"),
+                onTap: () => ShareHelper.share(
+                  "Join Lokkha: $referralLink",
+                  context: context,
                 ),
               ),
             ],

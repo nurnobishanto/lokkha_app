@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/features/blog/blog.dart';
 
@@ -58,11 +57,9 @@ class _BlogDetailViewState extends State<BlogDetailView> {
   }
 
   void _sharePost() {
-    SharePlus.instance.share(
-      ShareParams(
-        text:
-            '${_post.title}\n\nপড়ুন লক্ষ্য অ্যাপে: https://lokkha.app/blog/${_post.id}',
-      ),
+    ShareHelper.share(
+      '${_post.title}\n\nপড়ুন লক্ষ্য অ্যাপে: https://lokkha.app/blog/${_post.id}',
+      context: context,
     );
   }
 
