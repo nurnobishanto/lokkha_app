@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 
 class NotificationCard extends StatelessWidget {
   final String title;
@@ -21,101 +24,143 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? resolvedImageUrl =
+        image != null && image!.isNotEmpty ? Endpoints.resolveUrl(image) : null;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         child: Container(
-          padding: const EdgeInsets.all(12.0),
+          padding: EdgeInsets.all(12.r),
           decoration: BoxDecoration(
             color: isRead
                 ? context.cardColor
                 : (context.isDark
-                    ? context.surfaceColor
-                    : LightThemeColors.primaryColor.withValues(alpha: 0.04)),
-            borderRadius: BorderRadius.circular(12),
+                    ? const Color(0xFF006A4E).withOpacity(0.12)
+                    : const Color(0xFF006A4E).withOpacity(0.04)),
+            borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
               color: isRead
-                  ? context.borderColor
-                  : context.primaryColor.withValues(alpha: 0.3),
-              width: 0.8,
+                  ? context.borderColor.withOpacity(0.6)
+                  : const Color(0xFF006A4E).withOpacity(0.35),
+              width: isRead ? 0.8 : 1.0,
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ///  Icon / Image
+              /// Icon / Avatar / Image
               ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: image != null
-                    ? Image.network(
-                        image!,
-                        height: 50,
-                        width: 50,
+                borderRadius: BorderRadius.circular(24.r),
+                child: resolvedImageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: resolvedImageUrl,
+                        height: 46.r,
+                        width: 46.r,
                         fit: BoxFit.cover,
-                      )
-                    : Container(
-                        height: 50,
-                        width: 50,
-                        color:
-                            LightThemeColors.primaryColor.withValues(alpha: .2),
-                        child: const Icon(
-                          Icons.notifications,
-                          color: LightThemeColors.primaryColor,
+                        placeholder: (_, __) => Container(
+                          height: 46.r,
+                          width: 46.r,
+                          color: const Color(0xFF006A4E).withOpacity(0.1),
+                          child: const Center(
+                            child: SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
                         ),
-                      ),
+                        errorWidget: (_, __, ___) => _buildFallbackIcon(context),
+                      )
+                    : _buildFallbackIcon(context),
               ),
 
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
 
-              /// Content
+              /// Content (Title, Body, Human Time)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: context.textPrimary,
-                        fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14.5.sp,
+                              color: context.textPrimary,
+                              fontWeight:
+                                  isRead ? FontWeight.w500 : FontWeight.w700,
+                              height: 1.25,
+                            ),
+                          ),
+                        ),
+                        if (!isRead) ...[
+                          SizedBox(width: 6.w),
+                          Container(
+                            margin: EdgeInsets.only(top: 4.h),
+                            height: 8.r,
+                            width: 8.r,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF006A4E),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 4.h),
                     Text(
                       body,
                       maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 13,
-                        overflow: TextOverflow.ellipsis,
+                        fontSize: 12.5.sp,
                         color: context.textSecondary,
+                        height: 1.35,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      humanTime,
-                      style: TextStyle(fontSize: 12, color: context.textMuted),
-                    ),
+                    if (humanTime.isNotEmpty) ...[
+                      SizedBox(height: 5.h),
+                      Text(
+                        humanTime,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          color: context.textMuted,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
-
-              ///  Unread dot
-              if (!isRead)
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  height: 10,
-                  width: 10,
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFallbackIcon(BuildContext context) {
+    return Container(
+      height: 46.r,
+      width: 46.r,
+      decoration: BoxDecoration(
+        color: isRead
+            ? context.borderColor.withOpacity(0.25)
+            : const Color(0xFF006A4E).withOpacity(0.12),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.notifications_rounded,
+        size: 24.sp,
+        color: isRead ? context.textSecondary : const Color(0xFF006A4E),
       ),
     );
   }

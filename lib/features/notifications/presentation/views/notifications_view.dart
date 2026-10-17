@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import '../providers/notifications_notifier.dart';
 import '../widgets/notification_card.dart';
 import 'notification_details_view.dart';
@@ -15,62 +16,128 @@ class NotificationsView extends ConsumerWidget {
     final state = ref.watch(notificationsNotifierProvider);
     final notifier = ref.read(notificationsNotifierProvider.notifier);
     final notifications = state.model.notifications;
+    final unreadCount = state.model.unreadCount ?? 0;
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
       appBar: AppBar(
-        title: const Text(
-          "Notifications",
-          style: TextStyle(
-            color: LightThemeColors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "নোটিফিকেশন",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 17.sp,
+              ),
+            ),
+            if (unreadCount > 0) ...[
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 2.h),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444),
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+                child: Text(
+                  unreadCount > 99 ? '99+' : unreadCount.toString(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: LightThemeColors.primaryColor,
+        backgroundColor: const Color(0xFF006A4E),
         elevation: 0,
+        actions: [
+          if (notifications.isNotEmpty && unreadCount > 0)
+            Padding(
+              padding: EdgeInsets.only(right: 8.w),
+              child: state.isMarkingAllRead
+                  ? Center(
+                      child: SizedBox(
+                        width: 18.r,
+                        height: 18.r,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  : IconButton(
+                      tooltip: "সবগুলো পড়া হয়েছে",
+                      icon: const Icon(
+                        Icons.done_all_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        notifier.markAllAsRead();
+                      },
+                    ),
+            ),
+        ],
       ),
       body: Builder(
         builder: (context) {
           if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF006A4E),
+              ),
+            );
           }
 
           if (notifications.isEmpty) {
-            return Center(
-              child: RefreshIndicator(
-                onRefresh: notifier.fetchNotifications,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: context.isDark
-                              ? context.surfaceColor
-                              : Colors.grey.shade200,
-                          shape: BoxShape.circle,
+            return RefreshIndicator(
+              color: const Color(0xFF006A4E),
+              onRefresh: notifier.fetchNotifications,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.75,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(22.r),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF006A4E).withOpacity(0.08),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.notifications_off_outlined,
+                            size: 54.sp,
+                            color: const Color(0xFF006A4E),
+                          ),
                         ),
-                        child: Icon(
-                          Icons.notifications_off_outlined,
-                          size: 64,
-                          color: context.textMuted,
+                        SizedBox(height: 18.h),
+                        Text(
+                          "কোন নোটিফিকেশন নেই",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: context.textPrimary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        "No Notifications Yet",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: context.textPrimary,
+                        SizedBox(height: 6.h),
+                        Text(
+                          "আপনার নতুন সব নোটিফিকেশন এখানে প্রদর্শিত হবে।",
+                          style: TextStyle(
+                            fontSize: 13.sp,
+                            color: context.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -78,55 +145,56 @@ class NotificationsView extends ConsumerWidget {
           }
 
           return RefreshIndicator(
+            color: const Color(0xFF006A4E),
             onRefresh: notifier.fetchNotifications,
             child: SafeArea(
               child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 12.w),
                 itemCount: notifications.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
+                separatorBuilder: (context, index) => SizedBox(height: 8.h),
                 itemBuilder: (context, index) {
                   final notification = notifications[index];
+                  final String title = notification.title?.trim() ?? "বিজ্ঞপ্তি";
+                  final String body = notification.body?.trim() ?? "";
+                  final bool isRead = notification.isRead ?? false;
+                  final String humanTime =
+                      notification.timeHuman ?? notification.createdAt ?? "";
+
                   return NotificationCard(
-                    title: notification.title.toString(),
-                    body: notification.body.toString(),
-                    image: (notification.image != null &&
-                            notification.image!.isNotEmpty)
-                        ? Endpoints.storageUrl + notification.image!
-                        : null,
-                    isRead: notification.isRead ?? false,
-                    humanTime: notification.timeHuman.toString(),
+                    title: title,
+                    body: body,
+                    image: notification.image,
+                    isRead: isRead,
+                    humanTime: humanTime,
                     onTap: () {
-                      final route = notification.route;
                       final id = notification.id;
-                      if (notification.isRead != true && id != null) {
+                      if (!isRead && id != null) {
                         notifier.markAsRead(id, true);
                       }
 
-                      if (route != null && route.isNotEmpty) {
+                      final route = notification.route;
+                      if (route != null &&
+                          route.isNotEmpty &&
+                          GoRouter.maybeOf(context) != null) {
                         final args = notification.arguments;
-                        if (args == null || (args is List && args.isEmpty)) {
+                        if (args == null ||
+                            (args is List && args.isEmpty) ||
+                            (args is Map && args.isEmpty)) {
                           context.push(route);
+                        } else if (args is Map) {
+                          context.push(route, extra: args);
                         } else {
-                          final argId = args['id'];
-                          final params = args['params'];
-                          final finalID =
-                              argId != null ? int.tryParse(argId) : null;
-
-                          final arguments = (id != null && params != null)
-                              ? {params: finalID}
-                              : null;
-                          context.push(route, extra: arguments);
+                          context.push(route);
                         }
                       } else {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => NotificationDetailsPage(
-                              title: notification.title ?? "",
-                              body: notification.body ?? "",
+                              title: title,
+                              body: body,
                               image: notification.image,
-                              webLink: notification.webLink ?? "",
+                              webLink: notification.webLink,
                             ),
                           ),
                         );

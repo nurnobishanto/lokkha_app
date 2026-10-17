@@ -7,8 +7,8 @@ class MarkNotificationReadUseCase {
 
   Future<bool> call({
     required int notificationId,
-    required String? deviceId,
-    required bool isRead,
+    String? deviceId,
+    bool isRead = true,
   }) {
     return repository.markAsRead(
       notificationId: notificationId,

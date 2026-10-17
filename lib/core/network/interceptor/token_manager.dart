@@ -37,8 +37,13 @@ class TokenManager extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Inject Bearer token if not already manually provided
-    if (!options.headers.containsKey('Authorization')) {
+    // If skipAuth is requested or Authorization header is explicitly set to empty/null, do not inject token
+    if (options.extra['skipAuth'] == true ||
+        (options.headers.containsKey('Authorization') &&
+            (options.headers['Authorization'] == null ||
+                options.headers['Authorization'] == ''))) {
+      options.headers.remove('Authorization');
+    } else if (!options.headers.containsKey('Authorization')) {
       final token = await getToken();
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';

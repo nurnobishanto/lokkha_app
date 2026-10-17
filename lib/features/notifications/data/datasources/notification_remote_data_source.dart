@@ -1,17 +1,18 @@
 import 'dart:async';
-import 'package:lokkha/core/network/endpoints.dart';
+import 'package:dio/dio.dart';
 import 'package:lokkha/core/errors/exceptions.dart';
+import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import '../models/notification_model.dart';
 
 abstract class NotificationRemoteDataSource {
-  Future<NotificationModel> fetchNotifications({required String? deviceId});
+  Future<NotificationModel> fetchNotifications({String? deviceId});
   Future<bool> markAsRead({
     required int notificationId,
-    required String? deviceId,
-    required bool isRead,
+    String? deviceId,
+    bool isRead = true,
   });
+  Future<bool> markAllAsRead({String? deviceId});
 }
 
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
@@ -21,46 +22,85 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       : _client = client ?? RestClient();
 
   @override
-  Future<NotificationModel> fetchNotifications({required String? deviceId}) async {
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      'Authorization': 'Bearer $token',
-    };
-    final url = "${Endpoints.notifications}?device_id=$deviceId";
+  Future<NotificationModel> fetchNotifications({String? deviceId}) async {
+    final queryParams = <String, dynamic>{};
+    if (deviceId != null && deviceId.isNotEmpty) {
+      queryParams['device_id'] = deviceId;
+    }
 
+    // /api/v1/notifications is a Public endpoint that tracks notification delivery by device_id.
+    // The backend NotificationController@index crashes with a 500 Server Error if Authorization: Bearer is sent.
+    // skipAuth: true prevents injecting the Bearer header and prevents the 500 Server Error.
     final response = await _client.get(
-      url,
-      headers: headers,
+      Endpoints.notifications,
+      queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      options: Options(extra: {'skipAuth': true}),
     );
 
-    if (response.data["status"] == true) {
-      return NotificationModel.fromJson(response.data);
-    } else {
+    if (response.data is Map<String, dynamic>) {
+      final map = response.data as Map<String, dynamic>;
+      if (map['success'] == true ||
+          map['status'] == true ||
+          map.containsKey('data')) {
+        return NotificationModel.fromJson(map);
+      }
       throw AppException(
-        response.data["message"]?.toString() ?? "Failed to fetch notifications",
+        map['message']?.toString() ?? 'Failed to fetch notifications',
       );
     }
+    throw const AppException('Invalid notifications response format');
   }
 
   @override
   Future<bool> markAsRead({
     required int notificationId,
-    required String? deviceId,
-    required bool isRead,
+    String? deviceId,
+    bool isRead = true,
   }) async {
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      'Authorization': 'Bearer $token',
+    final url = Endpoints.notificationMarkRead(notificationId);
+    final data = <String, dynamic>{
+      if (deviceId != null && deviceId.isNotEmpty) 'device_id': deviceId,
+      'is_read': isRead,
     };
-    final url = "${Endpoints.notifications}/$notificationId/read";
-    final data = {'device_id': deviceId, 'is_read': isRead};
 
     final response = await _client.post(
       url,
-      headers: headers,
-      data: data,
+      data: data.isNotEmpty ? data : null,
+      options: (deviceId != null && deviceId.isNotEmpty)
+          ? Options(extra: {'skipAuth': true})
+          : null,
     );
 
-    return response.data['status'] == true;
+    if (response.data is Map<String, dynamic>) {
+      final map = response.data as Map<String, dynamic>;
+      return map['success'] == true ||
+          map['status'] == true ||
+          map['data']?['marked_read'] == true;
+    }
+    return false;
+  }
+
+  @override
+  Future<bool> markAllAsRead({String? deviceId}) async {
+    final url = Endpoints.notificationsReadAll;
+    final data = <String, dynamic>{
+      if (deviceId != null && deviceId.isNotEmpty) 'device_id': deviceId,
+    };
+
+    final response = await _client.post(
+      url,
+      data: data.isNotEmpty ? data : null,
+      options: (deviceId != null && deviceId.isNotEmpty)
+          ? Options(extra: {'skipAuth': true})
+          : null,
+    );
+
+    if (response.data is Map<String, dynamic>) {
+      final map = response.data as Map<String, dynamic>;
+      return map['success'] == true ||
+          map['status'] == true ||
+          map['data']?['all_marked_read'] == true;
+    }
+    return false;
   }
 }

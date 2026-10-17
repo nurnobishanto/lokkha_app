@@ -62,14 +62,14 @@ class NotificationDetailsPage extends StatelessWidget {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) => ImagePreviewPage(
-                            url: Endpoints.storageUrl + image!,
+                            url: Endpoints.resolveUrl(image),
                           ),
                         ),
                       );
                     }
                   },
                   child: Image.network(
-                    Endpoints.storageUrl + image!,
+                    Endpoints.resolveUrl(image),
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => Container(
                       color: context.isDark ? context.surfaceColor : Colors.grey.shade200,

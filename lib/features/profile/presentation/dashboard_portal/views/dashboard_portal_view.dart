@@ -65,18 +65,54 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
               child: const Icon(Icons.person, size: 18, color: Colors.white),
             ),
           ),
-          IconButton(
-            tooltip: 'নোটিফিকেশন',
-            onPressed: () => context.push(Routes.notifications),
-            icon: Container(
-              padding: EdgeInsets.all(6.r),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                tooltip: 'নোটিফিকেশন',
+                onPressed: () => context.push(Routes.notifications),
+                icon: Container(
+                  padding: EdgeInsets.all(6.r),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.notifications_none,
+                      size: 18, color: Colors.white),
+                ),
               ),
-              child: const Icon(Icons.notifications_none,
-                  size: 18, color: Colors.white),
-            ),
+              Positioned(
+                right: 6,
+                top: 6,
+                child: ValueListenableBuilder<int>(
+                  valueListenable: unReadNotificationCount,
+                  builder: (context, count, _) {
+                    if (count <= 0) return const SizedBox.shrink();
+                    return Container(
+                      padding: const EdgeInsets.all(2.5),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 15,
+                        minHeight: 15,
+                      ),
+                      child: Text(
+                        count > 99 ? '99+' : count.toString(),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.bold,
+                          height: 1.0,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
           SizedBox(width: 4.w),
         ],

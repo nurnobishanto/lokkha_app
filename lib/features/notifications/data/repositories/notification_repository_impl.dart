@@ -8,20 +8,25 @@ class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<NotificationListEntity> getNotifications({required String? deviceId}) {
+  Future<NotificationListEntity> getNotifications({String? deviceId}) {
     return remoteDataSource.fetchNotifications(deviceId: deviceId);
   }
 
   @override
   Future<bool> markAsRead({
     required int notificationId,
-    required String? deviceId,
-    required bool isRead,
+    String? deviceId,
+    bool isRead = true,
   }) {
     return remoteDataSource.markAsRead(
       notificationId: notificationId,
       deviceId: deviceId,
       isRead: isRead,
     );
+  }
+
+  @override
+  Future<bool> markAllAsRead({String? deviceId}) {
+    return remoteDataSource.markAllAsRead(deviceId: deviceId);
   }
 }

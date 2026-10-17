@@ -6,7 +6,7 @@ class GetNotificationsUseCase {
 
   GetNotificationsUseCase(this.repository);
 
-  Future<NotificationListEntity> call({required String? deviceId}) {
+  Future<NotificationListEntity> call({String? deviceId}) {
     return repository.getNotifications(deviceId: deviceId);
   }
 }

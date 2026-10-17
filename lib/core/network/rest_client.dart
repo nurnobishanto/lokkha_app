@@ -39,9 +39,20 @@ class RestClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await secureStorageService.getAuthToken();
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
+          final skipAuth = options.extra['skipAuth'] == true ||
+              (options.headers.containsKey('Authorization') &&
+                  (options.headers['Authorization'] == null ||
+                      options.headers['Authorization'] == ''));
+          if (skipAuth) {
+            options.headers.remove('Authorization');
+            return handler.next(options);
+          }
+
+          if (!options.headers.containsKey('Authorization')) {
+            final token = await secureStorageService.getAuthToken();
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           return handler.next(options);
         },

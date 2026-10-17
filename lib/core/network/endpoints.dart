@@ -228,7 +228,14 @@ class Endpoints {
   static final String courseDetails = '$appUrl/course';
   static final String courseLearn = '$appUrl/course-learn';
   static final String courseEnroll = '$appUrl/course-enroll';
-  static final String notifications = '$appUrl/notifications';
+  // ─── Module 35: User Push Notifications (3 Endpoints) ───────────────────
+  static const String notifications = '/api/v1/notifications';
+  static const String notificationsReadAll = '/api/v1/notifications/read-all';
+  static String notificationMarkRead(dynamic id) => '/api/v1/notifications/$id/read';
+  static const String v1Notifications = notifications;
+  static const String v1NotificationsReadAll = notificationsReadAll;
+  static String v1NotificationMarkRead(dynamic id) => notificationMarkRead(id);
+
   static final String myCourses = '$appUrl/my-courses';
 }
 

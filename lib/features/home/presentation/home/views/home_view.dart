@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/home.dart';
+import 'package:lokkha/features/notifications/notifications.dart';
 import 'package:lokkha/shared/shared.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -26,7 +27,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
       // 2. Fetch initial data for other background caches and drawer overview
       ref.read(homeNotifierProvider.notifier).fetchInitialData();
 
-      // 3. Check for In-App announcement popups
+      // 3. Fetch real unread notifications count in background
+      ref.read(notificationsNotifierProvider.notifier).fetchNotifications();
+
+      // 4. Check for In-App announcement popups
       if (mounted) {
         AppUpdateService().showInAppAnnouncementIfAvailable(context: context);
       }
@@ -39,6 +43,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           .read(homeFeedNotifierProvider.notifier)
           .fetchHomeFeed(isRefresh: true),
       ref.read(homeNotifierProvider.notifier).refreshHomeViewData(),
+      ref.read(notificationsNotifierProvider.notifier).fetchNotifications(),
     ]);
   }
 
@@ -76,7 +81,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
               child: ValueListenableBuilder<int>(
                 valueListenable: unReadNotificationCount,
                 builder: (context, count, _) {
-                  final displayCount = count > 0 ? count : 4;
+                  if (count <= 0) return const SizedBox.shrink();
                   return Container(
                     padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
@@ -88,7 +93,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       minHeight: 16,
                     ),
                     child: Text(
-                      displayCount > 99 ? '99+' : displayCount.toString(),
+                      count > 99 ? '99+' : count.toString(),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
