@@ -741,6 +741,9 @@ void main() {
       expect(find.text('1.1k Users >'), findsOneWidget);
       expect(find.text('Tonmoy'), findsOneWidget);
       expect(find.text('Tamanna Akter'), findsOneWidget);
+      expect(find.text('dider kanon'), findsOneWidget);
+      expect(find.text('BillalvHosaain'), findsNothing);
+      expect(find.text('লক্ষ্য'), findsNothing);
     });
 
     testWidgets('HomeCoursesSection renders our courses list and enroll button',

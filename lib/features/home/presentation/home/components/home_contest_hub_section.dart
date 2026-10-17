@@ -316,7 +316,7 @@ class HomeContestHubSection extends ConsumerWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 4.w),
-              itemCount: contestHub.topLeaderboard.take(5).length,
+              itemCount: contestHub.topLeaderboard.take(3).length,
               separatorBuilder: (_, __) => SizedBox(width: 8.w),
               itemBuilder: (context, index) {
                 final user = contestHub.topLeaderboard[index];

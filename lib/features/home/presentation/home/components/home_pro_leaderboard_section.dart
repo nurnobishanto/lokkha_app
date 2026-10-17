@@ -21,71 +21,50 @@ class HomeProLeaderboardSection extends StatelessWidget {
         contestHub?.activeContest?.name ??
         'Quiz Contest -32';
     final sponsorName = contestHub?.activeContest?.sponsorName ?? 'BD Taxation';
-    final leaderboardCount = contestHub?.leaderboardCount ??
-        (topUsers.isNotEmpty ? topUsers.length : 5);
-
     final countText = contestHub?.leaderboardCount != null
         ? '${contestHub!.leaderboardCount} Users >'
         : '1.1k Users >';
 
-    final displayUsers = topUsers.isNotEmpty
-        ? topUsers
-        : [
-            HomeLeaderboardUser(
-              rank: 1,
-              userId: 64,
-              userName: 'Tonmoy',
-              userPhoneMasked: '880****0036',
-              correctAnswers: 8,
-              incorrectAnswers: 12,
-              totalMarks: 0,
-              completeDurationSeconds: 23,
-            ),
-            HomeLeaderboardUser(
-              rank: 2,
-              userId: 2728,
-              userName: 'Tamanna Akter',
-              userPhoneMasked: '880****0776',
-              userAvatar:
-                  'https://lh3.googleusercontent.com/a/ACg8ocKLsf9WtAI0qQwSB_ucyX8LF7uE7IS8y4tYcxdRSzwOim7AHU55kg=s96-c',
-              correctAnswers: 5,
-              incorrectAnswers: 15,
-              totalMarks: 0,
-              completeDurationSeconds: 190,
-            ),
-            HomeLeaderboardUser(
-              rank: 3,
-              userId: 378,
-              userName: 'dider kanon',
-              userPhoneMasked: '880****4034',
-              userAvatar:
-                  'https://lh3.googleusercontent.com/a/ACg8ocLwalUTLvf-bXES3UYsarNPKz_ncC31oYINF9Xszwzbw4O9E1o=s96-c',
-              correctAnswers: 4,
-              incorrectAnswers: 16,
-              totalMarks: 0,
-              completeDurationSeconds: 28,
-            ),
-            HomeLeaderboardUser(
-              rank: 4,
-              userId: 50,
-              userName: 'BillalvHosaain',
-              userPhoneMasked: '880****0477',
-              correctAnswers: 0,
-              incorrectAnswers: 0,
-              totalMarks: 0,
-              completeDurationSeconds: 0,
-            ),
-            HomeLeaderboardUser(
-              rank: 5,
-              userId: 1744,
-              userName: 'লক্ষ্য',
-              userPhoneMasked: '880****4290',
-              correctAnswers: 0,
-              incorrectAnswers: 0,
-              totalMarks: 0,
-              completeDurationSeconds: 14,
-            ),
-          ];
+    final displayUsers = (topUsers.isNotEmpty
+            ? topUsers
+            : [
+                HomeLeaderboardUser(
+                  rank: 1,
+                  userId: 64,
+                  userName: 'Tonmoy',
+                  userPhoneMasked: '880****0036',
+                  correctAnswers: 8,
+                  incorrectAnswers: 12,
+                  totalMarks: 0,
+                  completeDurationSeconds: 23,
+                ),
+                HomeLeaderboardUser(
+                  rank: 2,
+                  userId: 2728,
+                  userName: 'Tamanna Akter',
+                  userPhoneMasked: '880****0776',
+                  userAvatar:
+                      'https://lh3.googleusercontent.com/a/ACg8ocKLsf9WtAI0qQwSB_ucyX8LF7uE7IS8y4tYcxdRSzwOim7AHU55kg=s96-c',
+                  correctAnswers: 5,
+                  incorrectAnswers: 15,
+                  totalMarks: 0,
+                  completeDurationSeconds: 190,
+                ),
+                HomeLeaderboardUser(
+                  rank: 3,
+                  userId: 378,
+                  userName: 'dider kanon',
+                  userPhoneMasked: '880****4034',
+                  userAvatar:
+                      'https://lh3.googleusercontent.com/a/ACg8ocLwalUTLvf-bXES3UYsarNPKz_ncC31oYINF9Xszwzbw4O9E1o=s96-c',
+                  correctAnswers: 4,
+                  incorrectAnswers: 16,
+                  totalMarks: 0,
+                  completeDurationSeconds: 28,
+                ),
+              ])
+        .take(3)
+        .toList();
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 8.h),
@@ -206,8 +185,13 @@ class HomeProLeaderboardSection extends StatelessWidget {
                 ),
 
                 // Performer Rows
-                ...displayUsers.map((user) {
-                  return _buildPerformerRow(context, user);
+                ...displayUsers.asMap().entries.map((entry) {
+                  final isLast = entry.key == displayUsers.length - 1;
+                  return _buildPerformerRow(
+                    context,
+                    entry.value,
+                    isLast: isLast,
+                  );
                 }),
               ],
             ),
@@ -217,7 +201,11 @@ class HomeProLeaderboardSection extends StatelessWidget {
     );
   }
 
-  Widget _buildPerformerRow(BuildContext context, HomeLeaderboardUser user) {
+  Widget _buildPerformerRow(
+    BuildContext context,
+    HomeLeaderboardUser user, {
+    bool isLast = false,
+  }) {
     // Rank Styling
     Color rankColor;
     Widget rankWidget;
@@ -289,12 +277,14 @@ class HomeProLeaderboardSection extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: context.borderColor.withOpacity(0.35),
-            width: 0.5,
-          ),
-        ),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: context.borderColor.withOpacity(0.35),
+                  width: 0.5,
+                ),
+              ),
       ),
       child: Row(
         children: [

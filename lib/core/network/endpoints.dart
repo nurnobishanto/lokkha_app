@@ -112,6 +112,8 @@ class Endpoints {
   static const String homeFeed = '/api/v1/home';
   static const String homeContests = '/api/v1/home/contests';
   static const String homeQuestionBanks = '/api/v1/home/question-banks';
+  static const String questionBankRandom = '/api/v1/question-bank/random';
+  static const String v1QuestionBankRandom = questionBankRandom;
   static const String subjectWiseBanks = homeQuestionBanks;
   static const String quickPracticeSubjects = homeQuestionBanks;
   static const String homeJobsExams = '/api/v1/home/jobs-exams';

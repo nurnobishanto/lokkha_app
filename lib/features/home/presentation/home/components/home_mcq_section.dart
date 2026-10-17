@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
+import 'package:lokkha/features/question_bank/presentation/providers/random_question_notifier.dart';
 
-class HomeMcqSection extends StatefulWidget {
+class HomeMcqSection extends ConsumerStatefulWidget {
   final HomeCurrentAffairsModel? currentAffairs;
 
   const HomeMcqSection({
@@ -14,46 +16,96 @@ class HomeMcqSection extends StatefulWidget {
   });
 
   @override
-  State<HomeMcqSection> createState() => _HomeMcqSectionState();
+  ConsumerState<HomeMcqSection> createState() => _HomeMcqSectionState();
 }
 
-class _HomeMcqSectionState extends State<HomeMcqSection> {
-  int? _selectedOptionIndex;
+class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
+  int? _fallbackSelectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && ref.read(randomQuestionNotifierProvider).question == null) {
+        ref.read(randomQuestionNotifierProvider.notifier).fetchRandomQuestion();
+      }
+    });
+  }
+
+  String _stripHtml(String? text) {
+    if (text == null) return '';
+    var cleaned = text.replaceAll(RegExp(r'<[^>]*>'), ' ').trim();
+    cleaned = cleaned
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&nbsp;', ' ');
+    return cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final randomState = ref.watch(randomQuestionNotifierProvider);
+    final question = randomState.question;
+
     final affairItem = widget.currentAffairs?.nationalItems.isNotEmpty == true
         ? widget.currentAffairs!.nationalItems.first
         : (widget.currentAffairs?.internationalItems.isNotEmpty == true
             ? widget.currentAffairs!.internationalItems.first
             : null);
 
-    // Fallback question & options matching Image 3 if API item doesn't have options
-    final questionText = (affairItem?.question != null &&
-            affairItem!.question!.trim().isNotEmpty)
-        ? affairItem.question!
-        : 'দুদক-এর পূর্ণরূপ কী?';
+    // Question text: priority to random question from API, then fallback to affairItem / default
+    final String questionText;
+    final List<String> options;
+    final int rightAnswerIndex;
+    final int? selectedOptionIndex;
+    final bool isAnswerRevealed;
+    final String? explanationText;
+    final String? subjectBadge;
 
-    final options = [
-      (affairItem?.option1 != null && affairItem!.option1!.isNotEmpty)
-          ? affairItem.option1!
-          : 'A) দুর্নীতি দমন কমিশন',
-      (affairItem?.option2 != null && affairItem!.option2!.isNotEmpty)
-          ? affairItem.option2!
-          : 'B) দুর্যোগ উন্নয়ন কেন্দ্র',
-      (affairItem?.option3 != null && affairItem!.option3!.isNotEmpty)
-          ? affairItem.option3!
-          : 'C) দুর্নীতি উন্নয়ন কমিটি',
-      (affairItem?.option4 != null && affairItem!.option4!.isNotEmpty)
-          ? affairItem.option4!
-          : 'D) দুর্যোগ দমন কমিশন',
-    ];
+    if (question != null && question.options.isNotEmpty) {
+      questionText = question.cleanTitle.isNotEmpty
+          ? question.cleanTitle
+          : 'দুদক-এর পূর্ণরূপ কী?';
+      options = question.options.map((e) => e.displayOption).toList();
+      rightAnswerIndex = question.rightAnswerIndex ?? 0;
+      selectedOptionIndex = randomState.selectedOptionIndex;
+      isAnswerRevealed = randomState.isAnswerRevealed;
+      explanationText = _stripHtml(question.explanation);
+      subjectBadge = question.primarySubject;
+    } else {
+      questionText = (affairItem?.question != null &&
+              affairItem!.question!.trim().isNotEmpty)
+          ? affairItem.question!
+          : 'দুদক-এর পূর্ণরূপ কী?';
 
-    final rightAnswerIndex = (affairItem?.rightAnswer != null &&
-            affairItem!.rightAnswer! >= 1 &&
-            affairItem.rightAnswer! <= 4)
-        ? (affairItem.rightAnswer! - 1)
-        : 0;
+      options = [
+        (affairItem?.option1 != null && affairItem!.option1!.isNotEmpty)
+            ? affairItem.option1!
+            : 'A) দুর্নীতি দমন কমিশন',
+        (affairItem?.option2 != null && affairItem!.option2!.isNotEmpty)
+            ? affairItem.option2!
+            : 'B) দুর্যোগ উন্নয়ন কেন্দ্র',
+        (affairItem?.option3 != null && affairItem!.option3!.isNotEmpty)
+            ? affairItem.option3!
+            : 'C) দুর্নীতি উন্নয়ন কমিটি',
+        (affairItem?.option4 != null && affairItem!.option4!.isNotEmpty)
+            ? affairItem.option4!
+            : 'D) দুর্যোগ দমন কমিশন',
+      ];
+
+      rightAnswerIndex = (affairItem?.rightAnswer != null &&
+              affairItem!.rightAnswer! >= 1 &&
+              affairItem.rightAnswer! <= 4)
+          ? (affairItem.rightAnswer! - 1)
+          : 0;
+      selectedOptionIndex = _fallbackSelectedIndex;
+      isAnswerRevealed = _fallbackSelectedIndex != null;
+      explanationText = _stripHtml(affairItem?.explanation);
+      subjectBadge = null;
+    }
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
@@ -74,48 +126,112 @@ class _HomeMcqSectionState extends State<HomeMcqSection> {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ─── Header: Title + MCQ Badge ─────────────────────────────────────
+          // ─── Header: Title + Subject Badge + Reload + MCQ Badge ────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  'কারেন্ট অ্যাফেয়ার্স',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'কারেন্ট অ্যাফেয়ার্স',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.bold,
+                          color: context.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (subjectBadge != null && subjectBadge.isNotEmpty) ...[
+                      SizedBox(width: 8.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 2.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: context.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Text(
+                          subjectBadge,
+                          style: TextStyle(
+                            fontSize: 10.5.sp,
+                            fontWeight: FontWeight.w600,
+                            color: context.primaryColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              InkWell(
-                onTap: () {
-                  if (GoRouter.maybeOf(context) != null) {
-                    context.push(Routes.currentAffairs);
-                  }
-                },
-                child: Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: const Color(0xFF10B981).withOpacity(0.4),
-                      width: 0.8,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Refresh / Next Random Question icon button
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20.r),
+                    onTap: () {
+                      setState(() {
+                        _fallbackSelectedIndex = null;
+                      });
+                      ref
+                          .read(randomQuestionNotifierProvider.notifier)
+                          .fetchRandomQuestion(refresh: true);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 4.h,
+                      ),
+                      child: Icon(
+                        Icons.refresh_rounded,
+                        size: 18.r,
+                        color: context.textSecondary,
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'MCQ',
-                    style: TextStyle(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF059669),
+                  SizedBox(width: 4.w),
+                  InkWell(
+                    onTap: () {
+                      if (GoRouter.maybeOf(context) != null) {
+                        context.push(Routes.currentAffairs);
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 3.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: const Color(0xFF10B981).withOpacity(0.4),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Text(
+                        'MCQ',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF059669),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -135,10 +251,9 @@ class _HomeMcqSectionState extends State<HomeMcqSection> {
 
           SizedBox(height: 12.h),
 
-          // ─── 4 Options ─────────────────────────────────────────────────────
+          // ─── Options ───────────────────────────────────────────────────────
           ...List.generate(options.length, (index) {
-            final isSelected = _selectedOptionIndex == index;
-            final isAnswerRevealed = _selectedOptionIndex != null;
+            final isSelected = selectedOptionIndex == index;
             final isCorrect = index == rightAnswerIndex;
 
             Color btnBgColor = context.isDark
@@ -167,9 +282,15 @@ class _HomeMcqSectionState extends State<HomeMcqSection> {
               padding: EdgeInsets.only(bottom: 8.h),
               child: InkWell(
                 onTap: () {
-                  setState(() {
-                    _selectedOptionIndex = index;
-                  });
+                  if (question != null) {
+                    ref
+                        .read(randomQuestionNotifierProvider.notifier)
+                        .selectOption(index);
+                  } else {
+                    setState(() {
+                      _fallbackSelectedIndex = index;
+                    });
+                  }
                 },
                 borderRadius: BorderRadius.circular(10.r),
                 child: Container(
@@ -215,6 +336,100 @@ class _HomeMcqSectionState extends State<HomeMcqSection> {
               ),
             );
           }),
+
+          // ─── Explanation Box (if available and answered) ───────────────────
+          if (isAnswerRevealed &&
+              explanationText != null &&
+              explanationText.isNotEmpty) ...[
+            SizedBox(height: 6.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(10.r),
+              decoration: BoxDecoration(
+                color: context.isDark
+                    ? const Color(0xFF0F172A)
+                    : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: context.borderColor.withOpacity(0.5),
+                  width: 0.8,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.lightbulb_outline_rounded,
+                        size: 14.sp,
+                        color: const Color(0xFFF59E0B),
+                      ),
+                      SizedBox(width: 5.w),
+                      Text(
+                        'ব্যাখ্যা',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                          color: context.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    explanationText,
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      color: context.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
+          // ─── Next Question Prompt on Answer ────────────────────────────────
+          if (isAnswerRevealed) ...[
+            SizedBox(height: 4.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(8.r),
+                onTap: () {
+                  setState(() {
+                    _fallbackSelectedIndex = null;
+                  });
+                  ref
+                      .read(randomQuestionNotifierProvider.notifier)
+                      .fetchRandomQuestion(refresh: true);
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'পরবর্তী প্রশ্ন',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF059669),
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 14.sp,
+                        color: const Color(0xFF059669),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
