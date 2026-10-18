@@ -12,7 +12,7 @@ import 'package:lokkha/features/blog/blog.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
 import 'package:lokkha/features/jobs/jobs.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/features/course/course.dart';
+import 'package:lokkha/features/course/course.dart' hide Package;
 import 'package:lokkha/features/study_material/study_material.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/contest/contest.dart';
@@ -336,6 +336,41 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: Routes.currentAffairs,
         builder: (context, state) {
           return const CurrentAffairsView();
+        },
+      ),
+      GoRoute(
+        path: Routes.packageDetails,
+        name: Routes.packageDetails,
+        builder: (context, state) {
+          final extra = state.extra;
+          int packageId = 0;
+          Package? initialPackage;
+
+          if (extra is int) {
+            packageId = extra;
+          } else if (extra is Package) {
+            packageId = extra.id ?? 0;
+            initialPackage = extra;
+          } else if (extra is Map) {
+            packageId = extra['id'] is int
+                ? extra['id']
+                : int.tryParse(extra['id']?.toString() ?? '') ?? 0;
+            if (extra['package'] is Package) {
+              initialPackage = extra['package'] as Package;
+            }
+          }
+
+          if (packageId == 0) {
+            final qId = state.uri.queryParameters['id'];
+            if (qId != null) {
+              packageId = int.tryParse(qId) ?? 0;
+            }
+          }
+
+          return PackageDetailsView(
+            packageId: packageId,
+            initialPackage: initialPackage,
+          );
         },
       ),
       GoRoute(

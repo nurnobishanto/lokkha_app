@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -60,7 +59,7 @@ class _WebExamViewState extends State<WebExamView> {
             currentUrl = url;
           });
           if (url.contains('packages')) {
-            context.pushNamed(Routes.packages);
+            context.go(Routes.packages);
           } else if (url.contains('goback')) {
             Navigator.of(context).pop();
           }

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/shared/models/category.dart';
@@ -178,69 +177,184 @@ final courseDetailsNotifierProvider =
 // ---------------------------------------------------------------------------
 class MyCoursesState {
   final bool isLoading;
+  final bool isLoadingMore;
   final bool hasError;
+  final String? errorMessage;
   final MyCourseModel model;
+  final int currentPage;
+  final bool hasMore;
 
   const MyCoursesState({
     this.isLoading = false,
+    this.isLoadingMore = false,
     this.hasError = false,
+    this.errorMessage,
     required this.model,
+    this.currentPage = 1,
+    this.hasMore = false,
   });
 
   MyCoursesState copyWith({
     bool? isLoading,
+    bool? isLoadingMore,
     bool? hasError,
+    String? errorMessage,
     MyCourseModel? model,
+    int? currentPage,
+    bool? hasMore,
   }) {
     return MyCoursesState(
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       hasError: hasError ?? this.hasError,
+      errorMessage: errorMessage ?? this.errorMessage,
       model: model ?? this.model,
+      currentPage: currentPage ?? this.currentPage,
+      hasMore: hasMore ?? this.hasMore,
     );
   }
 }
 
 class MyCoursesNotifier extends Notifier<MyCoursesState> {
   final RestClient _client;
+  bool _disposed = false;
 
   MyCoursesNotifier({RestClient? client}) : _client = client ?? RestClient();
 
   @override
   MyCoursesState build() {
-    Future.microtask(fetchMyCourses);
+    _disposed = false;
+    ref.onDispose(() => _disposed = true);
+    Future.microtask(() => fetchMyCourses());
     return MyCoursesState(model: MyCourseModel());
   }
 
-  Future<void> fetchMyCourses() async {
-    state = state.copyWith(isLoading: true, hasError: false);
+  Future<void> fetchMyCourses({bool isRefresh = false}) async {
+    if (!isRefresh) {
+      state = state.copyWith(
+        isLoading: true,
+        hasError: false,
+        errorMessage: null,
+      );
+    }
+
     final token = MySharedPref.getUserToken();
-    final url = Endpoints.myCourses;
+    final url = Endpoints.userCourses;
 
     final headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
 
     try {
-      final response = await _client.post(url, headers: headers);
-      if (response.data != null && response.data['status'] == true) {
+      final response = await _client.get(
+        url,
+        queryParameters: {'page': 1},
+        headers: headers,
+      );
+
+      if (_disposed) return;
+
+      final data = response.data;
+      if (data != null && (data['success'] == true || data['status'] == true)) {
+        final parsed = MyCourseModel.fromJson(data);
+        final meta = parsed.meta;
+        final hasMore = meta != null && meta.currentPage < meta.lastPage;
+
         state = state.copyWith(
-          model: MyCourseModel.fromJson(response.data),
+          model: parsed,
           isLoading: false,
           hasError: false,
+          errorMessage: null,
+          currentPage: 1,
+          hasMore: hasMore,
         );
       } else {
-        state = state.copyWith(isLoading: false, hasError: true);
-        CustomSnackBar.showCustomErrorToast(
-          message: response.data?['message']?.toString() ?? 'কোর্স লোড করতে ব্যর্থ',
+        final message =
+            data?['message']?.toString() ?? 'কোর্স লোড করতে ব্যর্থ';
+        state = state.copyWith(
+          isLoading: false,
+          hasError: true,
+          errorMessage: message,
         );
+        CustomSnackBar.showCustomErrorToast(message: message);
       }
     } catch (error) {
-      state = state.copyWith(isLoading: false, hasError: true);
-      debugPrint('MyCourses API Error: $error');
+      if (_disposed) return;
+      debugPrint('MyCourses V1 API Error: $error');
+      state = state.copyWith(
+        isLoading: false,
+        hasError: true,
+        errorMessage: 'সার্ভার সংযোগে সমস্যা হয়েছে',
+      );
       CustomSnackBar.showCustomErrorToast(
         message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
       );
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (_disposed || state.isLoading || state.isLoadingMore || !state.hasMore) {
+      return;
+    }
+
+    state = state.copyWith(isLoadingMore: true);
+    final nextPage = state.currentPage + 1;
+    final token = MySharedPref.getUserToken();
+    final url = Endpoints.userCourses;
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+
+    try {
+      final response = await _client.get(
+        url,
+        queryParameters: {'page': nextPage},
+        headers: headers,
+      );
+
+      if (_disposed) return;
+
+      final data = response.data;
+      if (data != null && (data['success'] == true || data['status'] == true)) {
+        final parsed = MyCourseModel.fromJson(data);
+        final meta = parsed.meta;
+        final hasMore = meta != null && meta.currentPage < meta.lastPage;
+
+        final combinedCourses = [
+          ...state.model.courses,
+          ...parsed.courses,
+        ];
+
+        final updatedModel = MyCourseModel(
+          success: true,
+          message: parsed.message,
+          courses: combinedCourses,
+          meta: meta ??
+              CoursePaginationMeta(
+                currentPage: nextPage,
+                lastPage: nextPage,
+                total: combinedCourses.length,
+              ),
+        );
+
+        state = state.copyWith(
+          model: updatedModel,
+          isLoadingMore: false,
+          currentPage: nextPage,
+          hasMore: hasMore,
+        );
+      } else {
+        state = state.copyWith(isLoadingMore: false);
+      }
+    } catch (error) {
+      if (_disposed) return;
+      debugPrint('MyCourses loadMore error: $error');
+      state = state.copyWith(isLoadingMore: false);
     }
   }
 }

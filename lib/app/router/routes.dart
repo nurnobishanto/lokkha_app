@@ -46,6 +46,7 @@ class Routes {
   static const String jobDetails = '/job-details';
   static const String currentAffairs = '/current-affairs';
   static const String packages = '/packages';
+  static const String packageDetails = '/package-details';
   static const String myPackages = '/my-packages';
   static const String myOrders = '/my-orders';
   static const String latestExam = '/latest-exam';

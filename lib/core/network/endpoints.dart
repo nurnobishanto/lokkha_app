@@ -106,8 +106,11 @@ class Endpoints {
 
   // ─── Packages & Subscriptions ──────────────────────────────────────────────
   static const String packages = '/api/v1/packages';
+  static String packageDetail(dynamic id) => '/api/v1/packages/$id';
   static const String userPackages = '/api/v1/user/packages';
   static const String couponApply = '/api/v1/packages/coupon-apply';
+  static const String claimFreeTrial = '/api/v1/packages/claim-trial';
+  static const String packagePurchase = '/api/v1/packages/purchase';
 
   // ─── Module 23: Home Feed & Landing Hub (8 Endpoints) ──────────────────────
   static const String homeFeed = '/api/v1/home';
@@ -206,14 +209,14 @@ class Endpoints {
   static final String termsPolicy = '$appUrl/page/terms-and-conditions';
   static final String refundPolicy = '$appUrl/page/refund-policy';
   static final String contestPolicy = '$appUrl/page/contest-policy';
-  static final String premiumPackage = '$appUrl/packages';
+  static const String premiumPackage = packages;
   static final String packageOrder = '$appUrl/package/order';
   static final String latestContest = '$appUrl/latest-contest';
   static final String startContest = '$appUrl/contest/';
   static final String latestContestResult = '$appUrl/latest-contest-result';
   static final String allContestList = '$appUrl/contest-list';
   static final String subjectSections = '$appUrl/subject-sections';
-  static final String myPackages = '$appUrl/my-packages';
+  static const String myPackages = userPackages;
   static final String myOrders = '$appUrl/my-orders';
   static final String myOrderDetails = '$appUrl/order-details';
   static final String latestExam = '$appUrl/latest-exams';
@@ -238,7 +241,7 @@ class Endpoints {
   static const String v1NotificationsReadAll = notificationsReadAll;
   static String v1NotificationMarkRead(dynamic id) => notificationMarkRead(id);
 
-  static final String myCourses = '$appUrl/my-courses';
+  static const String myCourses = userCourses;
 }
 
 /// Typedef alias for backward compatibility

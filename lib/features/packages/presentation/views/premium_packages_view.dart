@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
-import '../providers/premium_packages_notifier.dart';
 
 class PremiumPackagesView extends ConsumerWidget {
   const PremiumPackagesView({super.key});
@@ -47,6 +45,15 @@ class PremiumPackagesView extends ConsumerWidget {
                             children: [
                               _buildPackageTable(
                                 context: context,
+                                onTapDetails: () {
+                                  context.push(
+                                    Routes.packageDetails,
+                                    extra: {
+                                      'id': pkg.id ?? 0,
+                                      'package': pkg,
+                                    },
+                                  );
+                                },
                                 onTapCheckout: () {
                                   final isAuth = isLoggedIn.value;
                                   if (isAuth) {
@@ -72,19 +79,7 @@ class PremiumPackagesView extends ConsumerWidget {
                                 price: pkg.discountedPrice.toString(),
                                 oldPrice: pkg.regularPrice.toString(),
                                 discount: '- ${pkg.discount.toString()}%',
-                                features: pkg.features is List
-                                    ? (pkg.features as List)
-                                        .map((e) => e.toString())
-                                        .toList()
-                                    : (pkg.features != null &&
-                                            pkg.features
-                                                .toString()
-                                                .trim()
-                                                .startsWith('['))
-                                        ? (jsonDecode(pkg.features.toString())
-                                                as List<dynamic>)
-                                            .cast<String>()
-                                        : [],
+                                features: pkg.featureTexts,
                                 isFemale: (pkg.isFemale == true) ? 1 : 0,
                               ),
                               Divider(height: 0, color: context.borderColor),
@@ -136,10 +131,11 @@ class PremiumPackagesView extends ConsumerWidget {
     required String duration,
     required int isFemale,
     void Function()? onTapCheckout,
+    void Function()? onTapDetails,
     required List<String> features,
   }) {
     return InkWell(
-      onTap: onTapCheckout,
+      onTap: onTapDetails ?? onTapCheckout,
       child: Container(
         color: isFemale == 1
             ? (context.isDark

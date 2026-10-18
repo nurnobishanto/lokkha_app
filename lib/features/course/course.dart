@@ -2,7 +2,7 @@
 export 'data/models/course_details_model.dart';
 export 'data/models/course_learning_model.dart';
 export 'data/models/course_checkout_model.dart';
-export 'data/models/my_course_model.dart' hide Course;
+export 'data/models/my_course_model.dart';
 export 'data/models/lecture_sheet_details_model.dart';
 export 'data/models/lecture_sheet_category_model.dart';
 export 'data/models/lecture_sheet_list_categories_model.dart';

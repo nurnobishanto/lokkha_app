@@ -3,14 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/shared/widgets/theme/theme_mode_selector_sheet.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../riverpod/dashboard_portal_notifier.dart';
 
@@ -863,7 +861,7 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
                 icon: const Icon(Icons.menu_book_rounded,
                     color: Color(0xFF10B981), size: 20),
                 iconBg: const Color(0xFFE8F8F2),
-                onTap: () => context.push(Routes.examCategory),
+                onTap: () => context.go(Routes.examCategory),
               ),
               _buildShortcutItem(
                 context: context,
@@ -887,7 +885,7 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
                 icon: const Icon(Icons.workspace_premium_rounded,
                     color: Color(0xFFEA580C), size: 20),
                 iconBg: const Color(0xFFFFF7ED),
-                onTap: () => context.push(Routes.packages),
+                onTap: () => context.go(Routes.packages),
               ),
               _buildShortcutItem(
                 context: context,
@@ -1090,7 +1088,7 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
             ),
             SizedBox(height: 14.h),
             InkWell(
-              onTap: () => context.push(Routes.packages),
+              onTap: () => context.go(Routes.packages),
               borderRadius: BorderRadius.circular(12.r),
               child: Container(
                 width: double.infinity,

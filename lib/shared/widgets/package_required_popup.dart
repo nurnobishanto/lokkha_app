@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/router/router.dart';
@@ -59,7 +58,7 @@ class PackageRequiredPopup extends StatelessWidget {
               text: "প্যাকেজ নিন",
               onPressed: () {
                 Navigator.of(context).pop();
-                context.pushNamed(Routes.packages);
+                context.go(Routes.packages);
               },
             ),
           ],

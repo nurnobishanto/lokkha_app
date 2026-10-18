@@ -8,7 +8,6 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/di/network_provider.dart';
-import 'package:lokkha/shared/models/package.dart';
 
 class PremiumPackageCheckoutView extends ConsumerStatefulWidget {
   const PremiumPackageCheckoutView({super.key, required this.packagesModel});

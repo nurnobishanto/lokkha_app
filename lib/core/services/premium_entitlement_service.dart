@@ -105,7 +105,7 @@ class PremiumEntitlementService {
 
   void _defaultDenialAction() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      rootNavigatorKey.currentContext?.push(Routes.packages);
+      rootNavigatorKey.currentContext?.go(Routes.packages);
     });
   }
 }

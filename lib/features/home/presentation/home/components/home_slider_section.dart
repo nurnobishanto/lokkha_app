@@ -3,7 +3,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -36,7 +35,7 @@ class HomeSliderSection extends ConsumerWidget {
 
     switch (page) {
       case 'packages':
-        context.push(Routes.packages);
+        context.go(Routes.packages);
         break;
       case 'courses':
         context.push(Routes.courses);
@@ -67,9 +66,6 @@ class HomeSliderSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (sliders.isEmpty) return const SizedBox.shrink();
 
-    final currentIndex = ref.watch(
-      homeFeedNotifierProvider.select((s) => s.currentSliderIndex),
-    );
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 2.w),

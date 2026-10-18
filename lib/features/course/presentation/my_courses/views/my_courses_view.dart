@@ -1,55 +1,107 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/router/routes.dart';
+import 'package:lokkha/features/course/data/models/my_course_model.dart';
 import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 
-class MyCoursesView extends ConsumerWidget {
+class MyCoursesView extends ConsumerStatefulWidget {
   const MyCoursesView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyCoursesView> createState() => _MyCoursesViewState();
+}
+
+class _MyCoursesViewState extends ConsumerState<MyCoursesView> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(myCoursesNotifierProvider.notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(myCoursesNotifierProvider);
     final notifier = ref.read(myCoursesNotifierProvider.notifier);
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
-      appBar: CustomAppBar(title: 'আমার কোর্স'),
+      appBar: const CustomAppBar(title: 'আমার কোর্স'),
       body: Builder(
         builder: (context) {
           if (state.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF28a745)),
+              child: CircularProgressIndicator(
+                color: LightThemeColors.primaryColor,
+              ),
             );
           }
 
-          if (state.hasError) {
-            return _buildErrorState(notifier);
+          if (state.hasError && state.model.courses.isEmpty) {
+            return _buildErrorState(notifier, state.errorMessage);
           }
 
-          final packages = state.model.packages ?? [];
-          if (packages.isEmpty) return _buildEmptyState(context);
+          final courses = state.model.courses;
+          if (courses.isEmpty) {
+            return _buildEmptyState(context);
+          }
 
           return RefreshIndicator(
-            color: const Color(0xFF28a745),
-            onRefresh: notifier.fetchMyCourses,
-            child: GridView.builder(
-              padding: EdgeInsets.all(12.r),
-              itemCount: packages.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12.h,
-                crossAxisSpacing: 12.w,
-                childAspectRatio: 1.0,
-              ),
-              itemBuilder: (context, index) {
-                final package = packages[index];
-                if (package.course == null) return const SizedBox.shrink();
-                return _CourseCard(package: package);
-              },
+            color: LightThemeColors.primaryColor,
+            onRefresh: () => notifier.fetchMyCourses(isRefresh: true),
+            child: CustomScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.all(12.r),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12.h,
+                      crossAxisSpacing: 12.w,
+                      childAspectRatio: 0.84,
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return _CourseCard(course: courses[index]);
+                      },
+                      childCount: courses.length,
+                    ),
+                  ),
+                ),
+                if (state.isLoadingMore)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: LightThemeColors.primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           );
         },
@@ -59,63 +111,117 @@ class MyCoursesView extends ConsumerWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.school_outlined, size: 80.r, color: context.textMuted),
-          SizedBox(height: 16.h),
-          Text(
-            'কোনো কোর্স পাওয়া যায়নি',
-            style: TextStyle(
-              fontSize: 16.sp,
-              color: context.textPrimary,
-              fontWeight: FontWeight.w600,
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(24.r),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(20.r),
+              decoration: BoxDecoration(
+                color: LightThemeColors.primaryColor.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.school_outlined,
+                size: 72.r,
+                color: LightThemeColors.primaryColor,
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 16.h),
+            Text(
+              'কোনো কোর্স পাওয়া যায়নি',
+              style: TextStyle(
+                fontSize: 17.sp,
+                color: context.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              'আপনি এখনো কোনো কোর্সে ভর্তি হননি। নতুন কোর্স দেখে এখনই প্রস্তুতি শুরু করুন!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: context.textMuted,
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            ElevatedButton.icon(
+              onPressed: () => context.push(Routes.courses),
+              icon: const Icon(Icons.explore_outlined, size: 18),
+              label: const Text('কোর্সগুলো দেখুন'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LightThemeColors.primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildErrorState(MyCoursesNotifier notifier) {
+  Widget _buildErrorState(MyCoursesNotifier notifier, String? message) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.wifi_off_rounded, size: 80.r, color: Colors.grey.shade400),
-          SizedBox(height: 16.h),
-          ElevatedButton(
-            onPressed: notifier.fetchMyCourses,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF28a745),
+      child: Padding(
+        padding: EdgeInsets.all(24.r),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.wifi_off_rounded,
+              size: 64.r,
+              color: Colors.grey.shade400,
             ),
-            child: const Text(
-              'আবার চেষ্টা করুন',
-              style: TextStyle(color: Colors.white),
+            SizedBox(height: 16.h),
+            Text(
+              message ?? 'সার্ভার সংযোগে সমস্যা হয়েছে',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey.shade700,
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 16.h),
+            ElevatedButton.icon(
+              onPressed: () => notifier.fetchMyCourses(),
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('আবার চেষ্টা করুন'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LightThemeColors.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _CourseCard extends StatelessWidget {
-  final dynamic package;
+  final EnrolledCourseItem course;
 
-  const _CourseCard({required this.package});
+  const _CourseCard({required this.course});
 
   @override
   Widget build(BuildContext context) {
-    final course = package.course;
-    if (course == null) return const SizedBox.shrink();
-
     return InkWell(
+      borderRadius: BorderRadius.circular(12.r),
       onTap: () {
         context.pushNamed(
           Routes.courseDetails,
           extra: {
-            'course_id': course.id,
+            'course_id': course.courseId,
           },
         );
       },
@@ -128,7 +234,7 @@ class _CourseCard extends StatelessWidget {
             BoxShadow(
               color: context.isDark
                   ? Colors.transparent
-                  : Colors.black.withOpacity(0.05),
+                  : Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -139,60 +245,159 @@ class _CourseCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- TOP: Image Only ---
+              // --- TOP: Image with Validity Badge ---
               Expanded(
-                flex: 3,
+                flex: 6,
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Positioned.fill(
-                      child: course.image != null
-                          ? Image.network(
-                              '${Endpoints.storageUrl}/${course.image}',
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  _placeholderImage(),
-                            )
-                          : _placeholderImage(),
-                    ),
+                    if (course.resolvedImageUrl.isNotEmpty)
+                      CachedNetworkImage(
+                        imageUrl: course.resolvedImageUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (_, __) => _placeholderImage(),
+                        errorWidget: (_, __, ___) => _placeholderImage(),
+                      )
+                    else
+                      _placeholderImage(),
+
+                    // Lifetime or Expiration Status Badge
+                    if (course.lifetimeAccess)
+                      Positioned(
+                        top: 6.h,
+                        right: 6.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 3.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: LightThemeColors.primaryColor,
+                            borderRadius: BorderRadius.circular(6.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.25),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.all_inclusive_rounded,
+                                size: 10.sp,
+                                color: Colors.white,
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'লাইফটাইম',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9.5.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else if (course.isExpired)
+                      Positioned(
+                        top: 6.h,
+                        right: 6.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 3.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade600,
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Text(
+                            'মেয়াদ শেষ',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.5.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
+                    else if (course.remainingDays != null)
+                      Positioned(
+                        top: 6.h,
+                        right: 6.w,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6.w,
+                            vertical: 3.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: course.isExpiringSoon
+                                ? Colors.orange.shade800
+                                : const Color(0xB3000000),
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Text(
+                            '${course.remainingDays} দিন বাকি',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.5.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
 
               // --- BOTTOM: Info Section ---
               Expanded(
-                flex: 3,
+                flex: 5,
                 child: Padding(
                   padding: EdgeInsets.all(8.r),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        course.title ?? '',
+                        course.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 13.sp,
+                          fontSize: 12.5.sp,
                           fontWeight: FontWeight.bold,
                           color: context.textPrimary,
-                          height: 1.3,
+                          height: 1.25,
                         ),
                       ),
-                      SizedBox(height: 5.h),
                       Row(
                         children: [
                           Icon(
-                            Icons.play_circle_fill,
+                            course.isExpired
+                                ? Icons.info_outline_rounded
+                                : Icons.play_circle_fill,
                             size: 14.sp,
-                            color: LightThemeColors.primaryColor,
+                            color: course.isExpired
+                                ? Colors.grey
+                                : LightThemeColors.primaryColor,
                           ),
                           SizedBox(width: 4.w),
-                          Text(
-                            "কোর্সটি দেখুন",
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: LightThemeColors.primaryColor,
-                              fontWeight: FontWeight.w500,
+                          Expanded(
+                            child: Text(
+                              course.isExpired ? "বিস্তারিত দেখুন" : "কোর্সটি দেখুন",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.sp,
+                                color: course.isExpired
+                                    ? Colors.grey
+                                    : LightThemeColors.primaryColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
@@ -211,10 +416,12 @@ class _CourseCard extends StatelessWidget {
   Widget _placeholderImage() {
     return Container(
       color: const Color(0xFFE8F5E9),
-      child: const Icon(
-        Icons.school_rounded,
-        size: 40,
-        color: Color(0xFF28a745),
+      child: const Center(
+        child: Icon(
+          Icons.school_rounded,
+          size: 36,
+          color: LightThemeColors.primaryColor,
+        ),
       ),
     );
   }

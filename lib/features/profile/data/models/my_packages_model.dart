@@ -1,40 +1,82 @@
-// To parse this JSON data, do
-//
-//     final myPackagesModel = myPackagesModelFromJson(jsonString);
-
 import 'dart:convert';
-
+import 'package:intl/intl.dart';
 import 'package:lokkha/shared/models/user.dart';
+import 'package:lokkha/shared/models/package.dart';
 
 MyPackagesModel myPackagesModelFromJson(String str) =>
-    MyPackagesModel.fromJson(json.decode(str));
+    MyPackagesModel.fromJson(json.decode(str) as Map<String, dynamic>);
 
 String myPackagesModelToJson(MyPackagesModel data) =>
     json.encode(data.toJson());
 
+/// Typedef for Clean Architecture
+typedef UserPackagesResponseModel = MyPackagesModel;
+
 class MyPackagesModel {
-  final bool? status;
-  final List<PackageElement>? packages;
+  final bool success;
+  final String? message;
+  final List<PackageElement> packages;
 
   MyPackagesModel({
-    this.status,
-    this.packages,
+    this.success = false,
+    this.message,
+    this.packages = const [],
   });
 
-  factory MyPackagesModel.fromJson(Map<String, dynamic> json) =>
-      MyPackagesModel(
-        status: json["status"],
-        packages: json["packages"] == null
-            ? []
-            : List<PackageElement>.from(
-                json["packages"]!.map((x) => PackageElement.fromJson(x))),
-      );
+  // Backward compatibility getters
+  bool? get status => success;
+  List<PackageElement> get items => packages;
+
+  factory MyPackagesModel.fromJson(Map<String, dynamic> json) {
+    List<PackageElement> parsedPackages = [];
+
+    final rawData = json["data"];
+    if (rawData is Map<String, dynamic>) {
+      if (rawData["items"] is List) {
+        parsedPackages = (rawData["items"] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(PackageElement.fromJson)
+            .toList();
+      } else if (rawData["subscriptions"] is List) {
+        parsedPackages = (rawData["subscriptions"] as List)
+            .whereType<Map<String, dynamic>>()
+            .map(PackageElement.fromJson)
+            .toList();
+      }
+    } else if (rawData is List) {
+      parsedPackages = rawData
+          .whereType<Map<String, dynamic>>()
+          .map(PackageElement.fromJson)
+          .toList();
+    } else if (json["packages"] is List) {
+      parsedPackages = (json["packages"] as List)
+          .whereType<Map<String, dynamic>>()
+          .map(PackageElement.fromJson)
+          .toList();
+    } else if (json["items"] is List) {
+      parsedPackages = (json["items"] as List)
+          .whereType<Map<String, dynamic>>()
+          .map(PackageElement.fromJson)
+          .toList();
+    }
+
+    final isSuccess = json["success"] == true ||
+        json["status"] == true ||
+        json["status"]?.toString().toLowerCase() == "success";
+
+    return MyPackagesModel(
+      success: isSuccess,
+      message: json["message"]?.toString(),
+      packages: parsedPackages,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        "status": status,
-        "packages": packages == null
-            ? []
-            : List<dynamic>.from(packages!.map((x) => x.toJson())),
+        "success": success,
+        "message": message,
+        "data": {
+          "items": packages.map((x) => x.toJson()).toList(),
+        },
       };
 }
 
@@ -42,6 +84,7 @@ class PackageElement {
   final int? id;
   final int? userId;
   final int? packageId;
+  final String? name;
   final String? status;
   final DateTime? subscribedAt;
   final DateTime? cancelledAt;
@@ -54,6 +97,7 @@ class PackageElement {
     this.id,
     this.userId,
     this.packageId,
+    this.name,
     this.status,
     this.subscribedAt,
     this.cancelledAt,
@@ -63,33 +107,100 @@ class PackageElement {
     this.user,
   });
 
-  factory PackageElement.fromJson(Map<String, dynamic> json) => PackageElement(
-        id: json["id"],
-        userId: json["user_id"],
-        packageId: json["package_id"],
-        status: json["status"],
-        subscribedAt: json["subscribed_at"] == null
-            ? null
-            : DateTime.parse(json["subscribed_at"]),
-        cancelledAt: json["cancelled_at"] == null
-            ? null
-            : DateTime.parse(json["cancelled_at"]),
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        package: json["package"] == null
-            ? null
-            : PackagePackage.fromJson(json["package"]),
-        user: json["user"] == null ? null : User.fromJson(json["user"]),
-      );
+  /// Guaranteed name for the card
+  String get packageName {
+    if (package?.name != null && package!.name!.trim().isNotEmpty) {
+      return package!.name!.trim();
+    }
+    if (name != null && name!.trim().isNotEmpty) {
+      return name!.trim();
+    }
+    return "ফিচারসমূহ";
+  }
+
+  /// Subscription start date
+  DateTime get startDate => subscribedAt ?? createdAt ?? DateTime.now();
+
+  /// Subscription expiration / end date
+  DateTime get endDate => cancelledAt ?? DateTime.now();
+
+  /// Returns true if currently active
+  bool get isActive {
+    if (status?.toLowerCase() == 'active') {
+      return true;
+    }
+    final now = DateTime.now();
+    return now.isAfter(startDate) && now.isBefore(endDate);
+  }
+
+  /// Formatted date strings
+  String get formattedStartDate =>
+      DateFormat('dd MMM, yyyy').format(startDate);
+
+  String get formattedEndDate =>
+      DateFormat('dd MMM, yyyy').format(endDate);
+
+  /// Resolved package ID
+  int get effectivePackageId => packageId ?? package?.id ?? id ?? 0;
+
+  /// Convert to Package model for details and checkout
+  Package toPackage() {
+    return Package(
+      id: effectivePackageId,
+      name: packageName,
+      description: package?.description,
+      regularPrice: package?.regularPrice,
+      discountedPrice: package?.discountedPrice,
+      duration: package?.duration,
+      durationDays: package?.duration,
+      isCurrentlyActive: isActive,
+    );
+  }
+
+  factory PackageElement.fromJson(Map<String, dynamic> json) {
+    DateTime? parseDate(dynamic value) {
+      if (value == null) return null;
+      return DateTime.tryParse(value.toString());
+    }
+
+    final pkgJson = json["package"] is Map<String, dynamic>
+        ? PackagePackage.fromJson(json["package"])
+        : null;
+
+    final subDate = parseDate(json["subscribed_at"]) ??
+        parseDate(json["start_date"]) ??
+        parseDate(json["created_at"]);
+
+    final expDate = parseDate(json["cancelled_at"]) ??
+        parseDate(json["expires_at"]) ??
+        parseDate(json["end_date"]);
+
+    return PackageElement(
+      id: json["id"] is int
+          ? json["id"]
+          : int.tryParse(json["id"]?.toString() ?? ''),
+      userId: json["user_id"] is int
+          ? json["user_id"]
+          : int.tryParse(json["user_id"]?.toString() ?? ''),
+      packageId: json["package_id"] is int
+          ? json["package_id"]
+          : int.tryParse(json["package_id"]?.toString() ?? ''),
+      name: json["package_name"]?.toString() ?? json["name"]?.toString(),
+      status: json["status"]?.toString(),
+      subscribedAt: subDate,
+      cancelledAt: expDate,
+      createdAt: parseDate(json["created_at"]),
+      updatedAt: parseDate(json["updated_at"]),
+      package: pkgJson,
+      user: json["user"] == null ? null : User.fromJson(json["user"]),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "user_id": userId,
         "package_id": packageId,
+        "name": name,
         "status": status,
         "subscribed_at": subscribedAt?.toIso8601String(),
         "cancelled_at": cancelledAt?.toIso8601String(),
@@ -114,18 +225,6 @@ class PackagePackage {
   final bool? isTrial;
   final dynamic trialDuration;
   final dynamic termsAndConditions;
-  final dynamic metaTitle;
-  final String? metaDescription;
-  final dynamic metaKeywords;
-  final String? metaImage;
-  final dynamic metaAuthor;
-  final dynamic metaUrl;
-  final dynamic metaData;
-  final dynamic headerCode;
-  final dynamic footerCode;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final dynamic deletedAt;
 
   PackagePackage({
     this.id,
@@ -141,62 +240,35 @@ class PackagePackage {
     this.isTrial,
     this.trialDuration,
     this.termsAndConditions,
-    this.metaTitle,
-    this.metaDescription,
-    this.metaKeywords,
-    this.metaImage,
-    this.metaAuthor,
-    this.metaUrl,
-    this.metaData,
-    this.headerCode,
-    this.footerCode,
-    this.createdAt,
-    this.updatedAt,
-    this.deletedAt,
   });
 
   factory PackagePackage.fromJson(Map<String, dynamic> json) => PackagePackage(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        regularPrice: json["regular_price"],
-        duration: json["duration"],
-        discount: json["discount"],
-        discountedPrice: json["discounted_price"],
-        status: json["status"] == null
-            ? null
-            : (json["status"] is bool
-                ? json["status"]
-                : (json["status"] == 1 || json["status"] == "1" || json["status"] == "true")),
-        isFeatured: json["is_featured"] == null
-            ? null
-            : (json["is_featured"] is bool
-                ? json["is_featured"]
-                : (json["is_featured"] == 1 || json["is_featured"] == "1" || json["is_featured"] == "true")),
+        id: json["id"] is int
+            ? json["id"]
+            : int.tryParse(json["id"]?.toString() ?? ''),
+        name: json["name"]?.toString(),
+        description: json["description"]?.toString(),
+        regularPrice: json["regular_price"]?.toString(),
+        duration: json["duration_days"] is int
+            ? json["duration_days"]
+            : (json["duration"] is int
+                ? json["duration"]
+                : int.tryParse(json["duration"]?.toString() ?? '')),
+        discount: json["discount"]?.toString(),
+        discountedPrice: json["discounted_price"]?.toString(),
+        status: json["status"] == true ||
+            json["status"] == 1 ||
+            json["status"]?.toString() == "1" ||
+            json["status"]?.toString().toLowerCase() == "true",
+        isFeatured: json["is_featured"] == true ||
+            json["is_featured"] == 1 ||
+            json["is_featured"]?.toString() == "1",
         features: json["features"],
-        isTrial: json["is_trial"] == null
-            ? null
-            : (json["is_trial"] is bool
-                ? json["is_trial"]
-                : (json["is_trial"] == 1 || json["is_trial"] == "1" || json["is_trial"] == "true")),
-        trialDuration: json["trial_duration"],
+        isTrial: json["is_trial"] == true ||
+            json["is_trial"] == 1 ||
+            json["is_trial"]?.toString() == "1",
+        trialDuration: json["trial_duration_days"] ?? json["trial_duration"],
         termsAndConditions: json["terms_and_conditions"],
-        metaTitle: json["meta_title"],
-        metaDescription: json["meta_description"],
-        metaKeywords: json["meta_keywords"],
-        metaImage: json["meta_image"],
-        metaAuthor: json["meta_author"],
-        metaUrl: json["meta_url"],
-        metaData: json["meta_data"],
-        headerCode: json["header_code"],
-        footerCode: json["footer_code"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -213,17 +285,5 @@ class PackagePackage {
         "is_trial": isTrial,
         "trial_duration": trialDuration,
         "terms_and_conditions": termsAndConditions,
-        "meta_title": metaTitle,
-        "meta_description": metaDescription,
-        "meta_keywords": metaKeywords,
-        "meta_image": metaImage,
-        "meta_author": metaAuthor,
-        "meta_url": metaUrl,
-        "meta_data": metaData,
-        "header_code": headerCode,
-        "footer_code": footerCode,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
-        "deleted_at": deletedAt,
       };
 }

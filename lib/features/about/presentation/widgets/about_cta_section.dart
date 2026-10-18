@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_colors.dart';
 import 'package:lokkha/core/utils/global.dart';
@@ -25,10 +24,10 @@ class AboutCtaSection extends StatelessWidget {
     }
 
     if (url == '/exam' || url == 'exam' || url.contains('exam')) {
-      context.pushNamed(Routes.examCategory);
+      context.go(Routes.examCategory);
     } else if (url == '/register' || url == 'register' || url.contains('register')) {
       if (isLoggedIn.value) {
-        context.pushNamed(Routes.dashboardPortal);
+        context.go(Routes.dashboardPortal);
       } else {
         context.pushNamed(Routes.authGateway);
       }

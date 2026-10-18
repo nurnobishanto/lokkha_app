@@ -325,6 +325,7 @@ bool isAppRoute(String path) {
     Routes.jobs,
     Routes.currentAffairs,
     Routes.packages,
+    Routes.packageDetails,
     Routes.myApp,
     Routes.subjectSection,
     Routes.myPackages,
