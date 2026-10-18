@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/course/data/models/course_details_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
@@ -670,6 +671,41 @@ void main() {
       expect(find.text('৳150'), findsOneWidget);
       expect(find.text('৳300'), findsOneWidget);
       expect(find.text('এখনই ভর্তি হোন'), findsOneWidget);
+    });
+
+    testWidgets('CourseDetailsView renders "শেখা শুরু করুন" and unlocks modules when user is enrolled',
+        (tester) async {
+      final parsedDetails = CourseDetailsModel.fromJson(sampleCourse6DetailsJson);
+      final mockRepo = _MockCoursesRepository(
+        courseDetailsToReturn: parsedDetails,
+      );
+
+      // Pre-cache enrolled course 6
+      cacheEnrolledCourseIds([6]);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            coursesRepositoryProvider.overrideWithValue(mockRepo),
+          ],
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            builder: (context, child) => const MaterialApp(
+              home: CourseDetailsView(courseId: 6, initialIsEnrolled: true),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // 1. Should show "শেখা শুরু করুন" button
+      expect(find.text('শেখা শুরু করুন'), findsOneWidget);
+
+      // 2. Should NOT show "এখনই ভর্তি হোন" button
+      expect(find.text('এখনই ভর্তি হোন'), findsNothing);
     });
   });
 }

@@ -75,7 +75,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
                   _buildSectionHeader(
                     context,
                     title: "আমার মডিউলসমূহ",
-                    badgeText: "৬টি মডিউল",
                     icon: Icons.grid_view_rounded,
                     iconColor: context.primaryColor,
                   ),
@@ -587,8 +586,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
   // 3. আমার মডিউলসমূহ (৬টি মূল মডিউল - Colorful Pastel Grid)
   // ---------------------------------------------------------------------------
   Widget _buildMyModulesGrid(BuildContext context, DashboardPortalState controller) {
-    final counts = controller.counts;
-
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -605,8 +602,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFF2563EB).withValues(alpha: 0.18)
               : const Color(0xFFEFF6FF),
-          badgeColor: const Color(0xFF2563EB),
-          badgeCount: "${counts?.totalOrders ?? 0}",
           onTap: () => context.push(Routes.myOrders),
         ),
         _buildModuleItem(
@@ -617,8 +612,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFFE11D48).withValues(alpha: 0.18)
               : const Color(0xFFFFF1F2),
-          badgeColor: const Color(0xFFE11D48),
-          badgeCount: "${counts?.totalCourses ?? 0}",
           onTap: () => context.push(Routes.myCourses),
         ),
         _buildModuleItem(
@@ -629,8 +622,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFFD97706).withValues(alpha: 0.18)
               : const Color(0xFFFFFBEB),
-          badgeColor: const Color(0xFFD97706),
-          badgeCount: "${counts?.totalPackages ?? 0}",
           onTap: () => context.push(Routes.myPackages),
         ),
         _buildModuleItem(
@@ -641,8 +632,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFF0891B2).withValues(alpha: 0.18)
               : const Color(0xFFECFEFF),
-          badgeColor: const Color(0xFF0891B2),
-          badgeCount: "${counts?.totalSelfExams ?? 0}",
           onTap: () => context.push(Routes.selfExamHistory),
         ),
         _buildModuleItem(
@@ -653,8 +642,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFF7C3AED).withValues(alpha: 0.18)
               : const Color(0xFFF5F3FF),
-          badgeColor: const Color(0xFF7C3AED),
-          badgeCount: "${counts?.totalExams ?? 0}",
           onTap: () => context.push(Routes.profileHistory),
         ),
         _buildModuleItem(
@@ -665,8 +652,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: context.isDark
               ? const Color(0xFF059669).withValues(alpha: 0.18)
               : const Color(0xFFECFDF5),
-          badgeColor: const Color(0xFF059669),
-          badgeCount: "${counts?.totalContests ?? 0}",
           onTap: () => context.push(Routes.contestHistory),
         ),
       ],
@@ -679,12 +664,8 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
     required IconData icon,
     required Color iconColor,
     required Color iconBg,
-    required Color badgeColor,
-    required String badgeCount,
     required VoidCallback onTap,
   }) {
-    final int countVal = int.tryParse(badgeCount) ?? 0;
-
     return Material(
       color: context.cardColor,
       borderRadius: BorderRadius.circular(16.r),
@@ -709,51 +690,18 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    width: 42.r,
-                    height: 42.r,
-                    decoration: BoxDecoration(
-                      color: context.isDark
-                          ? iconBg.withValues(alpha: 0.15)
-                          : iconBg,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Center(
-                      child: Icon(icon, color: iconColor, size: 22.r),
-                    ),
-                  ),
-                  if (countVal > 0)
-                    Positioned(
-                      top: -4.h,
-                      right: -6.w,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 4.5.w,
-                          vertical: 1.5.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: badgeColor,
-                          borderRadius: BorderRadius.circular(10.r),
-                          border: Border.all(color: context.cardColor, width: 1.5),
-                        ),
-                        constraints: BoxConstraints(minWidth: 16.r),
-                        child: Center(
-                          child: Text(
-                            badgeCount,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 9.sp,
-                              fontWeight: FontWeight.w800,
-                              height: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+              Container(
+                width: 42.r,
+                height: 42.r,
+                decoration: BoxDecoration(
+                  color: context.isDark
+                      ? iconBg.withValues(alpha: 0.15)
+                      : iconBg,
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Center(
+                  child: Icon(icon, color: iconColor, size: 22.r),
+                ),
               ),
               SizedBox(height: 8.h),
               Text(
@@ -772,7 +720,6 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
       ),
     );
   }
-
 
   Widget _buildSupportCard(BuildContext context) {
     return Container(

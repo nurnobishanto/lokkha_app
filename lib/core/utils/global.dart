@@ -80,6 +80,35 @@ bool checkUserHasPackage() {
   return false;
 }
 
+bool isCourseEnrolled(int? courseId) {
+  if (courseId == null || courseId <= 0) return false;
+  try {
+    final cachedIds = MyGetStorage.readCache('enrolled_course_ids');
+    if (cachedIds is List) {
+      for (final item in cachedIds) {
+        if (item is int && item == courseId) return true;
+        if (item != null && item.toString() == courseId.toString()) return true;
+      }
+    }
+  } catch (_) {}
+  return false;
+}
+
+void cacheEnrolledCourseIds(List<int> courseIds) {
+  try {
+    final existing = MyGetStorage.readCache('enrolled_course_ids');
+    final Set<int> allIds = {};
+    if (existing is List) {
+      for (final e in existing) {
+        final id = int.tryParse(e.toString());
+        if (id != null) allIds.add(id);
+      }
+    }
+    allIds.addAll(courseIds);
+    MyGetStorage.writeCacheData('enrolled_course_ids', allIds.toList());
+  } catch (_) {}
+}
+
 /// Device Info
 String? deviceId;
 String? deviceOS;

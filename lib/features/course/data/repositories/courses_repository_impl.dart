@@ -16,7 +16,10 @@ class CoursesRepositoryImpl implements CoursesRepository {
   CoursesRepositoryImpl({RestClient? client}) : _client = client ?? RestClient();
 
   Map<String, String> _buildHeaders() {
-    final token = MySharedPref.getUserToken();
+    var token = MySharedPref.getUserToken();
+    if (token.isEmpty && myUser.jwtToken != null && myUser.jwtToken!.isNotEmpty) {
+      token = myUser.jwtToken!;
+    }
     return {
       if (token.isNotEmpty) 'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -151,7 +154,17 @@ class CoursesRepositoryImpl implements CoursesRepository {
           (response.data['status'] == true ||
               response.data['success'] == true ||
               response.data['data'] != null)) {
-        return CourseDetailsModel.fromJson(response.data as Map<String, dynamic>);
+        final model = CourseDetailsModel.fromJson(response.data as Map<String, dynamic>);
+        if (model.course != null) {
+          final bool enrolled = model.course!.isEnrolled == true || isCourseEnrolled(courseId);
+          if (enrolled && model.course!.isEnrolled != true) {
+            return CourseDetailsModel(
+              status: model.status,
+              course: model.course!.copyWith(isEnrolled: true),
+            );
+          }
+        }
+        return model;
       }
     } catch (e) {
       if (kDebugMode) debugPrint('Error fetching v1 course details: $e');
@@ -162,7 +175,17 @@ class CoursesRepositoryImpl implements CoursesRepository {
           headers: _buildHeaders(),
         );
         if (legacyRes.data != null) {
-          return CourseDetailsModel.fromJson(legacyRes.data as Map<String, dynamic>);
+          final model = CourseDetailsModel.fromJson(legacyRes.data as Map<String, dynamic>);
+          if (model.course != null) {
+            final bool enrolled = model.course!.isEnrolled == true || isCourseEnrolled(courseId);
+            if (enrolled && model.course!.isEnrolled != true) {
+              return CourseDetailsModel(
+                status: model.status,
+                course: model.course!.copyWith(isEnrolled: true),
+              );
+            }
+          }
+          return model;
         }
       } catch (_) {}
     }

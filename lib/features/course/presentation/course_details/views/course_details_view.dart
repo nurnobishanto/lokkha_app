@@ -14,7 +14,13 @@ import '../widgets/routine_bottom_sheet.dart';
 
 class CourseDetailsView extends ConsumerWidget {
   final int courseId;
-  const CourseDetailsView({super.key, required this.courseId});
+  final bool? initialIsEnrolled;
+
+  const CourseDetailsView({
+    super.key,
+    required this.courseId,
+    this.initialIsEnrolled,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,8 +28,13 @@ class CourseDetailsView extends ConsumerWidget {
     final textTheme = theme.textTheme;
     final state = ref.watch(courseDetailsNotifierProvider(courseId));
     final notifier = ref.read(courseDetailsNotifierProvider(courseId).notifier);
+    final myCoursesState = ref.watch(myCoursesNotifierProvider);
 
     final course = state.model.course;
+    final bool isUserEnrolled = (course?.isEnrolled == true) ||
+        (initialIsEnrolled == true) ||
+        isCourseEnrolled(courseId) ||
+        myCoursesState.model.courses.any((c) => c.courseId == courseId && !c.isExpired);
 
     return Scaffold(
       backgroundColor: context.isDark ? const Color(0xFF0F172A) : Colors.white,
@@ -271,7 +282,7 @@ class CourseDetailsView extends ConsumerWidget {
                           courseId: course.id,
                           title: module.title ?? '',
                           items: module.items ?? [],
-                          isEnrolled: course.isEnrolled ?? false,
+                          isEnrolled: isUserEnrolled,
                         )),
                   ],
 
@@ -331,7 +342,7 @@ class CourseDetailsView extends ConsumerWidget {
             if (state.isLoading || course == null) {
               return const SizedBox.shrink();
             }
-            if (course.isEnrolled == true) {
+            if (isUserEnrolled) {
               return Padding(
                 padding: EdgeInsets.only(
                   bottom: 8.h,

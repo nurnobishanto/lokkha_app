@@ -208,7 +208,10 @@ class _CoursesViewState extends ConsumerState<CoursesView> {
               if (GoRouter.maybeOf(context) != null) {
                 context.push(
                   Routes.courseDetails,
-                  extra: {'course_id': course.id},
+                  extra: {
+                    'course_id': course.id,
+                    'is_enrolled': course.isEnrolled,
+                  },
                 );
               }
             },
@@ -227,7 +230,10 @@ class _CoursesViewState extends ConsumerState<CoursesView> {
               if (GoRouter.maybeOf(context) != null) {
                 context.push(
                   Routes.courseDetails,
-                  extra: {'course_id': legacy.id},
+                  extra: {
+                    'course_id': legacy.id,
+                    'is_enrolled': legacy.isEnrolled,
+                  },
                 );
               }
             },

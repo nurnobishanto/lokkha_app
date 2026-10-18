@@ -7,6 +7,7 @@ import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
 import 'package:lokkha/features/navigation/data/models/profile_data_model.dart';
 import 'package:lokkha/shared/models/user.dart';
 
@@ -55,7 +56,14 @@ class NavbarNotifier extends Notifier<NavbarState> {
 
   Future<void> getMeProfileInfo() async {
     debugPrint("Called Get Me Profile Information (Riverpod)");
-    final token = await SecureStorageService.getToken();
+    var token = await SecureStorageService.getToken();
+    if (token == null || token.isEmpty) {
+      final prefToken = MySharedPref.getUserToken();
+      if (prefToken.isNotEmpty) token = prefToken;
+    }
+    if ((token == null || token.isEmpty) && myUser.jwtToken != null && myUser.jwtToken!.isNotEmpty) {
+      token = myUser.jwtToken;
+    }
     if (token == null || token.isEmpty) {
       debugPrint("❌ Token is empty, skipping profile fetch.");
       clearProfileState();
@@ -82,6 +90,10 @@ class NavbarNotifier extends Notifier<NavbarState> {
             isLoggedIn: true,
             isProfileLoading: false,
           );
+
+          try {
+            ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true);
+          } catch (_) {}
 
           debugPrint("✅ Profile Data fetch Success: ${myUser.name}");
           return;

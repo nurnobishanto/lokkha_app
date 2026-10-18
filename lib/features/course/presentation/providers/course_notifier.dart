@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_model.dart';
 import 'package:lokkha/features/course/data/repositories/courses_repository_impl.dart';
@@ -207,7 +208,10 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
 
   @override
   CourseDetailsState build() {
-    Future.microtask(() => fetchCourseDetails(courseId));
+    Future.microtask(() {
+      fetchCourseDetails(courseId);
+      ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true);
+    });
     return CourseDetailsState(model: CourseDetailsModel());
   }
 
@@ -220,10 +224,16 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
     try {
       final model = await _repository.getCourseDetails(id);
       if (model != null && model.course != null) {
+        final course = (model.course!.isEnrolled != true && isCourseEnrolled(id))
+            ? model.course!.copyWith(isEnrolled: true)
+            : model.course!;
         state = state.copyWith(
           isLoading: false,
           hasError: false,
-          model: model,
+          model: CourseDetailsModel(
+            status: model.status,
+            course: course,
+          ),
         );
       } else {
         state = state.copyWith(
@@ -333,6 +343,11 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
       final data = response.data;
       if (data != null && (data['success'] == true || data['status'] == true)) {
         final parsed = MyCourseModel.fromJson(data);
+        final enrolledIds = parsed.courses
+            .where((c) => !c.isExpired)
+            .map((c) => c.courseId)
+            .toList();
+        cacheEnrolledCourseIds(enrolledIds);
         final meta = parsed.meta;
         final hasMore = meta != null && meta.currentPage < meta.lastPage;
 
@@ -396,6 +411,11 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
       final data = response.data;
       if (data != null && (data['success'] == true || data['status'] == true)) {
         final parsed = MyCourseModel.fromJson(data);
+        final enrolledIds = parsed.courses
+            .where((c) => !c.isExpired)
+            .map((c) => c.courseId)
+            .toList();
+        cacheEnrolledCourseIds(enrolledIds);
         final meta = parsed.meta;
         final hasMore = meta != null && meta.currentPage < meta.lastPage;
 

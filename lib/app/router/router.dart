@@ -472,6 +472,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final extra = state.extra;
           int courseId = 0;
+          bool? isEnrolled;
           if (extra is int) {
             courseId = extra;
           } else if (extra is Map) {
@@ -481,6 +482,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             } else if (rawId != null) {
               courseId = int.tryParse(rawId.toString()) ?? 0;
             }
+            if (extra['is_enrolled'] == true) {
+              isEnrolled = true;
+            }
           }
           if (courseId == 0) {
             final param = state.uri.queryParameters['course_id'] ??
@@ -489,7 +493,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               courseId = int.tryParse(param) ?? 0;
             }
           }
-          return CourseDetailsView(courseId: courseId);
+          return CourseDetailsView(
+            courseId: courseId,
+            initialIsEnrolled: isEnrolled,
+          );
         },
       ),
       GoRoute(

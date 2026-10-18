@@ -49,7 +49,8 @@ class RestClient {
           }
 
           if (!options.headers.containsKey('Authorization')) {
-            final token = await secureStorageService.getAuthToken();
+            final token = await secureStorageService.getAuthToken() ??
+                await TokenManager.getToken();
             if (token != null && token.isNotEmpty) {
               options.headers['Authorization'] = 'Bearer $token';
             }

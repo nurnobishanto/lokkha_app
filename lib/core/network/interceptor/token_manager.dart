@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
+import 'package:lokkha/core/utils/global.dart';
 
 /// Central Token & Session Manager Interceptor
 class TokenManager extends Interceptor {
@@ -16,6 +17,12 @@ class TokenManager extends Interceptor {
         final prefToken = MySharedPref.getUserToken();
         if (prefToken.isNotEmpty) {
           token = prefToken;
+        }
+      }
+      if (token == null || token.isEmpty) {
+        final cachedToken = myUser.jwtToken;
+        if (cachedToken != null && cachedToken.isNotEmpty) {
+          token = cachedToken;
         }
       }
       return token;

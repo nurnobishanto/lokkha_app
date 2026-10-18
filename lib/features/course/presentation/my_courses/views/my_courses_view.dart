@@ -222,6 +222,7 @@ class _CourseCard extends StatelessWidget {
           Routes.courseDetails,
           extra: {
             'course_id': course.courseId,
+            'is_enrolled': true,
           },
         );
       },

@@ -1,3 +1,4 @@
+import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/course_module.dart';
 import 'package:lokkha/shared/models/review.dart';
 import 'package:lokkha/shared/models/teacher.dart';
@@ -99,12 +100,38 @@ class Course {
         ? json["category"] as Map<String, dynamic>
         : null;
 
-    final rawIsEnrolled = json["is_enrolled"] ?? userAccess?["is_enrolled"];
+    final parsedId = json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? '');
+
+    bool? determineEnrolled() {
+      final candidates = [
+        json["is_enrolled"],
+        userAccess?["is_enrolled"],
+        json["enrolled"],
+        userAccess?["enrolled"],
+        json["is_purchased"],
+        userAccess?["is_purchased"],
+        json["has_access"],
+        userAccess?["has_access"],
+        json["can_access"],
+        userAccess?["can_access"],
+      ];
+      for (final c in candidates) {
+        if (c == true || c == 1 || c == "1" || c == "true") return true;
+      }
+      final enrollment = userAccess?["enrollment"] ?? json["enrollment"] ?? json["user_enrollment"];
+      if (enrollment is Map && enrollment.isNotEmpty) return true;
+      if (parsedId != null && isCourseEnrolled(parsedId)) return true;
+      for (final c in candidates) {
+        if (c == false || c == 0 || c == "0" || c == "false") return false;
+      }
+      return null;
+    }
+
     final rawModules = json["modules"] ?? json["syllabus"];
     final rawTeachers = json["teachers"] ?? json["instructors"];
 
     return Course(
-      id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
+      id: parsedId,
       accessDuration: json["access_duration"] is int
           ? json["access_duration"]
           : int.tryParse(json["access_duration"]?.toString() ?? ''),
@@ -182,11 +209,7 @@ class Course {
           : (stats?["enrolled_students"] is int
               ? stats!["enrolled_students"]
               : int.tryParse(json["users_count"]?.toString() ?? '')),
-      isEnrolled: rawIsEnrolled == null
-          ? null
-          : (rawIsEnrolled is bool
-              ? rawIsEnrolled
-              : (rawIsEnrolled == 1 || rawIsEnrolled == "1" || rawIsEnrolled == "true")),
+      isEnrolled: determineEnrolled(),
       modules: rawModules is List
           ? List<CourseModule>.from(
               rawModules.whereType<Map<String, dynamic>>().map((x) => CourseModule.fromJson(x)))
@@ -252,4 +275,84 @@ class Course {
             : List<dynamic>.from(reviews!.map((x) => x.toJson())),
         "users": users == null ? [] : List<dynamic>.from(users!.map((x) => x)),
       };
+
+  Course copyWith({
+    int? id,
+    int? accessDuration,
+    String? title,
+    String? slug,
+    String? details,
+    String? duration,
+    int? courseCategoryId,
+    String? image,
+    String? regularPrice,
+    String? salePrice,
+    dynamic meetLink,
+    dynamic whatsappGroupLink,
+    dynamic facebookGroup,
+    dynamic zoomLink,
+    dynamic youtubePlaylist,
+    dynamic telegramGroup,
+    int? order,
+    DateTime? publishDate,
+    bool? status,
+    String? promotionVideo,
+    String? routineFile,
+    bool? isExamBatch,
+    bool? lifetimeAccess,
+    bool? featured,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    dynamic deletedAt,
+    int? modulesCount,
+    int? itemsCount,
+    int? teachersCount,
+    int? reviewsCount,
+    int? usersCount,
+    bool? isEnrolled,
+    List<CourseModule>? modules,
+    List<Teacher>? teachers,
+    List<Review>? reviews,
+    List<User>? users,
+  }) {
+    return Course(
+      id: id ?? this.id,
+      accessDuration: accessDuration ?? this.accessDuration,
+      title: title ?? this.title,
+      slug: slug ?? this.slug,
+      details: details ?? this.details,
+      duration: duration ?? this.duration,
+      courseCategoryId: courseCategoryId ?? this.courseCategoryId,
+      image: image ?? this.image,
+      regularPrice: regularPrice ?? this.regularPrice,
+      salePrice: salePrice ?? this.salePrice,
+      meetLink: meetLink ?? this.meetLink,
+      whatsappGroupLink: whatsappGroupLink ?? this.whatsappGroupLink,
+      facebookGroup: facebookGroup ?? this.facebookGroup,
+      zoomLink: zoomLink ?? this.zoomLink,
+      youtubePlaylist: youtubePlaylist ?? this.youtubePlaylist,
+      telegramGroup: telegramGroup ?? this.telegramGroup,
+      order: order ?? this.order,
+      publishDate: publishDate ?? this.publishDate,
+      status: status ?? this.status,
+      promotionVideo: promotionVideo ?? this.promotionVideo,
+      routineFile: routineFile ?? this.routineFile,
+      isExamBatch: isExamBatch ?? this.isExamBatch,
+      lifetimeAccess: lifetimeAccess ?? this.lifetimeAccess,
+      featured: featured ?? this.featured,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      modulesCount: modulesCount ?? this.modulesCount,
+      itemsCount: itemsCount ?? this.itemsCount,
+      teachersCount: teachersCount ?? this.teachersCount,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
+      usersCount: usersCount ?? this.usersCount,
+      isEnrolled: isEnrolled ?? this.isEnrolled,
+      modules: modules ?? this.modules,
+      teachers: teachers ?? this.teachers,
+      reviews: reviews ?? this.reviews,
+      users: users ?? this.users,
+    );
+  }
 }
