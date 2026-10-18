@@ -196,7 +196,10 @@ class AccuracyExamCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4.h),
-                    Row(
+                    Wrap(
+                      spacing: 4.w,
+                      runSpacing: 2.h,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           "মোট প্রশ্ন: ${item.totalQuestions}",
@@ -206,15 +209,12 @@ class AccuracyExamCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        SizedBox(width: 5.w),
                         Text("•", style: TextStyle(color: const Color(0xFF94A3B8), fontSize: 11.sp)),
-                        SizedBox(width: 5.w),
                         Icon(
                           Icons.check_circle_rounded,
                           size: 13.sp,
                           color: const Color(0xFF10B981),
                         ),
-                        SizedBox(width: 2.w),
                         Text(
                           "${item.correctCount} সঠিক",
                           style: TextStyle(
@@ -223,15 +223,12 @@ class AccuracyExamCard extends StatelessWidget {
                             color: const Color(0xFF059669),
                           ),
                         ),
-                        SizedBox(width: 5.w),
                         Text("•", style: TextStyle(color: const Color(0xFF94A3B8), fontSize: 11.sp)),
-                        SizedBox(width: 5.w),
                         Icon(
                           Icons.cancel_rounded,
                           size: 13.sp,
                           color: const Color(0xFFEF4444),
                         ),
-                        SizedBox(width: 2.w),
                         Text(
                           "${item.wrongCount} ভুল",
                           style: TextStyle(
@@ -283,11 +280,15 @@ class AccuracyExamCard extends StatelessWidget {
           SizedBox(height: 10.h),
 
           // 5. Bottom Action Row (প্রাপ্ত নম্বর + Buttons)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8.w,
+            runSpacing: 8.h,
             children: [
               // প্রাপ্ত নম্বর
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     "প্রাপ্ত নম্বর: ",
@@ -312,6 +313,7 @@ class AccuracyExamCard extends StatelessWidget {
 
               // Buttons
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // 🏆 র‍্যাঙ্ক Button
                   InkWell(

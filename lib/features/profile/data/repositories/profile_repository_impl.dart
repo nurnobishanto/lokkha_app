@@ -10,6 +10,7 @@ import '../models/order_v1_model.dart';
 import '../models/self_exam_model.dart';
 import '../models/self_exam_detail_model.dart';
 import '../models/content_history_model.dart';
+import '../models/accuracy_response_model.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -145,5 +146,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<bool> toggleSaveQuestion(int questionId) {
     return remoteDataSource.toggleSaveQuestion(questionId);
+  }
+
+  @override
+  Future<AccuracyResponseModel> getAccuracyAnalytics({int page = 1}) {
+    return remoteDataSource.getAccuracyAnalytics(page: page);
   }
 }

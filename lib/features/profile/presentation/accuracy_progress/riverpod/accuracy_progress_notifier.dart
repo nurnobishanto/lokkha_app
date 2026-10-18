@@ -2,115 +2,186 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/features/profile/data/models/accuracy_exam_item_model.dart';
 import 'package:lokkha/features/profile/data/models/accuracy_metric_model.dart';
+import 'package:lokkha/features/profile/data/models/accuracy_response_model.dart';
 import 'package:lokkha/features/profile/data/models/accuracy_trend_point_model.dart';
 import 'package:lokkha/features/profile/data/models/exam_history_model.dart';
+import 'package:lokkha/features/profile/domain/usecases/get_accuracy_analytics_usecase.dart';
 import 'package:lokkha/features/profile/presentation/profile_history/views/exam_rank_view.dart';
 import 'package:lokkha/features/profile/presentation/profile_history/views/exam_result_sheet_view.dart';
 
 class AccuracyProgressState {
-  final AccuracyMetricModel metrics;
-  final List<AccuracyTrendPointModel> trendPoints;
-  final List<AccuracyExamItemModel> examList;
+  final AccuracyResponseModel? responseData;
   final bool isLoading;
+  final bool isPaginating;
+  final int currentPage;
+  final String? errorMessage;
+  final AccuracyMetricModel? _legacyMetrics;
+  final List<AccuracyTrendPointModel>? _legacyTrendPoints;
+  final List<AccuracyExamItemModel>? _legacyExamList;
 
   const AccuracyProgressState({
-    this.metrics = const AccuracyMetricModel(
-      avgAccuracy: "2.2%",
-      highestAccuracy: "15%",
-      totalQuestionsAnswered: 630,
-      correctCount: 14,
-      wrongCount: 38,
-    ),
-    this.trendPoints = const [],
-    this.examList = const [],
+    this.responseData,
     this.isLoading = false,
-  });
-
-  AccuracyProgressState copyWith({
+    this.isPaginating = false,
+    this.currentPage = 1,
+    this.errorMessage,
     AccuracyMetricModel? metrics,
     List<AccuracyTrendPointModel>? trendPoints,
     List<AccuracyExamItemModel>? examList,
+  })  : _legacyMetrics = metrics,
+        _legacyTrendPoints = trendPoints,
+        _legacyExamList = examList;
+
+  AccuracyMetricsDataModel get metrics {
+    if (responseData != null) {
+      return responseData!.metrics;
+    }
+    final legacy = _legacyMetrics;
+    if (legacy != null) {
+      return AccuracyMetricsDataModel(
+        accuracyRate: double.tryParse(
+              legacy.avgAccuracy.replaceAll('%', '').trim(),
+            ) ??
+            0.0,
+        highestAccuracy: double.tryParse(
+              legacy.highestAccuracy.replaceAll('%', '').trim(),
+            ) ??
+            0.0,
+        totalQuestionsAnswered: legacy.totalQuestionsAnswered,
+        totalCorrectAnswers: legacy.correctCount,
+        totalIncorrectAnswers: legacy.wrongCount,
+      );
+    }
+    return const AccuracyMetricsDataModel();
+  }
+
+  AccuracyChartDataModel get chart {
+    if (responseData != null) {
+      return responseData!.chart;
+    }
+    final legacyPoints = _legacyTrendPoints;
+    if (legacyPoints != null && legacyPoints.isNotEmpty) {
+      return AccuracyChartDataModel(
+        labels: legacyPoints.map((p) => p.date).toList(),
+        data: legacyPoints.map((p) => p.percentage).toList(),
+      );
+    }
+    return const AccuracyChartDataModel();
+  }
+
+  List<AccuracyExamItemModel> get examList {
+    if (responseData != null) {
+      return responseData!.history.items;
+    }
+    final legacyExams = _legacyExamList;
+    return legacyExams ?? const [];
+  }
+
+  ExamHistoryMetaModel get meta =>
+      responseData?.history.meta ??
+      ExamHistoryMetaModel(
+        currentPage: currentPage,
+        lastPage: 1,
+        total: examList.length,
+      );
+
+  List<AccuracyTrendPointModel> get trendPoints {
+    final legacyPoints = _legacyTrendPoints;
+    if (legacyPoints != null && legacyPoints.isNotEmpty) {
+      return legacyPoints;
+    }
+    return chart.toLegacyTrendPoints();
+  }
+
+  AccuracyProgressState copyWith({
+    AccuracyResponseModel? responseData,
     bool? isLoading,
+    bool? isPaginating,
+    int? currentPage,
+    String? errorMessage,
+    bool clearError = false,
+    AccuracyMetricModel? metrics,
+    List<AccuracyTrendPointModel>? trendPoints,
+    List<AccuracyExamItemModel>? examList,
   }) {
     return AccuracyProgressState(
-      metrics: metrics ?? this.metrics,
-      trendPoints: trendPoints ?? this.trendPoints,
-      examList: examList ?? this.examList,
+      responseData: responseData ?? this.responseData,
       isLoading: isLoading ?? this.isLoading,
+      isPaginating: isPaginating ?? this.isPaginating,
+      currentPage: currentPage ?? this.currentPage,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      metrics: metrics ?? _legacyMetrics,
+      trendPoints: trendPoints ?? _legacyTrendPoints,
+      examList: examList ?? _legacyExamList,
     );
   }
 }
 
 class AccuracyProgressNotifier extends Notifier<AccuracyProgressState> {
+  final GetAccuracyAnalyticsUseCase _getAccuracyAnalyticsUseCase;
+  final AccuracyProgressState? _initialState;
+
+  AccuracyProgressNotifier({
+    GetAccuracyAnalyticsUseCase? getAccuracyAnalyticsUseCase,
+    AccuracyProgressState? initialState,
+  })  : _getAccuracyAnalyticsUseCase =
+            getAccuracyAnalyticsUseCase ?? GetAccuracyAnalyticsUseCase(),
+        _initialState = initialState;
+
   @override
   AccuracyProgressState build() {
-    return const AccuracyProgressState(
-      metrics: AccuracyMetricModel(
-        avgAccuracy: "2.2%",
-        highestAccuracy: "15%",
-        totalQuestionsAnswered: 630,
-        correctCount: 14,
-        wrongCount: 38,
-      ),
-      trendPoints: [
-        AccuracyTrendPointModel(date: "02 Nov", percentage: 15.0),
-        AccuracyTrendPointModel(date: "02 Nov", percentage: 0.0),
-        AccuracyTrendPointModel(date: "02 Nov", percentage: 0.0),
-        AccuracyTrendPointModel(date: "06 Nov", percentage: 0.0),
-        AccuracyTrendPointModel(date: "10 Nov", percentage: 12.0),
-        AccuracyTrendPointModel(date: "01 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "01 Dec", percentage: 10.0),
-        AccuracyTrendPointModel(date: "01 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "03 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "03 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "04 Dec", percentage: 5.0),
-        AccuracyTrendPointModel(date: "22 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "23 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "23 Dec", percentage: 0.0),
-        AccuracyTrendPointModel(date: "13 May", percentage: 0.0),
-      ],
-      examList: [
-        AccuracyExamItemModel(
-          id: "9163",
-          date: "13 May, 2026 • 01:22 PM",
-          accuracy: "0%",
-          status: "Failed",
-          isPassed: false,
-          title: "পরীক্ষা-৪৪ বাংলাদেশ বিষয়াবলী রাজনৈতিক ব্যবস্থ ....",
-          totalQuestions: 30,
-          correctCount: 0,
-          wrongCount: 0,
-          accuracyRatio: "0%",
-          obtainedMark: "0",
-        ),
-        AccuracyExamItemModel(
-          id: "4099",
-          date: "23 Dec, 2025 • 01:53 PM",
-          accuracy: "0%",
-          status: "Failed",
-          isPassed: false,
-          title: "বাংলা সাহিত্যের আধুনিক যুগ",
-          totalQuestions: 20,
-          correctCount: 0,
-          wrongCount: 1,
-          accuracyRatio: "0%",
-          obtainedMark: "-0.5",
-        ),
-        AccuracyExamItemModel(
-          id: "4089",
-          date: "23 Dec, 2025 • 12:14 PM",
-          accuracy: "0%",
-          status: "Failed",
-          isPassed: false,
-          title: "সমাস",
-          totalQuestions: 20,
-          correctCount: 0,
-          wrongCount: 2,
-          accuracyRatio: "0%",
-          obtainedMark: "-1",
-        ),
-      ],
-    );
+    if (_initialState != null) {
+      return _initialState!;
+    }
+    Future.microtask(() => loadAccuracyAnalytics(page: 1));
+    return const AccuracyProgressState(isLoading: true);
+  }
+
+  Future<void> loadAccuracyAnalytics({
+    int page = 1,
+    bool isRefresh = false,
+  }) async {
+    if (isRefresh || page == 1) {
+      state = state.copyWith(
+        isLoading: true,
+        isPaginating: false,
+        clearError: true,
+      );
+    } else {
+      state = state.copyWith(
+        isPaginating: true,
+        clearError: true,
+      );
+    }
+
+    try {
+      final response = await _getAccuracyAnalyticsUseCase(page: page);
+      state = state.copyWith(
+        responseData: response,
+        currentPage: page,
+        isLoading: false,
+        isPaginating: false,
+        clearError: true,
+      );
+    } catch (e) {
+      debugPrint('[AccuracyProgressNotifier] loadAccuracyAnalytics error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        isPaginating: false,
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  Future<void> changePage(int page) async {
+    if (page == state.currentPage || state.isPaginating || state.isLoading) {
+      return;
+    }
+    await loadAccuracyAnalytics(page: page);
+  }
+
+  Future<void> refresh() async {
+    await loadAccuracyAnalytics(page: 1, isRefresh: true);
   }
 
   void viewRanking(BuildContext context, AccuracyExamItemModel item) {
@@ -118,7 +189,7 @@ class AccuracyProgressNotifier extends Notifier<AccuracyProgressState> {
       MaterialPageRoute(
         builder: (_) => ExamRankView(
           exam: ExamHistoryModel(
-            id: "#${item.id}",
+            id: item.id.startsWith('#') ? item.id : "#${item.id}",
             date: item.date,
             status: item.status,
             isPassed: item.isPassed,
@@ -138,7 +209,7 @@ class AccuracyProgressNotifier extends Notifier<AccuracyProgressState> {
       MaterialPageRoute(
         builder: (_) => ExamResultSheetView(
           exam: ExamHistoryModel(
-            id: "#${item.id}",
+            id: item.id.startsWith('#') ? item.id : "#${item.id}",
             date: item.date,
             status: item.status,
             isPassed: item.isPassed,
@@ -155,4 +226,6 @@ class AccuracyProgressNotifier extends Notifier<AccuracyProgressState> {
 }
 
 final accuracyProgressNotifierProvider =
-    NotifierProvider<AccuracyProgressNotifier, AccuracyProgressState>(AccuracyProgressNotifier.new);
+    NotifierProvider<AccuracyProgressNotifier, AccuracyProgressState>(
+  AccuracyProgressNotifier.new,
+);

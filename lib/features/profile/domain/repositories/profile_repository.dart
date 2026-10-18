@@ -8,6 +8,7 @@ import '../../data/models/order_v1_model.dart';
 import '../../data/models/self_exam_model.dart';
 import '../../data/models/self_exam_detail_model.dart';
 import '../../data/models/content_history_model.dart';
+import '../../data/models/accuracy_response_model.dart';
 import '../../data/datasources/profile_remote_data_source.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 
@@ -68,4 +69,5 @@ abstract class ProfileRepository {
   Future<SelfExamDetailModel> getSelfAcademyDetail(dynamic id, {SelfExamModel? summaryExam});
   Future<ContentHistoryResponseModel> getContentHistory();
   Future<bool> toggleSaveQuestion(int questionId);
+  Future<AccuracyResponseModel> getAccuracyAnalytics({int page = 1});
 }

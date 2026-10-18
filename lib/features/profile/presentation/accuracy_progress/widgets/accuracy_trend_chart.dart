@@ -1,22 +1,47 @@
+import 'dart:math' as math;
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/features/profile/profile.dart';
+import 'package:lokkha/features/profile/data/models/accuracy_response_model.dart';
+import 'package:lokkha/features/profile/data/models/accuracy_trend_point_model.dart';
 
 class AccuracyTrendChart extends StatelessWidget {
-  final List<AccuracyTrendPointModel> points;
+  final AccuracyChartDataModel? chart;
+  final List<AccuracyTrendPointModel>? points;
   final String avgAccuracy;
   final String highestAccuracy;
 
   const AccuracyTrendChart({
     super.key,
-    required this.points,
+    this.chart,
+    this.points,
     required this.avgAccuracy,
     required this.highestAccuracy,
   });
 
   @override
   Widget build(BuildContext context) {
+    // 1. Resolve spots, labels, titles
+    List<FlSpot> spots = [];
+    List<String> labels = [];
+    List<String> titles = [];
+
+    if (chart != null && (chart!.points.isNotEmpty || chart!.data.isNotEmpty)) {
+      spots = chart!.flSpots;
+      labels = chart!.labels;
+      titles = chart!.titles;
+    } else if (points != null && points!.isNotEmpty) {
+      spots = points!
+          .asMap()
+          .entries
+          .map((e) => FlSpot(e.key.toDouble(), e.value.percentage.clamp(0.0, 100.0)))
+          .toList();
+      labels = points!.map((e) => e.date).toList();
+    }
+
+    final hasData = spots.isNotEmpty;
+
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
@@ -34,7 +59,7 @@ class AccuracyTrendChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Header (Icon + Title)
+          // 1. Header (Icon + Title + Exam Count)
           Row(
             children: [
               Icon(
@@ -43,20 +68,43 @@ class AccuracyTrendChart extends StatelessWidget {
                 color: const Color(0xFF059669),
               ),
               SizedBox(width: 8.w),
-              Text(
-                "নির্ভুলতা ও পারফরম্যান্স ট্রেন্ড গ্রাফ",
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w800,
-                  color: context.textPrimary,
+              Expanded(
+                child: Text(
+                  "নির্ভুলতা ও পারফরম্যান্স ট্রেন্ড গ্রাফ",
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w800,
+                    color: context.textPrimary,
+                  ),
                 ),
               ),
+              if (spots.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: context.isDark
+                        ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                        : const Color(0xFFECFDF5),
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(color: const Color(0xFFA7F3D0), width: 0.8),
+                  ),
+                  child: Text(
+                    "${spots.length} টি পরীক্ষা",
+                    style: TextStyle(
+                      fontSize: 10.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF059669),
+                    ),
+                  ),
+                ),
             ],
           ),
 
           SizedBox(height: 3.h),
           Text(
-            "আপনার সর্বশেষ পরীক্ষাগুলোর নির্ভুলতার শতকরা হার (%)",
+            spots.length > 6
+                ? "আপনার সর্বশেষ পরীক্ষাগুলোর নির্ভুলতার শতকরা হার (%) • ডানে স্ক্রোল করুন ↔"
+                : "আপনার সর্বশেষ পরীক্ষাগুলোর নির্ভুলতার শতকরা হার (%)",
             style: TextStyle(
               fontSize: 11.5.sp,
               color: context.textSecondary,
@@ -66,13 +114,17 @@ class AccuracyTrendChart extends StatelessWidget {
           SizedBox(height: 12.h),
 
           // 2. Badges Row (গড় & সর্বোচ্চ)
-          Row(
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 6.h,
             children: [
               // গড় Badge
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: context.isDark
+                      ? const Color(0xFF064E3B).withValues(alpha: 0.3)
+                      : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(color: const Color(0xFFA7F3D0)),
                 ),
@@ -96,8 +148,6 @@ class AccuracyTrendChart extends StatelessWidget {
                   ],
                 ),
               ),
-
-              SizedBox(width: 8.w),
 
               // সর্বোচ্চ Badge
               Container(
@@ -131,257 +181,225 @@ class AccuracyTrendChart extends StatelessWidget {
 
           SizedBox(height: 18.h),
 
-          // 3. Custom-Painted Interactive Chart
-          SizedBox(
-            height: 220.h,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Y-Axis Labels
-                SizedBox(
-                  width: 38.w,
-                  height: 165.h,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: const [
-                      _AxisLabel(text: "100%"),
-                      _AxisLabel(text: "75%"),
-                      _AxisLabel(text: "50%"),
-                      _AxisLabel(text: "25%"),
-                      _AxisLabel(text: "0%"),
-                    ],
-                  ),
-                ),
-
-                SizedBox(width: 8.w),
-
-                // Scrollable Plot Area
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    child: SizedBox(
-                      width: points.length * 48.w > 280.w ? points.length * 48.w : 280.w,
-                      child: CustomPaint(
-                        painter: _TrendChartPainter(
-                          points: points,
-                          isDarkMode: context.isDark,
-                        ),
+          // 3. Chart Area (fl_chart or empty state)
+          if (!hasData)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24.h),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.auto_graph_rounded,
+                      size: 36.sp,
+                      color: context.textSecondary.withValues(alpha: 0.3),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "পর্যাপ্ত পরীক্ষা দিলে এখানে আপনার নির্ভুলতার গ্রাফ দেখা যাবে।",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: context.textSecondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
+            )
+          else
+            SizedBox(
+              height: 200.h,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final minWidth = constraints.maxWidth;
+                  // If many spots, allow smooth horizontal scroll
+                  final neededWidth = math.max(minWidth, spots.length * 48.w);
+                  final isScrollable = neededWidth > minWidth;
+
+                  final chartWidget = SizedBox(
+                    width: neededWidth,
+                    height: 200.h,
+                    child: LineChart(
+                      LineChartData(
+                        minY: 0,
+                        maxY: 100,
+                        minX: 0,
+                        maxX: (spots.length > 1 ? spots.length - 1 : 1).toDouble(),
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: false,
+                          horizontalInterval: 25,
+                          getDrawingHorizontalLine: (value) => FlLine(
+                            color: context.borderColor.withValues(alpha: 0.6),
+                            strokeWidth: 1,
+                            dashArray: [4, 4],
+                          ),
+                        ),
+                        titlesData: FlTitlesData(
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 40.w,
+                              interval: 25,
+                              getTitlesWidget: (value, meta) {
+                                if (value % 25 != 0) return const SizedBox.shrink();
+                                return Padding(
+                                  padding: EdgeInsets.only(right: 6.w),
+                                  child: Text(
+                                    "${value.toInt()}%",
+                                    textAlign: TextAlign.right,
+                                    style: TextStyle(
+                                      color: context.textSecondary,
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 28.h,
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index >= 0 && index < labels.length) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(top: 8.h),
+                                    child: Text(
+                                      labels[index],
+                                      style: TextStyle(
+                                        color: context.textSecondary,
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          topTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 22.h,
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index >= 0 && index < spots.length) {
+                                  final val = spots[index].y;
+                                  if (val > 0) {
+                                    final valStr = val % 1 == 0
+                                        ? "${val.toInt()}%"
+                                        : "${val.toStringAsFixed(1)}%";
+                                    return Padding(
+                                      padding: EdgeInsets.only(bottom: 2.h),
+                                      child: Text(
+                                        valStr,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: const Color(0xFF059669),
+                                          fontSize: 9.5.sp,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          rightTitles: const AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                        ),
+                        borderData: FlBorderData(show: false),
+                        lineTouchData: LineTouchData(
+                          handleBuiltInTouches: true,
+                          touchTooltipData: LineTouchTooltipData(
+                            getTooltipColor: (_) => const Color(0xFF065F46),
+                            tooltipRoundedRadius: 8.r,
+                            tooltipPadding: EdgeInsets.symmetric(
+                              horizontal: 10.w,
+                              vertical: 6.h,
+                            ),
+                            getTooltipItems: (touchedSpots) {
+                              return touchedSpots.map((spot) {
+                                final idx = spot.x.toInt();
+                                final title = (idx >= 0 &&
+                                        idx < titles.length &&
+                                        titles[idx].isNotEmpty)
+                                    ? titles[idx]
+                                    : (idx >= 0 && idx < labels.length
+                                        ? labels[idx]
+                                        : "পরীক্ষা ${idx + 1}");
+                                return LineTooltipItem(
+                                  "$title\n${spot.y.toStringAsFixed(1)}%",
+                                  TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11.5.sp,
+                                  ),
+                                );
+                              }).toList();
+                            },
+                          ),
+                        ),
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: spots,
+                            isCurved: spots.length > 1,
+                            curveSmoothness: 0.35,
+                            color: const Color(0xFF059669),
+                            barWidth: 3,
+                            isStrokeCapRound: true,
+                            dotData: FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, barData, index) {
+                                final isNonZero = spot.y > 0;
+                                return FlDotCirclePainter(
+                                  radius: isNonZero ? 5.0 : 3.5,
+                                  color: isNonZero ? const Color(0xFF059669) : Colors.white,
+                                  strokeWidth: isNonZero ? 2.0 : 2.5,
+                                  strokeColor: isNonZero ? Colors.white : const Color(0xFF059669),
+                                );
+                              },
+                            ),
+                            belowBarData: BarAreaData(
+                              show: true,
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  const Color(0xFF059669).withValues(alpha: 0.25),
+                                  const Color(0xFF059669).withValues(alpha: 0.0),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+
+                  if (isScrollable) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: chartWidget,
+                    );
+                  }
+                  return chartWidget;
+                },
+              ),
             ),
-          ),
         ],
       ),
     );
   }
-}
-
-class _AxisLabel extends StatelessWidget {
-  final String text;
-  const _AxisLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 10.sp,
-        fontWeight: FontWeight.w600,
-        color: context.textSecondary,
-      ),
-    );
-  }
-}
-
-class _TrendChartPainter extends CustomPainter {
-  final List<AccuracyTrendPointModel> points;
-  final bool isDarkMode;
-
-  _TrendChartPainter({required this.points, this.isDarkMode = false});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (points.isEmpty) return;
-
-    final double plotHeight = 165.h;
-    final double stepX = size.width / (points.length > 1 ? (points.length - 1) : 1);
-
-    // 1. Draw dashed grid lines
-    final gridPaint = Paint()
-      ..color = isDarkMode ? Colors.white12 : const Color(0xFFF1F5F9)
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    for (int i = 0; i <= 4; i++) {
-      final double y = (plotHeight / 4) * i;
-      _drawDashedLine(canvas, Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    // 2. Compute point coordinates
-    final List<Offset> coords = [];
-    for (int i = 0; i < points.length; i++) {
-      final x = i * stepX;
-      // 0% at y = plotHeight, 100% at y = 0
-      final double pct = points[i].percentage.clamp(0, 100);
-      final y = plotHeight - (pct / 100.0) * plotHeight;
-      coords.add(Offset(x, y));
-    }
-
-    // 3. Draw gradient fill under curve
-    final fillPath = Path();
-    fillPath.moveTo(coords.first.dx, plotHeight);
-    fillPath.lineTo(coords.first.dx, coords.first.dy);
-
-    for (int i = 0; i < coords.length - 1; i++) {
-      final p0 = coords[i];
-      final p1 = coords[i + 1];
-      final controlX1 = p0.dx + (p1.dx - p0.dx) / 2;
-      final controlY1 = p0.dy;
-      final controlX2 = p0.dx + (p1.dx - p0.dx) / 2;
-      final controlY2 = p1.dy;
-      fillPath.cubicTo(controlX1, controlY1, controlX2, controlY2, p1.dx, p1.dy);
-    }
-
-    fillPath.lineTo(coords.last.dx, plotHeight);
-    fillPath.close();
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          const Color(0xFF059669).withValues(alpha: 0.25),
-          const Color(0xFF059669).withValues(alpha: 0.0),
-        ],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, plotHeight));
-
-    canvas.drawPath(fillPath, fillPaint);
-
-    // 4. Draw smooth bezier curve line
-    final linePath = Path();
-    linePath.moveTo(coords.first.dx, coords.first.dy);
-
-    for (int i = 0; i < coords.length - 1; i++) {
-      final p0 = coords[i];
-      final p1 = coords[i + 1];
-      final controlX1 = p0.dx + (p1.dx - p0.dx) / 2;
-      final controlY1 = p0.dy;
-      final controlX2 = p0.dx + (p1.dx - p0.dx) / 2;
-      final controlY2 = p1.dy;
-      linePath.cubicTo(controlX1, controlY1, controlX2, controlY2, p1.dx, p1.dy);
-    }
-
-    final linePaint = Paint()
-      ..color = const Color(0xFF059669)
-      ..strokeWidth = 2.4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawPath(linePath, linePaint);
-
-    // 5. Draw point dots and badges
-    final dotBgPaint = Paint()
-      ..color = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
-    final dotBorderPaint = Paint()
-      ..color = const Color(0xFF059669)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke;
-
-    for (int i = 0; i < coords.length; i++) {
-      final pt = coords[i];
-      final val = points[i].percentage;
-
-      // Circle dot
-      canvas.drawCircle(pt, 4.5, dotBgPaint);
-      canvas.drawCircle(pt, 4.5, dotBorderPaint);
-
-      // Value Chip Pill Badge
-      _drawValueBadge(canvas, pt, "${val.toInt()}%");
-
-      // X-Axis Date label rotated
-      _drawRotatedDateText(canvas, Offset(pt.dx, plotHeight + 14.h), points[i].date);
-    }
-  }
-
-  void _drawDashedLine(Canvas canvas, Offset p1, Offset p2, Paint paint) {
-    const double dashWidth = 4.0;
-    const double dashSpace = 4.0;
-    double startX = p1.dx;
-    while (startX < p2.dx) {
-      canvas.drawLine(
-        Offset(startX, p1.dy),
-        Offset((startX + dashWidth).clamp(p1.dx, p2.dx), p1.dy),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
-  }
-
-  void _drawValueBadge(Canvas canvas, Offset point, String text) {
-    final textSpan = TextSpan(
-      text: text,
-      style: TextStyle(
-        fontSize: 9.sp,
-        fontWeight: FontWeight.w900,
-        color: Colors.white,
-      ),
-    );
-
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    final badgeWidth = textPainter.width + 8.w;
-    final badgeHeight = textPainter.height + 4.h;
-    final badgeRect = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-        center: Offset(point.dx, point.dy - 12.h),
-        width: badgeWidth,
-        height: badgeHeight,
-      ),
-      Radius.circular(6.r),
-    );
-
-    final badgePaint = Paint()..color = const Color(0xFF065F46);
-    canvas.drawRRect(badgeRect, badgePaint);
-
-    textPainter.paint(
-      canvas,
-      Offset(
-        point.dx - (textPainter.width / 2),
-        point.dy - 12.h - (textPainter.height / 2),
-      ),
-    );
-  }
-
-  void _drawRotatedDateText(Canvas canvas, Offset center, String date) {
-    final textSpan = TextSpan(
-      text: date,
-      style: TextStyle(
-        fontSize: 9.5.sp,
-        fontWeight: FontWeight.w600,
-        color: isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-      ),
-    );
-
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(-0.785); // -45 degrees
-    textPainter.paint(canvas, Offset(-textPainter.width, -textPainter.height / 2));
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

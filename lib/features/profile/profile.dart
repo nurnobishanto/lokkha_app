@@ -19,6 +19,7 @@ export 'data/models/exam_review_detail_model.dart';
 export 'data/models/accuracy_metric_model.dart';
 export 'data/models/accuracy_exam_item_model.dart';
 export 'data/models/accuracy_trend_point_model.dart';
+export 'data/models/accuracy_response_model.dart';
 
 // Data & Repositories
 export 'data/datasources/profile_remote_data_source.dart';
@@ -39,6 +40,7 @@ export 'domain/usecases/get_self_academy_history_usecase.dart';
 export 'domain/usecases/get_self_academy_detail_usecase.dart';
 export 'domain/usecases/get_content_history_usecase.dart';
 export 'domain/usecases/toggle_save_question_usecase.dart';
+export 'domain/usecases/get_accuracy_analytics_usecase.dart';
 export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 

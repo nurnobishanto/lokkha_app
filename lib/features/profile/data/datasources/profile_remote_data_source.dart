@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/features/home/home.dart';
@@ -12,6 +11,7 @@ import '../models/order_v1_model.dart';
 import '../models/self_exam_model.dart';
 import '../models/self_exam_detail_model.dart';
 import '../models/content_history_model.dart';
+import '../models/accuracy_response_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<User?> getProfile();
@@ -57,6 +57,7 @@ abstract class ProfileRemoteDataSource {
   Future<SelfExamDetailModel> getSelfAcademyDetail(dynamic id, {SelfExamModel? summaryExam});
   Future<ContentHistoryResponseModel> getContentHistory();
   Future<bool> toggleSaveQuestion(int questionId);
+  Future<AccuracyResponseModel> getAccuracyAnalytics({int page = 1});
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -407,6 +408,25 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       return response.statusCode == 200;
     } catch (e) {
       debugPrint('[ProfileRemoteDataSource] toggleSaveQuestion error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<AccuracyResponseModel> getAccuracyAnalytics({int page = 1}) async {
+    try {
+      final response = await _client.get(
+        Endpoints.v1UserAccuracy,
+        queryParameters: {'page': page},
+      );
+      if (response.data is Map<String, dynamic>) {
+        return AccuracyResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      return const AccuracyResponseModel();
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getAccuracyAnalytics error: $e');
       rethrow;
     }
   }
