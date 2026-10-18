@@ -7,6 +7,9 @@ import '../models/device_session_model.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_review_detail_model.dart';
 import '../models/order_v1_model.dart';
+import '../models/self_exam_model.dart';
+import '../models/self_exam_detail_model.dart';
+import '../models/content_history_model.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -119,5 +122,28 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<OrderDetailV1Data> getOrderDetails(dynamic id) {
     return remoteDataSource.getOrderDetails(id);
+  }
+
+  @override
+  Future<SelfAcademyHistoryResponseModel> getSelfAcademyHistory({int page = 1}) {
+    return remoteDataSource.getSelfAcademyHistory(page: page);
+  }
+
+  @override
+  Future<SelfExamDetailModel> getSelfAcademyDetail(
+    dynamic id, {
+    SelfExamModel? summaryExam,
+  }) {
+    return remoteDataSource.getSelfAcademyDetail(id, summaryExam: summaryExam);
+  }
+
+  @override
+  Future<ContentHistoryResponseModel> getContentHistory() {
+    return remoteDataSource.getContentHistory();
+  }
+
+  @override
+  Future<bool> toggleSaveQuestion(int questionId) {
+    return remoteDataSource.toggleSaveQuestion(questionId);
   }
 }

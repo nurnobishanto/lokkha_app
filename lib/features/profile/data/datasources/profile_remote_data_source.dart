@@ -9,6 +9,9 @@ import '../models/device_session_model.dart';
 import '../models/exam_history_model.dart';
 import '../models/exam_review_detail_model.dart';
 import '../models/order_v1_model.dart';
+import '../models/self_exam_model.dart';
+import '../models/self_exam_detail_model.dart';
+import '../models/content_history_model.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<User?> getProfile();
@@ -50,6 +53,10 @@ abstract class ProfileRemoteDataSource {
     int perPage = 10,
   });
   Future<OrderDetailV1Data> getOrderDetails(dynamic id);
+  Future<SelfAcademyHistoryResponseModel> getSelfAcademyHistory({int page = 1});
+  Future<SelfExamDetailModel> getSelfAcademyDetail(dynamic id, {SelfExamModel? summaryExam});
+  Future<ContentHistoryResponseModel> getContentHistory();
+  Future<bool> toggleSaveQuestion(int questionId);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -327,6 +334,79 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       throw Exception('Order details not found');
     } catch (e) {
       debugPrint('[ProfileRemoteDataSource] getOrderDetails error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<SelfAcademyHistoryResponseModel> getSelfAcademyHistory({int page = 1}) async {
+    try {
+      final response = await _client.get(
+        '${Endpoints.v1UserSelfAcademyHistory}?page=$page',
+      );
+      if (response.data is Map<String, dynamic>) {
+        return SelfAcademyHistoryResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      return const SelfAcademyHistoryResponseModel(items: []);
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getSelfAcademyHistory error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<SelfExamDetailModel> getSelfAcademyDetail(
+    dynamic id, {
+    SelfExamModel? summaryExam,
+  }) async {
+    try {
+      final cleanId = id.toString().replaceAll('#', '').trim();
+      final response = await _client.get(
+        Endpoints.v1UserSelfAcademyDetail(cleanId),
+      );
+      return SelfExamDetailModel.fromJson(
+        response.data,
+        summaryExam: summaryExam,
+      );
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getSelfAcademyDetail error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ContentHistoryResponseModel> getContentHistory() async {
+    try {
+      final response = await _client.get(Endpoints.v1ContentHistory);
+      if (response.data is Map<String, dynamic>) {
+        return ContentHistoryResponseModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
+      }
+      return const ContentHistoryResponseModel();
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] getContentHistory error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> toggleSaveQuestion(int questionId) async {
+    try {
+      final response = await _client.post(
+        Endpoints.v1ToggleSaveQuestion,
+        data: {'question_id': questionId},
+      );
+      if (response.data is Map &&
+          (response.data['success'] == true ||
+              response.data['status'] == true)) {
+        return true;
+      }
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('[ProfileRemoteDataSource] toggleSaveQuestion error: $e');
       rethrow;
     }
   }

@@ -277,7 +277,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.contestHistory,
         name: Routes.contestHistory,
-        builder: (context, state) => const ContestHistoryView(),
+        builder: (context, state) => const LiveContestView(),
+      ),
+      GoRoute(
+        path: Routes.liveContest,
+        name: Routes.liveContest,
+        builder: (context, state) => const LiveContestView(),
       ),
       GoRoute(
         path: Routes.accuracyProgress,

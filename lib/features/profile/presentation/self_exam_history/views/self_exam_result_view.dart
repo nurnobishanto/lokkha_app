@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/features/profile/profile.dart';
+import '../riverpod/self_exam_result_notifier.dart';
 import '../widgets/self_exam_question_card.dart';
 
-class SelfExamResultView extends StatelessWidget {
+class SelfExamResultView extends ConsumerWidget {
   final SelfExamModel exam;
 
   const SelfExamResultView({
@@ -15,54 +18,26 @@ class SelfExamResultView extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    // Activity details matching media_1789640748043.png
-    final activity = SelfExamActivityModel(
-      time: "০ মিনিট ১০ সেকেন্ড",
-      totalQuestions: exam.totalQuestions,
-      totalMark: "X 1 = 0",
-      positiveMark: "1",
-      studentName: "sadman",
-      studentId: "250500049",
-      fullMark: "${exam.totalQuestions}",
-      yourMark: "${exam.obtainedMark} (0) / Failed",
-      attempt: "${exam.correctCount + exam.wrongCount} (2%)",
-      avoid: "${exam.totalQuestions - (exam.correctCount + exam.wrongCount)} (98%)",
-      correct: "${exam.correctCount} (0%)",
-      wrong: "${exam.wrongCount} (2%)",
+  Widget build(BuildContext context, WidgetRef ref) {
+    final resultState = ref.watch(selfExamResultNotifierProvider(exam));
+    final resultNotifier = ref.read(selfExamResultNotifierProvider(exam).notifier);
+    final profileUser = ref.watch(profileNotifierProvider).profileDataModel?.user ?? myUser;
+
+    final studentName = (profileUser.name != null && profileUser.name!.trim().isNotEmpty)
+        ? profileUser.name!
+        : 'sadman';
+    final studentId = (profileUser.userId != null && profileUser.userId!.trim().isNotEmpty)
+        ? profileUser.userId!
+        : (profileUser.id != null ? profileUser.id.toString() : '250500049');
+
+    final activeExam = resultState.detail?.exam ?? exam;
+    final activity = SelfExamActivityModel.fromExam(
+      activeExam,
+      studentName: studentName,
+      studentId: studentId,
     );
 
-    // Questions list matching media_1789640759734.png
-    final List<SelfExamQuestionModel> questionList = [
-      const SelfExamQuestionModel(
-        questionNumber: 1,
-        questionText: "'ভালুকের জ্বর' বাগধারাটির অর্থ কী?",
-        options: [
-          "A) জ্বর জ্বর ভাব",
-          "B) দীর্ঘস্থায়ী জ্বর",
-          "C) ক্ষণস্থায়ী জ্বর",
-          "D) তীব্র জ্বর",
-        ],
-        yourAnswer: "A",
-        correctAnswer: "C) ক্ষণস্থায়ী জ্বর",
-        isCorrect: false,
-        explanation: "ভালুকের জ্বর বাগধারাটির সঠিক অর্থ হলো ক্ষণস্থায়ী জ্বর।",
-      ),
-      const SelfExamQuestionModel(
-        questionNumber: 2,
-        questionText: "কোনটি 'ঘোড়া' শব্দের সমার্থক শব্দ নয়?",
-        options: [
-          "A) বড়বা",
-          "B) সপ্তি",
-          "C) বাজী",
-          "D) তোয়",
-        ],
-        yourAnswer: "A",
-        correctAnswer: "D) তোয়",
-        isCorrect: false,
-        explanation: "'তোয়' শব্দের অর্থ জল বা পানি, এটি ঘোড়া শব্দের সমার্থক নয়।",
-      ),
-    ];
+    final questionList = resultState.detail?.questions ?? [];
 
     return Scaffold(
       backgroundColor: context.scaffoldBg,
@@ -103,16 +78,26 @@ class SelfExamResultView extends StatelessWidget {
           // 2. Summary Stat Cards (Time, Total Questions, Total Mark, Positive Mark)
           _buildSummaryBox(context, title: "Time", value: activity.time),
           SizedBox(height: 10.h),
-          _buildSummaryBox(context, title: "Total Questions", value: "${activity.totalQuestions}"),
+          _buildSummaryBox(
+            context,
+            title: "Total Questions",
+            value: "${activity.totalQuestions}",
+          ),
           SizedBox(height: 10.h),
-          _buildSummaryBox(context, title: "Total Mark", value: activity.totalMark),
+          _buildSummaryBox(
+            context,
+            title: "Total Mark",
+            value: activity.totalMark,
+          ),
           SizedBox(height: 10.h),
           _buildSummaryBox(
             context,
             title: "Positive Mark",
             value: activity.positiveMark,
-            titleColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-            valueColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+            titleColor:
+                context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+            valueColor:
+                context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
           ),
 
           SizedBox(height: 14.h),
@@ -126,7 +111,9 @@ class SelfExamResultView extends StatelessWidget {
               border: Border.all(color: context.borderColor),
               boxShadow: [
                 BoxShadow(
-                  color: context.isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.02),
+                  color: context.isDark
+                      ? Colors.transparent
+                      : Colors.black.withValues(alpha: 0.02),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -174,7 +161,9 @@ class SelfExamResultView extends StatelessWidget {
                         context,
                         label: "Your Mark",
                         value: activity.yourMark,
-                        valueColor: context.isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                        valueColor: context.isDark
+                            ? const Color(0xFF60A5FA)
+                            : const Color(0xFF2563EB),
                       ),
                     ),
                   ],
@@ -187,7 +176,9 @@ class SelfExamResultView extends StatelessWidget {
                         context,
                         label: "Attempt",
                         value: activity.attempt,
-                        valueColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                        valueColor: context.isDark
+                            ? const Color(0xFF34D399)
+                            : const Color(0xFF059669),
                       ),
                     ),
                     SizedBox(width: 8.w),
@@ -196,7 +187,9 @@ class SelfExamResultView extends StatelessWidget {
                         context,
                         label: "Avoid",
                         value: activity.avoid,
-                        valueColor: context.isDark ? const Color(0xFFFBBF24) : const Color(0xFFD97706),
+                        valueColor: context.isDark
+                            ? const Color(0xFFFBBF24)
+                            : const Color(0xFFD97706),
                       ),
                     ),
                   ],
@@ -209,7 +202,9 @@ class SelfExamResultView extends StatelessWidget {
                         context,
                         label: "Correct",
                         value: activity.correct,
-                        valueColor: context.isDark ? const Color(0xFF2DD4BF) : const Color(0xFF0D9488),
+                        valueColor: context.isDark
+                            ? const Color(0xFF2DD4BF)
+                            : const Color(0xFF0D9488),
                       ),
                     ),
                     SizedBox(width: 8.w),
@@ -218,7 +213,9 @@ class SelfExamResultView extends StatelessWidget {
                         context,
                         label: "Wrong",
                         value: activity.wrong,
-                        valueColor: context.isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
+                        valueColor: context.isDark
+                            ? const Color(0xFFF87171)
+                            : const Color(0xFFDC2626),
                       ),
                     ),
                   ],
@@ -229,7 +226,7 @@ class SelfExamResultView extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          // 4. Action Buttons (2x2 Grid matching screenshot)
+          // 4. Action Buttons (2x2 Grid)
           Row(
             children: [
               Expanded(
@@ -237,11 +234,16 @@ class SelfExamResultView extends StatelessWidget {
                   context,
                   icon: Icons.download_rounded,
                   label: "ফলাফল কার্ড",
-                  borderColor: context.isDark ? context.borderColor : const Color(0xFF334155),
-                  textColor: context.isDark ? context.textPrimary : const Color(0xFF334155),
+                  borderColor: context.isDark
+                      ? context.borderColor
+                      : const Color(0xFF334155),
+                  textColor: context.isDark
+                      ? context.textPrimary
+                      : const Color(0xFF334155),
                   backgroundColor: context.cardColor,
                   onTap: () {
-                    CustomSnackBar.showCustomToast(message: "ফলাফল কার্ড ডাউনলোড হচ্ছে...");
+                    CustomSnackBar.showCustomToast(
+                        message: "ফলাফল কার্ড ডাউনলোড হচ্ছে...");
                   },
                 ),
               ),
@@ -251,13 +253,18 @@ class SelfExamResultView extends StatelessWidget {
                   context,
                   icon: Icons.download_rounded,
                   label: "দাখিলকৃত উত্তরপত্র",
-                  borderColor: context.isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626),
-                  textColor: context.isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626),
+                  borderColor: context.isDark
+                      ? const Color(0xFFEF4444)
+                      : const Color(0xFFDC2626),
+                  textColor: context.isDark
+                      ? const Color(0xFFF87171)
+                      : const Color(0xFFDC2626),
                   backgroundColor: context.isDark
                       ? const Color(0xFF7F1D1D).withValues(alpha: 0.15)
                       : context.cardColor,
                   onTap: () {
-                    CustomSnackBar.showCustomToast(message: "দাখিলকৃত উত্তরপত্র প্রস্তুত হচ্ছে...");
+                    CustomSnackBar.showCustomToast(
+                        message: "দাখিলকৃত উত্তরপত্র প্রস্তুত হচ্ছে...");
                   },
                 ),
               ),
@@ -271,13 +278,18 @@ class SelfExamResultView extends StatelessWidget {
                   context,
                   icon: Icons.download_rounded,
                   label: "পরীক্ষার উত্তরপত্র",
-                  borderColor: context.isDark ? const Color(0xFF14B8A6) : const Color(0xFF0D9488),
-                  textColor: context.isDark ? const Color(0xFF2DD4BF) : const Color(0xFF0D9488),
+                  borderColor: context.isDark
+                      ? const Color(0xFF14B8A6)
+                      : const Color(0xFF0D9488),
+                  textColor: context.isDark
+                      ? const Color(0xFF2DD4BF)
+                      : const Color(0xFF0D9488),
                   backgroundColor: context.isDark
                       ? const Color(0xFF134E4A).withValues(alpha: 0.15)
                       : context.cardColor,
                   onTap: () {
-                    CustomSnackBar.showCustomToast(message: "পরীক্ষার উত্তরপত্র ডাউনলোড হচ্ছে...");
+                    CustomSnackBar.showCustomToast(
+                        message: "পরীক্ষার উত্তরপত্র ডাউনলোড হচ্ছে...");
                   },
                 ),
               ),
@@ -287,13 +299,18 @@ class SelfExamResultView extends StatelessWidget {
                   context,
                   icon: Icons.download_rounded,
                   label: "পরীক্ষার প্রশ্নপত্র",
-                  borderColor: context.isDark ? const Color(0xFF10B981) : const Color(0xFF059669),
-                  textColor: context.isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+                  borderColor: context.isDark
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFF059669),
+                  textColor: context.isDark
+                      ? const Color(0xFF34D399)
+                      : const Color(0xFF059669),
                   backgroundColor: context.isDark
                       ? const Color(0xFF064E3B).withValues(alpha: 0.15)
                       : context.cardColor,
                   onTap: () {
-                    CustomSnackBar.showCustomToast(message: "পরীক্ষার প্রশ্নপত্র ডাউনলোড হচ্ছে...");
+                    CustomSnackBar.showCustomToast(
+                        message: "পরীক্ষার প্রশ্নপত্র ডাউনলোড হচ্ছে...");
                   },
                 ),
               ),
@@ -302,16 +319,44 @@ class SelfExamResultView extends StatelessWidget {
 
           SizedBox(height: 18.h),
 
-          // 5. Detailed Questions List
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: questionList.length,
-            separatorBuilder: (_, __) => SizedBox(height: 14.h),
-            itemBuilder: (context, index) {
-              return SelfExamQuestionCard(item: questionList[index]);
-            },
-          ),
+          // 5. Detailed Questions List / Loading / Error
+          if (resultState.isLoading && questionList.isEmpty) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+          ] else if (resultState.errorMessage.isNotEmpty && questionList.isEmpty) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: Column(
+                children: [
+                  Text(
+                    resultState.errorMessage,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: context.textSecondary,
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  TextButton.icon(
+                    onPressed: resultNotifier.fetchDetail,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('আবার চেষ্টা করুন'),
+                  ),
+                ],
+              ),
+            ),
+          ] else if (questionList.isNotEmpty) ...[
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: questionList.length,
+              separatorBuilder: (_, __) => SizedBox(height: 14.h),
+              itemBuilder: (context, index) {
+                return SelfExamQuestionCard(item: questionList[index]);
+              },
+            ),
+          ],
         ],
       ),
     );
@@ -334,7 +379,9 @@ class SelfExamResultView extends StatelessWidget {
         border: Border.all(color: context.borderColor),
         boxShadow: [
           BoxShadow(
-            color: context.isDark ? Colors.transparent : Colors.black.withValues(alpha: 0.02),
+            color: context.isDark
+                ? Colors.transparent
+                : Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -376,7 +423,9 @@ class SelfExamResultView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
       decoration: BoxDecoration(
-        color: context.isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+        color: context.isDark
+            ? const Color(0xFF1E293B)
+            : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: context.borderColor),
       ),

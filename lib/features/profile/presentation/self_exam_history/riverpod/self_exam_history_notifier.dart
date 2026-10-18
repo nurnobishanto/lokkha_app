@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/features/profile/data/models/self_exam_model.dart';
+import 'package:lokkha/features/profile/domain/usecases/get_self_academy_history_usecase.dart';
 import 'package:lokkha/features/profile/presentation/self_exam_history/views/self_exam_result_view.dart';
 
 class SelfExamHistoryState {
@@ -8,13 +9,15 @@ class SelfExamHistoryState {
   final int totalPages;
   final int totalRecords;
   final bool isLoading;
+  final String errorMessage;
   final List<SelfExamModel> examList;
 
   const SelfExamHistoryState({
     this.currentPage = 1,
-    this.totalPages = 3,
-    this.totalRecords = 25,
+    this.totalPages = 1,
+    this.totalRecords = 0,
     this.isLoading = false,
+    this.errorMessage = '',
     this.examList = const [],
   });
 
@@ -23,6 +26,7 @@ class SelfExamHistoryState {
     int? totalPages,
     int? totalRecords,
     bool? isLoading,
+    String? errorMessage,
     List<SelfExamModel>? examList,
   }) {
     return SelfExamHistoryState(
@@ -30,130 +34,62 @@ class SelfExamHistoryState {
       totalPages: totalPages ?? this.totalPages,
       totalRecords: totalRecords ?? this.totalRecords,
       isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
       examList: examList ?? this.examList,
     );
   }
 }
 
 class SelfExamHistoryNotifier extends Notifier<SelfExamHistoryState> {
+  final GetSelfAcademyHistoryUseCase? _injectedUseCase;
+  late final GetSelfAcademyHistoryUseCase _getSelfAcademyHistoryUseCase;
+
+  SelfExamHistoryNotifier([this._injectedUseCase]);
+
   @override
   SelfExamHistoryState build() {
-    return SelfExamHistoryState(
-      currentPage: 1,
-      totalPages: 3,
-      totalRecords: 25,
-      isLoading: false,
-      examList: _getItemsForPage(1),
-    );
+    _getSelfAcademyHistoryUseCase =
+        _injectedUseCase ?? GetSelfAcademyHistoryUseCase();
+    Future.microtask(() => loadExamHistory(page: 1));
+    return const SelfExamHistoryState(isLoading: true);
   }
 
-  List<SelfExamModel> _getItemsForPage(int page) {
-    List<SelfExamModel> items = [];
-    if (page == 1) {
-      items = const [
-        SelfExamModel(
-          id: "9560",
-          date: "30 Aug, 2026 • 06:34 PM",
-          duration: "10 সে.",
-          status: "Failed (0%)",
-          isPassed: false,
-          title: "সেলফ একাডেমি টেস্ট",
-          totalQuestions: 100,
-          correctCount: 0,
-          wrongCount: 2,
-          obtainedMark: "0",
-        ),
-        SelfExamModel(
-          id: "9559",
-          date: "30 Aug, 2026 • 06:34 PM",
-          status: "Failed (0%)",
-          isPassed: false,
-          title: "সেলফ একাডেমি টেস্ট",
-          totalQuestions: 100,
-          correctCount: 0,
-          wrongCount: 0,
-          obtainedMark: "0",
-        ),
-        SelfExamModel(
-          id: "9558",
-          date: "30 Aug, 2026 • 06:34 PM",
-          status: "Failed (0%)",
-          isPassed: false,
-          title: "সেলফ একাডেমি টেস্ট",
-          totalQuestions: 97,
-          correctCount: 0,
-          wrongCount: 0,
-          obtainedMark: "0",
-        ),
-        SelfExamModel(
-          id: "9557",
-          date: "30 Aug, 2026 • 06:32 PM",
-          status: "Failed (0%)",
-          isPassed: false,
-          title: "সেলফ একাডেমি টেস্ট",
-          totalQuestions: 97,
-          correctCount: 0,
-          wrongCount: 0,
-          obtainedMark: "0",
-        ),
-      ];
-    } else if (page == 2) {
-      items = const [
-        SelfExamModel(
-          id: "9556",
-          date: "28 Aug, 2026 • 11:20 AM",
-          duration: "15 সে.",
-          status: "Passed (85%)",
-          isPassed: true,
-          title: "সেলফ একাডেমি টেস্ট - সাধারণ জ্ঞান",
-          totalQuestions: 50,
-          correctCount: 42,
-          wrongCount: 4,
-          obtainedMark: "41.0",
-        ),
-        SelfExamModel(
-          id: "9555",
-          date: "25 Aug, 2026 • 04:10 PM",
-          status: "Passed (70%)",
-          isPassed: true,
-          title: "সেলফ একাডেমি টেস্ট - বাংলা ব্যাকরণ",
-          totalQuestions: 50,
-          correctCount: 35,
-          wrongCount: 5,
-          obtainedMark: "33.75",
-        ),
-      ];
-    } else {
-      items = const [
-        SelfExamModel(
-          id: "9550",
-          date: "20 Aug, 2026 • 02:15 PM",
-          status: "Failed (0%)",
-          isPassed: false,
-          title: "সেলফ একাডেমি টেস্ট",
-          totalQuestions: 30,
-          correctCount: 0,
-          wrongCount: 0,
-          obtainedMark: "0",
-        ),
-      ];
+  Future<void> loadExamHistory({required int page}) async {
+    try {
+      state = state.copyWith(
+        isLoading: true,
+        errorMessage: '',
+        currentPage: page,
+      );
+
+      final response = await _getSelfAcademyHistoryUseCase(page: page);
+
+      state = state.copyWith(
+        isLoading: false,
+        currentPage: response.currentPage,
+        totalPages: response.lastPage > 0 ? response.lastPage : 1,
+        totalRecords: response.total,
+        examList: response.items,
+      );
+    } catch (e) {
+      debugPrint('[SelfExamHistoryNotifier] loadExamHistory error: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'সেলফ টেস্ট রেকর্ড লোড করতে সমস্যা হয়েছে।',
+      );
     }
-    return items;
-  }
-
-  void loadExamHistory({required int page}) {
-    final items = _getItemsForPage(page);
-    state = state.copyWith(
-      currentPage: page,
-      examList: items,
-      isLoading: false,
-    );
   }
 
   void onPageChanged(int newPage) {
-    if (newPage >= 1 && newPage <= state.totalPages) {
+    if (newPage >= 1 &&
+        newPage <= state.totalPages &&
+        newPage != state.currentPage) {
       loadExamHistory(page: newPage);
     }
+  }
+
+  Future<void> onRefresh() async {
+    await loadExamHistory(page: state.currentPage);
   }
 
   void viewResult(BuildContext context, SelfExamModel item) {
@@ -166,4 +102,6 @@ class SelfExamHistoryNotifier extends Notifier<SelfExamHistoryState> {
 }
 
 final selfExamHistoryNotifierProvider =
-    NotifierProvider<SelfExamHistoryNotifier, SelfExamHistoryState>(SelfExamHistoryNotifier.new);
+    NotifierProvider<SelfExamHistoryNotifier, SelfExamHistoryState>(
+  SelfExamHistoryNotifier.new,
+);

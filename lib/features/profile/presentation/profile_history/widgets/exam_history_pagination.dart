@@ -16,95 +16,161 @@ class ExamHistoryPagination extends StatelessWidget {
     required this.onPageChanged,
   });
 
+  List<int> _buildVisiblePages(int current, int total) {
+    if (total <= 5) {
+      return List.generate(total, (i) => i + 1);
+    }
+
+    final Set<int> pages = {};
+    pages.add(1);
+    pages.add(total);
+
+    for (int i = current - 1; i <= current + 1; i++) {
+      if (i >= 1 && i <= total) {
+        pages.add(i);
+      }
+    }
+
+    if (current <= 3) {
+      pages.add(2);
+      pages.add(3);
+    }
+
+    if (current >= total - 2) {
+      pages.add(total - 1);
+      pages.add(total - 2);
+    }
+
+    final sorted = pages.toList()..sort();
+    final List<int> result = [];
+
+    for (int i = 0; i < sorted.length; i++) {
+      if (i > 0 && sorted[i] - sorted[i - 1] > 1) {
+        result.add(-1); // -1 represents ellipsis '...'
+      }
+      result.add(sorted[i]);
+    }
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final visiblePages = _buildVisiblePages(currentPage, totalPages);
+
     return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Left: Page record summary text
-          Flexible(
-            child: Text.rich(
-              TextSpan(
-                style: TextStyle(
-                  fontSize: 12.sp,
-                  color: context.textSecondary,
-                ),
-                children: [
-                  const TextSpan(text: "পৃষ্ঠা "),
-                  TextSpan(
-                    text: "$currentPage",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  const TextSpan(text: " / "),
-                  TextSpan(
-                    text: "$totalPages",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  const TextSpan(text: " (মোট "),
-                  TextSpan(
-                    text: "$totalRecords",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: context.textPrimary,
-                    ),
-                  ),
-                  const TextSpan(text: " টি রেকর্ড)"),
-                ],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Left: Page record summary text
+        Flexible(
+          child: Text.rich(
+            TextSpan(
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: context.textSecondary,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              children: [
+                const TextSpan(text: "পৃষ্ঠা "),
+                TextSpan(
+                  text: "$currentPage",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: context.textPrimary,
+                  ),
+                ),
+                const TextSpan(text: " / "),
+                TextSpan(
+                  text: "$totalPages",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: context.textPrimary,
+                  ),
+                ),
+                const TextSpan(text: " (মোট "),
+                TextSpan(
+                  text: "$totalRecords",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: context.textPrimary,
+                  ),
+                ),
+                const TextSpan(text: " টি রেকর্ড)"),
+              ],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+
+        SizedBox(width: 8.w),
+
+        // Right: Page controls (< 1 2 3 ... 11 >) with horizontal scrolling to prevent any overflow
+        Flexible(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            reverse: false,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Previous button
+                _buildNavButton(
+                  context: context,
+                  icon: Icons.chevron_left_rounded,
+                  enabled: currentPage > 1,
+                  onTap: () {
+                    if (currentPage > 1) {
+                      onPageChanged(currentPage - 1);
+                    }
+                  },
+                ),
+                SizedBox(width: 4.w),
+
+                // Page numbers & Ellipsis
+                for (final page in visiblePages) ...[
+                  if (page == -1)
+                    _buildEllipsis(context)
+                  else
+                    _buildPageNumberButton(
+                      context: context,
+                      page: page,
+                      isSelected: currentPage == page,
+                    ),
+                  SizedBox(width: 4.w),
+                ],
+
+                // Next button
+                _buildNavButton(
+                  context: context,
+                  icon: Icons.chevron_right_rounded,
+                  enabled: currentPage < totalPages,
+                  onTap: () {
+                    if (currentPage < totalPages) {
+                      onPageChanged(currentPage + 1);
+                    }
+                  },
+                ),
+              ],
             ),
           ),
+        ),
+      ],
+    );
+  }
 
-          // Right: Page controls (< 1 2 3 >)
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Previous button
-              _buildNavButton(
-                context: context,
-                icon: Icons.chevron_left_rounded,
-                enabled: currentPage > 1,
-                onTap: () {
-                  if (currentPage > 1) {
-                    onPageChanged(currentPage - 1);
-                  }
-                },
-              ),
-              SizedBox(width: 4.w),
-
-              // Page numbers
-              for (int i = 1; i <= totalPages; i++) ...[
-                _buildPageNumberButton(
-                  context: context,
-                  page: i,
-                  isSelected: currentPage == i,
-                ),
-                if (i < totalPages) SizedBox(width: 4.w),
-              ],
-              SizedBox(width: 4.w),
-
-              // Next button
-              _buildNavButton(
-                context: context,
-                icon: Icons.chevron_right_rounded,
-                enabled: currentPage < totalPages,
-                onTap: () {
-                  if (currentPage < totalPages) {
-                    onPageChanged(currentPage + 1);
-                  }
-                },
-              ),
-            ],
-          ),
-        ],
-      );
+  Widget _buildEllipsis(BuildContext context) {
+    return Container(
+      width: 20.r,
+      height: 32.r,
+      alignment: Alignment.center,
+      child: Text(
+        "...",
+        style: TextStyle(
+          fontSize: 13.sp,
+          fontWeight: FontWeight.bold,
+          color: context.textMuted,
+        ),
+      ),
+    );
   }
 
   Widget _buildNavButton({

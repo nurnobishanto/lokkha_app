@@ -95,6 +95,7 @@ class Endpoints {
   static const String userExams = '/api/v1/user/exams';
   static const String userCourses = '/api/v1/user/courses';
   static const String userSelfAcademyHistory = '/api/v1/user/self-academy-history';
+  static String userSelfAcademyDetail(dynamic id) => '$userSelfAcademyHistory/$id';
   static const String userExamHistory = '/api/v1/user/exam-history';
   static const String accuracy = '/api/v1/user/accuracy';
   static const String rewardPoints = '/api/v1/user/reward-points';
@@ -158,6 +159,7 @@ class Endpoints {
   static const String v1UserExams = userExams;
   static const String v1UserCourses = userCourses;
   static const String v1UserSelfAcademyHistory = userSelfAcademyHistory;
+  static String v1UserSelfAcademyDetail(dynamic id) => userSelfAcademyDetail(id);
   static const String v1UserExamHistory = userExamHistory;
   static const String v1ContentHistory = '/api/v1/user/content-history';
   static const String v1SavedQuestions = savedQuestions;

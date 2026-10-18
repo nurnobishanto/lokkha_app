@@ -25,6 +25,7 @@ class Routes {
   static const String profileUpdateRequired = '/profile-update-required';
   static const String selfExamHistory = '/self-exam-history';
   static const String contestHistory = '/contest-history';
+  static const String liveContest = '/live-contest';
   static const String accuracyProgress = '/accuracy-progress';
   static const String referral = '/referral';
   static const String dashboardPortal = '/dashboard-portal';

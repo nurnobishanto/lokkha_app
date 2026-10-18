@@ -5,6 +5,9 @@ import '../../data/models/device_session_model.dart';
 import '../../data/models/exam_history_model.dart';
 import '../../data/models/exam_review_detail_model.dart';
 import '../../data/models/order_v1_model.dart';
+import '../../data/models/self_exam_model.dart';
+import '../../data/models/self_exam_detail_model.dart';
+import '../../data/models/content_history_model.dart';
 import '../../data/datasources/profile_remote_data_source.dart';
 import '../../data/repositories/profile_repository_impl.dart';
 
@@ -61,4 +64,8 @@ abstract class ProfileRepository {
   });
 
   Future<OrderDetailV1Data> getOrderDetails(dynamic id);
+  Future<SelfAcademyHistoryResponseModel> getSelfAcademyHistory({int page = 1});
+  Future<SelfExamDetailModel> getSelfAcademyDetail(dynamic id, {SelfExamModel? summaryExam});
+  Future<ContentHistoryResponseModel> getContentHistory();
+  Future<bool> toggleSaveQuestion(int questionId);
 }

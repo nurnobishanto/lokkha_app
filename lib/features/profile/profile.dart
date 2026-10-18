@@ -3,6 +3,8 @@ export 'data/models/device_session_model.dart';
 export 'data/models/self_exam_model.dart';
 export 'data/models/self_exam_question_model.dart';
 export 'data/models/self_exam_activity_model.dart';
+export 'data/models/self_exam_detail_model.dart';
+export 'data/models/content_history_model.dart';
 export 'data/models/contest_history_item_model.dart';
 export 'data/models/saved_question_item_model.dart';
 export 'data/models/update_profile_model.dart';
@@ -33,6 +35,10 @@ export 'domain/usecases/get_exam_history_usecase.dart';
 export 'domain/usecases/get_exam_history_detail_usecase.dart';
 export 'domain/usecases/get_user_orders_usecase.dart';
 export 'domain/usecases/get_order_details_usecase.dart';
+export 'domain/usecases/get_self_academy_history_usecase.dart';
+export 'domain/usecases/get_self_academy_detail_usecase.dart';
+export 'domain/usecases/get_content_history_usecase.dart';
+export 'domain/usecases/toggle_save_question_usecase.dart';
 export 'data/repositories/device_session_repository.dart';
 export 'data/repositories/referral_repository.dart';
 
@@ -60,9 +66,11 @@ export 'presentation/self_exam_history/riverpod/self_exam_history_notifier.dart'
 export 'presentation/self_exam_history/views/self_exam_history_view.dart';
 export 'presentation/self_exam_history/views/self_exam_result_view.dart';
 
-// Presentation - Contest History
+// Presentation - Contest History & Live Contest
 export 'presentation/contest_history/riverpod/contest_history_notifier.dart';
 export 'presentation/contest_history/views/contest_history_view.dart';
+export 'presentation/live_contest/riverpod/live_contest_notifier.dart';
+export 'presentation/live_contest/views/live_contest_view.dart';
 
 // Presentation - Orders & Packages
 export 'presentation/my_orders/riverpod/my_orders_notifier.dart';

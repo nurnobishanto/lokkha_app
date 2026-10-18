@@ -533,7 +533,7 @@ class _DashboardPortalViewState extends ConsumerState<DashboardPortalView> {
           iconBg: const Color(0xFFFFFBEB),
           count: "${counts?.totalContests ?? 0}",
           label: "লাইভ কনটেস্ট",
-          onTap: () => context.push(Routes.allContest),
+          onTap: () => context.push(Routes.liveContest),
         ),
         _buildStatCard(
           context: context,
