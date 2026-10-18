@@ -1,4 +1,9 @@
 // Models
+export 'data/models/v1_course_model.dart';
+export 'data/models/v1_course_category_model.dart';
+export 'data/models/v1_courses_response.dart';
+export 'domain/repositories/courses_repository.dart';
+export 'data/repositories/courses_repository_impl.dart';
 export 'data/models/course_details_model.dart';
 export 'data/models/course_learning_model.dart';
 export 'data/models/course_checkout_model.dart';

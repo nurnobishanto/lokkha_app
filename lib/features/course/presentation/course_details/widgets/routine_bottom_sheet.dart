@@ -11,7 +11,7 @@ class RoutineBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fullUrl = Endpoints.storageUrl + fileUrl;
+    final fullUrl = Endpoints.resolveUrl(fileUrl);
     debugPrint("Routine File URL: $fullUrl");
 
     return SizedBox(

@@ -28,24 +28,26 @@ class CourseModule {
   });
 
   factory CourseModule.fromJson(Map<String, dynamic> json) => CourseModule(
-        id: json["id"],
+        id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
         parentId: json["parent_id"],
-        type: json["type"],
-        courseId: json["course_id"],
-        title: json["title"],
-        order: json["order"],
+        type: json["type"]?.toString(),
+        courseId: json["course_id"] is int ? json["course_id"] : int.tryParse(json["course_id"]?.toString() ?? ''),
+        title: json["title"]?.toString(),
+        order: json["order"] is int ? json["order"] : int.tryParse(json["order"]?.toString() ?? ''),
         description: json["description"],
         createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["created_at"]),
+            : DateTime.tryParse(json["created_at"].toString()),
         updatedAt: json["updated_at"] == null
             ? null
-            : DateTime.parse(json["updated_at"]),
+            : DateTime.tryParse(json["updated_at"].toString()),
         deletedAt: json["deleted_at"],
         items: json["items"] == null
             ? []
             : List<CourseItem>.from(
-                json["items"]!.map((x) => CourseItem.fromJson(x))),
+                (json["items"] as List)
+                    .whereType<Map<String, dynamic>>()
+                    .map((x) => CourseItem.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

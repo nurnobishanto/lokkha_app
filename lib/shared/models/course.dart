@@ -82,82 +82,129 @@ class Course {
     this.users,
   });
 
-  factory Course.fromJson(Map<String, dynamic> json) => Course(
-        id: json["id"],
-        accessDuration: json["access_duration"],
-        title: json["title"],
-        slug: json["slug"],
-        details: json["details"],
-        duration: json["duration"],
-        courseCategoryId: json["course_category_id"],
-        image: json["image"],
-        regularPrice: json["regular_price"],
-        salePrice: json["sale_price"],
-        meetLink: json["meet_link"],
-        whatsappGroupLink: json["whatsapp_group_link"],
-        facebookGroup: json["facebook_group"],
-        zoomLink: json["zoom_link"],
-        youtubePlaylist: json["youtube_playlist"],
-        telegramGroup: json["telegram_group"],
-        order: json["order"],
-        publishDate: json["publish_date"] == null
-            ? null
-            : DateTime.parse(json["publish_date"]),
-        status: json["status"] == null
-            ? null
-            : (json["status"] is bool
-                ? json["status"]
-                : (json["status"] == 1 || json["status"] == "1" || json["status"] == "true")),
-        promotionVideo: json["promotion_video"],
-        routineFile: json["routine_file"],
-        isExamBatch: json["is_exam_batch"] == null
-            ? null
-            : (json["is_exam_batch"] is bool
-                ? json["is_exam_batch"]
-                : (json["is_exam_batch"] == 1 || json["is_exam_batch"] == "1" || json["is_exam_batch"] == "true")),
-        lifetimeAccess: json["lifetime_access"] == null
-            ? null
-            : (json["lifetime_access"] is bool
-                ? json["lifetime_access"]
-                : (json["lifetime_access"] == 1 || json["lifetime_access"] == "1" || json["lifetime_access"] == "true")),
-        featured: json["featured"] == null
-            ? null
-            : (json["featured"] is bool
-                ? json["featured"]
-                : (json["featured"] == 1 || json["featured"] == "1" || json["featured"] == "true")),
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        deletedAt: json["deleted_at"],
-        modulesCount: json["modules_count"],
-        itemsCount: json["items_count"],
-        teachersCount: json["teachers_count"],
-        reviewsCount: json["reviews_count"],
-        usersCount: json["users_count"],
-        isEnrolled: json["is_enrolled"] == null
-            ? null
-            : (json["is_enrolled"] is bool
-                ? json["is_enrolled"]
-                : (json["is_enrolled"] == 1 || json["is_enrolled"] == "1" || json["is_enrolled"] == "true")),
-        modules: json["modules"] == null
-            ? []
-            : List<CourseModule>.from(
-                json["modules"]!.map((x) => CourseModule.fromJson(x))),
-        teachers: json["teachers"] == null
-            ? []
-            : List<Teacher>.from(
-                json["teachers"]!.map((x) => Teacher.fromJson(x))),
-        reviews: json["reviews"] == null
-            ? []
-            : List<Review>.from(
-                json["reviews"]!.map((x) => Review.fromJson(x))),
-        users: json["user"] == null
-            ? []
-            : List<User>.from(json["users"]!.map((x) => User.fromJson(x))),
-      );
+  factory Course.fromJson(Map<String, dynamic> json) {
+    final comm = json["community_links"] is Map<String, dynamic>
+        ? json["community_links"] as Map<String, dynamic>
+        : null;
+    final stats = json["stats"] is Map<String, dynamic>
+        ? json["stats"] as Map<String, dynamic>
+        : null;
+    final pricing = json["pricing"] is Map<String, dynamic>
+        ? json["pricing"] as Map<String, dynamic>
+        : null;
+    final userAccess = json["user_access"] is Map<String, dynamic>
+        ? json["user_access"] as Map<String, dynamic>
+        : null;
+    final category = json["category"] is Map<String, dynamic>
+        ? json["category"] as Map<String, dynamic>
+        : null;
+
+    final rawIsEnrolled = json["is_enrolled"] ?? userAccess?["is_enrolled"];
+    final rawModules = json["modules"] ?? json["syllabus"];
+    final rawTeachers = json["teachers"] ?? json["instructors"];
+
+    return Course(
+      id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
+      accessDuration: json["access_duration"] is int
+          ? json["access_duration"]
+          : int.tryParse(json["access_duration"]?.toString() ?? ''),
+      title: json["title"]?.toString(),
+      slug: json["slug"]?.toString(),
+      details: json["details"]?.toString(),
+      duration: json["duration"]?.toString(),
+      courseCategoryId: json["course_category_id"] is int
+          ? json["course_category_id"]
+          : (category != null && category["id"] is int
+              ? category["id"]
+              : int.tryParse(json["course_category_id"]?.toString() ?? '')),
+      image: json["image"]?.toString() ?? json["image_url"]?.toString(),
+      regularPrice: (json["regular_price"] ?? pricing?["regular_price"])?.toString(),
+      salePrice: (json["sale_price"] ?? pricing?["sale_price"])?.toString(),
+      meetLink: json["meet_link"] ?? comm?["meet_link"],
+      whatsappGroupLink: json["whatsapp_group_link"] ?? comm?["whatsapp_group"],
+      facebookGroup: json["facebook_group"] ?? comm?["facebook_group"],
+      zoomLink: json["zoom_link"] ?? comm?["zoom_link"],
+      youtubePlaylist: json["youtube_playlist"] ?? comm?["youtube_playlist"],
+      telegramGroup: json["telegram_group"] ?? comm?["telegram_group"],
+      order: json["order"] is int ? json["order"] : int.tryParse(json["order"]?.toString() ?? ''),
+      publishDate: json["publish_date"] == null
+          ? null
+          : DateTime.tryParse(json["publish_date"].toString()),
+      status: json["status"] == null
+          ? null
+          : (json["status"] is bool
+              ? json["status"]
+              : (json["status"] == 1 || json["status"] == "1" || json["status"] == "true")),
+      promotionVideo: json["promotion_video"] ?? json["promo_video_url"],
+      routineFile: json["routine_file"]?.toString() ?? json["routine_file_url"]?.toString(),
+      isExamBatch: json["is_exam_batch"] == null
+          ? null
+          : (json["is_exam_batch"] is bool
+              ? json["is_exam_batch"]
+              : (json["is_exam_batch"] == 1 || json["is_exam_batch"] == "1" || json["is_exam_batch"] == "true")),
+      lifetimeAccess: json["lifetime_access"] == null
+          ? null
+          : (json["lifetime_access"] is bool
+              ? json["lifetime_access"]
+              : (json["lifetime_access"] == 1 || json["lifetime_access"] == "1" || json["lifetime_access"] == "true")),
+      featured: json["featured"] == null
+          ? null
+          : (json["featured"] is bool
+              ? json["featured"]
+              : (json["featured"] == 1 || json["featured"] == "1" || json["featured"] == "true")),
+      createdAt: json["created_at"] == null
+          ? null
+          : DateTime.tryParse(json["created_at"].toString()),
+      updatedAt: json["updated_at"] == null
+          ? null
+          : DateTime.tryParse(json["updated_at"].toString()),
+      deletedAt: json["deleted_at"],
+      modulesCount: json["modules_count"] is int
+          ? json["modules_count"]
+          : (stats?["total_modules"] is int
+              ? stats!["total_modules"]
+              : int.tryParse(json["modules_count"]?.toString() ?? '')),
+      itemsCount: json["items_count"] is int
+          ? json["items_count"]
+          : (stats?["total_items"] is int
+              ? stats!["total_items"]
+              : int.tryParse(json["items_count"]?.toString() ?? '')),
+      teachersCount: json["teachers_count"] is int
+          ? json["teachers_count"]
+          : int.tryParse(json["teachers_count"]?.toString() ?? ''),
+      reviewsCount: json["reviews_count"] is int
+          ? json["reviews_count"]
+          : (stats?["total_reviews"] is int
+              ? stats!["total_reviews"]
+              : int.tryParse(json["reviews_count"]?.toString() ?? '')),
+      usersCount: json["users_count"] is int
+          ? json["users_count"]
+          : (stats?["enrolled_students"] is int
+              ? stats!["enrolled_students"]
+              : int.tryParse(json["users_count"]?.toString() ?? '')),
+      isEnrolled: rawIsEnrolled == null
+          ? null
+          : (rawIsEnrolled is bool
+              ? rawIsEnrolled
+              : (rawIsEnrolled == 1 || rawIsEnrolled == "1" || rawIsEnrolled == "true")),
+      modules: rawModules is List
+          ? List<CourseModule>.from(
+              rawModules.whereType<Map<String, dynamic>>().map((x) => CourseModule.fromJson(x)))
+          : [],
+      teachers: rawTeachers is List
+          ? List<Teacher>.from(
+              rawTeachers.whereType<Map<String, dynamic>>().map((x) => Teacher.fromJson(x)))
+          : [],
+      reviews: json["reviews"] is List
+          ? List<Review>.from(
+              (json["reviews"] as List).whereType<Map<String, dynamic>>().map((x) => Review.fromJson(x)))
+          : [],
+      users: json["users"] is List
+          ? List<User>.from(
+              (json["users"] as List).whereType<Map<String, dynamic>>().map((x) => User.fromJson(x)))
+          : [],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "id": id,

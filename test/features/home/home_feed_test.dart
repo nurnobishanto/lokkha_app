@@ -793,7 +793,7 @@ void main() {
 
       // Titles
       expect(find.text('ফ্রি পরীক্ষা সমূহ'), findsOneWidget);
-      expect(find.text('কোর্স ক্যাটাগরি'), findsOneWidget);
+      expect(find.text('প্রিমিয়াম পরীক্ষা সমূহ'), findsOneWidget);
 
       // Initially shows first 4 exam categories
       expect(find.text('১৯ তম শিক্ষক নিবন্ধন  ( স্কুল ও কলেজ)'), findsOneWidget);

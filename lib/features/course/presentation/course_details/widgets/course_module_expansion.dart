@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/shared/models/course_item.dart';
 import 'package:lokkha/app/router/router.dart';
 
 class CourseModuleExpansion extends StatelessWidget {
+  final int? courseId;
   final String title;
   final List<CourseItem> items;
   final bool initiallyExpanded;
@@ -12,6 +13,7 @@ class CourseModuleExpansion extends StatelessWidget {
 
   const CourseModuleExpansion({
     super.key,
+    this.courseId,
     required this.title,
     required this.items,
     this.initiallyExpanded = false,
@@ -55,8 +57,8 @@ class CourseModuleExpansion extends StatelessWidget {
             // Determine icon and label
             Icon icon;
             String label;
-            if (item.examId != null) {
-              icon = const Icon(Icons.description, color: Colors.blueGrey);
+            if (item.examId != null || item.hasExam == true || item.type?.contains(Type.EXAM) == true) {
+              icon = const Icon(Icons.assignment_outlined, color: Color(0xFF006A4E));
               label = 'পরীক্ষা';
             } else if (item.youtubeVideo != null &&
                 item.youtubeVideo!.isNotEmpty) {
@@ -82,8 +84,8 @@ class CourseModuleExpansion extends StatelessWidget {
               icon = const Icon(Icons.description, color: Colors.blueGrey);
               label = 'বিস্তারিত';
             } else {
-              // No supported content
-              return const SizedBox.shrink();
+              icon = const Icon(Icons.check_circle_outline, color: Color(0xFF006A4E));
+              label = 'আইটেম';
             }
 
             return ListTile(
@@ -96,24 +98,49 @@ class CourseModuleExpansion extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall
-                      ?.copyWith(fontSize: 15, color: context.textPrimary),
+                      ?.copyWith(fontSize: 14, color: context.textPrimary),
                 ),
-                subtitle: Text(
-                  label,
-                  style: TextStyle(fontSize: 12, color: context.textSecondary),
+                subtitle: Row(
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(fontSize: 12, color: context.textSecondary),
+                    ),
+                    if (isFree) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF006A4E).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'ফ্রি',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF006A4E),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 trailing: isAccessible
-                    ? const Icon(Icons.remove_red_eye,
-                        color: Colors.green, size: 18)
-                    : const Text('🔒', style: TextStyle(fontSize: 16)),
+                    ? const Icon(Icons.arrow_forward_ios_rounded,
+                        color: Color(0xFF006A4E), size: 14)
+                    : const Text('🔒', style: TextStyle(fontSize: 15)),
                 onTap: () async {
                   if (isAccessible) {
-                    final courseId = item.courseId;
+                    final targetCourseId = item.courseId ?? courseId;
                     final itemId = item.id;
-                    debugPrint("Course id:$courseId $itemId ");
                     context.pushNamed(
                       Routes.courseLearn,
-                      extra: {'id': courseId, 'item_id': itemId},
+                      extra: {'id': targetCourseId, 'item_id': itemId},
+                    );
+                  } else {
+                    CustomSnackBar.showCustomToast(
+                      message: 'কোর্সটিতে এনরোল করে পরীক্ষাটি শুরু করুন',
                     );
                   }
                 });

@@ -97,20 +97,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Branch 2: মেসেঞ্জার (Messenger)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.messenger,
-                name: Routes.messenger,
-                builder: (context, state) {
-                  return const MessengerRedirectScreen();
-                },
-              ),
-            ],
-          ),
-
-          // Branch 3: প্রিমিয়াম (Premium Packages)
+          // Branch 2: প্রিমিয়াম (Premium Packages)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -123,7 +110,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
 
-          // Branch 4: প্রোফাইল / ড্যাশবোর্ড (Profile / Dashboard)
+          // Branch 3: প্রোফাইল / ড্যাশবোর্ড (Profile / Dashboard)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -138,6 +125,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
+      GoRoute(
+        path: Routes.messenger,
+        name: Routes.messenger,
+        builder: (context, state) {
+          return const MessengerRedirectScreen();
+        },
+      ),
       GoRoute(
         path: Routes.questionBank,
         name: Routes.questionBank,
@@ -456,16 +450,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           int? categoryId;
           String? categoryName;
           if (extra is Map) {
-            final rawId = extra['course_category_id'] ?? extra['id'];
+            final rawId = extra['category_id'] ?? extra['course_category_id'] ?? extra['id'];
             if (rawId is int) {
               categoryId = rawId;
             } else if (rawId != null) {
               categoryId = int.tryParse(rawId.toString());
             }
-            categoryName = extra['category_name']?.toString();
+            categoryName = (extra['category_name'] ?? extra['title'])?.toString();
           }
-          categoryId ??= int.tryParse(state.uri.queryParameters['course_category_id'] ?? '');
-          categoryName ??= state.uri.queryParameters['category_name'];
+          categoryId ??= int.tryParse(state.uri.queryParameters['category_id'] ??
+              state.uri.queryParameters['course_category_id'] ??
+              '');
+          categoryName ??= (state.uri.queryParameters['category_name'] ??
+              state.uri.queryParameters['title']);
           return CoursesView(categoryId: categoryId, categoryName: categoryName);
         },
       ),

@@ -36,25 +36,25 @@ class Teacher {
   });
 
   factory Teacher.fromJson(Map<String, dynamic> json) => Teacher(
-        id: json["id"],
-        name: json["name"],
-        email: json["email"],
+        id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
+        name: json["name"]?.toString(),
+        email: json["email"]?.toString(),
         phone: json["phone"],
-        subject: json["subject"],
-        qualification: json["qualification"],
-        experience: json["experience"],
-        status: json["status"],
+        subject: json["subject"]?.toString() ?? json["designation"]?.toString(),
+        qualification: json["qualification"] ?? json["institution"],
+        experience: json["experience"] is int ? json["experience"] : int.tryParse(json["experience"]?.toString() ?? ''),
+        status: json["status"]?.toString(),
         address: json["address"],
-        profilePicture: json["profile_picture"],
+        profilePicture: json["profile_picture"]?.toString() ?? json["image_url"]?.toString(),
         video: json["video"],
-        image: json["image"],
-        advancedInfo: json["advanced_info"],
+        image: json["image"]?.toString() ?? json["image_url"]?.toString(),
+        advancedInfo: json["advanced_info"] ?? json["bio"],
         createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["created_at"]),
+            : DateTime.tryParse(json["created_at"].toString()),
         updatedAt: json["updated_at"] == null
             ? null
-            : DateTime.parse(json["updated_at"]),
+            : DateTime.tryParse(json["updated_at"].toString()),
         deletedAt: json["deleted_at"],
       );
 

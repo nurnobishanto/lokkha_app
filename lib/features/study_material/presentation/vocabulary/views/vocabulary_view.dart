@@ -19,6 +19,7 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
   void initState() {
     super.initState();
     _searchTextController = TextEditingController();
+    PremiumEntitlementService.to.ensurePremiumAccess();
   }
 
   @override
@@ -115,8 +116,10 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                         itemBuilder: (_, index) {
                           final vocab = vocabList[index];
                           return GestureDetector(
-                            onTap: () {
-                              if (havePackage.value) {
+                            onTap: () async {
+                              final hasPkg = await PremiumEntitlementService.to.ensurePremiumAccess();
+                              if (!context.mounted) return;
+                              if (hasPkg) {
                                 showDialog(
                                   context: context,
                                   builder: (_) => VocabularyDetailDialog(

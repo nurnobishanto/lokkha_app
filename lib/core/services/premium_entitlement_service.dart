@@ -33,7 +33,16 @@ class PremiumEntitlementService {
   // ── Public API ───────────────────────────────────────────────────────────
 
   /// Convenience getter — the authoritative premium check.
-  bool get isPremiumValid => havePackage.value;
+  bool get isPremiumValid => checkUserHasPackage();
+
+  /// Asserts and validates premium entitlement, checking local cache first then network if needed.
+  Future<bool> ensurePremiumAccess() async {
+    if (checkUserHasPackage()) return true;
+    try {
+      await validateEntitlement();
+    } catch (_) {}
+    return checkUserHasPackage();
+  }
 
   /// Full server-side validation.
   Future<void> validateEntitlement() async {
@@ -74,7 +83,9 @@ class PremiumEntitlementService {
   Future<void> _fetchEntitlement() async {
     final token = await SecureStorageService.getToken();
     if (token == null || token.isEmpty) {
-      _updateState(hasPremium: false);
+      if (!checkUserHasPackage()) {
+        _updateState(hasPremium: false);
+      }
       return;
     }
 
@@ -84,11 +95,17 @@ class PremiumEntitlementService {
       final authRepo = AuthRepository();
       final res = await authRepo.getCurrentUser();
       if (res != null && res.status) {
-        _updateState(hasPremium: res.havePackage);
-        log('✅ Entitlement validated: isPremium=${res.havePackage}');
+        final bool hasPkg = res.havePackage ||
+            (res.user?.isSubscribed ?? false) ||
+            (res.user?.hasActiveSubscription ?? false) ||
+            res.user?.activePackage != null;
+        _updateState(hasPremium: hasPkg);
+        log('✅ Entitlement validated: isPremium=$hasPkg');
         isValidating.value = false;
       } else {
-        _updateState(hasPremium: false);
+        if (!checkUserHasPackage()) {
+          _updateState(hasPremium: false);
+        }
         log('⚠️ Entitlement check returned status=false');
         isValidating.value = false;
       }

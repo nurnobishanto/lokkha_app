@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -159,22 +158,6 @@ class HomeCategoriesSection extends StatefulWidget {
     }
   }
 
-  String _formatBanglaNumber(int n) {
-    const enToBn = {
-      '0': '০',
-      '1': '১',
-      '2': '২',
-      '3': '৩',
-      '4': '৪',
-      '5': '৫',
-      '6': '৬',
-      '7': '৭',
-      '8': '৮',
-      '9': '৯',
-    };
-    return n.toString().split('').map((c) => enToBn[c] ?? c).join();
-  }
-
   @override
   State<HomeCategoriesSection> createState() => _HomeCategoriesSectionState();
 }
@@ -255,10 +238,10 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
           SizedBox(height: 12.h),
         ],
 
-        // ─── 2. Course Categories (কোর্স ক্যাটাগরি) ─────────────────────────
+        // ─── 2. Premium Exam Categories (প্রিমিয়াম পরীক্ষা সমূহ) ─────────
         if (effectiveCourses.isNotEmpty) ...[
           HomeSectionHeader(
-            title: 'কোর্স ক্যাটাগরি',
+            title: 'প্রিমিয়াম পরীক্ষা সমূহ',
             seeAllText: _isCoursesExpanded ? 'কম দেখুন' : 'সব দেখুন',
             onSeeAll: () {
               setState(() {

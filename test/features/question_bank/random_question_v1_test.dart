@@ -237,7 +237,7 @@ void main() {
       );
     }
 
-    testWidgets('HomeMcqSection renders dynamic question title, options and subject badge',
+    testWidgets('HomeMcqSection renders dynamic question title and options without category badge',
         (tester) async {
       final model = RandomQuestionModel.fromJson(
         sampleApiPayload['data'] as Map<String, dynamic>,
@@ -259,7 +259,7 @@ void main() {
       // Card Header
       expect(find.text('কারেন্ট অ্যাফেয়ার্স'), findsOneWidget);
       expect(find.text('MCQ'), findsOneWidget);
-      expect(find.text('English Language'), findsOneWidget);
+      expect(find.text('English Language'), findsNothing);
 
       // Question Title (rendered via HtmlWidget)
       expect(findTextOrRich("'Belle' শব্দটি কোন Gender?"), findsOneWidget);

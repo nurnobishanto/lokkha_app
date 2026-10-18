@@ -66,20 +66,31 @@ class HomeTopActionsGrid extends StatelessWidget {
                 context.push(item.route);
               }
             },
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(12.r),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius: BorderRadius.circular(10.r),
+                color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: context.borderColor.withOpacity(0.6),
-                  width: 0.8,
+                  color: context.isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
+                  width: 1,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 4,
+                    color: Colors.black.withValues(
+                      alpha: context.isDark ? 0.35 : 0.06,
+                    ),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: context.isDark ? 0.2 : 0.02,
+                    ),
+                    blurRadius: 3,
                     offset: const Offset(0, 1),
                   ),
                 ],

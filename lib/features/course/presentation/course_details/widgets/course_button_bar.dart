@@ -20,10 +20,16 @@ class CourseBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cleanPrice = _cleanPrice(price);
+    final cleanRegPrice = _cleanPrice(regularPrice);
+    final double? pVal = double.tryParse(cleanPrice);
+    final double? regVal = double.tryParse(cleanRegPrice);
+    final bool showDiscount = regVal != null && pVal != null && regVal > pVal && pVal > 0;
+
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(color: LightThemeColors.primaryColor),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: const BoxDecoration(color: Color(0xFF006A4E)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -36,7 +42,7 @@ class CourseBottomBar extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        "৳$price",
+                        "৳$cleanPrice",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -45,19 +51,22 @@ class CourseBottomBar extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        "৳$regularPrice",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white70,
-                          decoration: TextDecoration.lineThrough,
+                      if (showDiscount) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          "৳$cleanRegPrice",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      ],
                     ],
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     title,
                     style: const TextStyle(
@@ -77,7 +86,6 @@ class CourseBottomBar extends StatelessWidget {
             // Enroll Button
             ElevatedButton(
               onPressed: () {
-                // TODO: Add enroll logic
                 if (isLoggedIn.value) {
                   Navigator.push(
                     context,
@@ -96,7 +104,7 @@ class CourseBottomBar extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: LightThemeColors.primaryColor,
+                foregroundColor: const Color(0xFF006A4E),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -104,14 +112,23 @@ class CourseBottomBar extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: Text(
-                "Enroll Now",
-                style: const TextStyle(fontWeight: FontWeight.w600),
+              child: const Text(
+                "এখনই ভর্তি হোন",
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  static String _cleanPrice(String? price) {
+    if (price == null) return '0';
+    var p = price.trim();
+    if (p.contains('.')) {
+      p = p.replaceAll(RegExp(r'\.0+$'), '');
+    }
+    return p.isEmpty ? '0' : p;
   }
 }

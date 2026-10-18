@@ -36,14 +36,49 @@ Map<String, String> defaultHeaders = {
 };
 
 /// Authentication / User Info (Standard Flutter ValueNotifier)
+User myUser = MyGetStorage.readCache(MyGetStorage.meUser) ?? User();
+
+bool _cachedHasPackage() {
+  try {
+    if (myUser.hasActiveSubscription == true ||
+        myUser.isSubscribed == true ||
+        myUser.activePackage != null) {
+      return true;
+    }
+    final cached = MyGetStorage.readCache(MyGetStorage.meUser);
+    if (cached is User) {
+      return cached.hasActiveSubscription == true ||
+          cached.isSubscribed == true ||
+          cached.activePackage != null;
+    } else if (cached is Map) {
+      return cached['have_package'] == true ||
+          cached['have_package'] == 1 ||
+          cached['havePackage'] == true ||
+          cached['is_subscribed'] == true ||
+          cached['has_active_subscription'] == true ||
+          (cached['active_package'] is Map && (cached['active_package'] as Map).isNotEmpty);
+    }
+  } catch (_) {}
+  return false;
+}
+
 final ValueNotifier<String?> currentUserId = ValueNotifier<String?>('');
 final ValueNotifier<String?> userName = ValueNotifier<String?>('');
 final ValueNotifier<String?> userEmail = ValueNotifier<String?>('');
 final ValueNotifier<String?> userPhone = ValueNotifier<String?>('');
 final ValueNotifier<String?> userRole = ValueNotifier<String?>('');
 final ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
-final ValueNotifier<bool> havePackage = ValueNotifier<bool>(false);
+final ValueNotifier<bool> havePackage = ValueNotifier<bool>(_cachedHasPackage());
 final ValueNotifier<int> unReadNotificationCount = ValueNotifier<int>(0);
+
+bool checkUserHasPackage() {
+  if (havePackage.value) return true;
+  if (_cachedHasPackage()) {
+    havePackage.value = true;
+    return true;
+  }
+  return false;
+}
 
 /// Device Info
 String? deviceId;
@@ -195,7 +230,6 @@ Widget isCheckedGifImage(String imageUrl) {
   );
 }
 
-User myUser = MyGetStorage.readCache(MyGetStorage.meUser) ?? User();
 
 class NameAvatar extends StatelessWidget {
   final String name;

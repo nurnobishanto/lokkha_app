@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
@@ -73,6 +72,10 @@ class NavbarNotifier extends Notifier<NavbarState> {
           myUser = profile.user!;
           MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
           isLoggedIn.value = true;
+          havePackage.value = profile.user?.hasActiveSubscription == true ||
+              profile.user?.isSubscribed == true ||
+              profile.user?.activePackage != null ||
+              checkUserHasPackage();
 
           state = state.copyWith(
             profile: () => profile,

@@ -81,7 +81,12 @@ class User {
     final sub = json["has_active_subscription"] == true ||
         json["has_active_subscription"] == 1 ||
         json["is_subscribed"] == true ||
-        json["is_subscribed"] == 1;
+        json["is_subscribed"] == 1 ||
+        json["have_package"] == true ||
+        json["have_package"] == 1 ||
+        json["havePackage"] == true ||
+        json["havePackage"] == 1 ||
+        (json["active_package"] is Map && (json["active_package"] as Map).isNotEmpty);
 
     return User(
       id: json["id"],
@@ -166,6 +171,7 @@ class User {
         "reward_points": rewardPoints ?? points,
         "is_subscribed": isSubscribed,
         "has_active_subscription": hasActiveSubscription,
+        "have_package": isSubscribed == true || hasActiveSubscription == true,
         "active_package": activePackage,
       };
 

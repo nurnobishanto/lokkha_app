@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
 import 'package:lokkha/features/study_material/presentation/current_affairs/widgets/current_affairs_question_card.dart';

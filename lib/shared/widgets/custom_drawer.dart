@@ -23,7 +23,7 @@ class CustomDrawer extends ConsumerWidget {
     final isAuth = isLoggedIn.value;
     final name = userName.value?.trim();
     final phone = userPhone.value?.trim();
-    final isPremium = havePackage.value;
+    final isPremium = checkUserHasPackage();
 
     return Drawer(
       backgroundColor: context.scaffoldColor,

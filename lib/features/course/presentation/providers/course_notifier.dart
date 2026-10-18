@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
+import 'package:lokkha/features/course/data/models/v1_course_model.dart';
+import 'package:lokkha/features/course/data/repositories/courses_repository_impl.dart';
+import 'package:lokkha/features/course/domain/repositories/courses_repository.dart';
 import 'package:lokkha/shared/models/category.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/features/course/data/models/course_checkout_model.dart';
@@ -14,27 +18,51 @@ import 'package:lokkha/features/course/data/models/my_course_model.dart';
 import 'package:lokkha/features/exam/exam.dart';
 
 // ---------------------------------------------------------------------------
-// 1. Courses List Notifier
+// 1. Courses List Notifier (Clean Architecture & V1 Model Supported)
 // ---------------------------------------------------------------------------
 class CoursesState {
   final bool isLoading;
+  final bool isRefreshing;
   final bool hasError;
+  final String? errorMessage;
+  final List<V1CourseModel> courses;
+  final List<V1CourseCategoryModel> categories;
+  final int? selectedCategoryId;
+  final String? searchQuery;
   final CoursesModel model;
 
   const CoursesState({
     this.isLoading = false,
+    this.isRefreshing = false,
     this.hasError = false,
+    this.errorMessage,
+    this.courses = const [],
+    this.categories = const [],
+    this.selectedCategoryId,
+    this.searchQuery,
     required this.model,
   });
 
   CoursesState copyWith({
     bool? isLoading,
+    bool? isRefreshing,
     bool? hasError,
+    String? errorMessage,
+    List<V1CourseModel>? courses,
+    List<V1CourseCategoryModel>? categories,
+    int? selectedCategoryId,
+    String? searchQuery,
     CoursesModel? model,
   }) {
     return CoursesState(
       isLoading: isLoading ?? this.isLoading,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
       hasError: hasError ?? this.hasError,
+      errorMessage: errorMessage ?? this.errorMessage,
+      courses: courses ?? this.courses,
+      categories: categories ?? this.categories,
+      selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
+      searchQuery: searchQuery ?? this.searchQuery,
       model: model ?? this.model,
     );
   }
@@ -42,43 +70,92 @@ class CoursesState {
 
 class CoursesNotifier extends Notifier<CoursesState> {
   final int? categoryId;
-  final RestClient _client;
+  final CoursesRepository? _injectedRepo;
   bool _disposed = false;
 
-  CoursesNotifier(this.categoryId, {RestClient? client})
-      : _client = client ?? RestClient();
+  CoursesNotifier(this.categoryId, {CoursesRepository? repository, RestClient? client})
+      : _injectedRepo = repository ?? (client != null ? CoursesRepositoryImpl(client: client) : null);
+
+  CoursesRepository get _repository =>
+      _injectedRepo ?? ref.read(coursesRepositoryProvider);
 
   @override
   CoursesState build() {
     _disposed = false;
     ref.onDispose(() => _disposed = true);
-    Future.microtask(() => fetchCourses(categoryId));
-    return CoursesState(model: CoursesModel());
+    Future.microtask(() {
+      fetchCategories();
+      fetchCourses(categoryId);
+    });
+    return CoursesState(
+      model: CoursesModel(),
+      selectedCategoryId: categoryId,
+    );
   }
 
-  Future<void> fetchCourses(int? id) async {
+  Future<void> fetchCategories() async {
     if (_disposed) return;
-    state = state.copyWith(isLoading: true, hasError: false);
-    final url =
-        id == null ? Endpoints.courses : '${Endpoints.courses}?category_id=$id';
+    try {
+      final categories = await _repository.getCourseCategories();
+      if (_disposed) return;
+      if (categories.isNotEmpty) {
+        state = state.copyWith(categories: categories);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> fetchCourses(int? id, {bool refresh = false, String? search}) async {
+    if (_disposed) return;
+    state = state.copyWith(
+      isLoading: !refresh && state.courses.isEmpty,
+      isRefreshing: refresh,
+      hasError: false,
+      selectedCategoryId: id,
+      searchQuery: search ?? state.searchQuery,
+    );
 
     try {
-      final response = await _client.get(url);
+      final response = await _repository.getCourses(
+        categoryId: id,
+        search: search ?? state.searchQuery,
+      );
       if (_disposed) return;
-      if (response.data != null && response.data['status'] == true) {
+
+      if (response.success || response.items.isNotEmpty) {
         state = state.copyWith(
-          model: CoursesModel.fromJson(response.data),
+          courses: response.items,
+          model: response.toLegacyCoursesModel(),
           isLoading: false,
+          isRefreshing: false,
           hasError: false,
         );
       } else {
-        state = state.copyWith(isLoading: false, hasError: true);
+        state = state.copyWith(
+          isLoading: false,
+          isRefreshing: false,
+          hasError: true,
+          errorMessage: response.message ?? 'কোর্স লোড করা যায়নি',
+        );
       }
     } catch (e) {
       if (_disposed) return;
-      state = state.copyWith(isLoading: false, hasError: true);
+      state = state.copyWith(
+        isLoading: false,
+        isRefreshing: false,
+        hasError: true,
+        errorMessage: 'ইন্টারনেট সংযোগ চেক করুন',
+      );
       if (kDebugMode) debugPrint('Error fetching courses: $e');
     }
+  }
+
+  void selectCategory(int? id) {
+    if (state.selectedCategoryId == id) return;
+    fetchCourses(id);
+  }
+
+  void searchCourses(String query) {
+    fetchCourses(state.selectedCategoryId, search: query);
   }
 }
 
@@ -120,10 +197,13 @@ class CourseDetailsState {
 
 class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
   final int courseId;
-  final RestClient _client;
+  final CoursesRepository? _injectedRepo;
 
-  CourseDetailsNotifier(this.courseId, {RestClient? client})
-      : _client = client ?? RestClient();
+  CourseDetailsNotifier(this.courseId, {CoursesRepository? repository, RestClient? client})
+      : _injectedRepo = repository ?? (client != null ? CoursesRepositoryImpl(client: client) : null);
+
+  CoursesRepository get _repository =>
+      _injectedRepo ?? ref.read(coursesRepositoryProvider);
 
   @override
   CourseDetailsState build() {
@@ -137,19 +217,13 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
 
   Future<void> fetchCourseDetails(int id) async {
     state = state.copyWith(isLoading: true, hasError: false);
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      'Authorization': 'Bearer $token',
-    };
-    final url = '${Endpoints.courseDetails}/$id';
-
     try {
-      final response = await _client.get(url, headers: headers);
-      if (response.data != null && response.data['status'] == true) {
+      final model = await _repository.getCourseDetails(id);
+      if (model != null && model.course != null) {
         state = state.copyWith(
           isLoading: false,
           hasError: false,
-          model: CourseDetailsModel.fromJson(response.data),
+          model: model,
         );
       } else {
         state = state.copyWith(

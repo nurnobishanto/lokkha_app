@@ -55,6 +55,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: context.isDark ? const Color(0xFF0F172A) : Colors.white,
       drawer: const CustomDrawer(),
       appBar: AppBar(
         backgroundColor: const Color(0xFF006A4E),

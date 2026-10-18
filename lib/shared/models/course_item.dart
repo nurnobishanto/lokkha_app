@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 import 'package:lokkha/core/enums/question_type.dart';
 import 'exam.dart';
 
@@ -25,6 +26,7 @@ class CourseItem {
   final DateTime? updatedAt;
   final dynamic deletedAt;
   final Exam? exam;
+  final bool? hasExam;
 
   CourseItem({
     this.id,
@@ -50,24 +52,25 @@ class CourseItem {
     this.updatedAt,
     this.deletedAt,
     this.exam,
+    this.hasExam,
   });
 
   factory CourseItem.fromJson(Map<String, dynamic> json) => CourseItem(
-        id: json["id"],
-        courseId: json["course_id"],
-        courseModuleId: json["course_module_id"],
-        title: json["title"],
-        details: json["details"],
-        order: json["order"],
+        id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
+        courseId: json["course_id"] is int ? json["course_id"] : int.tryParse(json["course_id"]?.toString() ?? ''),
+        courseModuleId: json["course_module_id"] is int ? json["course_module_id"] : int.tryParse(json["course_module_id"]?.toString() ?? ''),
+        title: json["title"]?.toString(),
+        details: json["details"]?.toString(),
+        order: json["order"] is int ? json["order"] : int.tryParse(json["order"]?.toString() ?? ''),
         video: json["video"],
         image: json["image"],
-        file: json["file"],
-        examId: json["exam_id"],
+        file: json["file"]?.toString(),
+        examId: json["exam_id"] is int ? json["exam_id"] : int.tryParse(json["exam_id"]?.toString() ?? ''),
         youtubeVideo: json["youtube_video"],
         url: json["url"],
         btnName: json["btn_name"],
         youtubePlaylist: json["youtube_playlist"],
-        pdf: json["pdf"],
+        pdf: json["pdf"]?.toString(),
         status: json["status"] == null
             ? null
             : (json["status"] is bool
@@ -80,18 +83,22 @@ class CourseItem {
                 : (json["is_free"] == 1 || json["is_free"] == "1" || json["is_free"] == "true")),
         type: json["type"] == null
             ? []
-            : List<Type>.from(json["type"]!.map((x) => typeValues.map[x]!)),
+            : (json["type"] as List).map((x) {
+                final key = x.toString().toLowerCase().trim();
+                return typeValues.map[key];
+              }).whereType<Type>().toList(),
         publishedAt: json["published_at"] == null
             ? null
-            : DateTime.parse(json["published_at"]),
+            : DateTime.tryParse(json["published_at"].toString()),
         createdAt: json["created_at"] == null
             ? null
-            : DateTime.parse(json["created_at"]),
+            : DateTime.tryParse(json["created_at"].toString()),
         updatedAt: json["updated_at"] == null
             ? null
-            : DateTime.parse(json["updated_at"]),
+            : DateTime.tryParse(json["updated_at"].toString()),
         deletedAt: json["deleted_at"],
         exam: json["exam"] == null ? null : Exam.fromJson(json["exam"]),
+        hasExam: json["has_exam"] == true || json["exam_id"] != null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -105,6 +112,7 @@ class CourseItem {
         "image": image,
         "file": file,
         "exam_id": examId,
+        "has_exam": hasExam,
         "youtube_video": youtubeVideo,
         "url": url,
         "btn_name": btnName,

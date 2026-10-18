@@ -23,7 +23,7 @@ class CurrentAffairsContentView extends ConsumerWidget {
         child: IconButton(
           icon: const Icon(Icons.calendar_month, color: Colors.white),
           onPressed: () async {
-            if (havePackage.value) {
+            if (checkUserHasPackage()) {
               DateTime? pickedDate = await showDatePicker(
                 context: context,
                 initialDate: null,
@@ -111,7 +111,7 @@ class CurrentAffairsContentView extends ConsumerWidget {
               }
 
               final data = items[index];
-              final bool isLocked = !havePackage.value && index > 0;
+              final bool isLocked = !checkUserHasPackage() && index > 0;
               String displayDate = data.date ?? "";
               try {
                 if (displayDate.isNotEmpty) {
@@ -256,7 +256,7 @@ class CurrentAffairsContentView extends ConsumerWidget {
                                   alignment: Alignment.topRight,
                                   child: InkWell(
                                     onTap: () {
-                                      if (havePackage.value) {
+                                      if (checkUserHasPackage()) {
                                         ExplanationDialog.show(question);
                                       } else {
                                         showDialog(

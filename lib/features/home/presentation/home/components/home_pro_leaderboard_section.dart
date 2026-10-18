@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -17,10 +16,6 @@ class HomeProLeaderboardSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final topUsers = contestHub?.topLeaderboard ?? [];
-    final contestName = contestHub?.lastContestName ??
-        contestHub?.activeContest?.name ??
-        'Quiz Contest -32';
-    final sponsorName = contestHub?.activeContest?.sponsorName ?? 'BD Taxation';
     final countText = contestHub?.leaderboardCount != null
         ? '${contestHub!.leaderboardCount} Users >'
         : '1.1k Users >';
@@ -110,17 +105,28 @@ class HomeProLeaderboardSection extends StatelessWidget {
           // ─── Leaderboard Card ──────────────────────────────────────────────
           Container(
             decoration: BoxDecoration(
-              color: context.cardColor,
+              color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: context.borderColor.withOpacity(0.6),
-                width: 0.8,
+                color: context.isDark
+                    ? const Color(0xFF334155)
+                    : const Color(0xFFF1F5F9),
+                width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withValues(
+                    alpha: context.isDark ? 0.35 : 0.06,
+                  ),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(
+                    alpha: context.isDark ? 0.2 : 0.02,
+                  ),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
@@ -207,11 +213,9 @@ class HomeProLeaderboardSection extends StatelessWidget {
     bool isLast = false,
   }) {
     // Rank Styling
-    Color rankColor;
     Widget rankWidget;
 
     if (user.rank == 1) {
-      rankColor = const Color(0xFFF59E0B);
       rankWidget = Container(
         width: 22.r,
         height: 22.r,
@@ -227,7 +231,6 @@ class HomeProLeaderboardSection extends StatelessWidget {
         ),
       );
     } else if (user.rank == 2) {
-      rankColor = const Color(0xFF94A3B8);
       rankWidget = Container(
         width: 22.r,
         height: 22.r,
@@ -243,7 +246,6 @@ class HomeProLeaderboardSection extends StatelessWidget {
         ),
       );
     } else if (user.rank == 3) {
-      rankColor = const Color(0xFFD97706);
       rankWidget = Container(
         width: 22.r,
         height: 22.r,
@@ -259,7 +261,6 @@ class HomeProLeaderboardSection extends StatelessWidget {
         ),
       );
     } else {
-      rankColor = context.textSecondary;
       rankWidget = SizedBox(
         width: 22.r,
         child: Text(

@@ -16,11 +16,20 @@ class CourseDetailsModel {
     this.course,
   });
 
-  factory CourseDetailsModel.fromJson(Map<String, dynamic> json) =>
-      CourseDetailsModel(
-        status: json["status"],
-        course: json["course"] == null ? null : Course.fromJson(json["course"]),
-      );
+  factory CourseDetailsModel.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? courseMap;
+    if (json["course"] is Map<String, dynamic>) {
+      courseMap = json["course"];
+    } else if (json["data"] is Map<String, dynamic>) {
+      final data = json["data"] as Map<String, dynamic>;
+      courseMap = data["course"] is Map<String, dynamic> ? data["course"] : data;
+    }
+
+    return CourseDetailsModel(
+      status: json["status"] == true || json["success"] == true,
+      course: courseMap == null ? null : Course.fromJson(courseMap),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "status": status,

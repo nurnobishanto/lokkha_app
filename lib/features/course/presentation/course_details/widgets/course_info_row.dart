@@ -23,16 +23,16 @@ class CourseInfoRow extends StatelessWidget {
     final List<Widget> items = [];
 
     if ((enrolledCount ?? 0) > 0) {
-      items.add(_infoIconText(Icons.people, "$enrolledCount enrolled"));
+      items.add(_infoIconText(Icons.people_outline_rounded, "$enrolledCount জন ভর্তি"));
     }
 
     if ((examCount ?? 0) > 0) {
-      items.add(_infoIconText(Icons.school, "$examCount exams"));
+      items.add(_infoIconText(Icons.assignment_outlined, "$examCount টি পরীক্ষা"));
     }
 
     if ((duration?.isNotEmpty ?? false) || lifetimeAccess) {
-      final text = lifetimeAccess ? "Lifetime Access" : duration ?? '';
-      items.add(_infoIconText(Icons.access_time, text));
+      final text = lifetimeAccess ? "আজীবন মেয়াদ" : duration ?? '';
+      items.add(_infoIconText(Icons.access_time_rounded, text));
     }
 
     return Column(

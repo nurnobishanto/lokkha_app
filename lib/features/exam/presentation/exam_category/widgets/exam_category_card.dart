@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lokkha/core/constants/app_category_vectors.dart';
-import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/core.dart';
 
 class ExamCategoryCard extends StatelessWidget {
@@ -158,21 +157,33 @@ class ExamCategoryCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10.r),
+        borderRadius: BorderRadius.circular(12.r),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
           decoration: BoxDecoration(
-            color: context.cardColor,
-            borderRadius: BorderRadius.circular(10.r),
+            color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
-              color: borderColor ?? context.borderColor.withValues(alpha: 0.5),
-              width: 0.8,
+              color: borderColor ??
+                  (context.isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9)),
+              width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.025),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+                color: Colors.black.withValues(
+                  alpha: context.isDark ? 0.35 : 0.06,
+                ),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(
+                  alpha: context.isDark ? 0.2 : 0.02,
+                ),
+                blurRadius: 3,
+                offset: const Offset(0, 1),
               ),
             ],
           ),

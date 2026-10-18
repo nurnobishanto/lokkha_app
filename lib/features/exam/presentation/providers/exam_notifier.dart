@@ -107,17 +107,10 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
 
   Future<void> getRandomQuestionPackageCheck() async {
     state = state.copyWith(isLoading: true);
-    final isPremium = havePackage.value;
-    final cached = MyGetStorage.readCache(MyGetStorage.meUser);
-    if (cached != null) {
-      final bool havePkg = cached is User
-          ? (cached.hasActiveSubscription == true || cached.isSubscribed == true)
-          : (cached is Map
-              ? (cached['have_package'] == true || cached['have_package'] == 1)
-              : false);
-      havePackage.value = havePkg;
+    final isPremium = checkUserHasPackage();
+    if (isPremium) {
       state = state.copyWith(
-        randomQuestionPackage: havePkg,
+        randomQuestionPackage: true,
         isLoading: false,
       );
       return;

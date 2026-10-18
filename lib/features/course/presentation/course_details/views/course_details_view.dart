@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/router/routes.dart';
@@ -26,69 +26,120 @@ class CourseDetailsView extends ConsumerWidget {
     final course = state.model.course;
 
     return Scaffold(
-      backgroundColor: context.scaffoldColor,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppBar(
-          backgroundColor: LightThemeColors.primaryColor,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+      backgroundColor: context.isDark ? const Color(0xFF0F172A) : Colors.white,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF006A4E),
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+            size: 20,
           ),
-          title: Text(
-            course?.title ?? '',
-            style: const TextStyle(color: Colors.white, fontSize: 15.5),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go(Routes.home);
+            }
+          },
+        ),
+        title: Text(
+          course?.title ?? 'কোর্স বিস্তারিত',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
       body: Builder(
         builder: (context) {
           if (state.isLoading || course == null) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF006A4E)),
+            );
+          }
+          if (state.hasError && course.id == null) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.r),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.wifi_off_rounded,
+                      size: 52.sp,
+                      color: context.textMuted,
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      'কোর্স বিস্তারিত লোড করা যায়নি',
+                      style: TextStyle(
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                        color: context.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton.icon(
+                      onPressed: () => notifier.fetchCourseDetails(courseId),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('আবার চেষ্টা করুন'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF006A4E),
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 8.0),
                   if ((course.image ?? '').isNotEmpty) ...[
                     CourseImageViewer(
-                      imageUrl: Endpoints.storageUrl + course.image!,
+                      imageUrl: Endpoints.resolveUrl(course.image),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 14.h),
                   ],
 
                   /// Quick Info
                   CourseInfoRow(
-                    title: "Quick Info",
+                    title: "সাধারণ তথ্য",
                     enrolledCount: course.usersCount,
                     examCount: course.itemsCount,
                     duration: course.duration,
                     lifetimeAccess: course.lifetimeAccess == true,
-                    iconColor: theme.primaryColor,
+                    iconColor: const Color(0xFF006A4E),
                   ),
 
                   if ((course.routineFile ?? '').trim().isNotEmpty) ...[
-                    const SizedBox(height: 20),
+                    SizedBox(height: 16.h),
                     Text(
-                      "Routine",
+                      "কোর্স রুটিন",
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 8.h),
                     GestureDetector(
                       onTap: () {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
+                          shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(16),
+                              top: Radius.circular(16.r),
                             ),
                           ),
                           builder: (_) => RoutineBottomSheet(
@@ -97,27 +148,46 @@ class CourseDetailsView extends ConsumerWidget {
                         );
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 12,
-                          horizontal: 16,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12.h,
+                          horizontal: 14.w,
                         ),
                         decoration: BoxDecoration(
-                          color: context.cardColor,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: context.borderColor),
+                          color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+                          borderRadius: BorderRadius.circular(10.r),
+                          border: Border.all(
+                            color: context.isDark
+                                ? const Color(0xFF334155)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
                             Icon(
                               _getRoutineIcon(course.routineFile!),
-                              color: Colors.red,
+                              color: Colors.red.shade600,
+                              size: 24.sp,
                             ),
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10.w),
                             Text(
-                              "View Routine",
+                              "রুটিন দেখুন (PDF / Image)",
                               style: textTheme.bodyMedium?.copyWith(
                                 color: context.textPrimary,
+                                fontWeight: FontWeight.w600,
                               ),
+                            ),
+                            const Spacer(),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14.sp,
+                              color: context.textMuted,
                             ),
                           ],
                         ),
@@ -127,21 +197,22 @@ class CourseDetailsView extends ConsumerWidget {
 
                   /// Description
                   if ((course.details ?? '').trim().isNotEmpty) ...[
-                    const SizedBox(height: 20),
+                    SizedBox(height: 16.h),
                     Text(
-                      "Course Details",
+                      "কোর্স বিস্তারিত",
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: context.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    SizedBox(height: 6.h),
                     AnimatedCrossFade(
                       duration: const Duration(milliseconds: 300),
                       crossFadeState: state.showFullDetails
                           ? CrossFadeState.showSecond
                           : CrossFadeState.showFirst,
                       firstChild: SizedBox(
-                        height: 30, // Approx. 2–3 lines
+                        height: 50.h,
                         child: SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
                           child: HtmlWidget(course.details!),
@@ -149,39 +220,55 @@ class CourseDetailsView extends ConsumerWidget {
                       ),
                       secondChild: HtmlWidget(course.details!),
                     ),
+                    SizedBox(height: 4.h),
                     GestureDetector(
                       onTap: notifier.toggleDetails,
                       child: Text(
-                        state.showFullDetails ? " See Less" : " See More",
+                        state.showFullDetails ? "সংক্ষেপ করুন" : "আরও দেখুন",
                         style: textTheme.bodyMedium?.copyWith(
-                          color: LightThemeColors.primaryColor,
+                          color: const Color(0xFF006A4E),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
 
-                  /// Syllabus
+                  /// Syllabus / Exam modules
                   if ((course.modules?.isNotEmpty ?? false)) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      "Course Module",
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    SizedBox(height: 18.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "কোর্স সূচি / পরীক্ষা সমূহ",
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.textPrimary,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF006A4E).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                          child: Text(
+                            "${course.modules!.length} টি বিষয়",
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: const Color(0xFF006A4E),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 8.h),
                     ...course.modules!.where((module) {
                       final items = module.items ?? [];
-                      return items.any((item) =>
-                          item.youtubeVideo != null ||
-                          item.video != null ||
-                          item.pdf != null ||
-                          item.image != null ||
-                          item.file != null ||
-                          item.details != null ||
-                          item.url != null);
+                      return items.isNotEmpty;
                     }).map((module) => CourseModuleExpansion(
+                          courseId: course.id,
                           title: module.title ?? '',
                           items: module.items ?? [],
                           isEnrolled: course.isEnrolled ?? false,
@@ -189,32 +276,49 @@ class CourseDetailsView extends ConsumerWidget {
                   ],
 
                   /// Contact Info
-                  const SizedBox(height: 10),
+                  SizedBox(height: 16.h),
                   Text(
-                    "Call For More Details",
+                    "প্রয়োজনে যোগাযোগ করুন",
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: context.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  SizedBox(height: 8.h),
                   GestureDetector(
                     onTap: () => makePhoneCall('+8801332804290'),
-                    child: Row(
-                      children: [
-                        AppSvgImage.asset(
-                          AssetVectorPaths.phoneCall,
-                          width: 17,
-                          height: 17,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                      decoration: BoxDecoration(
+                        color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(8.r),
+                        border: Border.all(
+                          color: context.isDark
+                              ? const Color(0xFF334155)
+                              : const Color(0xFFE2E8F0),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          '+8801332804290',
-                          style: TextStyle(fontSize: 14.0),
-                        ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          AppSvgImage.asset(
+                            AssetVectorPaths.phoneCall,
+                            width: 17,
+                            height: 17,
+                          ),
+                          SizedBox(width: 10.w),
+                          Text(
+                            '+8801332804290',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                              color: context.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 20.h),
                 ],
               ),
             ),
@@ -229,14 +333,14 @@ class CourseDetailsView extends ConsumerWidget {
             }
             if (course.isEnrolled == true) {
               return Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 8.0,
-                  left: 8.0,
-                  right: 8.0,
+                padding: EdgeInsets.only(
+                  bottom: 8.h,
+                  left: 12.w,
+                  right: 12.w,
                 ),
                 child: CustomActionButton(
                   height: 50,
-                  text: "Start Learning",
+                  text: "শেখা শুরু করুন",
                   onPressed: () {
                     final firstModule = course.modules?.isNotEmpty == true
                         ? course.modules!.first

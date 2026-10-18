@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -33,19 +32,6 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
     });
   }
 
-  String _stripHtml(String? text) {
-    if (text == null) return '';
-    var cleaned = text.replaceAll(RegExp(r'<[^>]*>'), ' ').trim();
-    cleaned = cleaned
-        .replaceAll('&quot;', '"')
-        .replaceAll('&#39;', "'")
-        .replaceAll('&amp;', '&')
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll('&nbsp;', ' ');
-    return cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
-  }
-
   @override
   Widget build(BuildContext context) {
     final randomState = ref.watch(randomQuestionNotifierProvider);
@@ -64,7 +50,6 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
     final int? selectedOptionIndex;
     final bool isAnswerRevealed;
     final String? explanationText;
-    final String? subjectBadge;
 
     if (question != null && question.options.isNotEmpty) {
       questionText = question.title.trim().isNotEmpty
@@ -77,7 +62,6 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
       selectedOptionIndex = randomState.selectedOptionIndex;
       isAnswerRevealed = randomState.isAnswerRevealed;
       explanationText = question.explanation;
-      subjectBadge = question.primarySubject;
     } else {
       questionText = (affairItem?.question != null &&
               affairItem!.question!.trim().isNotEmpty)
@@ -107,24 +91,34 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
       selectedOptionIndex = _fallbackSelectedIndex;
       isAnswerRevealed = _fallbackSelectedIndex != null;
       explanationText = affairItem?.explanation;
-      subjectBadge = null;
     }
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 6.h),
       padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
-        color: context.cardColor,
+        color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: context.borderColor.withOpacity(0.6),
-          width: 0.8,
+          color: context.isDark
+              ? const Color(0xFF334155)
+              : const Color(0xFFF1F5F9),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(
+              alpha: context.isDark ? 0.35 : 0.06,
+            ),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: context.isDark ? 0.2 : 0.02,
+            ),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -132,52 +126,20 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ─── Header: Title + Subject Badge + Reload + MCQ Badge ────────────
+          // ─── Header: Title + Reload + MCQ Badge ────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'কারেন্ট অ্যাফেয়ার্স',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: context.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (subjectBadge != null && subjectBadge.isNotEmpty) ...[
-                      SizedBox(width: 6.w),
-                      Flexible(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 6.w,
-                            vertical: 2.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.primaryColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(6.r),
-                          ),
-                          child: Text(
-                            subjectBadge,
-                            style: TextStyle(
-                              fontSize: 10.5.sp,
-                              fontWeight: FontWeight.w600,
-                              color: context.primaryColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  'কারেন্ট অ্যাফেয়ার্স',
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                    color: context.textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Row(

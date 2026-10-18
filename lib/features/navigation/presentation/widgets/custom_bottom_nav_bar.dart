@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/global.dart';
 import '../riverpod/navbar_notifier.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
@@ -99,50 +97,10 @@ class CustomBottomNavBar extends ConsumerWidget {
                     ),
                   ),
 
-                  // 3. মেসেঞ্জার (Messenger)
+                  // 3. প্রিমিয়াম (Premium)
                   _buildNavItem(
                     ref: ref,
                     index: 2,
-                    currentIndex: activeIndex,
-                    label: "মেসেঞ্জার",
-                    activeGradient: const LinearGradient(
-                      colors: [Color(0xFF00C6FF), Color(0xFF0078FF)],
-                    ),
-                    inactiveLabelColor: const Color(0xFF0078FF),
-                    iconBuilder: (isSelected) {
-                      if (isSelected) {
-                        return FaIcon(
-                          FontAwesomeIcons.facebookMessenger,
-                          size: 18.r,
-                          color: Colors.white,
-                        );
-                      }
-                      return Container(
-                        width: 22.r,
-                        height: 22.r,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF00C6FF), Color(0xFF0078FF)],
-                          ),
-                        ),
-                        child: Center(
-                          child: FaIcon(
-                            FontAwesomeIcons.facebookMessenger,
-                            size: 12.r,
-                            color: Colors.white,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  // 4. প্রিমিয়াম (Premium)
-                  _buildNavItem(
-                    ref: ref,
-                    index: 3,
                     currentIndex: activeIndex,
                     label: "প্রিমিয়াম",
                     activeGradient: const LinearGradient(
@@ -202,10 +160,10 @@ class CustomBottomNavBar extends ConsumerWidget {
                     },
                   ),
 
-                  // 5. প্রোফাইল / লগইন (Profile / Login)
+                  // 4. প্রোফাইল / লগইন (Profile / Login)
                   _buildNavItem(
                     ref: ref,
-                    index: 4,
+                    index: 3,
                     currentIndex: activeIndex,
                     label: !userLoggedIn ? "লগইন" : "প্রোফাইল",
                     inactiveLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),

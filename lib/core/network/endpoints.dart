@@ -230,6 +230,9 @@ class Endpoints {
   static final String examList = '$appUrl/exam-list';
   static final String courseCategories = '$appUrl/course-categories';
   static final String courses = '$appUrl/courses';
+  static const String v1CourseCategories = '/api/v1/courses/categories';
+  static const String v1Courses = '/api/v1/courses';
+  static String v1CourseDetails(dynamic id) => '/api/v1/courses/$id';
   static final String courseDetails = '$appUrl/course';
   static final String courseLearn = '$appUrl/course-learn';
   static final String courseEnroll = '$appUrl/course-enroll';
