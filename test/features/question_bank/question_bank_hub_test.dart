@@ -88,18 +88,11 @@ void main() {
       );
       expect(find.text('সমন্বিত ব্যাংক নিয়োগ পরীক্ষা'), findsOneWidget);
 
-      // Action buttons
-      expect(find.text('পরীক্ষা দিন'), findsWidgets);
-      expect(find.text('প্রশ্ন সমাধান'), findsWidgets);
+      // Clean single action button
+      expect(find.text('অনুশীলন'), findsWidgets);
 
-      // Drag to reveal subject banks
-      await tester.dragUntilVisible(
-        find.text('বাংলা'),
-        find.byType(ListView),
-        const Offset(0, -50),
-      );
-      expect(find.text('বাংলা'), findsOneWidget);
-      expect(find.text('English Language'), findsOneWidget);
+      // Subject-wise question bank should NOT be present
+      expect(find.text('বিষয়ভিত্তিক প্রশ্নব্যাংক'), findsNothing);
     });
 
     testWidgets('QuestionBankExamSheet displays exam modes and duration chips', (tester) async {

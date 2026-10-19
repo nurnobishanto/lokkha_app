@@ -60,6 +60,23 @@ class _SubjectChildrenViewState extends ConsumerState<SubjectChildrenView> {
       appBar: CustomAppBar(
         title: widget.subject.name,
         centerTitle: true,
+        actions: [
+          IconButton(
+            tooltip: 'সরাসরি পরীক্ষা শুরু করুন',
+            icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SubjectExamSetupView(
+                    subjectId: widget.subject.id,
+                    subjectTitle: widget.subject.name,
+                    availableQuestions: widget.subject.totalQuestions,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -315,6 +332,38 @@ class _SubjectChildrenViewState extends ConsumerState<SubjectChildrenView> {
                 fontSize: 14.5.sp,
                 fontWeight: FontWeight.w600,
                 color: context.textPrimary,
+              ),
+            ),
+            SizedBox(height: 6.h),
+            Text(
+              'আপনি সরাসরি এই প্রশ্নব্যাংকের পরীক্ষা শুরু করতে পারেন।',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: context.textMuted,
+              ),
+            ),
+            SizedBox(height: 16.h),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SubjectExamSetupView(
+                      subjectId: widget.subject.id,
+                      subjectTitle: widget.subject.name,
+                      availableQuestions: widget.subject.totalQuestions,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
+              label: const Text('সরাসরি পরীক্ষা দিন'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.primaryColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
               ),
             ),
           ],

@@ -5,7 +5,7 @@ import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
 import 'package:lokkha/features/question_bank/presentation/providers/question_bank_hub_notifier.dart';
-import 'package:lokkha/features/question_bank/presentation/widgets/question_bank_exam_sheet.dart';
+import 'package:lokkha/features/quick_practice/quick_practice.dart';
 
 class QuestionBankView extends ConsumerStatefulWidget {
   const QuestionBankView({super.key});
@@ -37,7 +37,6 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
   Widget build(BuildContext context) {
     final hubState = ref.watch(questionBankHubNotifierProvider);
     final popularBanks = hubState.filteredPopularBanks;
-    final subjectBanks = hubState.filteredSubjectBanks;
 
     return Scaffold(
       backgroundColor: context.scaffoldBg,
@@ -65,13 +64,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
           ),
         ),
       ),
-      body: _buildQuestionBankCollection(popularBanks, subjectBanks, hubState),
+      body: _buildQuestionBankCollection(popularBanks, hubState),
     );
   }
 
   Widget _buildQuestionBankCollection(
     List<HomeQuestionBankItem> popularBanks,
-    List<HomeQuestionBankItem> subjectBanks,
     QuestionBankHubState hubState,
   ) {
     return RefreshIndicator(
@@ -140,7 +138,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
 
           SizedBox(height: 18.h),
 
-          // ─── 1. Popular Banks Section ─────────────────────────────────────
+          // ─── Popular Banks Header ─────────────────────────────────────────
           if (popularBanks.isNotEmpty) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,88 +175,29 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                Text(
-                  '${popularBanks.length}টি',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textSecondary,
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.5.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF006A4E).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Text(
+                    '${popularBanks.length}টি প্রশ্নব্যাংক',
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF006A4E),
+                    ),
                   ),
                 ),
               ],
             ),
             SizedBox(height: 12.h),
             ...popularBanks.map((bank) => _buildPopularBankCard(bank)),
-            SizedBox(height: 16.h),
           ],
 
-          // ─── 2. Subject-wise Banks Section ────────────────────────────────
-          if (subjectBanks.isNotEmpty) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(6.r),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0D9488).withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8.r),
-                        ),
-                        child: const Icon(
-                          Icons.auto_stories_rounded,
-                          color: Color(0xFF0D9488),
-                          size: 18,
-                        ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          'বিষয়ভিত্তিক প্রশ্নব্যাংক',
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.bold,
-                            color: context.textPrimary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  '${subjectBanks.length}টি বিষয়',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: subjectBanks.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 10.h,
-                crossAxisSpacing: 10.w,
-                childAspectRatio: 1.85,
-              ),
-              itemBuilder: (context, index) {
-                final item = subjectBanks[index];
-                return _buildSubjectBankCard(item);
-              },
-            ),
-          ],
-
-          // Empty Search State
-          if (popularBanks.isEmpty && subjectBanks.isEmpty) ...[
+          // ─── Empty Search State ───────────────────────────────────────────
+          if (popularBanks.isEmpty) ...[
             SizedBox(height: 40.h),
             Center(
               child: Column(
@@ -279,7 +218,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                   ),
                   SizedBox(height: 6.h),
                   Text(
-                    'অন্য কোনো নাম বা বিষয় লিখে চেষ্টা করুন।',
+                    'অন্য কোনো নাম লিখে চেষ্টা করুন।',
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: context.textMuted,
@@ -294,266 +233,211 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     );
   }
 
-  // ─── Clean & Minimal Popular Bank Card (No Truncation) ─────────────────────
+  // ─── Neat, Clean, Minimal & Professional Popular Bank Card ─────────────────
   Widget _buildPopularBankCard(HomeQuestionBankItem bank) {
     Color themeColor;
-    Color lightBg;
     IconData iconData;
 
     switch (bank.themeColor) {
       case 'sky':
         themeColor = const Color(0xFF0284C7);
-        lightBg = const Color(0xFFE0F2FE);
-        iconData = Icons.military_tech_rounded;
+        iconData = Icons.verified_user_rounded;
         break;
       case 'rose':
         themeColor = const Color(0xFFE11D48);
-        lightBg = const Color(0xFFFFE4E6);
         iconData = Icons.school_rounded;
         break;
       case 'amber':
         themeColor = const Color(0xFFD97706);
-        lightBg = const Color(0xFFFEF3C7);
         iconData = Icons.account_balance_wallet_rounded;
         break;
       case 'emerald':
       default:
         themeColor = const Color(0xFF006A4E);
-        lightBg = const Color(0xFFD1FAE5);
         iconData = Icons.account_balance_rounded;
         break;
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
+      margin: EdgeInsets.only(bottom: 11.h),
       decoration: BoxDecoration(
         color: context.cardColor,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: themeColor.withValues(alpha: 0.25),
+          color: context.borderColor.withValues(alpha: context.isDark ? 0.7 : 0.8),
           width: 0.9,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
+            color: Colors.black.withValues(
+              alpha: context.isDark ? 0.25 : 0.03,
+            ),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: InkWell(
-        onTap: () => QuestionBankExamSheet.show(context, bank),
-        borderRadius: BorderRadius.circular(16.r),
-        child: Padding(
-          padding: EdgeInsets.all(14.r),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Row: Icon + Badge + Title
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 44.r,
-                    height: 44.r,
-                    decoration: BoxDecoration(
-                      color: lightBg,
-                      borderRadius: BorderRadius.circular(12.r),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openPopularBank(context, bank),
+          borderRadius: BorderRadius.circular(14.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Clean Themed Icon Box
+                Container(
+                  width: 42.r,
+                  height: 42.r,
+                  decoration: BoxDecoration(
+                    color: themeColor.withValues(
+                      alpha: context.isDark ? 0.22 : 0.1,
                     ),
-                    child: Icon(
-                      iconData,
-                      color: themeColor,
-                      size: 22.sp,
-                    ),
+                    borderRadius: BorderRadius.circular(11.r),
                   ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (bank.badge != null && bank.badge!.isNotEmpty) ...[
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 7.w, vertical: 2.h),
-                            decoration: BoxDecoration(
-                              color: themeColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(6.r),
-                            ),
-                            child: Text(
-                              bank.badge!,
-                              style: TextStyle(
-                                fontSize: 10.sp,
-                                fontWeight: FontWeight.bold,
-                                color: themeColor,
+                  child: Icon(
+                    iconData,
+                    color: themeColor,
+                    size: 21.sp,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+
+                // Center Column: Badges, Title & Subtitle
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Badge & Question Count Wrap
+                      Wrap(
+                        spacing: 6.w,
+                        runSpacing: 4.h,
+                        children: [
+                          if (bank.badge != null && bank.badge!.isNotEmpty)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.5.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: themeColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(5.r),
+                              ),
+                              child: Text(
+                                bank.badge!,
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: themeColor,
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 4.h),
+                          if (bank.questionCount > 0)
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 6.5.w,
+                                vertical: 2.h,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.isDark
+                                    ? const Color(0xFF064E3B)
+                                    : const Color(0xFFECFDF5),
+                                borderRadius: BorderRadius.circular(5.r),
+                              ),
+                              child: Text(
+                                '${_formatBanglaNumber(bank.questionCount)}টি প্রশ্ন',
+                                style: TextStyle(
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: context.primaryColor,
+                                ),
+                              ),
+                            ),
                         ],
-                        // Title allowed 2 lines without truncation
+                      ),
+                      SizedBox(height: 5.h),
+                      Text(
+                        bank.title,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w700,
+                          color: context.textPrimary,
+                          height: 1.25,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (bank.subtitle != null && bank.subtitle!.isNotEmpty) ...[
+                        SizedBox(height: 3.h),
                         Text(
-                          bank.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          bank.subtitle!,
                           style: TextStyle(
-                            fontSize: 14.5.sp,
-                            fontWeight: FontWeight.bold,
-                            color: context.textPrimary,
-                            height: 1.25,
+                            fontSize: 11.5.sp,
+                            color: context.textSecondary,
+                            height: 1.3,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: context.textSecondary,
-                    size: 22,
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 8.w),
 
-              if (bank.subtitle != null && bank.subtitle!.isNotEmpty) ...[
-                SizedBox(height: 8.h),
-                Text(
-                  bank.subtitle!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.5.sp,
-                    color: context.textSecondary,
-                    height: 1.35,
+                // Clean Action Button matching Quick Practice
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: context.primaryColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'অনুশীলন',
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 3.w),
+                      Icon(
+                        Icons.play_arrow_rounded,
+                        size: 14.sp,
+                        color: Colors.white,
+                      ),
+                    ],
                   ),
                 ),
               ],
-
-              SizedBox(height: 12.h),
-
-              // Action Buttons Row (Exam System Integration)
-              Row(
-                children: [
-                  // Start Exam Pill
-                  InkWell(
-                    onTap: () => QuestionBankExamSheet.show(context, bank),
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 5.h),
-                      decoration: BoxDecoration(
-                        color: themeColor,
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.play_circle_fill_rounded,
-                              size: 14, color: Colors.white),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'পরীক্ষা দিন',
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  // Read / Practice Pill
-                  InkWell(
-                    onTap: () => QuestionBankExamSheet.show(context, bank),
-                    borderRadius: BorderRadius.circular(8.r),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 10.w, vertical: 5.h),
-                      decoration: BoxDecoration(
-                        color: themeColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.menu_book_rounded,
-                              size: 14, color: themeColor),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'প্রশ্ন সমাধান',
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.bold,
-                              color: themeColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // ─── Clean & Minimal Subject Bank Card ─────────────────────────────────────
-  Widget _buildSubjectBankCard(HomeQuestionBankItem item) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.cardColor,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: context.borderColor.withValues(alpha: 0.6),
-          width: 0.8,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.015),
-            blurRadius: 5,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () => QuestionBankExamSheet.show(context, item),
-        borderRadius: BorderRadius.circular(14.r),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                item.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.bold,
-                  color: context.textPrimary,
-                ),
-              ),
-              SizedBox(height: 6.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.5.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF006A4E).withValues(alpha: 0.09),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  '${_formatBanglaNumber(item.questionCount)} টি প্রশ্ন',
-                  style: TextStyle(
-                    fontSize: 10.5.sp,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF006A4E),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  void _openPopularBank(BuildContext context, HomeQuestionBankItem bank) {
+    final subject = QuickPracticeSubject(
+      id: bank.id,
+      name: bank.title,
+      slug: bank.slug,
+      questionsCount: bank.questionCount,
+      childrenCount: 1, // Opens children topic view from production API
+      showApp: true,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => SubjectChildrenView(subject: subject),
       ),
     );
   }
@@ -574,4 +458,3 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
     return buffer.toString();
   }
 }
-
