@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
+import 'package:lokkha/shared/shared.dart';
 
 class MockCurrentAffairsRepository implements CurrentAffairsRepository {
   CurrentAffairsFeedResponse feedResponse = const CurrentAffairsFeedResponse();
@@ -574,8 +576,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(findTextOrRich('বাংলাদেশের প্রথম রাষ্ট্রপতির নাম কী?'), findsOneWidget);
-      expect(find.text('ক). বঙ্গবন্ধু শেখ মুজিবুর রহমান'), findsOneWidget);
-      expect(find.text('খ). সৈয়দ নজরুল ইসলাম'), findsOneWidget);
+      // Options are hidden by default per user requirement
+      expect(find.text('ক). বঙ্গবন্ধু শেখ মুজিবুর রহমান'), findsNothing);
+      expect(find.text('খ). সৈয়দ নজরুল ইসলাম'), findsNothing);
+      // Correct answer is still prominently displayed
       expect(find.textContaining('সঠিক উত্তরঃ ক). বঙ্গবন্ধু শেখ মুজিবুর রহমান'), findsOneWidget);
       expect(find.byIcon(Icons.bookmark_outline_rounded), findsOneWidget);
       expect(find.byIcon(Icons.share_outlined), findsOneWidget);
@@ -620,6 +624,7 @@ void main() {
                   child: CurrentAffairsQuestionCard(
                     item: item,
                     serialNumber: 17,
+                    showOptions: true,
                   ),
                 ),
               ),
@@ -703,7 +708,10 @@ void main() {
       expect(find.text('সব বিষয়াবলি'), findsOneWidget);
     });
 
-    testWidgets('CurrentAffairsReaderView renders serialized Bengali question, 2-column options and explanation box', (tester) async {
+    testWidgets('CurrentAffairsReaderView renders serialized Bengali question, 2-column options and explanation box for package holder', (tester) async {
+      havePackage.value = true;
+      addTearDown(() => havePackage.value = false);
+
       final mockRepo = MockCurrentAffairsRepository();
       mockRepo.digestResponse = const CurrentAffairsMonthlyDigestResponse(
         month: '2026-10',
@@ -762,6 +770,60 @@ void main() {
       expect(find.text('ঘ). ৫টি পৌরসভা ও ৫টি গ্রামীণ উপজেলা'), findsOneWidget);
       expect(find.textContaining('সঠিক উত্তরঃ'), findsOneWidget);
       expect(find.text('ব্যাখ্যা:'), findsOneWidget);
+    });
+
+    testWidgets('CurrentAffairsReaderView hides explanation when user has no package and hides options when withOptions is false', (tester) async {
+      havePackage.value = false;
+      final mockRepo = MockCurrentAffairsRepository();
+      mockRepo.digestResponse = const CurrentAffairsMonthlyDigestResponse(
+        month: '2026-10',
+        monthName: 'অক্টোবর ২০২৬',
+        categories: [
+          CurrentAffairsDigestCategory(
+            id: 5,
+            name: 'সাম্প্রতিক বাংলাদেশ বিষয়াবলি',
+            totalQuestions: 1,
+            questions: [
+              CurrentAffairsFeedItem(
+                id: 86887,
+                title: 'কতটি পৌরসভা ও গ্রামীণ উপজেলায় ডিজিটাল ভূমি ব্যবস্থাপনা পদ্ধতি স্থাপনের পাইলট প্রকল্প গ্রহণ করা হয়েছে?',
+                date: '2026-10-01',
+                answer: '১টি পৌরসভা ও ২টি গ্রামীণ উপজেলা',
+                options: [
+                  CurrentAffairsOptionItem(key: 'A', labelBn: 'ক', value: '১টি পৌরসভা ও ২টি গ্রামীণ উপজেলা', isCorrect: true),
+                ],
+                explanation: 'ডিজিটাল ভূমি ব্যবস্থাপনা পদ্ধতি স্থাপনের জন্য পাইলট প্রকল্প।',
+              ),
+            ],
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (context, child) => ProviderScope(
+            overrides: [
+              currentAffairsRepositoryProvider.overrideWithValue(mockRepo),
+            ],
+            child: const MaterialApp(
+              home: CurrentAffairsReaderView(
+                categoryTitle: 'সাম্প্রতিক বাংলাদেশ বিষয়াবলি',
+                categoryId: 5,
+                withOptions: false,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(findTextOrRich('কতটি পৌরসভা ও গ্রামীণ উপজেলায়'), findsOneWidget);
+      expect(find.text('ক). ১টি পৌরসভা ও ২টি গ্রামীণ উপজেলা'), findsNothing);
+      expect(find.textContaining('সঠিক উত্তরঃ'), findsOneWidget);
+      // Explanation is NOT shown because user has no package!
+      expect(find.text('ব্যাখ্যা:'), findsNothing);
     });
 
     testWidgets('CurrentAffairsView renders tabs without "সকল" - only বাংলাদেশ, আন্তর্জাতিক, মাসিক ডাইজেস্ট', (tester) async {
@@ -948,7 +1010,10 @@ void main() {
       expect(state.selectedDate, isNull);
     });
 
-    testWidgets('CurrentAffairsQuestionCard explanation is collapsed initially and expands on tap', (tester) async {
+    testWidgets('CurrentAffairsQuestionCard explanation is collapsed initially and expands on tap for package holder', (tester) async {
+      havePackage.value = true;
+      addTearDown(() => havePackage.value = false);
+
       final item = const CurrentAffairsFeedItem(
         id: 202,
         title: 'কোন তারিখে রোকেয়া সাখাওয়াত হোসেনের মৃত্যু দিবস?',
@@ -999,6 +1064,50 @@ void main() {
       // Explanation is collapsed again
       expect(find.text('ব্যাখ্যা দেখুন'), findsOneWidget);
       expect(find.text('ব্যাখ্যা:'), findsNothing);
+    });
+
+    testWidgets('CurrentAffairsQuestionCard tapping explanation without package shows PackageRequiredPopup', (tester) async {
+      havePackage.value = false;
+
+      final item = const CurrentAffairsFeedItem(
+        id: 203,
+        title: 'কোন তারিখে রোকেয়া সাখাওয়াত হোসেনের মৃত্যু দিবস?',
+        answer: '৯ ডিসেম্বর',
+        explanation: 'রোকেয়া সাখাওয়াত হোসেন ১৮৮০ সালের ৯ ডিসেম্বর জন্মগ্রহণ করেন এবং ১৯৩২ সালের ৯ ডিসেম্বর মৃত্যুবরণ করেন।',
+        options: [
+          CurrentAffairsOptionItem(key: 'A', labelBn: 'ক', value: '৯ ডিসেম্বর', isCorrect: true),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (context, child) => ProviderScope(
+            child: MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(
+                  child: CurrentAffairsQuestionCard(item: item),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('ব্যাখ্যা দেখুন'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
+
+      await tester.tap(find.text('ব্যাখ্যা দেখুন'));
+      await tester.pumpAndSettle();
+
+      // Explanation text is NOT expanded
+      expect(find.text('ব্যাখ্যা:'), findsNothing);
+      // PackageRequiredPopup dialog is shown!
+      expect(find.byType(PackageRequiredPopup), findsOneWidget);
+      expect(find.text('প্রিমিয়াম মেম্বারশিপ প্রয়োজন'), findsOneWidget);
+      expect(find.text('প্যাকেজ নিন'), findsOneWidget);
     });
   });
 }

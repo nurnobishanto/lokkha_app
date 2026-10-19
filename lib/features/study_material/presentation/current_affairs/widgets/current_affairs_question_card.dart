@@ -7,17 +7,20 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
 import 'package:lokkha/features/study_material/presentation/current_affairs/widgets/current_affairs_detail_sheet.dart';
+import 'package:lokkha/shared/shared.dart';
 
 class CurrentAffairsQuestionCard extends ConsumerWidget {
   final CurrentAffairsFeedItem item;
   final int? serialNumber;
   final bool showDateHeader;
+  final bool showOptions;
 
   const CurrentAffairsQuestionCard({
     super.key,
     required this.item,
     this.serialNumber,
     this.showDateHeader = false,
+    this.showOptions = false,
   });
 
   static String _toBengaliNumber(int number) {
@@ -69,12 +72,19 @@ class CurrentAffairsQuestionCard extends ConsumerWidget {
           // 1. Question Title with HtmlWidget (clean, fast, readable)
           InkWell(
             onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (_) => CurrentAffairsDetailSheet(questionId: item.id),
-              );
+              if (checkUserHasPackage()) {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => CurrentAffairsDetailSheet(questionId: item.id),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (_) => const PackageRequiredPopup(),
+                );
+              }
             },
             child: IgnorePointer(
               child: HtmlWidget(
@@ -114,7 +124,7 @@ class CurrentAffairsQuestionCard extends ConsumerWidget {
           SizedBox(height: 10.h),
 
           // 2. Compact 2-column MCQ Options Grid (matching Reader UI)
-          if (item.options.isNotEmpty) ...[
+          if (showOptions && item.options.isNotEmpty) ...[
             _buildOptionsGrid(item.options, isDark),
             SizedBox(height: 10.h),
           ],
@@ -204,6 +214,22 @@ ${item.explanation != null && item.explanation!.isNotEmpty ? "ব্যাখ্
               borderRadius: BorderRadius.circular(6.r),
               onTap: () {
                 HapticFeedback.lightImpact();
+                final isExpanded = ref
+                    .read(currentAffairsHubNotifierProvider)
+                    .expandedExplanations
+                    .contains(item.id);
+                if (isExpanded) {
+                  notifier.toggleExplanation(item.id);
+                  return;
+                }
+
+                if (!checkUserHasPackage()) {
+                  showDialog(
+                    context: context,
+                    builder: (_) => const PackageRequiredPopup(),
+                  );
+                  return;
+                }
                 notifier.toggleExplanation(item.id);
               },
               child: Container(
@@ -236,6 +262,14 @@ ${item.explanation != null && item.explanation!.isNotEmpty ? "ব্যাখ্
                         color: isDark ? Colors.white70 : const Color(0xFF475569),
                       ),
                     ),
+                    if (!checkUserHasPackage()) ...[
+                      SizedBox(width: 4.w),
+                      Icon(
+                        Icons.lock_rounded,
+                        size: 12.sp,
+                        color: const Color(0xFFD97706),
+                      ),
+                    ],
                     SizedBox(width: 4.w),
                     Icon(
                       ref.watch(currentAffairsHubNotifierProvider.select((s) => s.expandedExplanations.contains(item.id)))

@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
+import 'package:lokkha/shared/shared.dart';
 
 class CurrentAffairsDetailSheet extends ConsumerStatefulWidget {
   final int questionId;
@@ -278,62 +280,93 @@ class _CurrentAffairsDetailSheetState extends ConsumerState<CurrentAffairsDetail
                                 color: isDark ? const Color(0xFF334155) : const Color(0xFFCBD5E1),
                               ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.info_outline_rounded, color: primaryColor, size: 18.sp),
-                                    SizedBox(width: 6.w),
-                                    Text(
-                                      'বিশদ ব্যাখ্যা',
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: primaryColor,
+                            child: checkUserHasPackage()
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.info_outline_rounded, color: primaryColor, size: 18.sp),
+                                          SizedBox(width: 6.w),
+                                          Text(
+                                            'বিশদ ব্যাখ্যা',
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: primaryColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 8.h),
+                                      if (question.explanationHtml != null && question.explanationHtml!.isNotEmpty)
+                                        HtmlWidget(
+                                          question.explanationHtml!,
+                                          textStyle: TextStyle(
+                                            fontSize: 13.5.sp,
+                                            height: 1.5,
+                                            color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                          ),
+                                        )
+                                      else if (question.explanation != null && question.explanation!.isNotEmpty)
+                                        Text(
+                                          question.explanation!,
+                                          style: TextStyle(
+                                            fontSize: 13.5.sp,
+                                            height: 1.5,
+                                            color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
+                                          ),
+                                        ),
+                                      if (question.resolvedExplanationImage != null &&
+                                          question.resolvedExplanationImage!.isNotEmpty) ...[
+                                        SizedBox(height: 10.h),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          child: Image.network(question.resolvedExplanationImage!),
+                                        ),
+                                      ],
+                                      if (question.reference != null && question.reference!.isNotEmpty) ...[
+                                        SizedBox(height: 10.h),
+                                        Text(
+                                          'তথ্যসূত্র: ${question.reference}',
+                                          style: TextStyle(
+                                            fontSize: 11.5.sp,
+                                            color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  )
+                                : InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => const PackageRequiredPopup(),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.lock_rounded,
+                                            color: const Color(0xFFD97706),
+                                            size: 18.sp,
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            'বিস্তারিত ব্যাখ্যা দেখতে প্যাকেজ কিনুন',
+                                            style: TextStyle(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: const Color(0xFFD97706),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                                SizedBox(height: 8.h),
-                                if (question.explanationHtml != null && question.explanationHtml!.isNotEmpty)
-                                  HtmlWidget(
-                                    question.explanationHtml!,
-                                    textStyle: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      height: 1.5,
-                                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                    ),
-                                  )
-                                else if (question.explanation != null && question.explanation!.isNotEmpty)
-                                  Text(
-                                    question.explanation!,
-                                    style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      height: 1.5,
-                                      color: isDark ? const Color(0xFFE2E8F0) : const Color(0xFF334155),
-                                    ),
                                   ),
-                                if (question.resolvedExplanationImage != null &&
-                                    question.resolvedExplanationImage!.isNotEmpty) ...[
-                                  SizedBox(height: 10.h),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    child: Image.network(question.resolvedExplanationImage!),
-                                  ),
-                                ],
-                                if (question.reference != null && question.reference!.isNotEmpty) ...[
-                                  SizedBox(height: 10.h),
-                                  Text(
-                                    'তথ্যসূত্র: ${question.reference}',
-                                    style: TextStyle(
-                                      fontSize: 11.5.sp,
-                                      color: isDark ? Colors.white54 : const Color(0xFF64748B),
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
                           ),
 
                           // Related Questions

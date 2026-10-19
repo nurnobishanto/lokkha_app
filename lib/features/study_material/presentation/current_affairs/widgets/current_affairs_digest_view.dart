@@ -44,7 +44,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
   void _openReader({
     required String title,
     int? categoryId,
-    required bool withOptions,
+    bool withOptions = false,
   }) {
     HapticFeedback.lightImpact();
     Navigator.of(context).push(
@@ -91,7 +91,6 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
             ? digest.month
             : (months.isNotEmpty ? months.first.month : ''));
     final format = hubState.digestFormat;
-    final isWithOptions = format == 'with_options';
 
     // Total counts
     final totalCount = digest?.statistics.totalQuestions ??
@@ -273,7 +272,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
               onPressed: () {
                 _openReader(
                   title: 'মাসিক কারেন্ট অ্যাফেয়ার্স ডাইজেস্ট',
-                  withOptions: isWithOptions,
+                  withOptions: false,
                 );
               },
             ),
@@ -417,7 +416,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
               _openReader(
                 title: 'সাম্প্রতিক বাংলাদেশ বিষয়াবলি',
                 categoryId: 5,
-                withOptions: isWithOptions,
+                withOptions: false,
               );
             },
           ),
@@ -439,7 +438,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
               _openReader(
                 title: 'সাম্প্রতিক আন্তর্জাতিক বিষয়াবলি',
                 categoryId: 8,
-                withOptions: isWithOptions,
+                withOptions: false,
               );
             },
           ),
@@ -460,7 +459,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
             onTap: () {
               _openReader(
                 title: 'সকল বিষয়াবলি',
-                withOptions: isWithOptions,
+                withOptions: false,
               );
             },
           ),

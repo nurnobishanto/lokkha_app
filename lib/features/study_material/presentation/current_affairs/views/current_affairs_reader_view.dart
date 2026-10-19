@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
 
@@ -17,7 +18,7 @@ class CurrentAffairsReaderView extends ConsumerWidget {
     required this.categoryTitle,
     this.categorySlug,
     this.categoryId,
-    this.withOptions = true,
+    this.withOptions = false,
     this.initialQuestions,
   });
 
@@ -277,9 +278,10 @@ class CurrentAffairsReaderView extends ConsumerWidget {
                                 ),
                               ),
 
-                              // Explanation Box (matching Image 3)
-                              if ((item.explanation != null && item.explanation!.trim().isNotEmpty) ||
-                                  (item.explanationHtml != null && item.explanationHtml!.trim().isNotEmpty)) ...[
+                              // Explanation Box (only shown if user has active package)
+                              if (checkUserHasPackage() &&
+                                  ((item.explanation != null && item.explanation!.trim().isNotEmpty) ||
+                                      (item.explanationHtml != null && item.explanationHtml!.trim().isNotEmpty))) ...[
                                 SizedBox(height: 10.h),
                                 Container(
                                   width: double.infinity,
