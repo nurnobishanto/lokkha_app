@@ -1,11 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import 'package:lokkha/shared/shared.dart';
 
 class SubSectionsSetTimeView extends ConsumerStatefulWidget {
   const SubSectionsSetTimeView({super.key});

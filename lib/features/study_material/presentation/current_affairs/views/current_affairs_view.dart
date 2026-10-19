@@ -238,9 +238,9 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                         decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.09),
+                          color: Colors.red.withValues(alpha: 0.09),
                           borderRadius: BorderRadius.circular(8.r),
-                          border: Border.all(color: Colors.red.withOpacity(0.25)),
+                          border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -391,7 +391,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.feed_outlined, size: 48.sp, color: Colors.grey.withOpacity(0.5)),
+                    Icon(Icons.feed_outlined, size: 48.sp, color: Colors.grey.withValues(alpha: 0.5)),
                     SizedBox(height: 12.h),
                     Text(
                       'কোনো তথ্য পাওয়া যায়নি',
@@ -543,7 +543,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
           borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -604,7 +604,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
         borderRadius: BorderRadius.circular(30.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -630,7 +630,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: hasDate ? primaryColor.withOpacity(0.12) : Colors.transparent,
+                  color: hasDate ? primaryColor.withValues(alpha: 0.12) : Colors.transparent,
                   borderRadius: BorderRadius.circular(24.r),
                 ),
                 child: Row(
@@ -660,7 +660,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
                         child: Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.close, size: 11.sp, color: primaryColor),
@@ -690,7 +690,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
                 decoration: BoxDecoration(
-                  color: hasMonth ? primaryColor.withOpacity(0.12) : Colors.transparent,
+                  color: hasMonth ? primaryColor.withValues(alpha: 0.12) : Colors.transparent,
                   borderRadius: BorderRadius.circular(24.r),
                 ),
                 child: Row(
@@ -720,7 +720,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
                         child: Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.close, size: 11.sp, color: primaryColor),
@@ -773,7 +773,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
                     width: 40.w,
                     height: 4.h,
                     decoration: BoxDecoration(
-                      color: Colors.grey.withOpacity(0.4),
+                      color: Colors.grey.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(2.r),
                     ),
                   ),
@@ -813,7 +813,7 @@ class _CurrentAffairsViewState extends ConsumerState<CurrentAffairsView>
                             itemCount: currentState.availableMonths.length,
                             separatorBuilder: (_, __) => Divider(
                               height: 1,
-                              color: isDark ? Colors.white10 : Colors.black.withOpacity(0.06),
+                              color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
                             ),
                             itemBuilder: (context, index) {
                               final m = currentState.availableMonths[index];

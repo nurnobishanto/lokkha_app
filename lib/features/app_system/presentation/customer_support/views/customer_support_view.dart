@@ -2,8 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/services/app_update_service.dart';
-import 'package:lokkha/shared/shared.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class CustomerSupportView extends StatelessWidget {

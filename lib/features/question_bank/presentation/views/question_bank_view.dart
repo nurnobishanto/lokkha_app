@@ -91,12 +91,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
               color: context.cardColor,
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: context.borderColor.withOpacity(0.6),
+                color: context.borderColor.withValues(alpha: 0.6),
                 width: 0.8,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -151,7 +151,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                       Container(
                         padding: EdgeInsets.all(6.r),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF006A4E).withOpacity(0.12),
+                          color: const Color(0xFF006A4E).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: const Icon(
@@ -203,7 +203,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                       Container(
                         padding: EdgeInsets.all(6.r),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0D9488).withOpacity(0.12),
+                          color: const Color(0xFF0D9488).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: const Icon(
@@ -330,12 +330,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
         color: context.cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: themeColor.withOpacity(0.25),
+          color: themeColor.withValues(alpha: 0.25),
           width: 0.9,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -376,7 +376,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 7.w, vertical: 2.h),
                             decoration: BoxDecoration(
-                              color: themeColor.withOpacity(0.12),
+                              color: themeColor.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(6.r),
                             ),
                             child: Text(
@@ -469,7 +469,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
                       padding: EdgeInsets.symmetric(
                           horizontal: 10.w, vertical: 5.h),
                       decoration: BoxDecoration(
-                        color: themeColor.withOpacity(0.1),
+                        color: themeColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Row(
@@ -505,12 +505,12 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
         color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: context.borderColor.withOpacity(0.6),
+          color: context.borderColor.withValues(alpha: 0.6),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.015),
+            color: Colors.black.withValues(alpha: 0.015),
             blurRadius: 5,
             offset: const Offset(0, 1),
           ),
@@ -539,7 +539,7 @@ class _QuestionBankViewState extends ConsumerState<QuestionBankView> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.5.h),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF006A4E).withOpacity(0.09),
+                  color: const Color(0xFF006A4E).withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(

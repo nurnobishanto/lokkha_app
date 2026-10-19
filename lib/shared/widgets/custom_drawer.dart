@@ -13,17 +13,20 @@ import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/presentation/customer_support/views/customer_support_view.dart';
 import 'package:lokkha/shared/widgets/base_webview.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
+import 'package:lokkha/features/auth/auth.dart';
 
 class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(centralAuthStateProvider);
+    final user = authState.user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isAuth = isLoggedIn.value;
-    final name = userName.value?.trim();
-    final phone = userPhone.value?.trim();
-    final isPremium = checkUserHasPackage();
+    final isAuth = authState.isLoggedIn || isLoggedIn.value;
+    final name = user?.name ?? userName.value?.trim();
+    final phone = user?.phone ?? userPhone.value?.trim();
+    final isPremium = authState.hasPackage || checkUserHasPackage();
 
     return Drawer(
       backgroundColor: context.scaffoldColor,

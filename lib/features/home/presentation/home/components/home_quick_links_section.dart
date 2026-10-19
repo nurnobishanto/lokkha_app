@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 
@@ -83,12 +82,12 @@ class HomeQuickLinksSection extends StatelessWidget {
         color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: context.borderColor.withOpacity(0.6),
+          color: context.borderColor.withValues(alpha: 0.6),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -148,7 +147,7 @@ class HomeQuickLinksSection extends StatelessWidget {
                       color: context.cardColor,
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(
-                        color: context.borderColor.withOpacity(0.6),
+                        color: context.borderColor.withValues(alpha: 0.6),
                         width: 0.6,
                       ),
                     ),

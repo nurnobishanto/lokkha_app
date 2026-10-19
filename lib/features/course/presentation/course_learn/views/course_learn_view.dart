@@ -8,9 +8,6 @@ import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import '../widgets/course_learn_app_bar.dart';
-import '../widgets/course_learn_body.dart';
-import '../widgets/course_learn_floating_bar.dart';
 
 class CourseLearnView extends ConsumerStatefulWidget {
   final int? id;

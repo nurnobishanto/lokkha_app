@@ -5,7 +5,6 @@ import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/notifications/notifications.dart';
-import 'package:lokkha/shared/shared.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -91,7 +90,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
             Text(
               data?.appMeta?.appTagline ?? "সঠিক পথে, স্বল্প সময়ে",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.92),
+                color: Colors.white.withValues(alpha: 0.92),
                 fontSize: 10.sp,
                 fontWeight: FontWeight.w400,
               ),
@@ -313,7 +312,7 @@ class _HomeSkeletonLoader extends StatelessWidget {
         Container(
           height: 140.h,
           decoration: BoxDecoration(
-            color: context.borderColor.withOpacity(0.2),
+            color: context.borderColor.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
         ),
@@ -326,7 +325,7 @@ class _HomeSkeletonLoader extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: 4.w),
                 height: 48.h,
                 decoration: BoxDecoration(
-                  color: context.borderColor.withOpacity(0.2),
+                  color: context.borderColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
               ),
@@ -337,7 +336,7 @@ class _HomeSkeletonLoader extends StatelessWidget {
         Container(
           height: 180.h,
           decoration: BoxDecoration(
-            color: context.borderColor.withOpacity(0.2),
+            color: context.borderColor.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(14.r),
           ),
         ),

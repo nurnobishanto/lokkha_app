@@ -14,6 +14,8 @@ import 'package:lokkha/features/auth/domain/usecases/verify_otp_usecase.dart';
 
 import 'package:lokkha/di/network_provider.dart';
 
+export 'package:lokkha/features/auth/presentation/providers/central_auth_notifier.dart';
+
 /// Data Source Provider
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   final client = ref.watch(restClientProvider);

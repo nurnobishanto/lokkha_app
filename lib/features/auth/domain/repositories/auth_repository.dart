@@ -1,10 +1,6 @@
-import '../../data/datasources/auth_remote_data_source.dart';
 import '../../data/models/auth_response_model.dart';
-import '../../data/repositories/auth_repository_impl.dart';
 
 abstract class AuthRepository {
-  factory AuthRepository() =>
-      AuthRepositoryImpl(remoteDataSource: AuthRemoteDataSourceImpl());
 
   Future<AuthResponseModel> checkPhone(String phone);
   Future<AuthResponseModel> sendOtp(String phone, {String type = 'Login'});

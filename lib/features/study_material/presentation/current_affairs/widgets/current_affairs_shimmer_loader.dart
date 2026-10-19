@@ -159,7 +159,7 @@ class _CurrentAffairsShimmerLoaderState extends State<CurrentAffairsShimmerLoade
                       ],
                     ),
                     SizedBox(height: 16.h),
-                    Divider(color: Colors.grey.withOpacity(0.15), height: 1),
+                    Divider(color: Colors.grey.withValues(alpha: 0.15), height: 1),
                   ],
                 ),
               );

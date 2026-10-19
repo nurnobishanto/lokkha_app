@@ -93,7 +93,7 @@ class HomeSliderSection extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -106,7 +106,7 @@ class HomeSliderSection extends ConsumerWidget {
                   fit: BoxFit.cover,
                   width: double.infinity,
                   placeholder: (context, url) => Container(
-                    color: context.borderColor.withOpacity(0.2),
+                    color: context.borderColor.withValues(alpha: 0.2),
                     child: Center(
                       child: SizedBox(
                         width: 22.r,
@@ -121,7 +121,7 @@ class HomeSliderSection extends ConsumerWidget {
                     ),
                   ),
                   errorWidget: (context, url, error) => Container(
-                    color: context.borderColor.withOpacity(0.15),
+                    color: context.borderColor.withValues(alpha: 0.15),
                     child: Center(
                       child: Icon(
                         Icons.image_not_supported_outlined,

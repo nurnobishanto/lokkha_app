@@ -11,7 +11,8 @@ import '../models/auth_response_model.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
 
-  AuthRepositoryImpl({required this.remoteDataSource});
+  AuthRepositoryImpl({AuthRemoteDataSource? remoteDataSource})
+      : remoteDataSource = remoteDataSource ?? AuthRemoteDataSourceImpl();
 
   @override
   Future<AuthResponseModel> checkPhone(String phone) {

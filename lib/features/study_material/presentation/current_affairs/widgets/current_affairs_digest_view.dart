@@ -280,7 +280,7 @@ class _CurrentAffairsDigestViewState extends ConsumerState<CurrentAffairsDigestV
           ),
 
           SizedBox(height: 18.h),
-          Divider(color: Colors.grey.withOpacity(0.2), height: 1),
+          Divider(color: Colors.grey.withValues(alpha: 0.2), height: 1),
           SizedBox(height: 14.h),
 
           // 4. Statistics Text Row (Matching Image 2)
@@ -527,7 +527,7 @@ class _CategoryNavCard extends StatelessWidget {
             border: borderColor != null ? Border.all(color: borderColor!, width: 1.2) : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

@@ -129,7 +129,7 @@ class _CurrentAffairsDetailSheetState extends ConsumerState<CurrentAffairsDetail
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 10.w, vertical: 4.h),
                                   decoration: BoxDecoration(
-                                    color: primaryColor.withOpacity(0.12),
+                                    color: primaryColor.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(16.r),
                                   ),
                                   child: Text(
@@ -208,7 +208,7 @@ class _CurrentAffairsDetailSheetState extends ConsumerState<CurrentAffairsDetail
                                       horizontal: 12.w, vertical: 10.h),
                                   decoration: BoxDecoration(
                                     color: isCorrect
-                                        ? const Color(0xFF10B981).withOpacity(0.12)
+                                        ? const Color(0xFF10B981).withValues(alpha: 0.12)
                                         : (isDark
                                             ? const Color(0xFF0F172A)
                                             : const Color(0xFFF8FAFC)),

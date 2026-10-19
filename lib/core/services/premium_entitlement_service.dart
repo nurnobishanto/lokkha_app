@@ -92,7 +92,7 @@ class PremiumEntitlementService {
     isValidating.value = true;
 
     try {
-      final authRepo = AuthRepository();
+      final authRepo = AuthRepositoryImpl();
       final res = await authRepo.getCurrentUser();
       if (res != null && res.status) {
         final bool hasPkg = res.havePackage ||

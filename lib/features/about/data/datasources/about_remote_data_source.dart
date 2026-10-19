@@ -1,5 +1,4 @@
 import 'package:lokkha/core/errors/exceptions.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import '../models/about_model.dart';
 

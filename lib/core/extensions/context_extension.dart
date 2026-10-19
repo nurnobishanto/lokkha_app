@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/app/theme/app_colors.dart';
+import 'package:lokkha/app/theme/app_theme.dart';
 
 export 'package:go_router/go_router.dart';
 export 'package:lokkha/core/localization/app_localizations.dart';
@@ -15,6 +15,13 @@ extension ContextExtension on BuildContext {
   // ─── Typography / Text Styles ───
   TextTheme get textStyle => Theme.of(this).textTheme;
   TextTheme get textTheme => Theme.of(this).textTheme;
+
+  TextStyle get heading1 => AppTextStyles.heading1.copyWith(color: textPrimary);
+  TextStyle get heading2 => AppTextStyles.heading2.copyWith(color: textPrimary);
+  TextStyle get heading3 => AppTextStyles.heading3.copyWith(color: textPrimary);
+  TextStyle get heading4 => AppTextStyles.heading4.copyWith(color: textPrimary);
+  TextStyle get body1 => AppTextStyles.body1.copyWith(color: textPrimary);
+  TextStyle get body2 => AppTextStyles.body2.copyWith(color: textSecondary);
 
   // ─── Scaffolds & Surfaces ───
   Color get scaffoldColor => AppColors.scaffold(this);

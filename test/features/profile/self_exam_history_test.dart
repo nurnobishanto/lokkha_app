@@ -171,7 +171,7 @@ class _MockProfileRepository implements ProfileRepository {
   int historyCallCount = 0;
   int detailCallCount = 0;
 
-  _MockProfileRepository({this.historyResponse, this.detailResponse});
+  _MockProfileRepository();
 
   @override
   Future<SelfAcademyHistoryResponseModel> getSelfAcademyHistory({int page = 1}) async {

@@ -3,9 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/profile/profile.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import '../riverpod/exam_result_sheet_notifier.dart';
 import '../widgets/result_question_card.dart';
 
 class ExamResultSheetView extends ConsumerWidget {

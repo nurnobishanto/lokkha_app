@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:url_launcher/url_launcher.dart';
 

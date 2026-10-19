@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/rest_client.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/features/packages/data/models/package_detail_response_model.dart';
+import 'package:lokkha/di/packages_provider.dart';
 import 'package:lokkha/shared/models/package.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -40,11 +38,15 @@ class PackageDetailsState {
 
 class PackageDetailsNotifier extends Notifier<PackageDetailsState> {
   final int packageId;
-  final RestClient _client;
+  final PackagesRepository? _injectedRepository;
   bool _disposed = false;
 
-  PackageDetailsNotifier(this.packageId, {RestClient? client})
-      : _client = client ?? RestClient();
+  PackageDetailsNotifier(this.packageId, {PackagesRepository? repository})
+      : _injectedRepository = repository;
+
+
+  PackagesRepository get _repo =>
+      _injectedRepository ?? ref.read(packagesRepositoryProvider);
 
   @override
   PackageDetailsState build() {
@@ -74,42 +76,23 @@ class PackageDetailsNotifier extends Notifier<PackageDetailsState> {
         errorMessage: null,
       );
     }
-    final token = MySharedPref.getUserToken();
-    final url = Endpoints.packageDetail(id); // GET /api/v1/packages/{id}
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-    };
 
     try {
-      final response = await _client.get(url, headers: headers);
+      final parsed = await _repo.getPackageDetails(id);
       if (_disposed) return;
 
-      final data = response.data;
-      if (data != null && (data['success'] == true || data['status'] == true)) {
-        final parsed = PackageDetailResponseModel.fromJson(data);
-        if (parsed.package != null) {
-          state = state.copyWith(
-            package: parsed.package,
-            isLoading: false,
-            hasError: false,
-            errorMessage: null,
-          );
-        } else {
-          state = state.copyWith(
-            isLoading: false,
-            hasError: true,
-            errorMessage: "প্যাকেজের তথ্য পাওয়া যায়নি",
-          );
-        }
+      if (parsed != null && parsed.package != null) {
+        state = state.copyWith(
+          package: parsed.package,
+          isLoading: false,
+          hasError: false,
+          errorMessage: null,
+        );
       } else {
-        final msg =
-            data?['message']?.toString() ?? "প্যাকেজ লোড করতে সমস্যা হয়েছে";
         state = state.copyWith(
           isLoading: false,
           hasError: true,
-          errorMessage: msg,
+          errorMessage: "প্যাকেজের তথ্য পাওয়া যায়নি",
         );
       }
     } catch (e) {
@@ -125,24 +108,12 @@ class PackageDetailsNotifier extends Notifier<PackageDetailsState> {
 
   Future<bool> claimFreeTrial(int id) async {
     state = state.copyWith(isClaimingTrial: true);
-    final token = MySharedPref.getUserToken();
-    final url = Endpoints.claimFreeTrial;
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-    };
 
     try {
-      final response = await _client.post(
-        url,
-        data: {'package_id': id},
-        headers: headers,
-      );
+      final data = await _repo.claimFreeTrial(id);
       if (_disposed) return false;
 
       state = state.copyWith(isClaimingTrial: false);
-      final data = response.data;
       if (data != null && (data['success'] == true || data['status'] == true)) {
         CustomSnackBar.showCustomToast(
           message:

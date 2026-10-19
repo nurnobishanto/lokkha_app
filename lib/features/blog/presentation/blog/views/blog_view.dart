@@ -2,11 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/features/blog/blog.dart';
-import '../../providers/blog_notifier.dart';
 
 class BlogView extends ConsumerStatefulWidget {
   const BlogView({super.key});

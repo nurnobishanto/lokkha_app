@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
 

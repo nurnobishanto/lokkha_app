@@ -65,14 +65,14 @@ class HomePackagesSection extends StatelessWidget {
                   border: Border.all(
                     color: pkg.isPopular
                         ? context.primaryColor
-                        : context.borderColor.withOpacity(0.6),
+                        : context.borderColor.withValues(alpha: 0.6),
                     width: pkg.isPopular ? 1.5 : 0.8,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: pkg.isPopular
-                          ? context.primaryColor.withOpacity(0.08)
-                          : Colors.black.withOpacity(0.02),
+                          ? context.primaryColor.withValues(alpha: 0.08)
+                          : Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -121,7 +121,7 @@ class HomePackagesSection extends StatelessWidget {
                           padding: EdgeInsets.symmetric(
                               horizontal: 6.w, vertical: 2.h),
                           decoration: BoxDecoration(
-                            color: context.primaryColor.withOpacity(0.08),
+                            color: context.primaryColor.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(4.r),
                           ),
                           child: Text(
@@ -201,7 +201,7 @@ class HomePackagesSection extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: pkg.isPopular
                               ? context.primaryColor
-                              : context.primaryColor.withOpacity(0.12),
+                              : context.primaryColor.withValues(alpha: 0.12),
                           foregroundColor: pkg.isPopular
                               ? Colors.white
                               : context.primaryColor,

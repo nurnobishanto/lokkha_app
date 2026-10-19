@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/profile/profile.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
 import '../providers/settings_notifier.dart';
 

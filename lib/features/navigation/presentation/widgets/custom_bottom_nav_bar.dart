@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/auth/auth.dart';
 import '../riverpod/navbar_notifier.dart';
 
 class CustomBottomNavBar extends ConsumerWidget {
@@ -15,7 +16,7 @@ class CustomBottomNavBar extends ConsumerWidget {
     final navState = ref.watch(navbarNotifierProvider);
     final bottomInset = MediaQuery.of(context).padding.bottom;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final userLoggedIn = navState.isLoggedIn || isLoggedIn.value;
+    final userLoggedIn = ref.watch(isLoggedInProvider) || navState.isLoggedIn || isLoggedIn.value;
     final activeIndex = navigationShell?.currentIndex ?? navState.currentIndex;
 
     return Container(

@@ -47,12 +47,12 @@ class HomeHallOfFameSection extends StatelessWidget {
                     color: context.cardColor,
                     borderRadius: BorderRadius.circular(14.r),
                     border: Border.all(
-                      color: context.borderColor.withOpacity(0.6),
+                      color: context.borderColor.withValues(alpha: 0.6),
                       width: 0.8,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.02),
+                        color: Colors.black.withValues(alpha: 0.02),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -65,7 +65,7 @@ class HomeHallOfFameSection extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 18.r,
-                            backgroundColor: context.primaryColor.withOpacity(0.1),
+                            backgroundColor: context.primaryColor.withValues(alpha: 0.1),
                             backgroundImage: item.avatarUrl != null &&
                                     item.avatarUrl!.isNotEmpty
                                 ? CachedNetworkImageProvider(item.avatarUrl!)
@@ -178,7 +178,7 @@ class HomeHallOfFameSection extends StatelessWidget {
                     color: context.cardColor,
                     borderRadius: BorderRadius.circular(10.r),
                     border: Border.all(
-                      color: context.borderColor.withOpacity(0.5),
+                      color: context.borderColor.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -186,7 +186,7 @@ class HomeHallOfFameSection extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(6.r),
                         decoration: BoxDecoration(
-                          color: context.primaryColor.withOpacity(0.1),
+                          color: context.primaryColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Text(

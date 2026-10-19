@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lottie/lottie.dart';
 import 'package:url_launcher/url_launcher.dart';

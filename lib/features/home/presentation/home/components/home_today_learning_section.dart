@@ -178,12 +178,12 @@ class _LearningExamCard extends StatelessWidget {
         color: context.cardColor,
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: context.borderColor.withOpacity(0.6),
+          color: context.borderColor.withValues(alpha: 0.6),
           width: 0.8,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -242,7 +242,7 @@ class _LearningExamCard extends StatelessWidget {
                         padding: EdgeInsets.symmetric(
                             horizontal: 8.w, vertical: 3.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.12),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Text(
@@ -319,7 +319,7 @@ class _LearningExamCard extends StatelessWidget {
                           padding: EdgeInsets.symmetric(
                               horizontal: 10.w, vertical: 4.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF59E0B).withOpacity(0.12),
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Row(

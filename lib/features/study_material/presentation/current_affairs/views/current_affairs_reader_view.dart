@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/data/models/current_affairs_v1_models.dart';
 import 'package:lokkha/features/study_material/presentation/providers/current_affairs_hub_notifier.dart';
 
@@ -28,7 +27,6 @@ class CurrentAffairsReaderView extends ConsumerWidget {
     final digest = hubState.monthlyDigest;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).primaryColor;
 
     // Filter questions by category if selected, otherwise all digest questions or feed questions
     List<CurrentAffairsFeedItem> questions = [];
@@ -131,7 +129,7 @@ class CurrentAffairsReaderView extends ConsumerWidget {
                 ),
 
                 SizedBox(height: 12.h),
-                Divider(color: Colors.grey.withOpacity(0.25), thickness: 1),
+                Divider(color: Colors.grey.withValues(alpha: 0.25), thickness: 1),
                 SizedBox(height: 8.h),
 
                 // 2. Questions grouped by date (matching Image 3)
@@ -329,7 +327,7 @@ class CurrentAffairsReaderView extends ConsumerWidget {
                               ],
 
                               SizedBox(height: 14.h),
-                              Divider(color: Colors.grey.withOpacity(0.18), height: 1),
+                              Divider(color: Colors.grey.withValues(alpha: 0.18), height: 1),
                             ],
                           ),
                         );

@@ -11,3 +11,5 @@ export 'package:lokkha/shared/widgets/custom_text_field.dart';
 export 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 export 'package:lokkha/shared/widgets/custom_transparent_divider.dart';
 export 'package:lokkha/shared/widgets/base_webview.dart';
+export 'package:lokkha/shared/widgets/app_empty_state_widget.dart';
+export 'package:lokkha/shared/widgets/app_error_state_widget.dart';

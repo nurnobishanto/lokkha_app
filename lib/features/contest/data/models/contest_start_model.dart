@@ -12,11 +12,15 @@ class ContestStartModel {
   final bool? status;
   final Contest? contest;
   final List<Question>? questions;
+  final String? message;
+  final bool? packageRequired;
 
   ContestStartModel({
     this.status,
     this.contest,
     this.questions,
+    this.message,
+    this.packageRequired,
   });
 
   factory ContestStartModel.fromJson(Map<String, dynamic> json) =>
@@ -28,6 +32,8 @@ class ContestStartModel {
             ? []
             : List<Question>.from(
                 json["questions"]!.map((x) => Question.fromJson(x))),
+        message: json["message"]?.toString(),
+        packageRequired: json["package_required"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -36,6 +42,8 @@ class ContestStartModel {
         "questions": questions == null
             ? []
             : List<dynamic>.from(questions!.map((x) => x.toJson())),
+        "message": message,
+        "package_required": packageRequired,
       };
 }
 

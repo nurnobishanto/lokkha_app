@@ -15,7 +15,8 @@ import '../models/accuracy_response_model.dart';
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
 
-  ProfileRepositoryImpl({required this.remoteDataSource});
+  ProfileRepositoryImpl({ProfileRemoteDataSource? remoteDataSource})
+      : remoteDataSource = remoteDataSource ?? ProfileRemoteDataSourceImpl();
 
   @override
   Future<User?> getProfile() {

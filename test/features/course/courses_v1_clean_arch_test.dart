@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/course/data/models/course_details_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
 import 'package:lokkha/features/course/data/models/v1_courses_response.dart';

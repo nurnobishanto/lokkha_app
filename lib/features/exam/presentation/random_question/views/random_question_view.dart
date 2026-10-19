@@ -2,15 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
 import 'package:lokkha/shared/shared.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
-import 'package:lokkha/shared/widgets/custom_transparent_divider.dart';
-import 'package:lokkha/shared/widgets/explanation_dialog.dart';
 
 class RandomQuestionSelector extends ConsumerStatefulWidget {
   const RandomQuestionSelector({super.key});

@@ -198,7 +198,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                 decoration: BoxDecoration(
                   color: context.scaffoldBg,
                   borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(color: context.borderColor.withOpacity(0.5)),
+                  border: Border.all(color: context.borderColor.withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   children: [
@@ -361,7 +361,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
               widget.isPracticeMode ? 'অনুশীলন মোড' : 'লাইভ পরীক্ষা',
               style: TextStyle(
                 fontSize: 11.sp,
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
               ),
             ),
           ],
@@ -374,7 +374,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
               decoration: BoxDecoration(
                 color: _remainingSeconds < 120
                     ? const Color(0xFFEF4444)
-                    : Colors.white.withOpacity(0.2),
+                    : Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
@@ -401,7 +401,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
             // Progress Bar
             LinearProgressIndicator(
               value: (_currentIndex + 1) / _questions.length,
-              backgroundColor: context.borderColor.withOpacity(0.4),
+              backgroundColor: context.borderColor.withValues(alpha: 0.4),
               valueColor:
                   const AlwaysStoppedAnimation<Color>(Color(0xFF006A4E)),
               minHeight: 4.h,
@@ -417,7 +417,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                     padding:
                         EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF006A4E).withOpacity(0.1),
+                      color: const Color(0xFF006A4E).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6.r),
                     ),
                     child: Text(
@@ -460,7 +460,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                       color: context.cardColor,
                       borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(
-                        color: context.borderColor.withOpacity(0.6),
+                        color: context.borderColor.withValues(alpha: 0.6),
                       ),
                     ),
                     child: Text(
@@ -482,26 +482,26 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                     final isCorrect = question.correctIndex == optIndex;
 
                     Color optionBg = context.cardColor;
-                    Color borderColor = context.borderColor.withOpacity(0.6);
+                    Color borderColor = context.borderColor.withValues(alpha: 0.6);
                     Color textColor = context.textPrimary;
                     Widget? trailingIcon;
 
                     if (_showExplanations) {
                       if (isCorrect) {
-                        optionBg = const Color(0xFF10B981).withOpacity(0.12);
+                        optionBg = const Color(0xFF10B981).withValues(alpha: 0.12);
                         borderColor = const Color(0xFF10B981);
                         textColor = const Color(0xFF059669);
                         trailingIcon = const Icon(Icons.check_circle_rounded,
                             color: Color(0xFF10B981), size: 20);
                       } else if (isSelected) {
-                        optionBg = const Color(0xFFEF4444).withOpacity(0.1);
+                        optionBg = const Color(0xFFEF4444).withValues(alpha: 0.1);
                         borderColor = const Color(0xFFEF4444);
                         textColor = const Color(0xFFDC2626);
                         trailingIcon = const Icon(Icons.cancel_rounded,
                             color: Color(0xFFEF4444), size: 20);
                       }
                     } else if (isSelected) {
-                      optionBg = const Color(0xFF006A4E).withOpacity(0.1);
+                      optionBg = const Color(0xFF006A4E).withValues(alpha: 0.1);
                       borderColor = const Color(0xFF006A4E);
                       textColor = const Color(0xFF006A4E);
                     }
@@ -578,10 +578,10 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                     Container(
                       padding: EdgeInsets.all(14.r),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.08),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(
-                          color: const Color(0xFF10B981).withOpacity(0.3),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Column(
@@ -626,7 +626,7 @@ class _QuestionBankExamViewState extends State<QuestionBankExamView> {
                 color: context.cardColor,
                 border: Border(
                   top: BorderSide(
-                    color: context.borderColor.withOpacity(0.4),
+                    color: context.borderColor.withValues(alpha: 0.4),
                   ),
                 ),
               ),

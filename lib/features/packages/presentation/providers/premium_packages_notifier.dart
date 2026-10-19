@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/core.dart';
+import 'package:lokkha/di/packages_provider.dart';
 import 'package:lokkha/features/packages/data/models/premium_package_model.dart';
 import 'package:lokkha/shared/models/package.dart';
 
@@ -61,11 +61,14 @@ class PremiumPackagesState {
 }
 
 class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
-  final RestClient _client;
+  final PackagesRepository? _repository;
   bool _disposed = false;
 
-  PremiumPackagesNotifier({RestClient? client})
-      : _client = client ?? RestClient();
+  PremiumPackagesNotifier({PackagesRepository? repository})
+      : _repository = repository;
+
+  PackagesRepository get _repo =>
+      _repository ?? ref.read(packagesRepositoryProvider);
 
   @override
   PremiumPackagesState build() {
@@ -93,34 +96,19 @@ class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
       );
     }
 
-    final queryParams = <String, dynamic>{
-      'page': 1,
-      'per_page': 15,
-      if (search != null && search.isNotEmpty) 'search': search,
-      if (isFeatured != null) 'is_featured': isFeatured ? 1 : 0,
-      if (isTrial != null) 'is_trial': isTrial ? 1 : 0,
-      if (sortBy != null && sortBy.isNotEmpty) 'sort_by': sortBy,
-    };
-
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-    };
-
     try {
-      final response = await _client.get(
-        Endpoints.packages,
-        queryParameters: queryParams,
-        headers: headers,
+      final model = await _repo.getPremiumPackages(
+        page: 1,
+        perPage: 15,
+        search: search,
+        isFeatured: isFeatured,
+        isTrial: isTrial,
+        sortBy: sortBy,
       );
 
       if (_disposed) return;
 
-      final data = response.data;
-      if (data != null && (data['success'] == true || data['status'] == true)) {
-        final model = PremiumPackageModel.fromJson(data);
+      if (model != null) {
         final meta = model.meta;
         final hasMore = meta != null && meta.currentPage < meta.lastPage;
 
@@ -135,7 +123,7 @@ class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
       } else {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: data?['message']?.toString() ?? 'প্যাকেজ লোড করতে ব্যর্থ',
+          errorMessage: 'প্যাকেজ লোড করতে ব্যর্থ',
         );
       }
     } catch (error) {
@@ -156,38 +144,19 @@ class PremiumPackagesNotifier extends Notifier<PremiumPackagesState> {
     state = state.copyWith(isLoadingMore: true);
     final nextPage = state.currentPage + 1;
 
-    final queryParams = <String, dynamic>{
-      'page': nextPage,
-      'per_page': 15,
-      if (state.searchQuery != null && state.searchQuery!.isNotEmpty)
-        'search': state.searchQuery,
-      if (state.isFeaturedFilter != null)
-        'is_featured': state.isFeaturedFilter! ? 1 : 0,
-      if (state.isTrialFilter != null)
-        'is_trial': state.isTrialFilter! ? 1 : 0,
-      if (state.sortBy != null && state.sortBy!.isNotEmpty)
-        'sort_by': state.sortBy,
-    };
-
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-    };
-
     try {
-      final response = await _client.get(
-        Endpoints.packages,
-        queryParameters: queryParams,
-        headers: headers,
+      final model = await _repo.getPremiumPackages(
+        page: nextPage,
+        perPage: 15,
+        search: state.searchQuery,
+        isFeatured: state.isFeaturedFilter,
+        isTrial: state.isTrialFilter,
+        sortBy: state.sortBy,
       );
 
       if (_disposed) return;
 
-      final data = response.data;
-      if (data != null && (data['success'] == true || data['status'] == true)) {
-        final model = PremiumPackageModel.fromJson(data);
+      if (model != null) {
         final meta = model.meta;
         final hasMore = meta != null && meta.currentPage < meta.lastPage;
 

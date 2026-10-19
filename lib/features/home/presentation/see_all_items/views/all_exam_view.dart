@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/widgets/show_log_in.dart';

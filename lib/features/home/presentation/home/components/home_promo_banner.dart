@@ -23,7 +23,7 @@ class HomePromoBanner extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
-          color: const Color(0xFF81C784).withOpacity(0.5),
+          color: const Color(0xFF81C784).withValues(alpha: 0.5),
           width: 0.8,
         ),
       ),
@@ -70,7 +70,7 @@ class HomePromoBanner extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(8.r),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 shape: BoxShape.circle,
               ),
               child: Icon(

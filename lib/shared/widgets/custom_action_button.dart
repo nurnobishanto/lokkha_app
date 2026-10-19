@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/shared/widgets/app_button.dart';
 
 class CustomActionButton extends StatelessWidget {
   final String text;
@@ -23,41 +24,22 @@ class CustomActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isLoading ? null : onPressed,
-      child: Container(
-        height: height,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: btnBackgroundColor,
-          borderRadius: BorderRadius.circular(7.0),
-          border: Border.all(
-            color: borderColor!,
-            width: 0,
-          ),
-        ),
-        child: Center(
-          child: isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : FittedBox(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
-                  ),
-                ),
-        ),
+    return AppButton(
+      text: text,
+      onPressed: onPressed,
+      backgroundColor: btnBackgroundColor,
+      textColor: textColor,
+      borderColor: borderColor != LightThemeColors.primaryColor ? borderColor : null,
+      height: height,
+      isLoading: isLoading,
+      isFullWidth: true,
+      borderRadius: 7.0,
+      textStyle: TextStyle(
+        fontSize: 13.0,
+        fontWeight: FontWeight.w600,
+        color: textColor,
       ),
     );
   }
 }
+

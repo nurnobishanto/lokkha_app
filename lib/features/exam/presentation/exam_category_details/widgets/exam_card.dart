@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
 
 import 'package:lokkha/shared/models/exam.dart';
@@ -35,7 +34,7 @@ class ExamCard extends StatelessWidget {
           BoxShadow(
             color: context.isDark
                 ? Colors.transparent
-                : primaryColor.withOpacity(0.08),
+                : primaryColor.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -47,8 +46,8 @@ class ExamCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
-          splashColor: primaryColor.withOpacity(0.05),
-          highlightColor: primaryColor.withOpacity(0.03),
+          splashColor: primaryColor.withValues(alpha: 0.05),
+          highlightColor: primaryColor.withValues(alpha: 0.03),
           child: Padding(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -87,14 +86,14 @@ class ExamCard extends StatelessWidget {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   primaryColor
-                                      .withOpacity(0.4), // lighter shade
+                                      .withValues(alpha: 0.4), // lighter shade
                                   primaryColor, // full-tone
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(14),
                               boxShadow: [
                                 BoxShadow(
-                                  color: primaryColor.withOpacity(0.3),
+                                  color: primaryColor.withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
@@ -131,7 +130,7 @@ class ExamCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: context.isDark
                         ? context.surfaceColor
-                        : primaryColor.withOpacity(0.04),
+                        : primaryColor.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: context.borderColor,
@@ -247,7 +246,7 @@ class ExamCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: primaryColor.withOpacity(0.4),
+                        color: primaryColor.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -258,8 +257,8 @@ class ExamCard extends StatelessWidget {
                     child: InkWell(
                       onTap: onStartExam,
                       borderRadius: BorderRadius.circular(14),
-                      splashColor: Colors.white.withOpacity(0.2),
-                      highlightColor: Colors.white.withOpacity(0.1),
+                      splashColor: Colors.white.withValues(alpha: 0.2),
+                      highlightColor: Colors.white.withValues(alpha: 0.1),
                       child: Center(
                           child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -269,19 +268,19 @@ class ExamCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.white.withOpacity(0.25),
-                                  Colors.white.withOpacity(0.10),
+                                  Colors.white.withValues(alpha: 0.25),
+                                  Colors.white.withValues(alpha: 0.10),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.25),
+                                color: Colors.white.withValues(alpha: 0.25),
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
+                                  color: Colors.black.withValues(alpha: 0.25),
                                   blurRadius: 8,
                                   offset: const Offset(2, 3),
                                 ),
@@ -329,7 +328,7 @@ class ExamCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(

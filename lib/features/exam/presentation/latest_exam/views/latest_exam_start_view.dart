@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/exam/exam.dart';
-import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
 
 class LatestExamStartDialog extends ConsumerStatefulWidget {
   final LatestExam latestExam;

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
 import 'package:lokkha/shared/models/mock_subject_select_model.dart';
-import 'package:lokkha/shared/models/subject.dart';
 import 'package:lokkha/shared/shared.dart';
 
 class TopicSelectionView extends ConsumerStatefulWidget {

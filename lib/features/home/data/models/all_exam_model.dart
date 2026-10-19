@@ -99,9 +99,9 @@ class Exams {
       };
 }
 
-enum Status { APPROVED }
+enum Status { approved }
 
-final statusValues = EnumValues({"approved": Status.APPROVED});
+final statusValues = EnumValues({"approved": Status.approved});
 
 class Link {
   final String? url;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
+import 'package:lokkha/shared/widgets/app_button.dart';
 
 class DecisionButton extends StatelessWidget {
   final String text;
@@ -20,33 +20,18 @@ class DecisionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: height,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: context.cardColor,
-          borderRadius: BorderRadius.circular(20.0),
-          border: Border.all(
-            color: borderColor ?? LightThemeColors.primaryColor,
-            width: 2, // Border width
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (leadingWidget != null) ...[
-              leadingWidget!,
-              const SizedBox(width: 10),
-            ],
-            Text(
-              text,
-              style: AppTextStyles.body1.copyWith(color: context.textPrimary),
-            ),
-          ],
-        ),
-      ),
+    return AppButton.outline(
+      text: text,
+      onPressed: onPressed,
+      icon: leadingWidget,
+      borderColor: borderColor ?? context.primaryColor,
+      backgroundColor: context.cardColor,
+      textColor: context.textPrimary,
+      height: height,
+      borderRadius: 20.0,
+      isFullWidth: true,
+      textStyle: AppTextStyles.body1.copyWith(color: context.textPrimary),
     );
   }
 }
+

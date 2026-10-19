@@ -181,10 +181,10 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                         vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withOpacity(0.12),
+                        color: const Color(0xFF10B981).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12.r),
                         border: Border.all(
-                          color: const Color(0xFF10B981).withOpacity(0.4),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.4),
                           width: 0.8,
                         ),
                       ),
@@ -240,16 +240,16 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
 
             if (isAnswerRevealed) {
               if (isSelected && isCorrect) {
-                btnBgColor = const Color(0xFF10B981).withOpacity(0.15);
+                btnBgColor = const Color(0xFF10B981).withValues(alpha: 0.15);
                 borderColor = const Color(0xFF10B981);
                 textColor = const Color(0xFF047857);
               } else if (isSelected && !isCorrect) {
-                btnBgColor = const Color(0xFFEF4444).withOpacity(0.15);
+                btnBgColor = const Color(0xFFEF4444).withValues(alpha: 0.15);
                 borderColor = const Color(0xFFEF4444);
                 textColor = const Color(0xFFB91C1C);
               } else if (isCorrect) {
-                btnBgColor = const Color(0xFF10B981).withOpacity(0.1);
-                borderColor = const Color(0xFF10B981).withOpacity(0.5);
+                btnBgColor = const Color(0xFF10B981).withValues(alpha: 0.1);
+                borderColor = const Color(0xFF10B981).withValues(alpha: 0.5);
                 textColor = const Color(0xFF047857);
               }
             }
@@ -342,7 +342,7 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                     : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
-                  color: context.borderColor.withOpacity(0.5),
+                  color: context.borderColor.withValues(alpha: 0.5),
                   width: 0.8,
                 ),
               ),

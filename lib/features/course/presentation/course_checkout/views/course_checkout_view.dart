@@ -9,10 +9,6 @@ import 'package:lokkha/features/course/presentation/providers/course_notifier.da
 import 'package:lokkha/features/packages/presentation/views/payment_webview.dart';
 import 'package:lokkha/features/profile/presentation/profile/riverpod/profile_notifier.dart';
 import 'package:lokkha/shared/models/course.dart';
-import 'package:lokkha/shared/widgets/base_webview.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
-import 'package:lokkha/shared/widgets/custom_text_field.dart';
 
 class CourseCheckoutView extends ConsumerStatefulWidget {
   final Course course;
@@ -416,7 +412,7 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                                       couponCode: _couponController.text.trim(),
                                       email: _mailController.text.trim(),
                                     );
-                                    if (paymentUrl != null && mounted) {
+                                    if (paymentUrl != null && context.mounted) {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

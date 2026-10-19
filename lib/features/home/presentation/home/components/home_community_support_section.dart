@@ -63,7 +63,7 @@ class HomeCommunitySupportSection extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(14.r),
               border: Border.all(
-                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -194,10 +194,10 @@ class _SocialPillButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 8.h),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10.r),
           border: Border.all(
-            color: color.withOpacity(0.25),
+            color: color.withValues(alpha: 0.25),
             width: 0.8,
           ),
         ),

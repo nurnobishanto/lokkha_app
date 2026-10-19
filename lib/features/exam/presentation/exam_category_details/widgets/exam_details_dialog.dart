@@ -5,7 +5,6 @@ import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/models/exam.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
 import 'package:lokkha/shared/widgets/web_exam_view.dart';
 
 const Color primaryColor = Color(0xFF006A4E);
@@ -98,7 +97,7 @@ class ExamDetailsDialog extends StatelessWidget {
                               label: const Text('প্রশ্ন পড়ুন'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    primaryColor.withOpacity(0.9),
+                                    primaryColor.withValues(alpha: 0.9),
                                 foregroundColor: Colors.white,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 14),
@@ -159,7 +158,7 @@ class ExamDetailsDialog extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: context.isDark
                               ? context.surfaceColor
-                              : primaryColor.withOpacity(0.05),
+                              : primaryColor.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: context.borderColor),
                         ),
@@ -220,7 +219,7 @@ class ExamDetailsDialog extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.isDark
             ? context.surfaceColor
-            : primaryColor.withOpacity(0.05),
+            : primaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: context.borderColor),
         boxShadow: [

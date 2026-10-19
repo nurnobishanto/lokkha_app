@@ -5,6 +5,11 @@ export 'data/models/latest_contest_model.dart';
 export 'data/models/contest_submit_model.dart';
 export 'data/models/contest_result_model.dart';
 
+// Domain & Data
+export 'domain/repositories/contest_repository.dart';
+export 'data/datasources/contest_remote_data_source.dart';
+export 'data/repositories/contest_repository_impl.dart';
+
 // Presentation - Providers
 export 'presentation/providers/contest_notifier.dart';
 

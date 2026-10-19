@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/di/network_provider.dart';
 import 'package:lokkha/features/jobs/data/models/job_list_model.dart';
 
 final jobsRepositoryProvider = Provider<JobsRepository>((ref) {
-  return JobsRepositoryImpl();
+  final client = ref.watch(restClientProvider);
+  return JobsRepositoryImpl(client: client);
 });
 
 abstract class JobsRepository {

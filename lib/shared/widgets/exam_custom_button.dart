@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/shared/widgets/app_button.dart';
 
 class ExamCustomButton extends StatelessWidget {
   final String text;
@@ -19,30 +20,21 @@ class ExamCustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: height,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: btnBackgroundColor,
-          borderRadius: BorderRadius.circular(5.0),
-          border: Border.all(
-            color: borderColor!,
-            width: 0, // Border width
-          ),
-        ),
-        child: Center(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ),
+    return AppButton(
+      text: text,
+      onPressed: onPressed,
+      backgroundColor: btnBackgroundColor,
+      borderColor: borderColor != LightThemeColors.primaryColor ? borderColor : null,
+      height: height,
+      borderRadius: 5.0,
+      size: AppButtonSize.sm,
+      isFullWidth: true,
+      textStyle: const TextStyle(
+        fontSize: 14.0,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
       ),
     );
   }
 }
+

@@ -347,7 +347,7 @@ Future<void> openAppOrWebView(String url) async {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   } else {
     final ctx = rootNavigatorKey.currentContext;
-    if (ctx != null) {
+    if (ctx != null && ctx.mounted) {
       Navigator.of(ctx).push(
         MaterialPageRoute(
           builder: (_) => BaseWebView(url: url, title: ''),

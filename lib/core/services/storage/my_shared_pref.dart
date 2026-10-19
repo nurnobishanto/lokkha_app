@@ -46,8 +46,11 @@ class MySharedPref {
     }
   }
 
-  static Future<void> removeUserToken() async =>
+  static Future<void> removeUserToken() async {
+    try {
       await _prefs.remove(_userTokenKey);
+    } catch (_) {}
+  }
 
   // ───── Theme ─────
   static Future<void> setThemeIsLight(bool isLight) async {

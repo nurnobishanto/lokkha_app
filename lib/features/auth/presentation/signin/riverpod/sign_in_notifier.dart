@@ -55,6 +55,13 @@ class SignInNotifier extends Notifier<SignInState> {
           message: res.message ?? "লগইন সফল হয়েছে!",
         );
 
+        if (res.user != null) {
+          ref.read(centralAuthStateProvider.notifier).setAuthenticated(
+                res.user!,
+                hasPackageStatus: res.havePackage,
+              );
+        }
+
         ref.read(navbarNotifierProvider.notifier).fetchProfileInfo();
 
         if (context.mounted) {

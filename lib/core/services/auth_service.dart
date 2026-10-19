@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
@@ -9,7 +8,6 @@ import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -183,7 +181,7 @@ class AuthService {
       isLoggedIn.value = false;
       await MySharedPref.removeUserToken();
       final context = rootNavigatorKey.currentContext;
-      if (context != null) {
+      if (context != null && context.mounted) {
         context.goNamed(Routes.authGateway);
       }
       return;
@@ -194,7 +192,7 @@ class AuthService {
       await MySharedPref.setUserToken(token);
     }
 
-    final authRepo = AuthRepository();
+    final authRepo = AuthRepositoryImpl();
     final res = await authRepo.getCurrentUser();
 
     if (res != null) {
@@ -205,7 +203,7 @@ class AuthService {
         // Check profile completion requirement
         if (!res.profileCompleted || res.rawData?['update_profile_required'] == true) {
           final context = rootNavigatorKey.currentContext;
-          if (context != null) {
+          if (context != null && context.mounted) {
             context.pushNamed(Routes.profileUpdateRequired, extra: {
               "phoneNumber": res.user?.phone ?? res.rawData?["data"]?["phone"] ?? "",
             });
@@ -246,7 +244,7 @@ class AuthService {
 
       CustomSnackBar.showCustomToast(message: "লগআউট সফল হয়েছে");
       final context = rootNavigatorKey.currentContext;
-      if (context != null) {
+      if (context != null && context.mounted) {
         context.goNamed(Routes.authGateway);
       }
     }

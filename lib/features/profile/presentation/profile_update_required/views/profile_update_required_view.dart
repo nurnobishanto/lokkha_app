@@ -1,12 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
-import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 import '../riverpod/profile_update_required_notifier.dart';
 
 class ProfileUpdateRequiredView extends ConsumerStatefulWidget {

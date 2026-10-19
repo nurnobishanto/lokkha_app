@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/shared/shared.dart';
 
 class HomeSectionHeader extends StatelessWidget {
   final String title;
@@ -30,7 +29,7 @@ class HomeSectionHeader extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(6.r),
               decoration: BoxDecoration(
-                color: context.primaryColor.withOpacity(0.12),
+                color: context.primaryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(

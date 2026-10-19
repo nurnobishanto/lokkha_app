@@ -8,6 +8,7 @@ import 'decorations_extensions.dart';
 T? makeNullable<T>(T? value) => value;
 
 /// Enum for page route
+// ignore: constant_identifier_names
 enum PageRouteAnimation { Fade, Scale, Rotate, Slide, SlideBottomTop }
 
 /// has match return bool for pattern matching
@@ -124,7 +125,7 @@ Widget dotIndicator(list, i, {bool isPersonal = false}) {
             width: i == ind ? 30 : 12,
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-                color: i == ind ? Colors.blue : Colors.grey.withOpacity(0.5),
+                color: i == ind ? Colors.blue : Colors.grey.withValues(alpha: 0.5),
                 borderRadius: radius(4)),
           );
         },
@@ -149,7 +150,7 @@ Widget lineIndicator(list, i, {bool isPersonal = false}) {
             // width: i == ind ? 30 : 12,
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-                color: i == ind ? Colors.blue : Colors.grey.withOpacity(0.5),
+                color: i == ind ? Colors.blue : Colors.grey.withValues(alpha: 0.5),
                 borderRadius: radius(4)),
           );
         },

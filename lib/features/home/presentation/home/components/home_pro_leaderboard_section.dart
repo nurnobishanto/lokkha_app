@@ -282,7 +282,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
             ? null
             : Border(
                 bottom: BorderSide(
-                  color: context.borderColor.withOpacity(0.35),
+                  color: context.borderColor.withValues(alpha: 0.35),
                   width: 0.5,
                 ),
               ),
@@ -296,7 +296,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
           // Avatar
           CircleAvatar(
             radius: 16.r,
-            backgroundColor: const Color(0xFF006A4E).withOpacity(0.1),
+            backgroundColor: const Color(0xFF006A4E).withValues(alpha: 0.1),
             backgroundImage: user.userAvatar != null &&
                     user.userAvatar!.isNotEmpty
                 ? CachedNetworkImageProvider(user.userAvatar!)
@@ -351,7 +351,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
                         padding: EdgeInsets.symmetric(
                             horizontal: 5.w, vertical: 1.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.12),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Text(
@@ -377,7 +377,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: context.borderColor.withOpacity(0.2),
+                    color: context.borderColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Text(

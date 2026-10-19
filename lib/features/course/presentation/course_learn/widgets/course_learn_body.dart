@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/features/course/course.dart';
-import 'full_screen_image_view.dart';
 
 class CourseLearnBody extends StatefulWidget {
   final CourseLearningModel model;

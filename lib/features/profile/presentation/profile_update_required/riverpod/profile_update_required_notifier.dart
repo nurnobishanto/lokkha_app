@@ -1,10 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class ProfileUpdateRequiredState {
   final String gender;

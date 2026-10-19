@@ -3,13 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/utils/global.dart';
-import 'package:lokkha/shared/widgets/custom_action_button.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
-import 'package:lokkha/shared/widgets/custom_drop_down_button.dart';
-import 'package:lokkha/shared/widgets/custom_text_form_field.dart';
 import '../riverpod/profile_update_notifier.dart';
 
 class ProfileUpdateView extends ConsumerStatefulWidget {

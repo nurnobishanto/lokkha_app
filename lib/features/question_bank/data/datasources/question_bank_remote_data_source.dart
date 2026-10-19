@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/features/question_bank/data/models/random_question_model.dart';
 

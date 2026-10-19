@@ -70,12 +70,12 @@ class HomeStatsSection extends StatelessWidget {
               color: context.cardColor,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: context.borderColor.withOpacity(0.5),
+                color: context.borderColor.withValues(alpha: 0.5),
                 width: 0.8,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -86,7 +86,7 @@ class HomeStatsSection extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
-                    color: accentColor.withOpacity(0.12),
+                    color: accentColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Icon(

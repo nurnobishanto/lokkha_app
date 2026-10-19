@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -39,10 +38,10 @@ class HomeContestHubSection extends ConsumerWidget {
       width: 44.w,
       padding: EdgeInsets.symmetric(vertical: 4.h),
       decoration: BoxDecoration(
-        color: context.primaryColor.withOpacity(0.1),
+        color: context.primaryColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8.r),
         border: Border.all(
-          color: context.primaryColor.withOpacity(0.25),
+          color: context.primaryColor.withValues(alpha: 0.25),
           width: 0.8,
         ),
       ),
@@ -109,12 +108,12 @@ class HomeContestHubSection extends ConsumerWidget {
               ),
               borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
-                color: const Color(0xFF10B981).withOpacity(0.35),
+                color: const Color(0xFF10B981).withValues(alpha: 0.35),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF10B981).withOpacity(0.08),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.08),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -212,10 +211,10 @@ class HomeContestHubSection extends ConsumerWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B).withOpacity(0.12),
+                      color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(
-                        color: const Color(0xFFF59E0B).withOpacity(0.3),
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
                         width: 0.6,
                       ),
                     ),
@@ -327,7 +326,7 @@ class HomeContestHubSection extends ConsumerWidget {
                     color: context.cardColor,
                     borderRadius: BorderRadius.circular(10.r),
                     border: Border.all(
-                      color: context.borderColor.withOpacity(0.5),
+                      color: context.borderColor.withValues(alpha: 0.5),
                     ),
                   ),
                   child: Row(
@@ -337,7 +336,7 @@ class HomeContestHubSection extends ConsumerWidget {
                         children: [
                           CircleAvatar(
                             radius: 18.r,
-                            backgroundColor: context.primaryColor.withOpacity(0.1),
+                            backgroundColor: context.primaryColor.withValues(alpha: 0.1),
                             backgroundImage: user.userAvatar != null &&
                                     user.userAvatar!.isNotEmpty
                                 ? CachedNetworkImageProvider(user.userAvatar!)

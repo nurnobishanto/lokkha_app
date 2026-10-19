@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -97,7 +96,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                       color: context.cardColor,
                       borderRadius: BorderRadius.circular(10.r),
                       border: Border.all(
-                        color: color.withOpacity(0.35),
+                        color: color.withValues(alpha: 0.35),
                         width: 0.8,
                       ),
                     ),
@@ -106,7 +105,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(6.r),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.12),
+                            color: color.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -173,7 +172,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                       color: context.cardColor,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: context.borderColor.withOpacity(0.6),
+                        color: context.borderColor.withValues(alpha: 0.6),
                       ),
                     ),
                     child: Column(
@@ -198,7 +197,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 6.w, vertical: 2.h),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
+                                  color: Colors.red.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4.r),
                                 ),
                                 child: Text(
@@ -281,7 +280,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                 color: context.cardColor,
                 borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
-                  color: context.borderColor.withOpacity(0.5),
+                  color: context.borderColor.withValues(alpha: 0.5),
                 ),
               ),
               child: Row(
@@ -289,7 +288,7 @@ class HomeCareerUpdatesSection extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(7.r),
                     decoration: BoxDecoration(
-                      color: context.primaryColor.withOpacity(0.1),
+                      color: context.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Icon(

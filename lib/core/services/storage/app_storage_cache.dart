@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 
-class _StorageWrapper {
-  const _StorageWrapper();
+class AppStorageWrapper {
+  const AppStorageWrapper();
 
   bool hasData(String key) => AppStorageCache.hasData(key);
   dynamic read(String key) => AppStorageCache.readCache(key);
@@ -11,7 +11,7 @@ class _StorageWrapper {
 }
 
 class AppStorageCache {
-  static const _StorageWrapper getStorage = _StorageWrapper();
+  static const AppStorageWrapper getStorage = AppStorageWrapper();
   static final Map<String, dynamic> _memoryCache = {};
 
   // Cache keys

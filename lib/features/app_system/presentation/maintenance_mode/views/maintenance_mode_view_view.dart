@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/shared/shared.dart';
 
 class MaintenanceModeView extends StatelessWidget {
   final String? title;

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/constants/app_strings.dart';
-import 'package:lokkha/core/localization/app_localizations.dart';
 import 'package:lokkha/core/utils/global.dart';
 
 class MyApp extends ConsumerWidget {

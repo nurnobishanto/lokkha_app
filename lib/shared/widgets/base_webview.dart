@@ -13,7 +13,7 @@ class BaseWebView extends StatefulWidget {
   });
 
   @override
-  _BaseWebViewState createState() => _BaseWebViewState();
+  State<BaseWebView> createState() => _BaseWebViewState();
 }
 
 class _BaseWebViewState extends State<BaseWebView> {

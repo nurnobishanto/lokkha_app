@@ -6,7 +6,6 @@ import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/presentation/providers/package_details_notifier.dart';
 import 'package:lokkha/features/packages/presentation/views/premium_package_checkout_view.dart';
 import 'package:lokkha/shared/models/package.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 
 class PackageDetailsView extends ConsumerStatefulWidget {
   final int packageId;

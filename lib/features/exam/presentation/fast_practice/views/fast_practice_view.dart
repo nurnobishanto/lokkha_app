@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
 

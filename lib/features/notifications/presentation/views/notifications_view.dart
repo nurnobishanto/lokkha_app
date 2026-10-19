@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import '../providers/notifications_notifier.dart';
 import '../widgets/notification_card.dart';
 import 'notification_details_view.dart';
@@ -110,7 +108,7 @@ class NotificationsView extends ConsumerWidget {
                         Container(
                           padding: EdgeInsets.all(22.r),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF006A4E).withOpacity(0.08),
+                            color: const Color(0xFF006A4E).withValues(alpha: 0.08),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(

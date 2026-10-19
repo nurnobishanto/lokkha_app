@@ -1323,7 +1323,7 @@ packages:
     source: hosted
     version: "4.7.0"
   webview_flutter_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: webview_flutter_platform_interface
       sha256: "7cb32b21825bd65569665c32bb00a34ded5779786d6201f5350979d2d529940d"

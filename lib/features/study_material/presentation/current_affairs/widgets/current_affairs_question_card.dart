@@ -308,7 +308,7 @@ ${item.explanation != null && item.explanation!.isNotEmpty ? "ব্যাখ্
           ],
 
           SizedBox(height: 14.h),
-          Divider(color: Colors.grey.withOpacity(0.18), height: 1),
+          Divider(color: Colors.grey.withValues(alpha: 0.18), height: 1),
         ],
       ),
     );

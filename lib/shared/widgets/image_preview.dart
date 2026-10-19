@@ -10,6 +10,7 @@ class ImagePreviewPage extends StatelessWidget {
     try {
       // Step 1: Permission check
       var status = await Permission.storage.request();
+      if (!context.mounted) return;
       if (!status.isGranted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Storage permission denied")),
@@ -23,6 +24,7 @@ class ImagePreviewPage extends StatelessWidget {
         options: Options(responseType: ResponseType.bytes),
       );
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Download failed: $e")),
       );

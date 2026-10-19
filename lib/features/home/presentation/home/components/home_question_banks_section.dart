@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
@@ -65,12 +64,12 @@ class HomeQuestionBanksSection extends StatelessWidget {
                       color: context.cardColor,
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: context.borderColor.withOpacity(0.6),
+                        color: context.borderColor.withValues(alpha: 0.6),
                         width: 0.8,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
+                          color: Colors.black.withValues(alpha: 0.02),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -85,7 +84,7 @@ class HomeQuestionBanksSection extends StatelessWidget {
                             Container(
                               padding: EdgeInsets.all(5.r),
                               decoration: BoxDecoration(
-                                color: context.primaryColor.withOpacity(0.1),
+                                color: context.primaryColor.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(6.r),
                               ),
                               child: Icon(
@@ -100,7 +99,7 @@ class HomeQuestionBanksSection extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 5.w, vertical: 1.5.h),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981).withOpacity(0.1),
+                                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4.r),
                                 ),
                                 child: Text(
@@ -171,9 +170,9 @@ class HomeQuestionBanksSection extends StatelessWidget {
                     size: 14.sp,
                     color: context.primaryColor,
                   ),
-                  backgroundColor: context.primaryColor.withOpacity(0.08),
+                  backgroundColor: context.primaryColor.withValues(alpha: 0.08),
                   side: BorderSide(
-                    color: context.primaryColor.withOpacity(0.2),
+                    color: context.primaryColor.withValues(alpha: 0.2),
                     width: 0.8,
                   ),
                   shape: RoundedRectangleBorder(

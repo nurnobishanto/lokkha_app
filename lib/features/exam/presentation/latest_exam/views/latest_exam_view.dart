@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/exam/presentation/latest_exam/views/latest_exam_start_view.dart';
 import 'package:lokkha/features/exam/presentation/providers/exam_notifier.dart';
-import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/shared/widgets/login_required_dialog.dart';
 
 class LatestExamView extends ConsumerWidget {
@@ -78,7 +74,7 @@ class LatestExamView extends ConsumerWidget {
 
                   final data = examsList[index];
                   return LatestExamCard(
-                    title: data.title ?? '',
+                    title: data.title,
                     date: data.date,
                     onTap: () {
                       showDialog(

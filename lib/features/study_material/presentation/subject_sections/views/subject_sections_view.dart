@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/study_material/study_material.dart';
-import 'package:lokkha/shared/models/subject.dart';
 import 'package:lokkha/shared/shared.dart';
 
 class SubjectSectionView extends StatelessWidget {

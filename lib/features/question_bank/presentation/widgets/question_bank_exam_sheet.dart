@@ -81,7 +81,7 @@ class _QuestionBankExamSheetState extends State<QuestionBankExamSheet> {
                 width: 48.r,
                 height: 48.r,
                 decoration: BoxDecoration(
-                  color: themeColor.withOpacity(0.12),
+                  color: themeColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14.r),
                 ),
                 child: Icon(
@@ -101,7 +101,7 @@ class _QuestionBankExamSheetState extends State<QuestionBankExamSheet> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 8.w, vertical: 2.h),
                         decoration: BoxDecoration(
-                          color: themeColor.withOpacity(0.12),
+                          color: themeColor.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Text(
@@ -279,7 +279,7 @@ class _QuestionBankExamSheetState extends State<QuestionBankExamSheet> {
                   label: Text('অনুশীলন মোড',
                       style: TextStyle(color: themeColor, fontSize: 12.5.sp)),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: themeColor.withOpacity(0.5)),
+                    side: BorderSide(color: themeColor.withValues(alpha: 0.5)),
                     padding: EdgeInsets.symmetric(vertical: 11.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.r),
@@ -303,7 +303,7 @@ class _QuestionBankExamSheetState extends State<QuestionBankExamSheet> {
                           color: context.textPrimary, fontSize: 12.5.sp)),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
-                        color: context.borderColor.withOpacity(0.7)),
+                        color: context.borderColor.withValues(alpha: 0.7)),
                     padding: EdgeInsets.symmetric(vertical: 11.h),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.r),

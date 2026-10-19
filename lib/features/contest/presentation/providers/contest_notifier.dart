@@ -2,15 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/network/endpoints.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/core/network/rest_client.dart';
-import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/di/contest_provider.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/contest/contest.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/shared/models/user.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 // ============================================================================
 // 1. Models & Helper Classes
@@ -116,10 +113,13 @@ class LatestContestState {
 
 class LatestContestNotifier extends Notifier<LatestContestState> {
   Timer? _tickerTimer;
-  final RestClient _client;
+  final ContestRepository? _repository;
 
-  LatestContestNotifier({RestClient? client})
-      : _client = client ?? RestClient();
+  LatestContestNotifier({ContestRepository? repository})
+      : _repository = repository;
+
+  ContestRepository get _repo =>
+      _repository ?? ref.read(contestRepositoryProvider);
 
   @override
   LatestContestState build() {
@@ -223,11 +223,9 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchContest() async {
     state = state.copyWith(isLoading: true);
-    final url = Endpoints.latestContest;
     try {
-      final response = await _client.get(url);
-      if (response.data['status'] == true) {
-        final model = LatestContestModel.fromJson(response.data);
+      final model = await _repo.getLatestContest();
+      if (model != null && model.status == true) {
         final img = model.contest?.image != null
             ? '${Endpoints.storageUrl}${model.contest!.image}'
             : state.imageUrl;
@@ -247,11 +245,9 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchAllContest() async {
     state = state.copyWith(isLoading: true);
-    final url = Endpoints.allContestList;
     try {
-      final response = await _client.get(url);
-      if (response.data['status'] == true) {
-        final model = AllContestModel.fromJson(response.data);
+      final model = await _repo.getAllContests();
+      if (model != null && model.status == true) {
         state = state.copyWith(
           isLoading: false,
           allContestModel: model,
@@ -267,11 +263,9 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
 
   Future<void> fetchContestResult() async {
     state = state.copyWith(isResultLoading: true);
-    final url = Endpoints.latestContestResult;
     try {
-      final response = await _client.get(url);
-      if (response.data['status'] == true) {
-        final model = ContestResultModel.fromJson(response.data);
+      final model = await _repo.getLatestContestResult();
+      if (model != null && model.status == true) {
         final results = model.contestResults ?? [];
         final List<RankCardUser> list = [];
 
@@ -325,14 +319,8 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
     }
 
     try {
-      final response = await _client.post(
-        '${Endpoints.startContest}$id/start',
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      );
-      if (response.data['status'] == true) {
-        final data = ContestStartModel.fromJson(response.data);
+      final data = await _repo.startContest(id);
+      if (data != null && data.status == true) {
         if (context.mounted) {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -340,8 +328,8 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
             ),
           );
         }
-      } else if (response.data['status'] == false) {
-        if (response.data['package_required'] == true) {
+      } else if (data != null && data.status == false) {
+        if (data.packageRequired == true) {
           if (context.mounted) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -350,9 +338,11 @@ class LatestContestNotifier extends Notifier<LatestContestState> {
             );
           }
         }
-        CustomSnackBar.showCustomErrorToast(
-          message: response.data['message']?.toString() ?? '',
-        );
+        if (data.message != null && data.message!.isNotEmpty) {
+          CustomSnackBar.showCustomErrorToast(
+            message: data.message!,
+          );
+        }
       }
     } catch (_) {}
   }
@@ -404,11 +394,14 @@ class ContestExamState {
 
 class ContestExamNotifier extends Notifier<ContestExamState> {
   final ContestStartModel exam;
-  final RestClient _client;
+  final ContestRepository? _repository;
   Timer? _timer;
 
-  ContestExamNotifier(this.exam, {RestClient? client})
-      : _client = client ?? RestClient();
+  ContestExamNotifier(this.exam, {ContestRepository? repository})
+      : _repository = repository;
+
+  ContestRepository get _repo =>
+      _repository ?? ref.read(contestRepositoryProvider);
 
   @override
   ContestExamState build() {
@@ -476,28 +469,19 @@ class ContestExamNotifier extends Notifier<ContestExamState> {
     if (state.isExamSubmitted) return;
     state = state.copyWith(isLoading: true, isExamSubmitted: true);
 
-    final token = MySharedPref.getUserToken();
-    final headers = {
-      if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    };
-    final url = '${Endpoints.startContest}${exam.contest?.id}/submit';
-
     final userAnswersArray =
         state.userAnswers.values.map((u) => u.toJson()).toList();
-    final data = {
-      'user_answers': userAnswersArray,
-    };
 
     try {
-      final response = await _client.post(
-        url,
-        headers: headers,
-        data: data,
+      final modelData = await _repo.submitContest(
+        contestId: exam.contest?.id ?? 0,
+        userAnswers: userAnswersArray,
       );
-      if (response.data['status'] == true) {
-        await MySharedPref.clearMockSubjects();
-        final modelData = ContestSubmitModel.fromJson(response.data);
+
+      if (modelData != null && modelData.status == true) {
+        try {
+          await MySharedPref.clearMockSubjects();
+        } catch (_) {}
         state = state.copyWith(isLoading: false);
         if (context != null && context.mounted) {
           Navigator.of(context).pushReplacement(

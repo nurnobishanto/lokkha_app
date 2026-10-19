@@ -16,6 +16,7 @@ export 'domain/usecases/reset_password_usecase.dart';
 export 'domain/usecases/logout_usecase.dart';
 
 // Presentation - Riverpod Notifiers
+export 'presentation/providers/central_auth_notifier.dart';
 export 'presentation/sign_up/riverpod/sign_up_notifier.dart';
 export 'presentation/signin/riverpod/sign_in_notifier.dart';
 export 'presentation/verify_otp/riverpod/verify_otp_notifier.dart';

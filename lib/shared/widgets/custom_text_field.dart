@@ -39,7 +39,7 @@ class CustomTextField extends StatelessWidget {
       onTap: onTap,
       validator: validator,
       readOnly: readOnly,
-      cursorColor: LightThemeColors.primaryColor,
+      cursorColor: context.primaryColor,
       textAlignVertical: TextAlignVertical.center,
       style: TextStyle(color: context.textPrimary, fontSize: 14),
       decoration: InputDecoration(

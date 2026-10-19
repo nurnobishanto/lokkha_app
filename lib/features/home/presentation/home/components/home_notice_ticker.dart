@@ -77,10 +77,10 @@ class _HomeNoticeTickerState extends State<HomeNoticeTicker> {
       margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: context.primaryColor.withOpacity(0.08),
+        color: context.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: context.primaryColor.withOpacity(0.2),
+          color: context.primaryColor.withValues(alpha: 0.2),
           width: 0.8,
         ),
       ),

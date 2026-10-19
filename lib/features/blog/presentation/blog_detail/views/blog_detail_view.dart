@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:lokkha/features/blog/blog.dart';
 
