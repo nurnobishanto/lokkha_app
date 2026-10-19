@@ -1,5 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/features/packages/data/models/premium_package_model.dart';
+import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/shared/models/package.dart';
 
 void main() {
@@ -131,4 +135,94 @@ void main() {
       expect(model.meta?.currentPage, 1);
     });
   });
+
+  group('PremiumPackagesView Widget Tests', () {
+    testWidgets('renders modern hero banner, clean cards, and trust footer', (tester) async {
+      final mockRepo = _MockTestPackagesRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            premiumPackagesNotifierProvider.overrideWith(
+              () => PremiumPackagesNotifier(repository: mockRepo),
+            ),
+          ],
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            builder: (context, child) => const MaterialApp(
+              home: PremiumPackagesView(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
+
+      // 1. Verify AppBar and Hero
+      expect(find.text('প্রিমিয়াম প্যাকেজ'), findsOneWidget);
+      expect(find.text('লক্ষ্য প্রো সাবস্ক্রিপশন'), findsOneWidget);
+      expect(find.text('সকল মডেল টেস্ট, বিষয়ভিত্তিক পরীক্ষা ও নির্ভুল ব্যাখ্যা'), findsOneWidget);
+
+      // 2. Verify First Package rendered as card
+      await tester.scrollUntilVisible(find.text('ফিচারসমূহ'), 100);
+      expect(find.text('ফিচারসমূহ'), findsOneWidget);
+      expect(find.text('৳150'), findsOneWidget);
+
+      // 3. Scroll to second package
+      await tester.scrollUntilVisible(find.text('অপরাজিতা এক্সপ্রেস'), 100);
+      expect(find.text('অপরাজিতা এক্সপ্রেস'), findsOneWidget);
+      expect(find.text('অপরাজিতা স্পেশাল • 40.1% ছাড়'), findsOneWidget);
+      expect(find.text('৳899'), findsOneWidget);
+
+      // 4. Scroll to Trust footer
+      await tester.scrollUntilVisible(find.text('১০০% নিরাপদ পেমেন্ট'), 100);
+      expect(find.text('১০০% নিরাপদ পেমেন্ট'), findsOneWidget);
+    });
+  });
 }
+
+class _MockTestPackagesRepo implements PackagesRepository {
+  @override
+  Future<PackageDetailResponseModel?> getPackageDetails(int packageId) async => null;
+
+  @override
+  Future<PremiumPackageModel?> getPremiumPackages({
+    int page = 1,
+    int perPage = 15,
+    String? search,
+    bool? isFeatured,
+    bool? isTrial,
+    String? sortBy,
+  }) async {
+    return PremiumPackageModel(
+      success: true,
+      packages: [
+        Package(
+          id: 1,
+          name: "ফিচারসমূহ",
+          duration: 180,
+          regularPrice: "180",
+          discountedPrice: "150",
+          discount: "16.67",
+        ),
+        Package(
+          id: 2,
+          name: "অপরাজিতা এক্সপ্রেস",
+          duration: 365,
+          regularPrice: "1500",
+          discountedPrice: "899",
+          discount: "40.07",
+          isFemale: true,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>?> claimFreeTrial(int packageId) async => null;
+}
+

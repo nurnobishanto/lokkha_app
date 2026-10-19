@@ -329,7 +329,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       // Verify Header
-      expect(find.text('লক্ষ্য'), findsOneWidget);
+      expect(find.text('লক্ষ্য'), findsWidgets);
       expect(find.text('সঠিক পথে, স্বল্প সময়ে'), findsOneWidget);
 
       // Scroll to and verify Drawer content

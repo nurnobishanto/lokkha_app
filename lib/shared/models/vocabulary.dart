@@ -61,11 +61,17 @@ class Vocabulary {
 
   factory Vocabulary.fromJson(Map<String, dynamic> json) {
     final pronunciation = json["pronunciation"]?.toString();
-    final banglaMeaning = json["bangla_meaning"]?.toString();
-    final meaning = json["meaning"]?.toString();
+    final details = json["details"]?.toString() ??
+        json["meaning"]?.toString() ??
+        json["bangla_meaning"]?.toString();
+    final meaning = json["meaning"]?.toString() ??
+        details ??
+        json["bangla_meaning"]?.toString();
+    final banglaMeaning = json["bangla_meaning"]?.toString() ??
+        meaning ??
+        details;
     final sentenceExample = json["sentence_example"]?.toString();
     final notes = json["notes"]?.toString();
-    final details = json["details"]?.toString() ?? banglaMeaning ?? meaning;
 
     // Parse synonyms (supports v1 'synonyms' and legacy 'synonym')
     final rawSynonyms = json["synonyms"] ?? json["synonym"];

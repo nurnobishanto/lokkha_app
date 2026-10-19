@@ -140,6 +140,18 @@ class Endpoints {
   static const String blogs = '/api/v1/blog';
   static const String blog = '/api/v1/blog';
 
+  // ─── Quick Practice / Subject Sections (V1) ────────────────────────────────
+  static const String subjectSectionsSubjects = '/api/v1/subject-sections/subjects';
+  static String subjectSectionsChildren(dynamic id) =>
+      '/api/v1/subject-sections/subjects/$id/children';
+  static String subjectSectionsQuestions(dynamic id) =>
+      '/api/v1/subject-sections/subjects/$id/questions';
+  static const String v1SubjectSectionsSubjects = subjectSectionsSubjects;
+  static String v1SubjectSectionsChildren(dynamic id) =>
+      subjectSectionsChildren(id);
+  static String v1SubjectSectionsQuestions(dynamic id) =>
+      subjectSectionsQuestions(id);
+
   // ─── Aliases for compatibility ────────────────────────────────────────────
   static const String v1AuthCheckPhone = checkPhone;
   static const String v1AuthSendOtp = sendOtp;

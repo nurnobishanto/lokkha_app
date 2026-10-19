@@ -46,16 +46,17 @@ class AllCourseView extends ConsumerWidget {
           child: Column(
             children: [
               GridView.builder(
-                padding: EdgeInsets.all(8.w),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: courses.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8.w,
-                  crossAxisSpacing: 8.w,
+                  crossAxisCount:
+                      MediaQuery.sizeOf(context).width > 600 ? 3 : 2,
+                  mainAxisSpacing: 10.h,
+                  crossAxisSpacing: 10.w,
                   childAspectRatio:
-                      MediaQuery.sizeOf(context).width > 600 ? 1.5 : 1.1,
+                      MediaQuery.sizeOf(context).width > 600 ? 0.95 : 0.80,
                 ),
                 itemBuilder: (_, index) {
                   final course = courses[index];

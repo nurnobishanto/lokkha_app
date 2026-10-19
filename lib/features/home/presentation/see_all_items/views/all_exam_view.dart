@@ -599,51 +599,56 @@ class AllExamView extends ConsumerWidget {
 
                 // Footer Row: Date & Category (Left) + Compact Action Button (Right)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Published Date / Category
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.schedule_rounded,
-                          size: 11.5.sp,
-                          color: context.textMuted,
-                        ),
-                        SizedBox(width: 3.w),
-                        Text(
-                          exam.publishedAt != null
-                              ? 'প্রকাশিত: ${DateFormatter.formatToReadable(exam.publishedAt)}'
-                              : 'প্রকাশিত',
-                          style: TextStyle(
-                            fontSize: 10.5.sp,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.schedule_rounded,
+                            size: 11.5.sp,
                             color: context.textMuted,
-                            fontWeight: FontWeight.w500,
                           ),
-                        ),
-                        if (hasCategory) ...[
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                              color: context.textMuted,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              categoryName,
-                              style: TextStyle(
-                                fontSize: 10.5.sp,
-                                color: context.primaryColor,
-                                fontWeight: FontWeight.w600,
+                          SizedBox(width: 3.w),
+                          Expanded(
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: exam.publishedAt != null
+                                        ? 'প্রকাশিত: ${DateFormatter.formatToReadable(exam.publishedAt)}'
+                                        : 'প্রকাশিত',
+                                    style: TextStyle(
+                                      color: context.textMuted,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  if (hasCategory) ...[
+                                    TextSpan(
+                                      text: ' • ',
+                                      style: TextStyle(
+                                        color: context.textMuted,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: categoryName,
+                                      style: TextStyle(
+                                        color: context.primaryColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
+                              style: TextStyle(fontSize: 10.5.sp),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
-                      ],
+                      ),
                     ),
+                    SizedBox(width: 8.w),
 
                     // Compact Action Button
                     InkWell(

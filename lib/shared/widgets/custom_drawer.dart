@@ -1,10 +1,10 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/utils/share_helper.dart';
 import 'package:lokkha/app/router/routes.dart';
-import 'package:lokkha/app/theme/app_colors.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/network/endpoints.dart';
@@ -12,7 +12,6 @@ import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/app_system/presentation/customer_support/views/customer_support_view.dart';
 import 'package:lokkha/shared/widgets/base_webview.dart';
-import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
 import 'package:lokkha/features/auth/auth.dart';
 
 class CustomDrawer extends ConsumerWidget {
@@ -21,459 +20,321 @@ class CustomDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(centralAuthStateProvider);
-    final user = authState.user;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAuth = authState.isLoggedIn || isLoggedIn.value;
-    final name = user?.name ?? userName.value?.trim();
-    final phone = user?.phone ?? userPhone.value?.trim();
-    final isPremium = authState.hasPackage || checkUserHasPackage();
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final drawerWidth = (screenWidth * 0.82).clamp(300.0, 350.0);
+    final topPadding = math.max(MediaQuery.of(context).padding.top, 20.0);
 
     return Drawer(
-      backgroundColor: context.scaffoldColor,
+      width: drawerWidth,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(
+          right: Radius.circular(24.r),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      backgroundColor:
+          isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       child: ListView(
         padding: EdgeInsets.zero,
         physics: const ClampingScrollPhysics(),
         children: [
-          // ─── Header: Brand & User Info ──────────────────────────
+          // ─── Header: Centered Brand Hero Card ───────────────────────────
           Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(16.w, 48.h, 16.w, 18.h),
+            padding: EdgeInsets.fromLTRB(16.w, topPadding + 10.h, 16.w, 24.h),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  LightThemeColors.primaryColor,
-                  Color(0xFF1E6B54),
+                  Color(0xFF006A4E),
+                  Color(0xFF004D38),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
+            child: Stack(
+              children: [
+                // Centered Hero Brand Content
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(7.r),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          AssetImagePaths.appIcon,
+                          height: 44.r,
+                          width: 44.r,
+                        ),
+                      ),
+                      10.verticalSpace,
+                      Text(
+                        'লক্ষ্য',
+                        style: TextStyle(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      Text(
+                        'সঠিক পথে, স্বল্প সময়ে',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Close Button Top Right
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Container(
+                      padding: EdgeInsets.all(5.r),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.close_rounded,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        size: 16.sp,
+                      ),
+                    ),
+                    splashRadius: 18.r,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ─── Menu Groups ────────────────────────────────────────────────
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                // Group 1: মূল ফিচার ও সাপোর্ট
+                _buildSectionHeader(context, 'সাপোর্ট'),
+                _buildCardGroup(
+                  isDark: isDark,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(7.r),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        AssetImagePaths.appIcon,
-                        height: 36.r,
-                        width: 36.r,
-                      ),
+                    _DrawerMenuTile(
+                      icon: Icons.info_outline_rounded,
+                      iconColor: const Color(0xFF006A4E),
+                      title: 'আমাদের সম্পর্কে',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        context.pushNamed(Routes.about);
+                      },
                     ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'লক্ষ্য',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
+                    _buildDivider(isDark: isDark),
+                    _DrawerMenuTile(
+                      icon: Icons.headset_mic_outlined,
+                      iconColor: const Color(0xFF2563EB),
+                      title: 'কাস্টমার সাপোর্ট',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CustomerSupportView(),
                           ),
-                          Text(
-                            'সঠিক পথে, স্বল্প সময়ে',
-                            style: TextStyle(
-                              fontSize: 11.5.sp,
-                              color: Colors.white.withValues(alpha: 0.85),
-                            ),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
+                    ),
+                    _buildDivider(isDark: isDark),
+                    _DrawerMenuTile(
+                      icon: Icons.share_outlined,
+                      iconColor: const Color(0xFFD97706),
+                      title: 'শেয়ার করুন',
+                      onTap: () {
+                        final pkg = appPackage.value.isNotEmpty
+                            ? appPackage.value
+                            : 'com.techyfo.lokkha';
+                        final text = Platform.isIOS
+                            ? "https://apps.apple.com/us/app/lokkha/id6670564455"
+                            : "https://play.google.com/store/apps/details?id=$pkg";
+                        ShareHelper.share(
+                          text,
+                          context: context,
+                          subject: 'লক্ষ্য - ক্যারিয়ার প্রস্তুতি অ্যাপ',
+                        );
+                      },
                     ),
                   ],
                 ),
 
                 SizedBox(height: 14.h),
 
-                // User Status Pill / Card
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      width: 1,
-                    ),
-                  ),
-                  child: isAuth
-                      ? Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 17.r,
-                              backgroundColor: Colors.white,
-                              child: Text(
-                                (name != null && name.isNotEmpty)
-                                    ? name[0].toUpperCase()
-                                    : 'U',
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: LightThemeColors.primaryColor,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    (name != null && name.isNotEmpty)
-                                        ? name
-                                        : 'শিক্ষার্থী',
-                                    style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  if (phone != null && phone.isNotEmpty)
-                                    Text(
-                                      phone,
-                                      style: TextStyle(
-                                        fontSize: 11.sp,
-                                        color: Colors.white.withValues(alpha: 0.8),
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                ],
-                              ),
-                            ),
-                            if (isPremium)
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8.w, vertical: 3.h),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF59E0B),
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.star,
-                                        size: 11.sp, color: Colors.white),
-                                    SizedBox(width: 2.w),
-                                    Text(
-                                      'প্রিমিয়াম',
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'স্বাগতম অতিথি!',
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    'অগ্রগতি সংরক্ষণ করতে লগইন করুন',
-                                    style: TextStyle(
-                                      fontSize: 11.sp,
-                                      color: Colors.white.withValues(alpha: 0.8),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 8.w),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                                context.pushNamed(Routes.authGateway);
-                              },
-                              borderRadius: BorderRadius.circular(8.r),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10.w, vertical: 5.h),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                child: Text(
-                                  'লগইন',
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: LightThemeColors.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ],
-            ),
-          ),
-
-          // ─── Menu Items ──────────────────────────────────────────
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section 1: মূল সেবা ও তথ্য
-                _buildSectionHeader(context, 'মূল ফিচার ও সাপোর্ট'),
-                SizedBox(height: 6.h),
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      _DrawerMenuTile(
-                        icon: Icons.info_outline_rounded,
-                        iconColor: LightThemeColors.primaryColor,
-                        title: 'আমাদের সম্পর্কে',
-                        subtitle: 'লক্ষ্যের গল্প, মিশন ও সাফল্য',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          context.pushNamed(Routes.about);
-                        },
-                      ),
-                      const Divider(height: 1, indent: 50),
-                      _DrawerMenuTile(
-                        icon: Icons.headset_mic_rounded,
-                        iconColor: const Color(0xFF3B82F6),
-                        title: 'কাস্টমার সাপোর্ট',
-                        subtitle: 'যেকোনো সহযোগিতার জন্য হেল্পলাইন',
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const CustomerSupportView(),
-                            ),
-                          );
-                        },
-                      ),
-                      const Divider(height: 1, indent: 50),
-                      _DrawerMenuTile(
-                        icon: Icons.share_rounded,
-                        iconColor: const Color(0xFFF59E0B),
-                        title: 'শেয়ার করুন',
-                        subtitle: 'বন্ধুদের সাথে লক্ষ্য অ্যাপ শেয়ার করুন',
-                        onTap: () {
-                          final pkg = appPackage.value.isNotEmpty
-                              ? appPackage.value
-                              : 'com.techyfo.lokkha';
-                          final text = Platform.isIOS
-                              ? "https://apps.apple.com/us/app/lokkha/id6670564455"
-                              : "https://play.google.com/store/apps/details?id=$pkg";
-                          ShareHelper.share(
-                            text,
-                            context: context,
-                            subject: 'লক্ষ্য - ক্যারিয়ার প্রস্তুতি অ্যাপ',
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                // Group 2: থিম সেটিংস (Clean Theme Toggle without Chevron)
+                _buildSectionHeader(context, 'থিম সেটিংস'),
+                _buildCardGroup(
+                  isDark: isDark,
+                  children: [
+                    _DrawerThemeTile(isDark: isDark),
+                  ],
                 ),
 
                 SizedBox(height: 14.h),
 
-                // Section 2: থিম সেটিংস
-                _buildSectionHeader(context, 'পছন্দসমূহ'),
-                SizedBox(height: 6.h),
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFE2E8F0),
-                    ),
-                  ),
-                  child: const ThemeToggleTile(),
-                ),
-
-                SizedBox(height: 14.h),
-
-                // Section 3: নীতিমালা ও শর্তাবলী
+                // Group 3: নীতিমালা ও শর্তাবলী
                 _buildSectionHeader(context, 'নীতিমালা ও শর্তাবলী'),
-                SizedBox(height: 6.h),
-                Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(14.r),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFE2E8F0),
+                _buildCardGroup(
+                  isDark: isDark,
+                  children: [
+                    _DrawerMenuTile(
+                      icon: Icons.shield_outlined,
+                      iconColor: const Color(0xFF0D9488),
+                      title: 'প্রাইভেসি পলিসি',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BaseWebView(
+                            title: "প্রাইভেসি পলিসি",
+                            url: Endpoints.privacyPolicy,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      _DrawerMenuTile(
-                        icon: Icons.shield_outlined,
-                        iconColor: const Color(0xFF10B981),
-                        title: 'প্রাইভেসি পলিসি',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BaseWebView(
-                              title: "প্রাইভেসি পলিসি",
-                              url: Endpoints.privacyPolicy,
-                            ),
+                    _buildDivider(isDark: isDark),
+                    _DrawerMenuTile(
+                      icon: Icons.receipt_long_outlined,
+                      iconColor: const Color(0xFF7C3AED),
+                      title: 'রিফান্ড পলিসি',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BaseWebView(
+                            title: "রিফান্ড পলিসি",
+                            url: Endpoints.refundPolicy,
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 50),
-                      _DrawerMenuTile(
-                        icon: Icons.payments_outlined,
-                        iconColor: const Color(0xFF8B5CF6),
-                        title: 'রিফান্ড পলিসি',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BaseWebView(
-                              title: "রিফান্ড পলিসি",
-                              url: Endpoints.refundPolicy,
-                            ),
+                    ),
+                    _buildDivider(isDark: isDark),
+                    _DrawerMenuTile(
+                      icon: Icons.emoji_events_outlined,
+                      iconColor: const Color(0xFFEA580C),
+                      title: 'কনটেস্ট পলিসি',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BaseWebView(
+                            title: "কনটেস্ট পলিসি",
+                            url: Endpoints.contestPolicy,
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 50),
-                      _DrawerMenuTile(
-                        icon: Icons.emoji_events_outlined,
-                        iconColor: const Color(0xFFF97316),
-                        title: 'কন্টেস্ট পলিসি',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BaseWebView(
-                              title: "কন্টেস্ট পলিসি",
-                              url: Endpoints.contestPolicy,
-                            ),
+                    ),
+                    _buildDivider(isDark: isDark),
+                    _DrawerMenuTile(
+                      icon: Icons.article_outlined,
+                      iconColor: const Color(0xFF64748B),
+                      title: 'টার্মস এন্ড কন্ডিশন',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BaseWebView(
+                            title: "টার্মস এন্ড কন্ডিশন",
+                            url: Endpoints.termsPolicy,
                           ),
                         ),
                       ),
-                      const Divider(height: 1, indent: 50),
-                      _DrawerMenuTile(
-                        icon: Icons.description_outlined,
-                        iconColor: const Color(0xFF64748B),
-                        title: 'টার্মস এন্ড কন্ডিশন',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BaseWebView(
-                              title: "টার্মস এন্ড কন্ডিশন",
-                              url: Endpoints.termsPolicy,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
 
-                SizedBox(height: 14.h),
+                SizedBox(height: 16.h),
 
-                // Section 4: Auth Action (Login or Logout)
+                // Group 4: Auth Action (Subtle & Clean Logout)
+                // Group 4: Auth Action (Subtle & Clean Logout / Login)
                 if (isAuth)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: Colors.redAccent.withValues(alpha: 0.3),
+                  _buildCardGroup(
+                    isDark: isDark,
+                    children: [
+                      _DrawerMenuTile(
+                        icon: Icons.logout_rounded,
+                        iconColor: Colors.redAccent,
+                        title: 'লগ আউট',
+                        titleColor: Colors.redAccent,
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          AuthService.confirmAndLogout();
+                        },
                       ),
-                    ),
-                    child: _DrawerMenuTile(
-                      icon: Icons.logout_rounded,
-                      iconColor: Colors.redAccent,
-                      title: 'লগ আউট',
-                      titleColor: Colors.redAccent,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        AuthService.confirmAndLogout();
-                      },
-                    ),
+                    ],
                   )
                 else
-                  Container(
-                    decoration: BoxDecoration(
-                      color: LightThemeColors.primaryColor.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(14.r),
-                      border: Border.all(
-                        color: LightThemeColors.primaryColor.withValues(alpha: 0.3),
+                  _buildCardGroup(
+                    isDark: isDark,
+                    children: [
+                      _DrawerMenuTile(
+                        icon: Icons.login_rounded,
+                        iconColor: const Color(0xFF006A4E),
+                        title: 'লগইন / রেজিস্ট্রেশন',
+                        titleColor: const Color(0xFF006A4E),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          context.pushNamed(Routes.authGateway);
+                        },
                       ),
-                    ),
-                    child: _DrawerMenuTile(
-                      icon: Icons.login_rounded,
-                      iconColor: LightThemeColors.primaryColor,
-                      title: 'লগইন / রেজিস্ট্রেশন',
-                      titleColor: LightThemeColors.primaryColor,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        context.pushNamed(Routes.authGateway);
-                      },
-                    ),
+                    ],
                   ),
 
-                SizedBox(height: 24.h),
+                SizedBox(height: 20.h),
 
-                // ─── Footer: Copyright & Version ────────────────────────
+                // Footer: Brand Version & Copyright
                 Center(
                   child: Column(
                     children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'লক্ষ্য',
+                            style: TextStyle(
+                              fontSize: 11.5.sp,
+                              fontWeight: FontWeight.w600,
+                              color: context.textMuted,
+                            ),
+                          ),
+                          if (appVersion.value.isNotEmpty) ...[
+                            Text(
+                              ' • ভার্শন ${appVersion.value}',
+                              style: TextStyle(
+                                fontSize: 11.5.sp,
+                                color: context.textMuted,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      SizedBox(height: 2.h),
                       Text(
                         '© 2025 Lokkha. All rights reserved.',
                         style: TextStyle(
-                          fontSize: 11.5.sp,
-                          color: context.textMuted,
+                          fontSize: 10.5.sp,
+                          color: context.textMuted.withValues(alpha: 0.7),
                         ),
                       ),
-                      if (appVersion.value.isNotEmpty) ...[
-                        SizedBox(height: 2.h),
-                        Text(
-                          'ভার্শন ${appVersion.value}',
-                          style: TextStyle(
-                            fontSize: 11.sp,
-                            color: context.textMuted,
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -488,7 +349,7 @@ class CustomDrawer extends ConsumerWidget {
 
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
-      padding: EdgeInsets.only(left: 4.w, bottom: 2.h),
+      padding: EdgeInsets.only(left: 4.w, bottom: 6.h),
       child: Text(
         title,
         style: TextStyle(
@@ -500,13 +361,49 @@ class CustomDrawer extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _buildCardGroup(
+      {required List<Widget> children, required bool isDark}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : const Color(0xFFF1F5F9),
+        ),
+      ),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildDivider({required bool isDark}) {
+    return Divider(
+      height: 1,
+      thickness: 0.6,
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.06)
+          : const Color(0xFFF1F5F9),
+      indent: 58.w,
+      endIndent: 12.w,
+    );
+  }
 }
 
 class _DrawerMenuTile extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final String title;
-  final String? subtitle;
   final Color? titleColor;
   final VoidCallback onTap;
 
@@ -514,61 +411,125 @@ class _DrawerMenuTile extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.title,
-    this.subtitle,
     this.titleColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14.r),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 11.h),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(7.r),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.r),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          child: Row(
+            children: [
+              Container(
+                width: 34.r,
+                height: 34.r,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(9.r),
+                ),
+                child: Icon(icon, color: iconColor, size: 18.sp),
               ),
-              child: Icon(icon, color: iconColor, size: 19.sp),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13.5.sp,
-                      fontWeight: FontWeight.w600,
-                      color: titleColor ?? context.textPrimary,
-                    ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13.5.sp,
+                    fontWeight: FontWeight.w600,
+                    color: titleColor ?? context.textPrimary,
                   ),
-                  if (subtitle != null && subtitle!.isNotEmpty)
-                    Text(
-                      subtitle!,
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        color: context.textMuted,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 20.sp,
-              color: context.textMuted.withValues(alpha: 0.6),
-            ),
-          ],
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18.sp,
+                color: (titleColor ?? context.textMuted).withValues(alpha: 0.4),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerThemeTile extends ConsumerWidget {
+  final bool isDark;
+
+  const _DrawerThemeTile({required this.isDark});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    final isDarkMode = mode == ThemeMode.dark ||
+        (mode == ThemeMode.system &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+    final accentColor =
+        isDarkMode ? const Color(0xFF6366F1) : const Color(0xFFF59E0B);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          ref.read(themeModeProvider.notifier).toggleTheme();
+        },
+        borderRadius: BorderRadius.circular(16.r),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+          child: Row(
+            children: [
+              Container(
+                width: 34.r,
+                height: 34.r,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(9.r),
+                ),
+                child: Icon(
+                  isDarkMode
+                      ? Icons.dark_mode_outlined
+                      : Icons.light_mode_outlined,
+                  color: accentColor,
+                  size: 18.sp,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'ডার্ক মোড',
+                      style: TextStyle(
+                        fontSize: 13.5.sp,
+                        fontWeight: FontWeight.w600,
+                        color: context.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Transform.scale(
+                scale: 0.82,
+                child: Switch.adaptive(
+                  value: isDarkMode,
+                  activeTrackColor: const Color(0xFF006A4E),
+                  activeThumbColor: Colors.white,
+                  onChanged: (_) {
+                    ref.read(themeModeProvider.notifier).toggleTheme();
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

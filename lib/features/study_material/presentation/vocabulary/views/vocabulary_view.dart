@@ -137,19 +137,51 @@ class _VocabularyViewState extends ConsumerState<VocabularyView> {
                               width: double.infinity,
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 12),
                               decoration: BoxDecoration(
                                 color: context.cardColor,
                                 border:
                                     Border.all(color: context.borderColor),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
-                                vocab.word ?? '',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: context.textPrimary,
-                                    fontWeight: FontWeight.w500),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          vocab.word ?? '',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: context.textPrimary,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        if (vocab.displayMeaning != null &&
+                                            vocab.displayMeaning!.trim().isNotEmpty) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            vocab.displayMeaning!,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: context.textMuted,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 14,
+                                    color: context.textMuted,
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -511,26 +543,24 @@ class _VocabularyDetailDialogState
               popupList(
                   "Synonyms", vocab.synonym, LightThemeColors.primaryColor)
             else if (!_isLoading)
-              const Text("No synonyms found"),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text("No synonyms found",
+                    style: TextStyle(color: Colors.grey, fontSize: 13)),
+              ),
             if (vocab.antonym != null && vocab.antonym!.isNotEmpty)
               popupList(
                   "Antonyms", vocab.antonym, LightThemeColors.primaryColor)
             else if (!_isLoading)
-              const Text("No antonyms found"),
-            if (vocab.wrongSynonym != null &&
-                vocab.wrongSynonym!.isNotEmpty)
-              popupList("Wrong Synonyms", vocab.wrongSynonym, Colors.red)
-            else if (!_isLoading &&
-                (widget.vocabulary.wrongSynonym == null ||
-                    widget.vocabulary.wrongSynonym!.isEmpty))
-              const Text("No wrong synonyms found"),
-            if (vocab.wrongAntonym != null &&
-                vocab.wrongAntonym!.isNotEmpty)
-              popupList("Wrong Antonyms", vocab.wrongAntonym, Colors.red)
-            else if (!_isLoading &&
-                (widget.vocabulary.wrongAntonym == null ||
-                    widget.vocabulary.wrongAntonym!.isEmpty))
-              const Text("No wrong antonyms found"),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
+                child: Text("No antonyms found",
+                    style: TextStyle(color: Colors.grey, fontSize: 13)),
+              ),
+            if (vocab.wrongSynonym != null && vocab.wrongSynonym!.isNotEmpty)
+              popupList("Wrong Synonyms", vocab.wrongSynonym, Colors.red),
+            if (vocab.wrongAntonym != null && vocab.wrongAntonym!.isNotEmpty)
+              popupList("Wrong Antonyms", vocab.wrongAntonym, Colors.red),
           ],
         ),
       ),
@@ -557,19 +587,31 @@ Widget popupList(String title, List<String?>? items, Color color) {
     children: [
       Text(
         "$title:",
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
       ),
-      const SizedBox(height: 4),
+      const SizedBox(height: 6),
       Wrap(
         spacing: 6,
-        runSpacing: 4,
+        runSpacing: 6,
         children: filteredItems.asMap().entries.map((entry) {
           int idx = entry.key;
           String e = entry.value;
           bool isLast = idx == filteredItems.length - 1;
-          return Text(
-            isLast ? e : "$e,",
-            style: TextStyle(color: color, fontWeight: FontWeight.w500),
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: color.withValues(alpha: 0.2)),
+            ),
+            child: Text(
+              isLast ? e : "$e,",
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+            ),
           );
         }).toList(),
       ),

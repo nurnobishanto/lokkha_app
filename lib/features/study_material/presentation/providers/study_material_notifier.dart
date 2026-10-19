@@ -232,9 +232,40 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
       ]);
 
       final alphabets = results[0] as List<String>;
-      final categories = results[1] as List<Category>;
-      final types = results[2] as List<Category>;
+      List<Category> categories = results[1] as List<Category>;
+      List<Category> types = results[2] as List<Category>;
       final vocabModel = results[3] as VocabularyModel;
+      final rawList = vocabModel.vocabularies?.data ?? [];
+
+      // Extract unique categories from items if categories endpoint was empty
+      if (categories.isEmpty) {
+        final catMap = <int, Category>{};
+        for (final item in rawList) {
+          if (item.categories != null) {
+            for (final cat in item.categories!) {
+              if (cat.id != null && !catMap.containsKey(cat.id)) {
+                catMap[cat.id!] = cat;
+              }
+            }
+          }
+        }
+        categories = catMap.values.toList();
+      }
+
+      // Extract unique types from items if types endpoint was empty
+      if (types.isEmpty) {
+        final typeMap = <int, Category>{};
+        for (final item in rawList) {
+          if (item.types != null) {
+            for (final t in item.types!) {
+              if (t.id != null && !typeMap.containsKey(t.id)) {
+                typeMap[t.id!] = t;
+              }
+            }
+          }
+        }
+        types = typeMap.values.toList();
+      }
 
       final combinedModel = vocabModel.copyWith(
         alphabets: alphabets,
@@ -242,7 +273,6 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
         types: types,
       );
 
-      final rawList = combinedModel.vocabularies?.data ?? [];
       final lastPage = combinedModel.vocabularies?.lastPage ?? 1;
       final curPage = combinedModel.vocabularies?.currentPage ?? 1;
       final total = combinedModel.vocabularies?.total ?? rawList.length;
@@ -395,19 +425,50 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
             state.selectedAlphabet.isNotEmpty ? state.selectedAlphabet : null,
         typeId: state.selectedType?.id,
         categoryId: state.selectedCategory?.id,
+        search: state.search.isNotEmpty ? state.search : null,
       );
+
+      final rawList = vocabModel.vocabularies?.data ?? [];
+      List<Category> categories = state.categories;
+      if (categories.isEmpty) {
+        final catMap = <int, Category>{};
+        for (final item in rawList) {
+          if (item.categories != null) {
+            for (final cat in item.categories!) {
+              if (cat.id != null && !catMap.containsKey(cat.id)) {
+                catMap[cat.id!] = cat;
+              }
+            }
+          }
+        }
+        categories = catMap.values.toList();
+      }
+
+      List<Category> types = state.types;
+      if (types.isEmpty) {
+        final typeMap = <int, Category>{};
+        for (final item in rawList) {
+          if (item.types != null) {
+            for (final t in item.types!) {
+              if (t.id != null && !typeMap.containsKey(t.id)) {
+                typeMap[t.id!] = t;
+              }
+            }
+          }
+        }
+        types = typeMap.values.toList();
+      }
 
       final combinedModel = vocabModel.copyWith(
         alphabets: state.alphabets.isNotEmpty
             ? state.alphabets
             : vocabModel.alphabets,
-        categories: state.categories.isNotEmpty
-            ? state.categories
+        categories: categories.isNotEmpty
+            ? categories
             : vocabModel.categories,
-        types: state.types.isNotEmpty ? state.types : vocabModel.types,
+        types: types.isNotEmpty ? types : vocabModel.types,
       );
 
-      final rawList = combinedModel.vocabularies?.data ?? [];
       final lastPage = combinedModel.vocabularies?.lastPage ?? 1;
       final curPage = combinedModel.vocabularies?.currentPage ?? 1;
       final total = combinedModel.vocabularies?.total ?? rawList.length;
@@ -417,6 +478,8 @@ class VocabularyNotifier extends Notifier<VocabularyState> {
       state = state.copyWith(
         isLoading: false,
         model: combinedModel,
+        categories: categories,
+        types: types,
         rawVocab: rawList,
         filteredVocab: filtered,
         totalPages: lastPage,

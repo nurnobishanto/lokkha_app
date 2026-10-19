@@ -62,9 +62,14 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
     }
     if (typeId != null) {
       queryParams['type_ids[]'] = typeId;
+      queryParams['type_id'] = typeId;
     }
     if (categoryId != null) {
       queryParams['category_ids[]'] = categoryId;
+      queryParams['category_id'] = categoryId;
+    }
+    if (search != null && search.trim().isNotEmpty) {
+      queryParams['search'] = search.trim();
     }
 
     try {

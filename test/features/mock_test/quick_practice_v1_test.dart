@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/features/mock_test/mock_test.dart';
+import 'package:lokkha/features/quick_practice/quick_practice.dart';
 import 'package:lokkha/shared/shared.dart';
 
 const Map<String, dynamic> sampleV1QuestionBanksJson = {
@@ -215,5 +216,65 @@ void main() {
       expect(find.text('কমন টপিক For All (16)'), findsOneWidget);
       expect(find.text('টেকনিক্যাল বিষয়সমূহ (3)'), findsOneWidget);
     });
+
+    testWidgets('MockTestTabView renders directly without TabBar or question bank tab', (tester) async {
+      await tester.pumpWidget(
+        ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (context, child) => ProviderScope(
+            overrides: [
+              quickPracticeRepositoryProvider.overrideWithValue(const _MockQuickPracticeRepo()),
+            ],
+            child: const MaterialApp(
+              home: MockTestTabView(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('কুইক প্র্যাকটিস'), findsOneWidget);
+      expect(find.byType(TabBar), findsNothing);
+      expect(find.byType(DefaultTabController), findsNothing);
+      expect(find.text('বিষয় সমূহ'), findsNothing);
+      expect(find.text('প্রশ্ন ব্যাংক'), findsNothing);
+    });
   });
+}
+
+class _MockQuickPracticeRepo implements QuickPracticeRepository {
+  const _MockQuickPracticeRepo();
+
+  @override
+  Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search}) async {
+    return const [];
+  }
+
+  @override
+  Future<SubjectChildrenResponse> getSubjectChildren(
+    int subjectId, {
+    int page = 1,
+    int perPage = 24,
+    String? search,
+  }) async {
+    return const SubjectChildrenResponse(
+      success: true,
+      items: [],
+      meta: PaginationMeta(total: 0),
+    );
+  }
+
+  @override
+  Future<SubjectQuestionsResponse> getSubjectQuestions(
+    int subjectId, {
+    int page = 1,
+    int perPage = 15,
+  }) async {
+    return const SubjectQuestionsResponse(
+      success: true,
+      items: [],
+      meta: PaginationMeta(total: 0),
+    );
+  }
 }
