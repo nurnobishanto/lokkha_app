@@ -1,6 +1,7 @@
 import 'package:lokkha/features/quick_practice/data/models/quick_practice_models.dart';
 
 abstract class QuickPracticeRepository {
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview();
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search});
   Future<SubjectChildrenResponse> getSubjectChildren(
     int subjectId, {
@@ -13,4 +14,8 @@ abstract class QuickPracticeRepository {
     int page = 1,
     int perPage = 15,
   });
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  );
 }

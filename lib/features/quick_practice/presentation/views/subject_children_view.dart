@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/quick_practice/data/models/quick_practice_models.dart';
 import 'package:lokkha/features/quick_practice/presentation/providers/quick_practice_providers.dart';
-import 'package:lokkha/features/quick_practice/presentation/views/subject_questions_practice_view.dart';
 import 'package:lokkha/features/quick_practice/presentation/widgets/subject_child_card.dart';
+import 'package:lokkha/features/quick_practice/presentation/views/subject_exam_setup_view.dart';
 
 class SubjectChildrenView extends ConsumerStatefulWidget {
   final QuickPracticeSubject subject;
@@ -193,10 +193,23 @@ class _SubjectChildrenViewState extends ConsumerState<SubjectChildrenView> {
                                   onTap: () {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            SubjectQuestionsPracticeView(
+                                        builder: (_) => SubjectExamSetupView(
                                           subjectId: item.id,
-                                          title: item.name,
+                                          subjectTitle: item.name,
+                                          availableQuestions:
+                                              item.questionsCount,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  onPracticeTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => SubjectExamSetupView(
+                                          subjectId: item.id,
+                                          subjectTitle: item.name,
+                                          availableQuestions:
+                                              item.questionsCount,
                                         ),
                                       ),
                                     );

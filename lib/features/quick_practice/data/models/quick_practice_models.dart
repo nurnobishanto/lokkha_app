@@ -91,7 +91,7 @@ class QuickPracticeSubject {
       name: json['name'] as String? ?? '',
       slug: json['slug'] as String?,
       parentId: json['parent_id'] as int?,
-      image: json['image'] as String?,
+      image: (json['image_url'] ?? json['image']) as String?,
       description: json['description'] as String?,
       status: json['status'] is bool ? json['status'] as bool : (json['status'] == 1 || json['status'] == '1'),
       showApp: json['show_app'] is bool ? json['show_app'] as bool : (json['show_app'] != false && json['show_app'] != 0),
@@ -166,12 +166,14 @@ class SubjectChild {
   final int id;
   final String name;
   final String? slug;
+  final int? parentId;
   final int questionsCount;
 
   const SubjectChild({
     required this.id,
     required this.name,
     this.slug,
+    this.parentId,
     this.questionsCount = 0,
   });
 
@@ -188,6 +190,7 @@ class SubjectChild {
       id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? '') ?? 0,
       name: json['name'] as String? ?? '',
       slug: json['slug'] as String?,
+      parentId: json['parent_id'] as int?,
       questionsCount: json['questions_count'] as int? ?? json['question_count'] as int? ?? 0,
     );
   }
@@ -196,6 +199,7 @@ class SubjectChild {
         'id': id,
         'name': name,
         'slug': slug,
+        'parent_id': parentId,
         'questions_count': questionsCount,
       };
 }
@@ -413,3 +417,132 @@ class SubjectQuestionsResponse {
     );
   }
 }
+
+/// ─── Subject Section Overview Model (GET /api/v1/subject-sections) ───────
+class SubjectSectionOverview {
+  final int id;
+  final String name;
+  final String? slug;
+  final String? description;
+  final bool status;
+  final bool showApp;
+  final int? subjectsCount;
+
+  const SubjectSectionOverview({
+    required this.id,
+    required this.name,
+    this.slug,
+    this.description,
+    this.status = true,
+    this.showApp = true,
+    this.subjectsCount,
+  });
+
+  factory SubjectSectionOverview.fromJson(Map<String, dynamic> json) {
+    return SubjectSectionOverview(
+      id: json['id'] is int
+          ? json['id'] as int
+          : int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      name: json['name'] as String? ?? '',
+      slug: json['slug'] as String?,
+      description: json['description'] as String?,
+      status: json['status'] is bool
+          ? json['status'] as bool
+          : (json['status'] == 1 || json['status'] == '1'),
+      showApp: json['show_app'] is bool
+          ? json['show_app'] as bool
+          : (json['show_app'] != false && json['show_app'] != 0),
+      subjectsCount: json['subjects_count'] as int? ?? json['subject_count'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'slug': slug,
+        'description': description,
+        'status': status,
+        'show_app': showApp,
+        'subjects_count': subjectsCount,
+      };
+}
+
+/// ─── Subject Exam Option Models (POST /api/v1/subject-sections/subjects/{id}/start-exam)
+class SubjectStartExamRequest {
+  final int? questionCount;
+  final bool enableTimer;
+  final int? time;
+  final bool enableNegativeMark;
+  final double? negativeMark;
+  final String? questionOption; // random, latest, unanswered, answered, wrong_answered, correct_answered
+
+  const SubjectStartExamRequest({
+    this.questionCount = 10,
+    this.enableTimer = true,
+    this.time = 15,
+    this.enableNegativeMark = true,
+    this.negativeMark = 0.25,
+    this.questionOption = 'random',
+  });
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (questionCount != null) map['question_count'] = questionCount;
+    map['enable_timer'] = enableTimer;
+    if (time != null) map['time'] = time;
+    map['enable_negative_mark'] = enableNegativeMark;
+    if (negativeMark != null) map['negative_mark'] = negativeMark;
+    if (questionOption != null) map['question_option'] = questionOption;
+    return map;
+  }
+}
+
+class SubjectExamSession {
+  final int examId;
+  final int totalQuestions;
+  final int duration;
+  final List<String> guidelines;
+  final Map<String, String> webviewUrls;
+
+  const SubjectExamSession({
+    required this.examId,
+    this.totalQuestions = 0,
+    this.duration = 0,
+    this.guidelines = const [],
+    this.webviewUrls = const {},
+  });
+
+  String? get startUrl => webviewUrls['start'];
+  String? get resultUrl => webviewUrls['result'];
+
+  factory SubjectExamSession.fromJson(Map<String, dynamic> json) {
+    final data = (json['data'] is Map<String, dynamic>)
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
+    final rawGuidelines = data['guidelines'] as List? ?? [];
+    final guidelines = rawGuidelines.map((e) => e.toString()).toList();
+
+    final rawUrls = data['webview_urls'] as Map<String, dynamic>? ?? {};
+    final webviewUrls = rawUrls.map((k, v) => MapEntry(k.toString(), v.toString()));
+
+    return SubjectExamSession(
+      examId: data['exam_id'] is int
+          ? data['exam_id'] as int
+          : int.tryParse(data['exam_id']?.toString() ?? '') ?? 0,
+      totalQuestions: data['total_questions'] as int? ?? 0,
+      duration: data['duration'] as int? ?? 0,
+      guidelines: guidelines,
+      webviewUrls: webviewUrls,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'exam_id': examId,
+        'total_questions': totalQuestions,
+        'duration': duration,
+        'guidelines': guidelines,
+        'webview_urls': webviewUrls,
+      };
+}
+

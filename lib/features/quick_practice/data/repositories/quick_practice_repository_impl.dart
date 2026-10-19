@@ -10,6 +10,11 @@ class QuickPracticeRepositoryImpl implements QuickPracticeRepository {
   }) : _remoteDataSource = remoteDataSource ?? QuickPracticeRemoteDataSourceImpl();
 
   @override
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview() {
+    return _remoteDataSource.getSubjectSectionsOverview();
+  }
+
+  @override
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search}) {
     return _remoteDataSource.getTopLevelSubjects(search: search);
   }
@@ -40,5 +45,13 @@ class QuickPracticeRepositoryImpl implements QuickPracticeRepository {
       page: page,
       perPage: perPage,
     );
+  }
+
+  @override
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  ) {
+    return _remoteDataSource.startSubjectExam(subjectId, request);
   }
 }

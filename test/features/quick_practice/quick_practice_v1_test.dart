@@ -358,10 +358,231 @@ void main() {
       expect(find.text('সঠিক উত্তর: গ'), findsOneWidget);
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
     });
+
+    testWidgets('SubjectExamSetupBottomSheet renders options and handles exam setup', (tester) async {
+      final mockRepo = _MockQuickPracticeRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            quickPracticeRepositoryProvider.overrideWithValue(mockRepo),
+          ],
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            builder: (context, child) => const MaterialApp(
+              home: Scaffold(
+                body: SubjectExamSetupBottomSheet(
+                  subjectId: 525,
+                  subjectTitle: 'BEPZA',
+                  availableQuestions: 15,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('অনুশীলন পরীক্ষা সেটআপ'), findsOneWidget);
+      expect(find.text('BEPZA'), findsOneWidget);
+      expect(find.text('প্রশ্ন সংখ্যা'), findsOneWidget);
+      expect(find.text('10টি'), findsOneWidget);
+      expect(find.text('15টি'), findsOneWidget);
+      expect(find.text('20টি'), findsOneWidget);
+      expect(find.text('পরীক্ষার সময়সীমা'), findsOneWidget);
+      expect(find.text('নেগেটিভ মার্কিং'), findsOneWidget);
+      expect(find.text('প্রশ্ন বাছাইয়ের নিয়ম'), findsOneWidget);
+      expect(find.text('পরীক্ষা শুরু করুন'), findsOneWidget);
+    });
+
+    testWidgets('SubjectExamSetupView renders topic details, selectors and start button', (tester) async {
+      final mockRepo = _MockQuickPracticeRepo();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            quickPracticeRepositoryProvider.overrideWithValue(mockRepo),
+          ],
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            builder: (context, child) => const MaterialApp(
+              home: SubjectExamSetupView(
+                subjectId: 525,
+                subjectTitle: 'BEPZA',
+                availableQuestions: 15,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('BEPZA'), findsWidgets);
+      expect(find.text('অনুশীলন পরীক্ষা সেটআপ'), findsOneWidget);
+      expect(find.text('15টি প্রশ্ন উপলব্ধ'), findsOneWidget);
+      expect(find.text('প্রশ্ন সংখ্যা'), findsOneWidget);
+      expect(find.text('10টি'), findsOneWidget);
+      expect(find.text('15টি'), findsOneWidget);
+      expect(find.text('পরীক্ষার সময়সীমা'), findsOneWidget);
+      expect(find.text('নেগেটিভ মার্কিং'), findsOneWidget);
+      expect(find.text('প্রশ্ন বাছাইয়ের নিয়ম'), findsOneWidget);
+      expect(find.text('নির্দেশনাবলী'), findsOneWidget);
+      expect(find.text('পরীক্ষা শুরু করুন'), findsOneWidget);
+    });
+  });
+
+  group('Subject Sections 5 Endpoints Models & Lifecycle Tests', () {
+    test('SubjectSectionOverview parses GET /api/v1/subject-sections response', () {
+      final json = {
+        "id": 20,
+        "name": "কর্তৃপক্ষ/ফ্যাকাল্টি",
+        "slug": "kortripokkho-faculty",
+        "description": "বিভিন্ন কর্তৃপক্ষ ও বিশ্ববিদ্যালয়ের বিগত প্রশ্ন",
+        "status": true,
+        "show_app": true,
+        "subjects_count": 14,
+      };
+
+      final section = SubjectSectionOverview.fromJson(json);
+      expect(section.id, 20);
+      expect(section.name, "কর্তৃপক্ষ/ফ্যাকাল্টি");
+      expect(section.slug, "kortripokkho-faculty");
+      expect(section.status, true);
+      expect(section.showApp, true);
+      expect(section.subjectsCount, 14);
+
+      final outJson = section.toJson();
+      expect(outJson['name'], "কর্তৃপক্ষ/ফ্যাকাল্টি");
+      expect(outJson['subjects_count'], 14);
+    });
+
+    test('QuickPracticeSubject parses image_url and question counts correctly', () {
+      final json = {
+        "id": 20,
+        "name": "কর্তৃপক্ষ/ফ্যাকাল্টি",
+        "slug": "kortripokkho-faculty",
+        "questions_count": 850,
+        "children_count": 14,
+        "image_url": "https://api.lokkha.com/uploads/subjects/faculty.png",
+      };
+
+      final subject = QuickPracticeSubject.fromJson(json);
+      expect(subject.id, 20);
+      expect(subject.name, "কর্তৃপক্ষ/ফ্যাকাল্টি");
+      expect(subject.questionsCount, 850);
+      expect(subject.childrenCount, 14);
+      expect(subject.image, "https://api.lokkha.com/uploads/subjects/faculty.png");
+      expect(subject.hasChildren, true);
+    });
+
+    test('SubjectChild parses parent_id and questions_count correctly', () {
+      final json = {
+        "id": 525,
+        "name": "BEPZA",
+        "slug": "bepza",
+        "parent_id": 20,
+        "questions_count": 15,
+      };
+
+      final child = SubjectChild.fromJson(json);
+      expect(child.id, 525);
+      expect(child.name, "BEPZA");
+      expect(child.parentId, 20);
+      expect(child.questionsCount, 15);
+      expect(child.formattedQuestionsCount, "15");
+    });
+
+    test('SubjectStartExamRequest serializes payload for POST start-exam', () {
+      const request = SubjectStartExamRequest(
+        questionCount: 15,
+        enableTimer: true,
+        time: 20,
+        enableNegativeMark: true,
+        negativeMark: 0.50,
+        questionOption: "latest",
+      );
+
+      final json = request.toJson();
+      expect(json['question_count'], 15);
+      expect(json['enable_timer'], true);
+      expect(json['time'], 20);
+      expect(json['enable_negative_mark'], true);
+      expect(json['negative_mark'], 0.50);
+      expect(json['question_option'], "latest");
+    });
+
+    test('SubjectExamSession parses session data and WebView URLs', () {
+      final json = {
+        "success": true,
+        "message": "Exam session initiated successfully.",
+        "data": {
+          "exam_id": 525,
+          "total_questions": 15,
+          "duration": 20,
+          "guidelines": [
+            "প্রতিটি ভুল উত্তরের জন্য ০.৫০ নম্বর কাটা যাবে।",
+            "নির্ধারিত সময় শেষে স্বয়ংক্রিয় সাবমিট হবে।"
+          ],
+          "webview_urls": {
+            "start": "https://lokkha.com/webview/exam/525/start",
+            "result": "https://lokkha.com/webview/exam/525/result"
+          }
+        }
+      };
+
+      final session = SubjectExamSession.fromJson(json);
+      expect(session.examId, 525);
+      expect(session.totalQuestions, 15);
+      expect(session.duration, 20);
+      expect(session.guidelines.length, 2);
+      expect(session.startUrl, "https://lokkha.com/webview/exam/525/start");
+      expect(session.resultUrl, "https://lokkha.com/webview/exam/525/result");
+    });
+
+    test('SubjectExamSetupNotifier starts exam and transitions state successfully', () async {
+      final mockRepo = _MockQuickPracticeRepo();
+      final container = ProviderContainer(
+        overrides: [
+          quickPracticeRepositoryProvider.overrideWithValue(mockRepo),
+        ],
+      );
+
+      final notifier = container.read(subjectExamSetupNotifierProvider.notifier);
+      expect(container.read(subjectExamSetupNotifierProvider).isStarting, false);
+
+      const req = SubjectStartExamRequest(
+        questionCount: 10,
+        enableTimer: true,
+        time: 15,
+      );
+
+      final session = await notifier.startExam(subjectId: 525, request: req);
+      expect(session, isNotNull);
+      expect(session!.examId, 999);
+      expect(session.startUrl, 'https://lokkha.com/exams/subject/999/start');
+      expect(container.read(subjectExamSetupNotifierProvider).isStarting, false);
+      expect(container.read(subjectExamSetupNotifierProvider).session, session);
+    });
   });
 }
 
 class _MockQuickPracticeRepo implements QuickPracticeRepository {
+  @override
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview() async {
+    return const [
+      SubjectSectionOverview(
+        id: 1,
+        name: 'বিষয়ভিত্তিক প্রশ্নব্যাংক',
+        slug: 'subject-based',
+        status: true,
+        showApp: true,
+        subjectsCount: 20,
+      ),
+    ];
+  }
+
   @override
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search}) async {
     return [
@@ -450,6 +671,23 @@ class _MockQuickPracticeRepo implements QuickPracticeRepository {
         ),
       ],
       meta: PaginationMeta(total: 1),
+    );
+  }
+
+  @override
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  ) async {
+    return const SubjectExamSession(
+      examId: 999,
+      totalQuestions: 10,
+      duration: 15,
+      guidelines: ['প্রতিটি ভুল উত্তরের জন্য ০.২৫ নম্বর কাটা যাবে।'],
+      webviewUrls: {
+        'start': 'https://lokkha.com/exams/subject/999/start',
+        'result': 'https://lokkha.com/exams/subject/999/result',
+      },
     );
   }
 }

@@ -6,11 +6,13 @@ import 'package:lokkha/features/quick_practice/data/models/quick_practice_models
 class SubjectChildCard extends StatelessWidget {
   final SubjectChild childItem;
   final VoidCallback onTap;
+  final VoidCallback? onPracticeTap;
 
   const SubjectChildCard({
     super.key,
     required this.childItem,
     required this.onTap,
+    this.onPracticeTap,
   });
 
   @override
@@ -104,33 +106,40 @@ class SubjectChildCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.w,
-                    vertical: 6.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.primaryColor,
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onPracticeTap ?? onTap,
                     borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'অনুশীলন',
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 6.h,
                       ),
-                      SizedBox(width: 3.w),
-                      Icon(
-                        Icons.play_arrow_rounded,
-                        size: 14.sp,
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: context.primaryColor,
+                        borderRadius: BorderRadius.circular(8.r),
                       ),
-                    ],
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'অনুশীলন',
+                            style: TextStyle(
+                              fontSize: 11.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 3.w),
+                          Icon(
+                            Icons.play_arrow_rounded,
+                            size: 14.sp,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],

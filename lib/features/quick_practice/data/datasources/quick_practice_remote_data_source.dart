@@ -2,6 +2,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/quick_practice/data/models/quick_practice_models.dart';
 
 abstract class QuickPracticeRemoteDataSource {
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview();
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search});
   Future<SubjectChildrenResponse> getSubjectChildren(
     int subjectId, {
@@ -14,6 +15,10 @@ abstract class QuickPracticeRemoteDataSource {
     int page = 1,
     int perPage = 15,
   });
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  );
 }
 
 class QuickPracticeRemoteDataSourceImpl implements QuickPracticeRemoteDataSource {
@@ -21,6 +26,27 @@ class QuickPracticeRemoteDataSourceImpl implements QuickPracticeRemoteDataSource
 
   QuickPracticeRemoteDataSourceImpl({RestClient? client})
       : _client = client ?? RestClient();
+
+  @override
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview() async {
+    final response = await _client.get(Endpoints.subjectSectionsOverview);
+
+    if (response.data is Map<String, dynamic>) {
+      final rawData = response.data['data'] ?? response.data['sections'];
+      if (rawData is List) {
+        return rawData
+            .map((e) =>
+                SubjectSectionOverview.fromJson(e as Map<String, dynamic>))
+            .toList();
+      }
+    } else if (response.data is List) {
+      return (response.data as List)
+          .map((e) =>
+              SubjectSectionOverview.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+    return [];
+  }
 
   @override
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search}) async {
@@ -82,5 +108,21 @@ class QuickPracticeRemoteDataSourceImpl implements QuickPracticeRemoteDataSource
       return SubjectQuestionsResponse.fromJson(response.data as Map<String, dynamic>);
     }
     return const SubjectQuestionsResponse();
+  }
+
+  @override
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  ) async {
+    final response = await _client.post(
+      Endpoints.subjectSectionsStartExam(subjectId),
+      data: request.toJson(),
+    );
+
+    if (response.data is Map<String, dynamic>) {
+      return SubjectExamSession.fromJson(response.data as Map<String, dynamic>);
+    }
+    throw Exception('Failed to generate practice test.');
   }
 }

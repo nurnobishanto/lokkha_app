@@ -9,3 +9,5 @@ export 'presentation/views/subject_questions_practice_view.dart';
 export 'presentation/widgets/quick_practice_subject_card.dart';
 export 'presentation/widgets/subject_child_card.dart';
 export 'presentation/widgets/practice_question_card.dart';
+export 'presentation/widgets/subject_exam_setup_bottom_sheet.dart';
+export 'presentation/views/subject_exam_setup_view.dart';

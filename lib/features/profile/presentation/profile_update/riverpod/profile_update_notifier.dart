@@ -90,11 +90,30 @@ class ProfileUpdateNotifier extends Notifier<ProfileUpdateState> {
   }
 
   Future<void> selectDate(BuildContext context) async {
+    DateTime initialDate = DateTime(2000, 1, 1);
+    if (state.dob.trim().isNotEmpty) {
+      final parsed = DateTime.tryParse(state.dob.trim());
+      if (parsed != null && parsed.isBefore(DateTime.now())) {
+        initialDate = parsed;
+      }
+    }
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2000, 1, 1),
+      initialDate: initialDate,
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: const Color(0xFF006A4E),
+                  onPrimary: Colors.white,
+                ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       state = state.copyWith(dob: picked.toIso8601String().split("T").first);

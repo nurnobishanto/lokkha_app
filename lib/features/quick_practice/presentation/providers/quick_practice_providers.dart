@@ -174,7 +174,10 @@ class SubjectChildrenNotifier extends Notifier<SubjectChildrenState> {
     return const SubjectChildrenState();
   }
 
-  Future<void> fetchChildren({bool isRefresh = false}) async {
+  Timer? _debounceTimer;
+
+  Future<void> fetchChildren({bool isRefresh = false, String? search}) async {
+    final query = search ?? state.searchQuery;
     state = state.copyWith(
       isLoading: !isRefresh && state.children.isEmpty,
       hasError: false,
@@ -182,7 +185,11 @@ class SubjectChildrenNotifier extends Notifier<SubjectChildrenState> {
     );
 
     try {
-      final response = await _repository.getSubjectChildren(subjectId, page: 1);
+      final response = await _repository.getSubjectChildren(
+        subjectId,
+        page: 1,
+        search: query.trim().isNotEmpty ? query.trim() : null,
+      );
       state = state.copyWith(
         isLoading: false,
         hasError: false,
@@ -203,10 +210,14 @@ class SubjectChildrenNotifier extends Notifier<SubjectChildrenState> {
 
     state = state.copyWith(isLoadingMore: true);
     final nextPage = state.meta.currentPage + 1;
+    final query = state.searchQuery.trim();
 
     try {
-      final response =
-          await _repository.getSubjectChildren(subjectId, page: nextPage);
+      final response = await _repository.getSubjectChildren(
+        subjectId,
+        page: nextPage,
+        search: query.isNotEmpty ? query : null,
+      );
       state = state.copyWith(
         isLoadingMore: false,
         children: [...state.children, ...response.items],
@@ -219,10 +230,16 @@ class SubjectChildrenNotifier extends Notifier<SubjectChildrenState> {
 
   void setSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 350), () {
+      fetchChildren(search: query);
+    });
   }
 
   void clearSearch() {
+    _debounceTimer?.cancel();
     state = state.copyWith(searchQuery: '');
+    fetchChildren(search: '');
   }
 }
 
@@ -378,3 +395,59 @@ final subjectQuestionsNotifierProvider = NotifierProvider.family<
     SubjectQuestionsNotifier, SubjectQuestionsState, int>(
   SubjectQuestionsNotifier.new,
 );
+
+// ─── 4. Subject Exam Setup / Launch Notifier ───────────────────────────────
+class SubjectExamSetupState {
+  final bool isStarting;
+  final String? errorMessage;
+  final SubjectExamSession? session;
+
+  const SubjectExamSetupState({
+    this.isStarting = false,
+    this.errorMessage,
+    this.session,
+  });
+
+  SubjectExamSetupState copyWith({
+    bool? isStarting,
+    String? errorMessage,
+    SubjectExamSession? session,
+  }) {
+    return SubjectExamSetupState(
+      isStarting: isStarting ?? this.isStarting,
+      errorMessage: errorMessage,
+      session: session ?? this.session,
+    );
+  }
+}
+
+class SubjectExamSetupNotifier extends Notifier<SubjectExamSetupState> {
+  @override
+  SubjectExamSetupState build() => const SubjectExamSetupState();
+
+  Future<SubjectExamSession?> startExam({
+    required int subjectId,
+    required SubjectStartExamRequest request,
+  }) async {
+    state = state.copyWith(isStarting: true, errorMessage: null);
+
+    try {
+      final repo = ref.read(quickPracticeRepositoryProvider);
+      final session = await repo.startSubjectExam(subjectId, request);
+      state = state.copyWith(isStarting: false, session: session);
+      return session;
+    } catch (e) {
+      state = state.copyWith(
+        isStarting: false,
+        errorMessage: 'পরীক্ষা তৈরি করা সম্ভব হয়নি। অনুগ্রহ করে পুনরায় চেষ্টা করুন।',
+      );
+      return null;
+    }
+  }
+}
+
+final subjectExamSetupNotifierProvider =
+    NotifierProvider<SubjectExamSetupNotifier, SubjectExamSetupState>(
+  SubjectExamSetupNotifier.new,
+);
+

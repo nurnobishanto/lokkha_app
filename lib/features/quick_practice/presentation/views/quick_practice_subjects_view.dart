@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/quick_practice/presentation/providers/quick_practice_providers.dart';
 import 'package:lokkha/features/quick_practice/presentation/views/subject_children_view.dart';
-import 'package:lokkha/features/quick_practice/presentation/views/subject_questions_practice_view.dart';
+import 'package:lokkha/features/quick_practice/presentation/views/subject_exam_setup_view.dart';
 import 'package:lokkha/features/quick_practice/presentation/widgets/quick_practice_subject_card.dart';
 
 class QuickPracticeSubjectsView extends ConsumerStatefulWidget {
@@ -179,9 +179,10 @@ class _QuickPracticeSubjectsViewState
                         } else {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => SubjectQuestionsPracticeView(
+                              builder: (_) => SubjectExamSetupView(
                                 subjectId: subject.id,
-                                title: subject.name,
+                                subjectTitle: subject.name,
+                                availableQuestions: subject.totalQuestions,
                               ),
                             ),
                           );

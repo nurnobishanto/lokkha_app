@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/quick_practice/presentation/providers/quick_practice_providers.dart';
 import 'package:lokkha/features/quick_practice/presentation/widgets/practice_question_card.dart';
+import 'package:lokkha/features/quick_practice/presentation/widgets/subject_exam_setup_bottom_sheet.dart';
 
 class SubjectQuestionsPracticeView extends ConsumerStatefulWidget {
   final int subjectId;
@@ -59,6 +60,22 @@ class _SubjectQuestionsPracticeViewState
         title: widget.title,
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.play_circle_filled_rounded,
+              color: Colors.white,
+              size: 22.sp,
+            ),
+            tooltip: 'পরীক্ষা দিন',
+            onPressed: () {
+              SubjectExamSetupBottomSheet.show(
+                context,
+                subjectId: widget.subjectId,
+                subjectTitle: widget.title,
+                availableQuestions: state.questions.length,
+              );
+            },
+          ),
           if (state.questions.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(right: 14.w),
