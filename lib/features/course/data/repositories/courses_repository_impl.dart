@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/course/data/models/course_details_model.dart';
+import 'package:lokkha/features/course/data/models/course_learning_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
 import 'package:lokkha/features/course/data/models/v1_courses_response.dart';
 import 'package:lokkha/features/course/domain/repositories/courses_repository.dart';
@@ -144,7 +145,94 @@ class CoursesRepositoryImpl implements CoursesRepository {
   }
 
   @override
+  Future<CourseDetailsModel?> getUserCourseDetails(int courseId) async {
+    try {
+      final response = await _client.get(
+        Endpoints.v1UserCourseDetails(courseId),
+        headers: _buildHeaders(),
+      );
+      if (response.data != null &&
+          (response.data['status'] == true ||
+              response.data['success'] == true ||
+              response.data['data'] != null)) {
+        final model = CourseDetailsModel.fromJson(response.data as Map<String, dynamic>);
+        return model;
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error fetching user course details for $courseId: $e');
+    }
+    return null;
+  }
+
+  @override
+  Future<CourseLearningModel?> getCourseLearning(int courseId, {int? itemId}) async {
+    final queryParams = <String, dynamic>{
+      if (itemId != null) 'item': itemId,
+    };
+
+    try {
+      final response = await _client.get(
+        Endpoints.v1UserLearning(courseId),
+        queryParameters: queryParams,
+        headers: _buildHeaders(),
+      );
+      if (response.data != null &&
+          (response.data['status'] == true ||
+              response.data['success'] == true ||
+              response.data['data'] != null)) {
+        return CourseLearningModel.fromJson(response.data as Map<String, dynamic>);
+      }
+    } catch (e) {
+      if (kDebugMode) debugPrint('Error fetching v1 course learning for $courseId: $e');
+      // Fallback to legacy endpoint
+      try {
+        String legacyUrl = '${Endpoints.courseLearn}/$courseId';
+        if (itemId != null) {
+          legacyUrl = '$legacyUrl?item=$itemId';
+        }
+        final legacyRes = await _client.get(
+          legacyUrl,
+          headers: _buildHeaders(),
+        );
+        if (legacyRes.data != null) {
+          return CourseLearningModel.fromJson(legacyRes.data as Map<String, dynamic>);
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  @override
   Future<CourseDetailsModel?> getCourseDetails(int courseId) async {
+    final token = MySharedPref.getUserToken();
+    final bool isLoggedIn = token.isNotEmpty;
+
+    // 1. If user is logged in, first attempt to fetch enrolled course details
+    if (isLoggedIn) {
+      try {
+        final userModel = await getUserCourseDetails(courseId);
+        if (userModel != null && userModel.course != null && userModel.course!.id != null) {
+          // If the course does not have syllabus modules loaded, fetch them from classroom
+          var course = userModel.course!;
+          if (course.modules == null || course.modules!.isEmpty) {
+            try {
+              final learningModel = await getCourseLearning(courseId);
+              if (learningModel?.data != null && learningModel!.data!.syllabus.isNotEmpty) {
+                course = course.copyWith(modules: learningModel.data!.syllabus);
+              }
+            } catch (_) {}
+          }
+          return CourseDetailsModel(
+            status: true,
+            course: course,
+          );
+        }
+      } catch (e) {
+        if (kDebugMode) debugPrint('User course details check skipped/failed for $courseId: $e');
+      }
+    }
+
+    // 2. Fetch public course details
     try {
       final response = await _client.get(
         Endpoints.v1CourseDetails(courseId),

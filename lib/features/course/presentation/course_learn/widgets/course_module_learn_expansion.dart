@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lokkha/shared/models/course_item.dart';
 
 class CourseModuleLearnExpansion extends StatelessWidget {
+  final int? courseId;
   final String title;
   final List<CourseItem> items;
   final bool initiallyExpanded;
@@ -10,6 +11,7 @@ class CourseModuleLearnExpansion extends StatelessWidget {
 
   const CourseModuleLearnExpansion({
     super.key,
+    this.courseId,
     required this.title,
     required this.items,
     this.initiallyExpanded = false,
@@ -54,7 +56,13 @@ class CourseModuleLearnExpansion extends StatelessWidget {
 
             // Determine content type
             Icon leadingIcon;
-            if (item.youtubeVideo != null) {
+            if (item.hasExam == true ||
+                item.examId != null ||
+                item.examInfo != null ||
+                item.type?.contains(Type.EXAM) == true) {
+              leadingIcon = const Icon(Icons.assignment_outlined,
+                  color: Color(0xFF006A4E));
+            } else if (item.youtubeVideo != null) {
               leadingIcon =
                   const Icon(Icons.ondemand_video, color: Colors.blue);
             } else if (item.video != null) {
@@ -74,8 +82,8 @@ class CourseModuleLearnExpansion extends StatelessWidget {
               leadingIcon =
                   const Icon(Icons.description, color: Colors.blueGrey);
             } else {
-              // Skip unknown/empty types
-              return const SizedBox.shrink();
+              leadingIcon = const Icon(Icons.article_outlined,
+                  color: Color(0xFF006A4E));
             }
 
             return ListTile(
@@ -89,17 +97,20 @@ class CourseModuleLearnExpansion extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.bodySmall?.copyWith(fontSize: 14),
               ),
-              trailing: isAccessible
-                  ? const Icon(Icons.remove_red_eye,
+              trailing: item.isCompleted == true
+                  ? const Icon(Icons.check_circle,
                       color: Colors.green, size: 18)
-                  : const Text('🔒', style: TextStyle(fontSize: 16)),
+                  : isAccessible
+                      ? const Icon(Icons.remove_red_eye,
+                          color: Color(0xFF006A4E), size: 18)
+                      : const Text('🔒', style: TextStyle(fontSize: 16)),
               onTap: isAccessible
                   ? () {
                       Navigator.of(context).pop();
-                      final courseId = item.courseId;
+                      final targetCourseId = item.courseId ?? courseId;
                       final itemId = item.id;
-                      if (courseId != null) {
-                        onItemTap?.call(courseId, itemId);
+                      if (targetCourseId != null) {
+                        onItemTap?.call(targetCourseId, itemId);
                       }
                     }
                   : null,

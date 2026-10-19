@@ -4,6 +4,8 @@ import 'package:lokkha/shared/models/course_item.dart';
 
 import 'package:lokkha/shared/models/course.dart';
 
+import 'package:lokkha/shared/models/course_module.dart';
+
 CourseLearningModel courseLearningModelFromJson(String str) =>
     CourseLearningModel.fromJson(json.decode(str));
 String courseLearningModelToJson(CourseLearningModel data) =>
@@ -22,8 +24,8 @@ class CourseLearningModel {
 
   factory CourseLearningModel.fromJson(Map<String, dynamic> json) =>
       CourseLearningModel(
-        status: json["status"],
-        message: json["message"],
+        status: json["status"] == true || json["success"] == true,
+        message: json["message"]?.toString(),
         data: json["data"] == null ? null : Data.fromJson(json["data"]),
       );
 
@@ -40,6 +42,7 @@ class Data {
   final int? nextItemId;
   final dynamic prevItemId;
   final dynamic progressPercent;
+  final List<CourseModule> syllabus;
 
   Data({
     this.course,
@@ -47,17 +50,52 @@ class Data {
     this.nextItemId,
     this.prevItemId,
     this.progressPercent,
+    this.syllabus = const [],
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        course: json["course"] == null ? null : Course.fromJson(json["course"]),
-        currentItem: json["current_item"] == null
-            ? null
-            : CourseItem.fromJson(json["current_item"]),
-        nextItemId: json["next_item_id"],
-        prevItemId: json["prev_item_id"],
-        progressPercent: json["progress_percent"],
-      );
+  factory Data.fromJson(Map<String, dynamic> json) {
+    final rawSyllabus = json["syllabus"] ?? json["modules"];
+    List<CourseModule> parsedModules = [];
+    if (rawSyllabus is List) {
+      parsedModules = rawSyllabus
+          .whereType<Map<String, dynamic>>()
+          .map((x) => CourseModule.fromJson(x))
+          .toList();
+    }
+
+    Course? parsedCourse =
+        json["course"] == null ? null : Course.fromJson(json["course"]);
+    if (parsedCourse != null &&
+        parsedModules.isNotEmpty &&
+        (parsedCourse.modules == null || parsedCourse.modules!.isEmpty)) {
+      parsedCourse = parsedCourse.copyWith(modules: parsedModules);
+    }
+
+    final nav = json["navigation"] is Map<String, dynamic>
+        ? json["navigation"] as Map<String, dynamic>
+        : null;
+
+    final parsedNextId = nav != null
+        ? nav["next_item_id"]
+        : json["next_item_id"];
+    final parsedPrevId = nav != null
+        ? nav["prev_item_id"]
+        : json["prev_item_id"];
+
+    final parsedProgress = json["progress_percent"] ??
+        (json["course"] is Map ? json["course"]["progress_percent"] : null);
+
+    return Data(
+      course: parsedCourse,
+      currentItem: json["current_item"] == null
+          ? null
+          : CourseItem.fromJson(json["current_item"]),
+      nextItemId: parsedNextId is int ? parsedNextId : int.tryParse(parsedNextId?.toString() ?? ''),
+      prevItemId: parsedPrevId,
+      progressPercent: parsedProgress,
+      syllabus: parsedModules,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         "course": course?.toJson(),
@@ -65,5 +103,6 @@ class Data {
         "next_item_id": nextItemId,
         "prev_item_id": prevItemId,
         "progress_percent": progressPercent,
+        "syllabus": syllabus.map((x) => x.toJson()).toList(),
       };
 }

@@ -7,11 +7,13 @@ import 'theme_mode_selector_sheet.dart';
 /// Reusable Theme Toggle Tile for Drawer, Profile, Settings, etc.
 class ThemeToggleTile extends ConsumerWidget {
   final bool showSelectorOnTap;
+  final bool showSubtitle;
   final EdgeInsetsGeometry? contentPadding;
 
   const ThemeToggleTile({
     super.key,
     this.showSelectorOnTap = true,
+    this.showSubtitle = true,
     this.contentPadding,
   });
 
@@ -65,13 +67,15 @@ class ThemeToggleTile extends ConsumerWidget {
             color: context.textPrimary,
           ),
         ),
-        subtitle: Text(
-          modeTitle,
-          style: TextStyle(
-            fontSize: 12.sp,
-            color: context.textMuted,
-          ),
-        ),
+        subtitle: showSubtitle
+            ? Text(
+                modeTitle,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  color: context.textMuted,
+                ),
+              )
+            : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

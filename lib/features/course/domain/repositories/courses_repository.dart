@@ -2,6 +2,8 @@ import 'package:lokkha/features/course/data/models/course_details_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
 import 'package:lokkha/features/course/data/models/v1_courses_response.dart';
 
+import 'package:lokkha/features/course/data/models/course_learning_model.dart';
+
 abstract class CoursesRepository {
   /// Retrieves list of course categories (/api/v1/courses/categories)
   Future<List<V1CourseCategoryModel>> getCourseCategories();
@@ -14,6 +16,12 @@ abstract class CoursesRepository {
     int perPage = 20,
   });
 
-  /// Retrieves full course details (/api/v1/courses/$id or /api/course/$id)
+  /// Retrieves full course details (/api/v1/courses/$id, /api/v1/user/courses/$id, or legacy)
   Future<CourseDetailsModel?> getCourseDetails(int courseId);
+
+  /// Retrieves enrolled user course details (/api/v1/user/courses/$id)
+  Future<CourseDetailsModel?> getUserCourseDetails(int courseId);
+
+  /// Retrieves classroom content (/api/v1/user/learning/$id)
+  Future<CourseLearningModel?> getCourseLearning(int courseId, {int? itemId});
 }

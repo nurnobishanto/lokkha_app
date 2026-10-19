@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/router/routes.dart';
@@ -173,6 +174,10 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
                     SizedBox(height: 14.h),
                   ],
 
+                  if (isUserEnrolled) ...[
+                    _buildEnrolledProgressCard(course, context),
+                  ],
+
                   /// Quick Info
                   CourseInfoRow(
                     title: "সাধারণ তথ্য",
@@ -336,6 +341,11 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
                         )),
                   ],
 
+                  /// Community & Live Class Links
+                  if (isUserEnrolled) ...[
+                    _buildCommunityLinksCard(course, context),
+                  ],
+
                   /// Contact Info
                   SizedBox(height: 16.h),
                   Text(
@@ -394,6 +404,11 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
               return const SizedBox.shrink();
             }
             if (isUserEnrolled) {
+              final bool hasProgress =
+                  (course.progressPercent != null && course.progressPercent! > 0) ||
+                      course.resumeItemId != null;
+              final buttonLabel = hasProgress ? "পড়া চালিয়ে যান" : "শেখা শুরু করুন";
+
               return Padding(
                 padding: EdgeInsets.only(
                   bottom: 8.h,
@@ -402,7 +417,7 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
                 ),
                 child: CustomActionButton(
                   height: 50,
-                  text: "শেখা শুরু করুন",
+                  text: buttonLabel,
                   onPressed: () {
                     final firstModule = course.modules?.isNotEmpty == true
                         ? course.modules!.first
@@ -410,11 +425,13 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
                     final firstItem = firstModule?.items?.isNotEmpty == true
                         ? firstModule!.items!.first
                         : null;
+                    final targetItemId = course.resumeItemId ?? firstItem?.id;
+
                     context.pushNamed(
                       Routes.courseLearn,
                       extra: {
                         'id': course.id,
-                        'item_id': firstItem?.id,
+                        'item_id': targetItemId,
                       },
                     );
                   },
@@ -428,6 +445,218 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
               courseModel: course,
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnrolledProgressCard(Course course, BuildContext context) {
+    final progress = (course.progressPercent ?? 0).toInt();
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 14.h),
+      padding: EdgeInsets.all(14.r),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF006A4E),
+            Color(0xFF004D38),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF006A4E).withValues(alpha: 0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(6.r),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.verified_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Text(
+                  'আপনার এনরোলমেন্ট সক্রিয়',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Text(
+                  course.lifetimeAccess == true
+                      ? 'লাইফটাইম'
+                      : (course.daysRemaining != null
+                          ? '${course.daysRemaining} দিন বাকি'
+                          : 'অ্যাক্টিভ'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'কোর্স অগ্রগতি',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 12.sp,
+                ),
+              ),
+              Text(
+                '$progress% সম্পন্ন',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6.r),
+            child: LinearProgressIndicator(
+              value: (progress.clamp(0, 100)) / 100.0,
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF22C55E)),
+              minHeight: 6.h,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCommunityLinksCard(Course course, BuildContext context) {
+    final bool hasCommunity = (course.facebookGroup?.toString().isNotEmpty ?? false) ||
+        (course.whatsappGroupLink?.toString().isNotEmpty ?? false) ||
+        (course.meetLink?.toString().isNotEmpty ?? false) ||
+        (course.zoomLink?.toString().isNotEmpty ?? false) ||
+        (course.telegramGroup?.toString().isNotEmpty ?? false);
+
+    if (!hasCommunity) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 16.h),
+        Text(
+          "কমিউনিটি ও ক্লাস লিংক",
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: context.textPrimary,
+              ),
+        ),
+        SizedBox(height: 8.h),
+        Wrap(
+          spacing: 8.w,
+          runSpacing: 8.h,
+          children: [
+            if ((course.facebookGroup?.toString() ?? '').isNotEmpty)
+              _buildCommunityBtn(
+                title: 'ফেসবুক গ্রুপ',
+                icon: Icons.facebook,
+                color: const Color(0xFF1877F2),
+                url: course.facebookGroup.toString(),
+              ),
+            if ((course.whatsappGroupLink?.toString() ?? '').isNotEmpty)
+              _buildCommunityBtn(
+                title: 'হোয়াটসঅ্যাপ',
+                icon: Icons.chat_rounded,
+                color: const Color(0xFF25D366),
+                url: course.whatsappGroupLink.toString(),
+              ),
+            if ((course.meetLink?.toString() ?? '').isNotEmpty)
+              _buildCommunityBtn(
+                title: 'লাইভ ক্লাস (Meet)',
+                icon: Icons.video_call_rounded,
+                color: const Color(0xFF00897B),
+                url: course.meetLink.toString(),
+              ),
+            if ((course.zoomLink?.toString() ?? '').isNotEmpty)
+              _buildCommunityBtn(
+                title: 'লাইভ ক্লাস (Zoom)',
+                icon: Icons.videocam_rounded,
+                color: const Color(0xFF2D8CFF),
+                url: course.zoomLink.toString(),
+              ),
+            if ((course.telegramGroup?.toString() ?? '').isNotEmpty)
+              _buildCommunityBtn(
+                title: 'টেলিগ্রাম',
+                icon: Icons.send_rounded,
+                color: const Color(0xFF0088CC),
+                url: course.telegramGroup.toString(),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCommunityBtn({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required String url,
+  }) {
+    return GestureDetector(
+      onTap: () => launchUrlString(url, mode: LaunchMode.externalApplication),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16.sp, color: color),
+            SizedBox(width: 6.w),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
         ),
       ),
     );

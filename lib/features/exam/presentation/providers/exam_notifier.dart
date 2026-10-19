@@ -343,11 +343,18 @@ class LatestExamNotifier extends Notifier<LatestExamState> {
     }
 
     if (context.mounted) {
+      final targetUrl = isStartExam
+          ? Endpoints.v1ExamWebviewStart(tag.id, token: token)
+          : Endpoints.v1ExamWebviewRead(tag.id, token: token);
+
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => WebExamView(
-            title: "Exam",
-            url: Endpoints.webTestExamStart,
+            title: tag.name ?? "Exam",
+            url: targetUrl,
+            examId: tag.id,
+            mode: isStartExam ? ExamWebViewMode.start : ExamWebViewMode.read,
+            isExamRunning: isStartExam,
             body: data,
           ),
         ),

@@ -30,6 +30,8 @@ export 'models/subject.dart';
 export 'models/question.dart';
 export 'models/category.dart';
 export 'models/course.dart';
+export 'models/course_item.dart';
+export 'models/course_module.dart';
 export 'models/exam.dart';
 export 'models/order.dart';
 export 'models/package.dart';

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/course/data/models/course_details_model.dart';
+import 'package:lokkha/features/course/data/models/course_learning_model.dart';
 import 'package:lokkha/features/course/data/models/v1_course_category_model.dart';
 import 'package:lokkha/features/course/data/models/v1_courses_response.dart';
 import 'package:lokkha/features/course/data/repositories/courses_repository_impl.dart';
@@ -54,6 +55,18 @@ class _MockCoursesRepository implements CoursesRepository {
   Future<CourseDetailsModel?> getCourseDetails(int courseId) async {
     if (shouldThrow) throw Exception('Course details error');
     return courseDetailsToReturn;
+  }
+
+  @override
+  Future<CourseDetailsModel?> getUserCourseDetails(int courseId) async {
+    if (shouldThrow) throw Exception('User course details error');
+    return courseDetailsToReturn;
+  }
+
+  @override
+  Future<CourseLearningModel?> getCourseLearning(int courseId, {int? itemId}) async {
+    if (shouldThrow) throw Exception('Course learning error');
+    return null;
   }
 }
 

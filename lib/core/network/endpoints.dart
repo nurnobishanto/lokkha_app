@@ -104,6 +104,43 @@ class Endpoints {
   static const String savedQuestions = '/api/v1/user/content-history/saved-questions';
   static const String toggleSaveQuestion = '/api/v1/user/content-history/toggle-save-question';
 
+  // ─── Module: Exams & Live Portal Engine (17 Endpoints) ────────────────────
+  static const String v1Exams = '/api/v1/exams';
+  static const String v1ExamCategories = '/api/v1/exams/categories';
+  static String v1ExamCategory(dynamic id) => '/api/v1/exams/categories/$id';
+  static String v1ExamDetail(dynamic id) => '/api/v1/exams/$id';
+  static String v1ExamInstructions(dynamic id) => '/api/v1/exams/$id/instructions';
+  static String v1ExamStart(dynamic id) => '/api/v1/exams/$id/start';
+  static String v1ExamSession(dynamic id) => '/api/v1/exams/$id/session';
+  static String v1ExamSaveAnswer(dynamic id) => '/api/v1/exams/$id/save-answer';
+  static String v1ExamSubmit(dynamic id) => '/api/v1/exams/$id/submit';
+  static String v1ExamResult(dynamic id, dynamic resultId) =>
+      '/api/v1/exams/$id/result/$resultId';
+  static String v1ExamLeaderboard(dynamic id) => '/api/v1/exams/$id/leaderboard';
+  static String v1ExamRead(dynamic id) => '/api/v1/exams/$id/read';
+  static String v1ExamWebviewStart(dynamic id, {String? token}) {
+    final base = '$baseUrl/api/v1/exams/$id/webview/start';
+    if (token != null && token.isNotEmpty) {
+      return '$base?token=$token';
+    }
+    return base;
+  }
+  static String v1ExamWebviewResult(dynamic id, dynamic resultId, {String? token}) {
+    final base = '$baseUrl/api/v1/exams/$id/webview/result/$resultId';
+    if (token != null && token.isNotEmpty) {
+      return '$base?token=$token';
+    }
+    return base;
+  }
+  static String v1ExamWebviewRead(dynamic id, {String? token}) {
+    final base = '$baseUrl/api/v1/exams/$id/webview/read';
+    if (token != null && token.isNotEmpty) {
+      return '$base?token=$token';
+    }
+    return base;
+  }
+  static String v1UserExamDetail(dynamic id) => '/api/v1/user/exams/$id';
+
   // ─── Packages & Subscriptions ──────────────────────────────────────────────
   static const String packages = '/api/v1/packages';
   static String packageDetail(dynamic id) => '/api/v1/packages/$id';
@@ -141,16 +178,23 @@ class Endpoints {
   static const String blog = '/api/v1/blog';
 
   // ─── Quick Practice / Subject Sections (V1) ────────────────────────────────
+  static const String subjectSectionsOverview = '/api/v1/subject-sections';
   static const String subjectSectionsSubjects = '/api/v1/subject-sections/subjects';
   static String subjectSectionsChildren(dynamic id) =>
       '/api/v1/subject-sections/subjects/$id/children';
   static String subjectSectionsQuestions(dynamic id) =>
       '/api/v1/subject-sections/subjects/$id/questions';
+  static String subjectSectionsStartExam(dynamic id) =>
+      '/api/v1/subject-sections/subjects/$id/start-exam';
+
+  static const String v1SubjectSectionsOverview = subjectSectionsOverview;
   static const String v1SubjectSectionsSubjects = subjectSectionsSubjects;
   static String v1SubjectSectionsChildren(dynamic id) =>
       subjectSectionsChildren(id);
   static String v1SubjectSectionsQuestions(dynamic id) =>
       subjectSectionsQuestions(id);
+  static String v1SubjectSectionsStartExam(dynamic id) =>
+      subjectSectionsStartExam(id);
 
   // ─── Aliases for compatibility ────────────────────────────────────────────
   static const String v1AuthCheckPhone = checkPhone;
@@ -245,6 +289,8 @@ class Endpoints {
   static const String v1CourseCategories = '/api/v1/courses/categories';
   static const String v1Courses = '/api/v1/courses';
   static String v1CourseDetails(dynamic id) => '/api/v1/courses/$id';
+  static String v1UserCourseDetails(dynamic id) => '/api/v1/user/courses/$id';
+  static String v1UserLearning(dynamic id) => '/api/v1/user/learning/$id';
   static final String courseDetails = '$appUrl/course';
   static final String courseLearn = '$appUrl/course-learn';
   static final String courseEnroll = '$appUrl/course-enroll';

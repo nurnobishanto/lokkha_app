@@ -46,6 +46,9 @@ class CourseLearnFloatingBar extends StatelessWidget {
                     const SizedBox(height: 12),
                     ...course.modules!
                         .where((module) => (module.items ?? []).any((item) =>
+                            item.hasExam == true ||
+                            item.examId != null ||
+                            item.examInfo != null ||
                             item.youtubeVideo != null ||
                             item.video != null ||
                             item.pdf != null ||
@@ -54,9 +57,10 @@ class CourseLearnFloatingBar extends StatelessWidget {
                             item.details != null ||
                             item.url != null))
                         .map((module) => CourseModuleLearnExpansion(
+                              courseId: course.id,
                               title: module.title ?? 'Untitled Module',
                               items: module.items ?? [],
-                              isEnrolled: course.isEnrolled ?? false,
+                              isEnrolled: course.isEnrolled ?? true,
                               onItemTap: onItemSelected,
                             )),
                     const SizedBox(height: 80),

@@ -5,6 +5,8 @@ import 'package:lokkha/features/exam/domain/repositories/exam_repository.dart';
 import 'package:lokkha/features/exam/domain/usecases/get_user_exams_usecase.dart';
 import 'package:lokkha/features/home/presentation/see_all_items/providers/see_all_items_notifier.dart';
 
+import 'package:lokkha/features/exam/data/models/exam_lifecycle_models.dart';
+
 class MockExamRepository implements ExamRepository {
   UserExamsV1Response? responseToReturn;
   String? lastFilter;
@@ -34,6 +36,38 @@ class MockExamRepository implements ExamRepository {
           ),
         );
   }
+
+  @override
+  Future<ExamInstructionsResponse> getExamInstructions(int examId) async =>
+      const ExamInstructionsResponse();
+
+  @override
+  Future<ExamStartResponse> startExam(int examId) async =>
+      const ExamStartResponse();
+
+  @override
+  Future<ActiveExamSessionResponse> getActiveSession(int examId) async =>
+      const ActiveExamSessionResponse();
+
+  @override
+  Future<SaveAnswerResponse> saveAnswer({
+    required int examId,
+    required int questionId,
+    required dynamic answer,
+  }) async =>
+      const SaveAnswerResponse();
+
+  @override
+  Future<ExamSubmitResponse> submitExam({
+    required int examId,
+    required Map<String, dynamic> answers,
+    required int totalDuration,
+  }) async =>
+      const ExamSubmitResponse();
+
+  @override
+  Future<ExamLeaderboardResponse> getExamLeaderboard(int examId) async =>
+      const ExamLeaderboardResponse();
 }
 
 void main() {

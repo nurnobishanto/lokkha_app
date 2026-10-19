@@ -28,10 +28,16 @@ class CourseModule {
   });
 
   factory CourseModule.fromJson(Map<String, dynamic> json) => CourseModule(
-        id: json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? ''),
+        id: json["id"] is int
+            ? json["id"]
+            : (json["module_id"] is int
+                ? json["module_id"]
+                : int.tryParse(json["id"]?.toString() ?? json["module_id"]?.toString() ?? '')),
         parentId: json["parent_id"],
         type: json["type"]?.toString(),
-        courseId: json["course_id"] is int ? json["course_id"] : int.tryParse(json["course_id"]?.toString() ?? ''),
+        courseId: json["course_id"] is int
+            ? json["course_id"]
+            : int.tryParse(json["course_id"]?.toString() ?? ''),
         title: json["title"]?.toString(),
         order: json["order"] is int ? json["order"] : int.tryParse(json["order"]?.toString() ?? ''),
         description: json["description"],

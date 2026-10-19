@@ -145,6 +145,13 @@ class _ExamCategoryDetailsViewState
                                   ExamDetailsDialog(exam: exam),
                             );
                           },
+                          onStartExam: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  ExamDetailsDialog(exam: exam),
+                            );
+                          },
                         );
                       },
                     ),

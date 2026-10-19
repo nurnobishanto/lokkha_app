@@ -942,10 +942,8 @@ class CourseLearnState {
 
 class CourseLearnNotifier extends Notifier<CourseLearnState> {
   final int courseId;
-  final RestClient _client;
 
-  CourseLearnNotifier(this.courseId, {RestClient? client})
-      : _client = client ?? RestClient();
+  CourseLearnNotifier(this.courseId);
 
   @override
   CourseLearnState build() {
@@ -975,19 +973,11 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
     }
 
     try {
-      String fetchUrl = "${Endpoints.courseLearn}/$cId";
-      if (itemID != null) {
-        fetchUrl = "${Endpoints.courseLearn}/$cId?item=$itemID";
-      }
+      final repository = ref.read(coursesRepositoryProvider);
+      final data = await repository.getCourseLearning(cId, itemId: itemID);
 
-      final response = await _client.get(
-        fetchUrl,
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.data != null && response.data["status"] == true) {
-        final data = CourseLearningModel.fromJson(response.data);
-        final currentVideoUrl = data.data?.currentItem?.youtubeVideo ?? '';
+      if (data != null && (data.status == true || data.data != null)) {
+        final currentVideoUrl = data.data?.currentItem?.youtubeVideo?.toString() ?? '';
         String? extractedId;
         if (currentVideoUrl.isNotEmpty) {
           final uri = Uri.tryParse(currentVideoUrl);
@@ -1009,7 +999,7 @@ class CourseLearnNotifier extends Notifier<CourseLearnState> {
           onVideoReady(extractedId);
         }
       } else {
-        final msg = response.data?['message']?.toString() ?? 'Something went wrong';
+        final msg = data?.message?.toString() ?? 'Something went wrong';
         state = state.copyWith(
           isLoading: false,
           errorMessage: msg,

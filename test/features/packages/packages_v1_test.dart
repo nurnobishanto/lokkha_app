@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lokkha/features/packages/data/models/premium_package_model.dart';
 import 'package:lokkha/features/packages/packages.dart';
 import 'package:lokkha/shared/models/package.dart';
 

@@ -37,6 +37,16 @@ class Course {
   final int? reviewsCount;
   final int? usersCount;
   final bool? isEnrolled;
+  final int? enrollmentId;
+  final int? resumeItemId;
+  final num? progressPercent;
+  final String? classroomUrl;
+  final bool? isExpired;
+  final int? daysRemaining;
+  final String? accessExpiry;
+  final String? enrolledAt;
+  final int? totalLessons;
+  final int? completedLessons;
   final List<CourseModule>? modules;
   final List<Teacher>? teachers;
   final List<Review>? reviews;
@@ -76,6 +86,16 @@ class Course {
     this.reviewsCount,
     this.usersCount,
     this.isEnrolled,
+    this.enrollmentId,
+    this.resumeItemId,
+    this.progressPercent,
+    this.classroomUrl,
+    this.isExpired,
+    this.daysRemaining,
+    this.accessExpiry,
+    this.enrolledAt,
+    this.totalLessons,
+    this.completedLessons,
     this.modules,
     this.teachers,
     this.reviews,
@@ -99,9 +119,16 @@ class Course {
         ? json["category"] as Map<String, dynamic>
         : null;
 
-    final parsedId = json["id"] is int ? json["id"] : int.tryParse(json["id"]?.toString() ?? '');
+    final parsedId = json["id"] is int
+        ? json["id"]
+        : (json["course_id"] is int
+            ? json["course_id"]
+            : int.tryParse(json["id"]?.toString() ?? json["course_id"]?.toString() ?? ''));
 
     bool? determineEnrolled() {
+      if (json["enrollment_id"] != null || json["classroom_url"] != null) {
+        return true;
+      }
       final candidates = [
         json["is_enrolled"],
         userAccess?["is_enrolled"],
@@ -127,6 +154,25 @@ class Course {
 
     final rawModules = json["modules"] ?? json["syllabus"];
     final rawTeachers = json["teachers"] ?? json["instructors"];
+
+    final parsedEnrollmentId = json["enrollment_id"] is int
+        ? json["enrollment_id"]
+        : int.tryParse(json["enrollment_id"]?.toString() ?? '');
+    final parsedResumeItemId = json["resume_item_id"] is int
+        ? json["resume_item_id"]
+        : int.tryParse(json["resume_item_id"]?.toString() ?? '');
+    final parsedProgress = json["progress_percent"] is num
+        ? json["progress_percent"]
+        : num.tryParse(json["progress_percent"]?.toString() ?? '');
+    final parsedTotalLessons = json["total_lessons"] is int
+        ? json["total_lessons"]
+        : int.tryParse(json["total_lessons"]?.toString() ?? '');
+    final parsedCompletedLessons = json["completed_lessons"] is int
+        ? json["completed_lessons"]
+        : int.tryParse(json["completed_lessons"]?.toString() ?? '');
+    final parsedDaysRemaining = json["days_remaining"] is int
+        ? json["days_remaining"]
+        : int.tryParse(json["days_remaining"]?.toString() ?? '');
 
     return Course(
       id: parsedId,
@@ -208,6 +254,16 @@ class Course {
               ? stats!["enrolled_students"]
               : int.tryParse(json["users_count"]?.toString() ?? '')),
       isEnrolled: determineEnrolled(),
+      enrollmentId: parsedEnrollmentId,
+      resumeItemId: parsedResumeItemId,
+      progressPercent: parsedProgress,
+      classroomUrl: json["classroom_url"]?.toString(),
+      isExpired: json["is_expired"] == true,
+      daysRemaining: parsedDaysRemaining,
+      accessExpiry: json["access_expiry"]?.toString(),
+      enrolledAt: json["enrolled_at"]?.toString(),
+      totalLessons: parsedTotalLessons,
+      completedLessons: parsedCompletedLessons,
       modules: rawModules is List
           ? List<CourseModule>.from(
               rawModules.whereType<Map<String, dynamic>>().map((x) => CourseModule.fromJson(x)))
@@ -224,6 +280,106 @@ class Course {
           ? List<User>.from(
               (json["users"] as List).whereType<Map<String, dynamic>>().map((x) => User.fromJson(x)))
           : [],
+    );
+  }
+
+  Course copyWith({
+    int? id,
+    int? accessDuration,
+    String? title,
+    String? slug,
+    String? details,
+    String? duration,
+    int? courseCategoryId,
+    String? image,
+    String? regularPrice,
+    String? salePrice,
+    dynamic meetLink,
+    dynamic whatsappGroupLink,
+    dynamic facebookGroup,
+    dynamic zoomLink,
+    dynamic youtubePlaylist,
+    dynamic telegramGroup,
+    int? order,
+    DateTime? publishDate,
+    bool? status,
+    dynamic promotionVideo,
+    String? routineFile,
+    bool? isExamBatch,
+    bool? lifetimeAccess,
+    bool? featured,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    dynamic deletedAt,
+    int? modulesCount,
+    int? itemsCount,
+    int? teachersCount,
+    int? reviewsCount,
+    int? usersCount,
+    bool? isEnrolled,
+    int? enrollmentId,
+    int? resumeItemId,
+    num? progressPercent,
+    String? classroomUrl,
+    bool? isExpired,
+    int? daysRemaining,
+    String? accessExpiry,
+    String? enrolledAt,
+    int? totalLessons,
+    int? completedLessons,
+    List<CourseModule>? modules,
+    List<Teacher>? teachers,
+    List<Review>? reviews,
+    List<User>? users,
+  }) {
+    return Course(
+      id: id ?? this.id,
+      accessDuration: accessDuration ?? this.accessDuration,
+      title: title ?? this.title,
+      slug: slug ?? this.slug,
+      details: details ?? this.details,
+      duration: duration ?? this.duration,
+      courseCategoryId: courseCategoryId ?? this.courseCategoryId,
+      image: image ?? this.image,
+      regularPrice: regularPrice ?? this.regularPrice,
+      salePrice: salePrice ?? this.salePrice,
+      meetLink: meetLink ?? this.meetLink,
+      whatsappGroupLink: whatsappGroupLink ?? this.whatsappGroupLink,
+      facebookGroup: facebookGroup ?? this.facebookGroup,
+      zoomLink: zoomLink ?? this.zoomLink,
+      youtubePlaylist: youtubePlaylist ?? this.youtubePlaylist,
+      telegramGroup: telegramGroup ?? this.telegramGroup,
+      order: order ?? this.order,
+      publishDate: publishDate ?? this.publishDate,
+      status: status ?? this.status,
+      promotionVideo: promotionVideo ?? this.promotionVideo,
+      routineFile: routineFile ?? this.routineFile,
+      isExamBatch: isExamBatch ?? this.isExamBatch,
+      lifetimeAccess: lifetimeAccess ?? this.lifetimeAccess,
+      featured: featured ?? this.featured,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      modulesCount: modulesCount ?? this.modulesCount,
+      itemsCount: itemsCount ?? this.itemsCount,
+      teachersCount: teachersCount ?? this.teachersCount,
+      reviewsCount: reviewsCount ?? this.reviewsCount,
+      usersCount: usersCount ?? this.usersCount,
+      isEnrolled: isEnrolled ?? this.isEnrolled,
+      enrollmentId: enrollmentId ?? this.enrollmentId,
+      resumeItemId: resumeItemId ?? this.resumeItemId,
+      progressPercent: progressPercent ?? this.progressPercent,
+      classroomUrl: classroomUrl ?? this.classroomUrl,
+      isExpired: isExpired ?? this.isExpired,
+      daysRemaining: daysRemaining ?? this.daysRemaining,
+      accessExpiry: accessExpiry ?? this.accessExpiry,
+      enrolledAt: enrolledAt ?? this.enrolledAt,
+      totalLessons: totalLessons ?? this.totalLessons,
+      completedLessons: completedLessons ?? this.completedLessons,
+      modules: modules ?? this.modules,
+      teachers: teachers ?? this.teachers,
+      reviews: reviews ?? this.reviews,
+      users: users ?? this.users,
     );
   }
 
@@ -273,84 +429,4 @@ class Course {
             : List<dynamic>.from(reviews!.map((x) => x.toJson())),
         "users": users == null ? [] : List<dynamic>.from(users!.map((x) => x)),
       };
-
-  Course copyWith({
-    int? id,
-    int? accessDuration,
-    String? title,
-    String? slug,
-    String? details,
-    String? duration,
-    int? courseCategoryId,
-    String? image,
-    String? regularPrice,
-    String? salePrice,
-    dynamic meetLink,
-    dynamic whatsappGroupLink,
-    dynamic facebookGroup,
-    dynamic zoomLink,
-    dynamic youtubePlaylist,
-    dynamic telegramGroup,
-    int? order,
-    DateTime? publishDate,
-    bool? status,
-    String? promotionVideo,
-    String? routineFile,
-    bool? isExamBatch,
-    bool? lifetimeAccess,
-    bool? featured,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    dynamic deletedAt,
-    int? modulesCount,
-    int? itemsCount,
-    int? teachersCount,
-    int? reviewsCount,
-    int? usersCount,
-    bool? isEnrolled,
-    List<CourseModule>? modules,
-    List<Teacher>? teachers,
-    List<Review>? reviews,
-    List<User>? users,
-  }) {
-    return Course(
-      id: id ?? this.id,
-      accessDuration: accessDuration ?? this.accessDuration,
-      title: title ?? this.title,
-      slug: slug ?? this.slug,
-      details: details ?? this.details,
-      duration: duration ?? this.duration,
-      courseCategoryId: courseCategoryId ?? this.courseCategoryId,
-      image: image ?? this.image,
-      regularPrice: regularPrice ?? this.regularPrice,
-      salePrice: salePrice ?? this.salePrice,
-      meetLink: meetLink ?? this.meetLink,
-      whatsappGroupLink: whatsappGroupLink ?? this.whatsappGroupLink,
-      facebookGroup: facebookGroup ?? this.facebookGroup,
-      zoomLink: zoomLink ?? this.zoomLink,
-      youtubePlaylist: youtubePlaylist ?? this.youtubePlaylist,
-      telegramGroup: telegramGroup ?? this.telegramGroup,
-      order: order ?? this.order,
-      publishDate: publishDate ?? this.publishDate,
-      status: status ?? this.status,
-      promotionVideo: promotionVideo ?? this.promotionVideo,
-      routineFile: routineFile ?? this.routineFile,
-      isExamBatch: isExamBatch ?? this.isExamBatch,
-      lifetimeAccess: lifetimeAccess ?? this.lifetimeAccess,
-      featured: featured ?? this.featured,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      deletedAt: deletedAt ?? this.deletedAt,
-      modulesCount: modulesCount ?? this.modulesCount,
-      itemsCount: itemsCount ?? this.itemsCount,
-      teachersCount: teachersCount ?? this.teachersCount,
-      reviewsCount: reviewsCount ?? this.reviewsCount,
-      usersCount: usersCount ?? this.usersCount,
-      isEnrolled: isEnrolled ?? this.isEnrolled,
-      modules: modules ?? this.modules,
-      teachers: teachers ?? this.teachers,
-      reviews: reviews ?? this.reviews,
-      users: users ?? this.users,
-    );
-  }
 }
