@@ -163,7 +163,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     if (authRes.user != null) {
       myUser = authRes.user!;
-      MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
       currentUserId.value = authRes.user?.id?.toString() ?? authRes.user?.userId;
       userName.value = authRes.user?.name;
       userEmail.value = authRes.user?.email;

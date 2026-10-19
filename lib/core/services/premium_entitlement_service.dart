@@ -103,9 +103,7 @@ class PremiumEntitlementService {
         log('✅ Entitlement validated: isPremium=$hasPkg');
         isValidating.value = false;
       } else {
-        if (!checkUserHasPackage()) {
-          _updateState(hasPremium: false);
-        }
+        _updateState(hasPremium: false);
         log('⚠️ Entitlement check returned status=false');
         isValidating.value = false;
       }

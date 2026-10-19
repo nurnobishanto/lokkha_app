@@ -6,13 +6,14 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
+import 'package:lokkha/features/profile/presentation/profile/riverpod/profile_notifier.dart';
 import '../widgets/course_button_bar.dart';
 import '../widgets/course_image_viewer.dart';
 import '../widgets/course_info_row.dart';
 import '../widgets/course_module_expansion.dart';
 import '../widgets/routine_bottom_sheet.dart';
 
-class CourseDetailsView extends ConsumerWidget {
+class CourseDetailsView extends ConsumerStatefulWidget {
   final int courseId;
   final bool? initialIsEnrolled;
 
@@ -23,18 +24,47 @@ class CourseDetailsView extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CourseDetailsView> createState() => _CourseDetailsViewState();
+}
+
+class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(courseDetailsNotifierProvider(widget.courseId).notifier)
+          .fetchCourseDetails(widget.courseId);
+      ref
+          .read(myCoursesNotifierProvider.notifier)
+          .fetchMyCourses(isRefresh: true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final state = ref.watch(courseDetailsNotifierProvider(courseId));
-    final notifier = ref.read(courseDetailsNotifierProvider(courseId).notifier);
+    final state = ref.watch(courseDetailsNotifierProvider(widget.courseId));
+    final notifier = ref.read(courseDetailsNotifierProvider(widget.courseId).notifier);
     final myCoursesState = ref.watch(myCoursesNotifierProvider);
 
     final course = state.model.course;
-    final bool isUserEnrolled = (course?.isEnrolled == true) ||
-        (initialIsEnrolled == true) ||
-        isCourseEnrolled(courseId) ||
-        myCoursesState.model.courses.any((c) => c.courseId == courseId && !c.isExpired);
+
+    // The live API response for this course is the authoritative source of truth.
+    final bool isUserEnrolled;
+    if (course != null && course.isEnrolled != null) {
+      // If the API explicitly returns true or false, strictly respect the server's verdict.
+      isUserEnrolled = course.isEnrolled == true;
+    } else if (course != null) {
+      // Fallback only if the backend did not return any enrollment/user_access field
+      isUserEnrolled = myCoursesState.model.courses.any(
+              (c) => c.courseId == widget.courseId && !c.isExpired) ||
+          havePackage.value;
+    } else {
+      // Preliminary hint while network request is loading
+      isUserEnrolled = widget.initialIsEnrolled == true;
+    }
 
     return Scaffold(
       backgroundColor: context.isDark ? const Color(0xFF0F172A) : Colors.white,
@@ -67,51 +97,71 @@ class CourseDetailsView extends ConsumerWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      body: Builder(
-        builder: (context) {
-          if (state.isLoading || course == null) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF006A4E)),
-            );
-          }
-          if (state.hasError && course.id == null) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(24.r),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.wifi_off_rounded,
-                      size: 52.sp,
-                      color: context.textMuted,
+      body: RefreshIndicator(
+        color: const Color(0xFF006A4E),
+        onRefresh: () async {
+          await Future.wait<dynamic>([
+            notifier.fetchCourseDetails(widget.courseId),
+            ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true),
+            ref.read(profileNotifierProvider.notifier).fetchProfileData(),
+          ]);
+        },
+        child: Builder(
+          builder: (context) {
+            if (state.isLoading || course == null) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(height: 200.h),
+                  const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF006A4E)),
+                  ),
+                ],
+              );
+            }
+            if (state.hasError && course.id == null) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(height: 150.h),
+                  Padding(
+                    padding: EdgeInsets.all(24.r),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.wifi_off_rounded,
+                          size: 52.sp,
+                          color: context.textMuted,
+                        ),
+                        SizedBox(height: 12.h),
+                        Text(
+                          'কোর্স বিস্তারিত লোড করা যায়নি',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.w600,
+                            color: context.textPrimary,
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+                        ElevatedButton.icon(
+                          onPressed: () => notifier.fetchCourseDetails(widget.courseId),
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('আবার চেষ্টা করুন'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF006A4E),
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      'কোর্স বিস্তারিত লোড করা যায়নি',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: context.textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    ElevatedButton.icon(
-                      onPressed: () => notifier.fetchCourseDetails(courseId),
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('আবার চেষ্টা করুন'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF006A4E),
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-          return SafeArea(
-            child: SingleChildScrollView(
+                  ),
+                ],
+              );
+            }
+            return SafeArea(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +386,8 @@ class CourseDetailsView extends ConsumerWidget {
           );
         },
       ),
-      bottomNavigationBar: SafeArea(
+    ),
+    bottomNavigationBar: SafeArea(
         child: Builder(
           builder: (context) {
             if (state.isLoading || course == null) {

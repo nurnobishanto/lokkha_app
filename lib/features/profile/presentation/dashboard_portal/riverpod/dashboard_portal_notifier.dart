@@ -70,12 +70,12 @@ class DashboardPortalNotifier extends Notifier<DashboardPortalState> {
           hasError: false,
         );
 
-        // Sync subscription state
-        if (res.data?.activeSubscription != null) {
-          final isSubActive = res.data!.activeSubscription!.status == 'active' &&
-              res.data!.activeSubscription!.daysLeft > 0;
-          havePackage.value = isSubActive;
-        }
+        // Sync subscription state directly from live API response
+        final activeSub = res.data?.activeSubscription;
+        final isSubActive = activeSub != null &&
+            activeSub.status == 'active' &&
+            activeSub.daysLeft > 0;
+        havePackage.value = isSubActive;
 
         // Sync reward points
         if (res.data?.rewards != null && myUser.id != null) {

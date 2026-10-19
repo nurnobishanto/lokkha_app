@@ -78,12 +78,10 @@ class NavbarNotifier extends Notifier<NavbarState> {
         final profile = ProfileDataModel.fromJson(response.data as Map<String, dynamic>);
         if (profile.status == true && profile.user != null) {
           myUser = profile.user!;
-          MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
           isLoggedIn.value = true;
           havePackage.value = profile.user?.hasActiveSubscription == true ||
               profile.user?.isSubscribed == true ||
-              profile.user?.activePackage != null ||
-              checkUserHasPackage();
+              profile.user?.activePackage != null;
 
           state = state.copyWith(
             profile: () => profile,

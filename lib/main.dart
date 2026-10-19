@@ -20,6 +20,7 @@ Future<void> main() async {
   // Init SharedPreferences safely
   try {
     await MySharedPref.init();
+    await AppStorageCache.wipeAllDataCaches();
   } catch (e) {
     debugPrint("SharedPreferences init failed: $e");
   }

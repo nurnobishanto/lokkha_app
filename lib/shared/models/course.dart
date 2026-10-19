@@ -1,4 +1,3 @@
-import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/shared/models/course_module.dart';
 import 'package:lokkha/shared/models/review.dart';
 import 'package:lokkha/shared/models/teacher.dart';
@@ -120,7 +119,6 @@ class Course {
       }
       final enrollment = userAccess?["enrollment"] ?? json["enrollment"] ?? json["user_enrollment"];
       if (enrollment is Map && enrollment.isNotEmpty) return true;
-      if (parsedId != null && isCourseEnrolled(parsedId)) return true;
       for (final c in candidates) {
         if (c == false || c == 0 || c == "0" || c == "false") return false;
       }

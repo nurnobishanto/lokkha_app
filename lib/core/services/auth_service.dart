@@ -237,7 +237,8 @@ class AuthService {
       // Always wipe local credentials regardless of API response
       await SecureStorageService.clearAuthData();
       await MySharedPref.removeUserToken();
-      MyGetStorage.removeCache(MyGetStorage.meUser);
+      await AppStorageCache.wipeAllDataCaches();
+      await MyGetStorage.removeCache(MyGetStorage.meUser);
       isLoggedIn.value = false;
       havePackage.value = false;
       myUser = User();

@@ -98,10 +98,6 @@ class CentralAuthNotifier extends Notifier<CentralAuthState> {
 
       final prefToken = MySharedPref.getUserToken();
       final bool hasToken = prefToken.isNotEmpty || isLoggedIn.value;
-      final bool pkgActive = havePackage.value ||
-          (cachedUser?.hasActiveSubscription == true) ||
-          (cachedUser?.isSubscribed == true) ||
-          (cachedUser?.activePackage != null);
 
       if (cachedUser != null) {
         myUser = cachedUser;
@@ -110,7 +106,7 @@ class CentralAuthNotifier extends Notifier<CentralAuthState> {
       return CentralAuthState(
         user: cachedUser,
         isLoggedIn: hasToken,
-        hasPackage: pkgActive,
+        hasPackage: havePackage.value,
       );
     } catch (e) {
       log('⚠️ CentralAuthNotifier hydration error: $e');
@@ -141,11 +137,10 @@ class CentralAuthNotifier extends Notifier<CentralAuthState> {
         (user.isSubscribed == true) ||
         (user.activePackage != null);
 
-    // Update global state and cache
+    // Update global state and memory
     myUser = user;
     isLoggedIn.value = true;
     havePackage.value = isPkg;
-    MyGetStorage.writeCacheData(MyGetStorage.meUser, user);
 
     state = state.copyWith(
       user: () => user,
@@ -201,6 +196,7 @@ class CentralAuthNotifier extends Notifier<CentralAuthState> {
       await MySharedPref.removeUserToken();
     } catch (_) {}
     try {
+      await AppStorageCache.wipeAllDataCaches();
       await MyGetStorage.removeCache(MyGetStorage.meUser);
     } catch (_) {}
 

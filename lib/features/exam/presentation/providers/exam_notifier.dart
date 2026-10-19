@@ -60,19 +60,6 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
 
   Future<void> getRandomQuestion({bool forceNew = false}) async {
     state = state.copyWith(isLoading: true, isAnswerSelected: false);
-    if (forceNew) {
-      MyGetStorage.removeCache(MyGetStorage.randomQuestionKey);
-    }
-    if (!forceNew && MyGetStorage.hasData(MyGetStorage.randomQuestionKey)) {
-      final cacheData = MyGetStorage.readCache(MyGetStorage.randomQuestionKey);
-      if (cacheData != null) {
-        state = state.copyWith(
-          randomQuestionModel: RandomQuestionModel.fromJson(cacheData),
-          isLoading: false,
-        );
-        return;
-      }
-    }
 
     final deviceID = await getDeviceId();
     final url =
@@ -81,8 +68,6 @@ class RandomQuestionNotifier extends Notifier<RandomQuestionState> {
       final response = await _client.get(url);
       if (response.data != null && response.data['status'] == true) {
         final data = RandomQuestionModel.fromJson(response.data);
-        MyGetStorage.writeCacheData(
-            MyGetStorage.randomQuestionKey, response.data);
         state = state.copyWith(
           randomQuestionModel: data,
           randomQuestionPackage: response.data['package_required'] == true,

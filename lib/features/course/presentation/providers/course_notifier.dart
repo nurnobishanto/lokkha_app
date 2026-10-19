@@ -224,16 +224,10 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
     try {
       final model = await _repository.getCourseDetails(id);
       if (model != null && model.course != null) {
-        final course = (model.course!.isEnrolled != true && isCourseEnrolled(id))
-            ? model.course!.copyWith(isEnrolled: true)
-            : model.course!;
         state = state.copyWith(
           isLoading: false,
           hasError: false,
-          model: CourseDetailsModel(
-            status: model.status,
-            course: course,
-          ),
+          model: model,
         );
       } else {
         state = state.copyWith(

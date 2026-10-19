@@ -155,15 +155,6 @@ class CoursesRepositoryImpl implements CoursesRepository {
               response.data['success'] == true ||
               response.data['data'] != null)) {
         final model = CourseDetailsModel.fromJson(response.data as Map<String, dynamic>);
-        if (model.course != null) {
-          final bool enrolled = model.course!.isEnrolled == true || isCourseEnrolled(courseId);
-          if (enrolled && model.course!.isEnrolled != true) {
-            return CourseDetailsModel(
-              status: model.status,
-              course: model.course!.copyWith(isEnrolled: true),
-            );
-          }
-        }
         return model;
       }
     } catch (e) {
@@ -176,15 +167,6 @@ class CoursesRepositoryImpl implements CoursesRepository {
         );
         if (legacyRes.data != null) {
           final model = CourseDetailsModel.fromJson(legacyRes.data as Map<String, dynamic>);
-          if (model.course != null) {
-            final bool enrolled = model.course!.isEnrolled == true || isCourseEnrolled(courseId);
-            if (enrolled && model.course!.isEnrolled != true) {
-              return CourseDetailsModel(
-                status: model.status,
-                course: model.course!.copyWith(isEnrolled: true),
-              );
-            }
-          }
           return model;
         }
       } catch (_) {}

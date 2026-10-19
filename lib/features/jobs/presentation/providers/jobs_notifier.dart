@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/jobs/data/models/job_list_model.dart';
 import 'package:lokkha/features/jobs/data/repositories/jobs_repository.dart';
 
@@ -72,23 +71,6 @@ class JobsNotifier extends Notifier<JobsState> {
   }
 
   Future<void> init() async {
-    // Check cache first for rapid startup
-    if (MyGetStorage.getStorage.hasData(MyGetStorage.jobKey)) {
-      final cacheData = MyGetStorage.readCache(MyGetStorage.jobKey);
-      if (cacheData != null && cacheData is Map<String, dynamic>) {
-        try {
-          final cachedModel = JobListModel.fromJson(cacheData);
-          if (cachedModel.jobs?.data?.isNotEmpty == true) {
-            state = state.copyWith(
-              model: cachedModel,
-              filteredJobs: cachedModel.jobs?.data ?? [],
-              isLoading: false,
-            );
-          }
-        } catch (_) {}
-      }
-    }
-
     await Future.wait([
       fetchDepartments(),
       fetchJobs("", page: 1),
@@ -137,10 +119,6 @@ class JobsNotifier extends Notifier<JobsState> {
     int page = 1,
     bool refresh = false,
   }) async {
-    if (refresh) {
-      MyGetStorage.removeCache(MyGetStorage.jobKey);
-    }
-
     if (page == 1) {
       state = state.copyWith(isLoading: true, search: search);
     } else {
@@ -156,10 +134,6 @@ class JobsNotifier extends Notifier<JobsState> {
       );
 
       if (modelData.success == true || modelData.status == true) {
-        if (page == 1) {
-          // Cache page 1 data
-          MyGetStorage.writeCacheData(MyGetStorage.jobKey, modelData.toJson());
-        }
 
         if (page > 1 && state.model.jobs != null) {
           final existing = List<Job>.from(state.model.jobs?.data ?? []);

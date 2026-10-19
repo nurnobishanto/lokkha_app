@@ -78,7 +78,10 @@ class _CoursesViewState extends ConsumerState<CoursesView> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await notifier.fetchCourses(_activeCategoryId, refresh: true);
+          await Future.wait([
+            notifier.fetchCourses(_activeCategoryId, refresh: true),
+            ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true),
+          ]);
         },
         color: const Color(0xFF006A4E),
         child: _buildBody(context, state, notifier),

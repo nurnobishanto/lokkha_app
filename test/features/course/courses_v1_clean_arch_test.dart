@@ -674,13 +674,17 @@ void main() {
 
     testWidgets('CourseDetailsView renders "শেখা শুরু করুন" and unlocks modules when user is enrolled',
         (tester) async {
-      final parsedDetails = CourseDetailsModel.fromJson(sampleCourse6DetailsJson);
+      final enrolledJson = Map<String, dynamic>.from(sampleCourse6DetailsJson);
+      enrolledJson['data'] = Map<String, dynamic>.from(sampleCourse6DetailsJson['data'] as Map);
+      enrolledJson['data']['user_access'] = {
+        "is_authenticated": true,
+        "is_enrolled": true,
+        "enrollment": {"id": 60}
+      };
+      final parsedDetails = CourseDetailsModel.fromJson(enrolledJson);
       final mockRepo = _MockCoursesRepository(
         courseDetailsToReturn: parsedDetails,
       );
-
-      // Pre-cache enrolled course 6
-      cacheEnrolledCourseIds([6]);
 
       await tester.pumpWidget(
         ProviderScope(

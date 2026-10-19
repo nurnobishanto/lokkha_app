@@ -21,6 +21,9 @@ class _MyCoursesViewState extends ConsumerState<MyCoursesView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true);
+    });
   }
 
   @override

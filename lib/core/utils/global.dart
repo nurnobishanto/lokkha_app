@@ -36,31 +36,7 @@ Map<String, String> defaultHeaders = {
 };
 
 /// Authentication / User Info (Standard Flutter ValueNotifier)
-User myUser = MyGetStorage.readCache(MyGetStorage.meUser) ?? User();
-
-bool _cachedHasPackage() {
-  try {
-    if (myUser.hasActiveSubscription == true ||
-        myUser.isSubscribed == true ||
-        myUser.activePackage != null) {
-      return true;
-    }
-    final cached = MyGetStorage.readCache(MyGetStorage.meUser);
-    if (cached is User) {
-      return cached.hasActiveSubscription == true ||
-          cached.isSubscribed == true ||
-          cached.activePackage != null;
-    } else if (cached is Map) {
-      return cached['have_package'] == true ||
-          cached['have_package'] == 1 ||
-          cached['havePackage'] == true ||
-          cached['is_subscribed'] == true ||
-          cached['has_active_subscription'] == true ||
-          (cached['active_package'] is Map && (cached['active_package'] as Map).isNotEmpty);
-    }
-  } catch (_) {}
-  return false;
-}
+User myUser = User();
 
 final ValueNotifier<String?> currentUserId = ValueNotifier<String?>('');
 final ValueNotifier<String?> userName = ValueNotifier<String?>('');
@@ -68,44 +44,25 @@ final ValueNotifier<String?> userEmail = ValueNotifier<String?>('');
 final ValueNotifier<String?> userPhone = ValueNotifier<String?>('');
 final ValueNotifier<String?> userRole = ValueNotifier<String?>('');
 final ValueNotifier<bool> isLoggedIn = ValueNotifier<bool>(false);
-final ValueNotifier<bool> havePackage = ValueNotifier<bool>(_cachedHasPackage());
+final ValueNotifier<bool> havePackage = ValueNotifier<bool>(false);
 final ValueNotifier<int> unReadNotificationCount = ValueNotifier<int>(0);
 
+/// Authoritative check directly from live server/API state.
+/// Never overrides or resurrects entitlements from local storage.
 bool checkUserHasPackage() {
-  if (havePackage.value) return true;
-  if (_cachedHasPackage()) {
-    havePackage.value = true;
-    return true;
-  }
-  return false;
+  return havePackage.value;
 }
 
 bool isCourseEnrolled(int? courseId) {
-  if (courseId == null || courseId <= 0) return false;
-  try {
-    final cachedIds = MyGetStorage.readCache('enrolled_course_ids');
-    if (cachedIds is List) {
-      for (final item in cachedIds) {
-        if (item is int && item == courseId) return true;
-        if (item != null && item.toString() == courseId.toString()) return true;
-      }
-    }
-  } catch (_) {}
+  // Never rely on local storage for enrollment.
+  // The live server response (API) is the single source of truth.
   return false;
 }
 
 void cacheEnrolledCourseIds(List<int> courseIds) {
+  // Wipe any legacy cache from local storage so stale IDs never linger
   try {
-    final existing = MyGetStorage.readCache('enrolled_course_ids');
-    final Set<int> allIds = {};
-    if (existing is List) {
-      for (final e in existing) {
-        final id = int.tryParse(e.toString());
-        if (id != null) allIds.add(id);
-      }
-    }
-    allIds.addAll(courseIds);
-    MyGetStorage.writeCacheData('enrolled_course_ids', allIds.toList());
+    MyGetStorage.removeCache('enrolled_course_ids');
   } catch (_) {}
 }
 

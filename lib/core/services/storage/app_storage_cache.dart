@@ -39,6 +39,23 @@ class AppStorageCache {
     } catch (_) {}
   }
 
+  /// Completely wipes all legacy offline data caches so the API remains the single source of truth.
+  static Future<void> wipeAllDataCaches() async {
+    final keysToPurge = [
+      randomQuestionKey,
+      favQuestionsKey,
+      jobKey,
+      internationalAffairs,
+      bdAffairs,
+      'enrolled_course_ids',
+      meUser,
+      'dashboard_overview_cache',
+    ];
+    for (final k in keysToPurge) {
+      await removeCache(k);
+    }
+  }
+
   // Write Data
   static Future<void> writeCacheData(String key, dynamic value) async {
     _memoryCache[key] = value;

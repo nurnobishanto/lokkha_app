@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/services/auth_service.dart';
-import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/navigation/data/models/profile_data_model.dart';
@@ -60,7 +59,9 @@ class ProfileNotifier extends Notifier<ProfileState> {
       final user = await _getProfileUseCase();
       if (user != null) {
         myUser = user;
-        MyGetStorage.writeCacheData(MyGetStorage.meUser, myUser);
+        havePackage.value = user.hasActiveSubscription == true ||
+            user.isSubscribed == true ||
+            user.activePackage != null;
         final profileModel = ProfileDataModel(status: true, user: user);
         isLoggedIn.value = true;
 

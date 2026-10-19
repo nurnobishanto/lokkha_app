@@ -7,11 +7,24 @@ import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import '../riverpod/my_packages_notifier.dart';
 
-class MyPackagesView extends ConsumerWidget {
+class MyPackagesView extends ConsumerStatefulWidget {
   const MyPackagesView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyPackagesView> createState() => _MyPackagesViewState();
+}
+
+class _MyPackagesViewState extends ConsumerState<MyPackagesView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(myPackagesNotifierProvider.notifier).fetchMyPackages(isRefresh: true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(myPackagesNotifierProvider);
     final notifier = ref.read(myPackagesNotifierProvider.notifier);
 

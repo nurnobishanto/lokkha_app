@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
+import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/profile/data/models/my_packages_model.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
@@ -80,8 +81,10 @@ class MyPackagesNotifier extends Notifier<MyPackagesState> {
 
       final data = response.data;
       if (data != null && (data['success'] == true || data['status'] == true)) {
+        final model = MyPackagesModel.fromJson(data);
+        havePackage.value = model.packages.any((p) => p.isActive);
         state = state.copyWith(
-          model: MyPackagesModel.fromJson(data),
+          model: model,
           isLoading: false,
           hasError: false,
           errorMessage: null,

@@ -13,6 +13,8 @@ import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
+import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
+import 'package:lokkha/features/profile/presentation/my_packages/riverpod/my_packages_notifier.dart';
 import '../riverpod/profile_notifier.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
@@ -28,6 +30,8 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(profileNotifierProvider.notifier).fetchProfileData();
+      ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true);
+      ref.read(myPackagesNotifierProvider.notifier).fetchMyPackages(isRefresh: true);
     });
   }
 
@@ -56,10 +60,20 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
             return const Center(child: Text("তথ্য লোড করা সম্ভব হয়নি"));
           }
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        return RefreshIndicator(
+          color: LightThemeColors.primaryColor,
+          onRefresh: () async {
+            await Future.wait<dynamic>([
+              ref.read(profileNotifierProvider.notifier).fetchProfileData(),
+              ref.read(myCoursesNotifierProvider.notifier).fetchMyCourses(isRefresh: true),
+              ref.read(myPackagesNotifierProvider.notifier).fetchMyPackages(isRefresh: true),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --- HEADER CARD (Matching media_1789898866331.png) ---
               Container(
@@ -458,11 +472,12 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
               SizedBox(height: 20.h),
             ],
           ),
-        );
-      },
-    ),
-  );
-  }
+        ),
+      );
+    },
+  ),
+);
+}
 
   Widget _buildSectionLabel(String text) {
     return Builder(
