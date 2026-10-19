@@ -289,6 +289,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ReferralView(),
       ),
       GoRoute(
+        path: Routes.rewardPoints,
+        name: Routes.rewardPoints,
+        builder: (context, state) => const RewardPointsView(),
+      ),
+      GoRoute(
         path: Routes.profileUpdateRequired,
         name: Routes.profileUpdateRequired,
         builder: (context, state) {

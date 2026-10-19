@@ -28,6 +28,7 @@ class Routes {
   static const String liveContest = '/live-contest';
   static const String accuracyProgress = '/accuracy-progress';
   static const String referral = '/referral';
+  static const String rewardPoints = '/reward-points';
   static const String dashboardPortal = '/dashboard-portal';
   static const String settings = '/settings';
   static const String notifications = '/notifications';

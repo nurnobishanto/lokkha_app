@@ -87,6 +87,10 @@ export 'presentation/my_packages/views/my_packages_view.dart';
 export 'presentation/referral/riverpod/referral_notifier.dart';
 export 'presentation/referral/views/referral_view.dart';
 
+// Presentation - Reward Points
+export 'presentation/reward_points/riverpod/reward_points_notifier.dart';
+export 'presentation/reward_points/views/reward_points_view.dart';
+
 // Presentation - Dashboard Portal & Update Required
 export 'presentation/dashboard_portal/riverpod/dashboard_portal_notifier.dart';
 export 'presentation/dashboard_portal/views/dashboard_portal_view.dart';

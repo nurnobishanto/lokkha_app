@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/custom_app_bar.dart';
 import 'package:lokkha/core/utils/global.dart';
@@ -35,118 +36,133 @@ class ReferralView extends ConsumerWidget {
           final successful = state.successfulReferrals;
           final users = state.referredUsers;
 
-        return ListView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 28.h),
-          children: [
-            // -----------------------------------------------------------------
-            // 1. TOP HEADER CARD (Matching media_1789897121729.png)
-            // -----------------------------------------------------------------
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              decoration: BoxDecoration(
-                color: context.cardColor,
-                borderRadius: BorderRadius.circular(16.r),
-                border: Border.all(color: context.borderColor),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          return RefreshIndicator(
+            onRefresh: () => notifier.loadReferralData(isRefresh: true),
+            color: const Color(0xFF059669),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      // Back Button
-                      InkWell(
-                        onTap: () => Navigator.of(context).pop(),
-                        borderRadius: BorderRadius.circular(20.r),
-                        child: Container(
-                          width: 36.r,
-                          height: 36.r,
-                          decoration: BoxDecoration(
-                            color: context.surfaceColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.arrow_back,
-                            size: 18.sp,
-                            color: context.textPrimary,
-                          ),
-                        ),
+              padding: EdgeInsets.fromLTRB(14.w, 14.h, 14.w, 28.h),
+              children: [
+                // -----------------------------------------------------------------
+                // 1. TOP HEADER CARD (Matching media_1789897121729.png)
+                // -----------------------------------------------------------------
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: context.cardColor,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(color: context.borderColor),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.02),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "আমার রেফারেল",
-                              style: TextStyle(
-                                fontSize: 16.5.sp,
-                                fontWeight: FontWeight.w800,
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          // Back Button
+                          InkWell(
+                            onTap: () => Navigator.of(context).pop(),
+                            borderRadius: BorderRadius.circular(20.r),
+                            child: Container(
+                              width: 36.r,
+                              height: 36.r,
+                              decoration: BoxDecoration(
+                                color: context.surfaceColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                size: 18.sp,
                                 color: context.textPrimary,
                               ),
                             ),
-                            SizedBox(height: 2.h),
-                            Text(
-                              "বন্ধুদের আমন্ত্রণ জানান ও রিওয়ার্ড পয়েন্ট অর্জন করুন",
-                              style: TextStyle(
-                                fontSize: 11.5.sp,
-                                color: context.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "আমার রেফারেল",
+                                  style: TextStyle(
+                                    fontSize: 16.5.sp,
+                                    fontWeight: FontWeight.w800,
+                                    color: context.textPrimary,
+                                  ),
+                                ),
+                                SizedBox(height: 2.h),
+                                Text(
+                                  "বন্ধুদের আমন্ত্রণ জানান ও রিওয়ার্ড পয়েন্ট অর্জন করুন",
+                                  style: TextStyle(
+                                    fontSize: 11.5.sp,
+                                    color: context.textSecondary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+
+                      // রিওয়ার্ড পয়েন্ট Pill Button
+                      InkWell(
+                        onTap: () => context.push(Routes.rewardPoints),
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: context.cardColor,
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: const Color(0xFF059669),
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.monetization_on_rounded,
+                                size: 15.sp,
+                                color: const Color(0xFFF59E0B),
+                              ),
+                              SizedBox(width: 5.w),
+                              Text(
+                                "রিওয়ার্ড পয়েন্ট",
+                                style: TextStyle(
+                                  color: const Color(0xFF059669),
+                                  fontSize: 11.5.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(width: 4.w),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 10.sp,
+                                color: const Color(0xFF059669),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 12.h),
+                ),
 
-                  // রিওয়ার্ড পয়েন্ট Pill Button
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 14.w,
-                      vertical: 6.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: context.cardColor,
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(
-                        color: const Color(0xFF059669),
-                        width: 1.2,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.monetization_on_rounded,
-                          size: 15.sp,
-                          color: const Color(0xFFF59E0B),
-                        ),
-                        SizedBox(width: 5.w),
-                        Text(
-                          "রিওয়ার্ড পয়েন্ট",
-                          style: TextStyle(
-                            color: const Color(0xFF059669),
-                            fontSize: 11.5.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 12.h),
+                SizedBox(height: 12.h),
 
             // -----------------------------------------------------------------
             // 2. 3 SUMMARY STAT CARDS IN A ROW
@@ -455,15 +471,25 @@ class ReferralView extends ConsumerWidget {
             // -----------------------------------------------------------------
             // 5. REFERRED USERS LIST / EMPTY STATE
             // -----------------------------------------------------------------
-            if (users.isEmpty)
+            if (state.isLoading && users.isEmpty)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 30.h),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF059669),
+                  ),
+                ),
+              )
+            else if (users.isEmpty)
               _buildEmptyState(context)
             else
               ...users.map((u) => _buildReferredUserCard(u, context)),
           ],
-        );
-      },
-    ),
-  );
+        ),
+      );
+    },
+  ),
+);
   }
 
   // ---------------------------------------------------------------------------
@@ -621,6 +647,36 @@ class ReferralView extends ConsumerWidget {
   // REFERRED USER CARD WIDGET
   // ---------------------------------------------------------------------------
   Widget _buildReferredUserCard(dynamic user, BuildContext context) {
+    String name = 'ব্যবহারকারী';
+    String phone = '';
+    String date = '';
+    int points = 100;
+    String status = 'সফল';
+
+    if (user is ReferralItem) {
+      name = user.referredUser?.name.isNotEmpty == true
+          ? user.referredUser!.name
+          : 'ব্যবহারকারী';
+      phone = user.referredUser?.phoneMasked ?? '';
+      date = user.registeredAt ?? '';
+      points = user.rewardPoints > 0 ? user.rewardPoints : 100;
+      status = user.status.toLowerCase() == 'successful' || user.status.isEmpty
+          ? 'সফল'
+          : user.status;
+    } else if (user is Map) {
+      name = user['name']?.toString() ?? 'ব্যবহারকারী';
+      date = user['date']?.toString() ?? '';
+      points = (user['points'] as int?) ?? 100;
+      status = (user['status']?.toString().toLowerCase() == 'successful')
+          ? 'সফল'
+          : (user['status']?.toString() ?? 'সফল');
+    }
+
+    final subtitleParts = [
+      if (phone.isNotEmpty) phone,
+      if (date.isNotEmpty) date,
+    ];
+
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.r),
@@ -634,14 +690,19 @@ class ReferralView extends ConsumerWidget {
           Container(
             width: 38.r,
             height: 38.r,
-            decoration: BoxDecoration(
-              color: context.surfaceColor,
+            decoration: const BoxDecoration(
+              color: Color(0xFFECFDF5),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.person,
-              color: context.textSecondary,
-              size: 20.sp,
+            child: Center(
+              child: Text(
+                name.isNotEmpty ? name.characters.first : 'U',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF059669),
+                ),
+              ),
             ),
           ),
           SizedBox(width: 12.w),
@@ -649,38 +710,81 @@ class ReferralView extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  user['name'] ?? 'ব্যবহারকারী',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.5.sp,
+                          fontWeight: FontWeight.bold,
+                          color: context.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (status.isNotEmpty) ...[
+                      SizedBox(width: 6.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(6.r),
+                        ),
+                        child: Text(
+                          status,
+                          style: TextStyle(
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF16A34A),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                SizedBox(height: 2.h),
-                Text(
-                  user['date'] ?? '',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: context.textSecondary,
+                if (subtitleParts.isNotEmpty) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    subtitleParts.join(' • '),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: context.textSecondary,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
+          SizedBox(width: 8.w),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
+              color: const Color(0xFFFEF9C3),
               borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(color: const Color(0xFFFDE047).withValues(alpha: 0.6)),
             ),
-            child: Text(
-              "+১০০ Pts",
-              style: TextStyle(
-                fontSize: 11.5.sp,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF059669),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.monetization_on_rounded,
+                  size: 13.sp,
+                  color: const Color(0xFFD97706),
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  "+$points",
+                  style: TextStyle(
+                    fontSize: 11.5.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFB45309),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
