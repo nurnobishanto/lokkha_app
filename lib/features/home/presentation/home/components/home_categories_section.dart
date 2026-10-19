@@ -190,6 +190,7 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
         if (effectiveExams.isNotEmpty) ...[
           HomeSectionHeader(
             title: 'ফ্রি পরীক্ষা সমূহ',
+            icon: Icons.menu_book_rounded,
             seeAllText: _isExamsExpanded ? 'কম দেখুন' : 'সব দেখুন',
             onSeeAll: () {
               setState(() {
@@ -220,6 +221,7 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
                   slug: cat.slug,
                   imageUrl: cat.imageUrl,
                   themeIcon: cat.theme?.icon,
+                  isPremium: false,
                   onTap: () {
                     if (GoRouter.maybeOf(context) != null) {
                       context.push(
@@ -242,6 +244,49 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
         if (effectiveCourses.isNotEmpty) ...[
           HomeSectionHeader(
             title: 'প্রিমিয়াম পরীক্ষা সমূহ',
+            icon: Icons.workspace_premium_rounded,
+            iconColor: const Color(0xFFD97706),
+            iconBackgroundColor: const Color(0xFFFEF3C7),
+            trailingBadge: Container(
+              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFFF9F1C),
+                    Color(0xFFF77F00),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(6.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFF77F00).withValues(alpha: 0.35),
+                    blurRadius: 4,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Colors.white,
+                    size: 10.sp,
+                  ),
+                  SizedBox(width: 2.w),
+                  Text(
+                    'PRO',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8.5.sp,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                      height: 1.1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
             seeAllText: _isCoursesExpanded ? 'কম দেখুন' : 'সব দেখুন',
             onSeeAll: () {
               setState(() {
@@ -272,6 +317,7 @@ class _HomeCategoriesSectionState extends State<HomeCategoriesSection> {
                   slug: courseCat.slug,
                   imageUrl: courseCat.imageUrl,
                   themeIcon: courseCat.theme?.icon,
+                  isPremium: true,
                   onTap: () {
                     if (GoRouter.maybeOf(context) != null) {
                       context.push(

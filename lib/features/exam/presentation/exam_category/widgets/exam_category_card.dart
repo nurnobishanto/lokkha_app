@@ -14,6 +14,7 @@ class ExamCategoryCard extends StatelessWidget {
   final Color? borderColor;
   final Color? iconColor;
   final bool? isIcon;
+  final bool isPremium;
   final VoidCallback? onTap;
 
   const ExamCategoryCard({
@@ -26,6 +27,7 @@ class ExamCategoryCard extends StatelessWidget {
     this.borderColor,
     this.iconColor,
     this.isIcon = true,
+    this.isPremium = false,
     this.onTap,
   });
 
@@ -153,71 +155,206 @@ class ExamCategoryCard extends StatelessWidget {
       themeIcon: themeIcon,
     );
 
+    final isDark = context.isDark;
+
+    final BoxDecoration cardDecoration;
+    if (isPremium) {
+      cardDecoration = BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [
+                  Color(0xFF251C14),
+                  Color(0xFF1E2430),
+                ]
+              : const [
+                  Color(0xFFFFFDF7),
+                  Color(0xFFFFF7ED),
+                ],
+        ),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: borderColor ??
+              (isDark
+                  ? const Color(0xFFF59E0B).withValues(alpha: 0.45)
+                  : const Color(0xFFFBBF24).withValues(alpha: 0.7)),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFF59E0B).withValues(
+              alpha: isDark ? 0.20 : 0.12,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.25 : 0.03,
+            ),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      );
+    } else {
+      cardDecoration = BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: borderColor ??
+              (isDark
+                  ? const Color(0xFF334155)
+                  : const Color(0xFFF1F5F9)),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.35 : 0.06,
+            ),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.2 : 0.02,
+            ),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      );
+    }
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12.r),
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-          decoration: BoxDecoration(
-            color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: borderColor ??
-                  (context.isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFF1F5F9)),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: context.isDark ? 0.35 : 0.06,
-                ),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: context.isDark ? 0.2 : 0.02,
-                ),
-                blurRadius: 3,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          decoration: cardDecoration,
+          child: Stack(
+            clipBehavior: Clip.antiAlias,
             children: [
-              if (isIcon == true) ...[
-                if (imageUrl != null && imageUrl!.isNotEmpty)
-                  CachedNetworkImage(
-                    imageUrl: imageUrl!,
-                    width: 28.r,
-                    height: 28.r,
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => _buildSvgWidget(svgString),
-                    errorWidget: (_, __, ___) => _buildSvgWidget(svgString),
-                  )
-                else
-                  _buildSvgWidget(svgString),
-                SizedBox(width: 8.w),
-              ],
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 2,
-                  textAlign: TextAlign.start,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12.5.sp,
-                    fontWeight: FontWeight.w600,
-                    color: context.textPrimary,
-                    height: 1.25,
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: 10.w,
+                      right: isPremium ? 28.w : 10.w,
+                      top: 4.h,
+                      bottom: 4.h,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (isIcon == true) ...[
+                          if (isPremium)
+                            Container(
+                              width: 32.r,
+                              height: 32.r,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: isDark
+                                      ? [
+                                          const Color(0xFF78350F).withValues(alpha: 0.4),
+                                          const Color(0xFF451A03).withValues(alpha: 0.3),
+                                        ]
+                                      : [
+                                          const Color(0xFFFEF3C7),
+                                          const Color(0xFFFDE68A),
+                                        ],
+                                ),
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: const Color(0xFFF59E0B).withValues(
+                                    alpha: isDark ? 0.4 : 0.5,
+                                  ),
+                                  width: 0.8,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: _buildIcon(svgString, size: 22.r),
+                            )
+                          else
+                            _buildIcon(svgString, size: 28.r),
+                          SizedBox(width: 8.w),
+                        ],
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 2,
+                            textAlign: TextAlign.start,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12.5.sp,
+                              fontWeight: FontWeight.w600,
+                              color: context.textPrimary,
+                              height: 1.25,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
+              if (isPremium)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 5.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFFF9F1C),
+                          Color(0xFFF77F00),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(11.r),
+                        bottomLeft: Radius.circular(8.r),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFF77F00).withValues(alpha: 0.35),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.workspace_premium_rounded,
+                          size: 9.sp,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 1.5.w),
+                        Text(
+                          "PRO",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 7.5.sp,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -225,18 +362,32 @@ class ExamCategoryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSvgWidget(String svgString) {
+  Widget _buildIcon(String svgString, {required double size}) {
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        placeholder: (_, __) => _buildSvgWidget(svgString, size: size),
+        errorWidget: (_, __, ___) => _buildSvgWidget(svgString, size: size),
+      );
+    }
+    return _buildSvgWidget(svgString, size: size);
+  }
+
+  Widget _buildSvgWidget(String svgString, {required double size}) {
     return SizedBox(
-      width: 28.r,
-      height: 28.r,
+      width: size,
+      height: size,
       child: SvgPicture.string(
         svgString,
-        width: 28.r,
-        height: 28.r,
+        width: size,
+        height: size,
         fit: BoxFit.contain,
         placeholderBuilder: (_) => Icon(
           Icons.school_rounded,
-          size: 24.sp,
+          size: (size * 0.85).sp,
           color: const Color(0xFF006A4E),
         ),
       ),

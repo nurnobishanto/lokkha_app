@@ -6,6 +6,9 @@ class HomeSectionHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
   final IconData? icon;
+  final Color? iconColor;
+  final Color? iconBackgroundColor;
+  final Widget? trailingBadge;
   final VoidCallback? onSeeAll;
   final String seeAllText;
 
@@ -14,6 +17,9 @@ class HomeSectionHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.icon,
+    this.iconColor,
+    this.iconBackgroundColor,
+    this.trailingBadge,
     this.onSeeAll,
     this.seeAllText = 'সব দেখুন',
   });
@@ -29,13 +35,14 @@ class HomeSectionHeader extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(6.r),
               decoration: BoxDecoration(
-                color: context.primaryColor.withValues(alpha: 0.12),
+                color: iconBackgroundColor ??
+                    context.primaryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Icon(
                 icon,
                 size: 16.sp,
-                color: context.primaryColor,
+                color: iconColor ?? context.primaryColor,
               ),
             ),
             SizedBox(width: 8.w),
@@ -45,13 +52,24 @@ class HomeSectionHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: context.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (trailingBadge != null) ...[
+                      SizedBox(width: 6.w),
+                      trailingBadge!,
+                    ],
+                  ],
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   SizedBox(height: 2.h),
@@ -108,6 +126,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
   final double fontSize;
   final double dividerHeight;
   final EdgeInsetsGeometry padding;
+  final Widget? trailingBadge;
 
   const SectionTitleWithSeeAll({
     super.key,
@@ -117,6 +136,7 @@ class SectionTitleWithSeeAll extends StatelessWidget {
     this.fontSize = 18,
     this.dividerHeight = 1.5,
     this.padding = const EdgeInsets.symmetric(horizontal: 2),
+    this.trailingBadge,
   });
 
   @override
@@ -140,6 +160,10 @@ class SectionTitleWithSeeAll extends StatelessWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
+                if (trailingBadge != null) ...[
+                  const SizedBox(width: 8),
+                  trailingBadge!,
+                ],
                 const SizedBox(width: 10),
                 Expanded(
                   child: transparentDivider(

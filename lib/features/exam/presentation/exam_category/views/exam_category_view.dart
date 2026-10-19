@@ -52,6 +52,46 @@ class ExamCategoryView extends ConsumerWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8.0.w),
                 child: SectionTitleWithSeeAll(
                   title: "প্রিমিয়াম পরীক্ষা সমূহ",
+                  trailingBadge: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFFF9F1C),
+                          Color(0xFFF77F00),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(6.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFF77F00).withValues(alpha: 0.35),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.workspace_premium_rounded,
+                          color: Colors.white,
+                          size: 10.sp,
+                        ),
+                        SizedBox(width: 2.w),
+                        Text(
+                          'PRO',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.5.sp,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   onSeeAllPressed: () {
                     context.push(Routes.allCourses);
                   },
@@ -76,9 +116,10 @@ class ExamCategoryView extends ConsumerWidget {
                       title: course.title ?? "",
                       slug: course.slug,
                       imageUrl: course.image,
+                      isPremium: true,
                       onTap: () {
                         context.push(
-                          Routes.courses,
+                           Routes.courses,
                           extra: {
                             "course_category_id": course.id,
                             'category_name': course.title,
@@ -119,6 +160,7 @@ class ExamCategoryView extends ConsumerWidget {
                       title: exam.name ?? "",
                       slug: exam.slug,
                       imageUrl: exam.image,
+                      isPremium: false,
                       onTap: () {
                         if (exam.id != null) {
                           context.push(
