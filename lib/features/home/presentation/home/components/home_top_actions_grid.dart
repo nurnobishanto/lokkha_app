@@ -109,10 +109,8 @@ class HomeTopActionsGrid extends StatelessWidget {
                       item.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12.sp,
+                      style: context.cardTitle.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: context.textPrimary,
                       ),
                     ),
                   ),

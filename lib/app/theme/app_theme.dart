@@ -4,17 +4,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/services/storage/my_shared_pref.dart';
 import 'app_colors.dart';
+import 'app_font_config.dart';
 
 export 'app_colors.dart';
+export 'app_font_config.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
-/// Font Sizing & Typography Tokens
+/// Font Sizing & Typography Tokens (Powered by [AppFontConfig])
 /// ─────────────────────────────────────────────────────────────────────────────
 class MyFonts {
   static TextStyle get getAppFontType =>
       LocalizationService.supportedLanguagesFontsFamilies[
           MySharedPref.getCurrentLocal().languageCode] ??
-      const TextStyle();
+      const TextStyle(fontFamily: AppFontConfig.fontFamily);
 
   static TextStyle get headlineTextStyle => getAppFontType;
   static TextStyle get bodyTextStyle => getAppFontType;
@@ -22,19 +24,19 @@ class MyFonts {
   static TextStyle get appBarTextStyle => getAppFontType;
   static TextStyle get chipTextStyle => getAppFontType;
 
-  // Font sizes
-  static double get appBarTittleSize => 18.sp;
-  static double get body1TextSize => 13.sp;
-  static double get body2TextSize => 13.sp;
-  static double get headline1TextSize => 32.sp;
-  static double get headline2TextSize => 24.sp;
-  static double get headline3TextSize => 19.sp;
-  static double get headline4TextSize => 16.sp;
-  static double get headline5TextSize => 13.sp;
-  static double get headline6TextSize => 11.sp;
-  static double get buttonTextSize => 16.sp;
-  static double get captionTextSize => 13.sp;
-  static double get chipTextSize => 10.sp;
+  // Font sizes delegated to central AppFontConfig
+  static double get appBarTittleSize => AppFontConfig.appBarTitle;
+  static double get body1TextSize => AppFontConfig.body1;
+  static double get body2TextSize => AppFontConfig.body2;
+  static double get headline1TextSize => AppFontConfig.h1;
+  static double get headline2TextSize => AppFontConfig.h2;
+  static double get headline3TextSize => AppFontConfig.h3;
+  static double get headline4TextSize => AppFontConfig.h4;
+  static double get headline5TextSize => AppFontConfig.h5;
+  static double get headline6TextSize => AppFontConfig.h6;
+  static double get buttonTextSize => AppFontConfig.button;
+  static double get captionTextSize => AppFontConfig.caption;
+  static double get chipTextSize => AppFontConfig.chip;
 }
 
 /// ─────────────────────────────────────────────────────────────────────────────
@@ -168,65 +170,110 @@ class MyStyles {
             : DarkThemeColors.appbarColor,
       );
 
-  static TextTheme getTextTheme({required bool isLightTheme}) => TextTheme(
-        labelLarge:
-            MyFonts.buttonTextStyle.copyWith(fontSize: MyFonts.buttonTextSize),
-        bodyLarge: (MyFonts.bodyTextStyle).copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: MyFonts.body1TextSize,
-          color: isLightTheme
-              ? LightThemeColors.bodyTextColor
-              : DarkThemeColors.bodyTextColor,
-        ),
-        bodyMedium: (MyFonts.bodyTextStyle).copyWith(
-            fontSize: MyFonts.body2TextSize,
-            color: isLightTheme
-                ? LightThemeColors.bodyTextColor
-                : DarkThemeColors.bodyTextColor),
-        displayLarge: (MyFonts.headlineTextStyle).copyWith(
-            fontSize: MyFonts.headline1TextSize,
-            fontWeight: FontWeight.bold,
-            color: isLightTheme
-                ? LightThemeColors.headlinesTextColor
-                : DarkThemeColors.headlinesTextColor),
-        displayMedium: (MyFonts.headlineTextStyle).copyWith(
-            fontSize: MyFonts.headline2TextSize,
-            fontWeight: FontWeight.bold,
-            color: isLightTheme
-                ? LightThemeColors.headlinesTextColor
-                : DarkThemeColors.headlinesTextColor),
-        displaySmall: (MyFonts.headlineTextStyle).copyWith(
-            fontSize: MyFonts.headline3TextSize,
-            fontWeight: FontWeight.bold,
-            color: isLightTheme
-                ? LightThemeColors.headlinesTextColor
-                : DarkThemeColors.headlinesTextColor),
-        headlineMedium: (MyFonts.headlineTextStyle).copyWith(
-          fontSize: MyFonts.headline4TextSize,
-          fontWeight: FontWeight.bold,
-          color: isLightTheme
-              ? LightThemeColors.headlinesTextColor
-              : DarkThemeColors.headlinesTextColor,
-        ),
-        headlineSmall: (MyFonts.headlineTextStyle).copyWith(
-            fontSize: MyFonts.headline5TextSize,
-            fontWeight: FontWeight.bold,
-            color: isLightTheme
-                ? LightThemeColors.headlinesTextColor
-                : DarkThemeColors.headlinesTextColor),
-        titleLarge: (MyFonts.headlineTextStyle).copyWith(
-            fontSize: MyFonts.headline6TextSize,
-            fontWeight: FontWeight.bold,
-            color: isLightTheme
-                ? LightThemeColors.headlinesTextColor
-                : DarkThemeColors.headlinesTextColor),
-        bodySmall: TextStyle(
-          color: isLightTheme
-              ? LightThemeColors.captionTextColor
-              : DarkThemeColors.captionTextColor,
-          fontSize: MyFonts.captionTextSize,
-        ),
-      );
+  static TextTheme getTextTheme({required bool isLightTheme}) {
+    final headlineColor = isLightTheme
+        ? LightThemeColors.headlinesTextColor
+        : DarkThemeColors.headlinesTextColor;
+    final bodyColor = isLightTheme
+        ? LightThemeColors.bodyTextColor
+        : DarkThemeColors.bodyTextColor;
+    final captionColor = isLightTheme
+        ? LightThemeColors.captionTextColor
+        : DarkThemeColors.captionTextColor;
+
+    return TextTheme(
+      displayLarge: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.h1,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.25,
+      ),
+      displayMedium: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.h2,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.28,
+      ),
+      displaySmall: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.h3,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.3,
+      ),
+      headlineLarge: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.h3,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.3,
+      ),
+      headlineMedium: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.sectionTitle,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.3,
+      ),
+      headlineSmall: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.h5,
+        fontWeight: FontWeight.w600,
+        color: headlineColor,
+        height: 1.35,
+      ),
+      titleLarge: MyFonts.appBarTextStyle.copyWith(
+        fontSize: AppFontConfig.appBarTitle,
+        fontWeight: FontWeight.w700,
+        color: headlineColor,
+        height: 1.25,
+      ),
+      titleMedium: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.titleMedium,
+        fontWeight: FontWeight.w600,
+        color: headlineColor,
+        height: 1.3,
+      ),
+      titleSmall: MyFonts.headlineTextStyle.copyWith(
+        fontSize: AppFontConfig.cardTitle,
+        fontWeight: FontWeight.w600,
+        color: headlineColor,
+        height: 1.28,
+      ),
+      bodyLarge: MyFonts.bodyTextStyle.copyWith(
+        fontSize: AppFontConfig.body1,
+        fontWeight: FontWeight.w500,
+        color: bodyColor,
+        height: 1.45,
+      ),
+      bodyMedium: MyFonts.bodyTextStyle.copyWith(
+        fontSize: AppFontConfig.body2,
+        fontWeight: FontWeight.w400,
+        color: bodyColor,
+        height: 1.45,
+      ),
+      bodySmall: MyFonts.bodyTextStyle.copyWith(
+        fontSize: AppFontConfig.caption,
+        fontWeight: FontWeight.w400,
+        color: captionColor,
+        height: 1.35,
+      ),
+      labelLarge: MyFonts.buttonTextStyle.copyWith(
+        fontSize: AppFontConfig.button,
+        fontWeight: FontWeight.w600,
+        color: bodyColor,
+        height: 1.25,
+      ),
+      labelMedium: MyFonts.chipTextStyle.copyWith(
+        fontSize: AppFontConfig.chip,
+        fontWeight: FontWeight.w600,
+        color: bodyColor,
+        height: 1.2,
+      ),
+      labelSmall: MyFonts.chipTextStyle.copyWith(
+        fontSize: AppFontConfig.badge,
+        fontWeight: FontWeight.w700,
+        color: captionColor,
+        height: 1.1,
+      ),
+    );
+  }
 
   static ChipThemeData getChipTheme({required bool isLightTheme}) {
     return ChipThemeData(
@@ -326,6 +373,7 @@ class AppTheme {
   static ThemeData getThemeData({required bool isLight}) {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: AppFontConfig.fontFamily,
       primaryColor: isLight
           ? LightThemeColors.primaryColor
           : DarkThemeColors.primaryColor,

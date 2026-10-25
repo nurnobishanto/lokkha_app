@@ -133,11 +133,7 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
               Expanded(
                 child: Text(
                   'কারেন্ট অ্যাফেয়ার্স',
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
+                  style: context.sectionTitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -211,10 +207,8 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
               questionText,
               isDark: context.isDark,
             ),
-            textStyle: TextStyle(
-              fontSize: 14.sp,
+            textStyle: context.body1.copyWith(
               fontWeight: FontWeight.w600,
-              color: context.textPrimary,
               height: 1.35,
             ),
             customStylesBuilder: (element) {
@@ -289,8 +283,7 @@ class _HomeMcqSectionState extends ConsumerState<HomeMcqSection> {
                             options[index],
                             isDark: context.isDark,
                           ),
-                          textStyle: TextStyle(
-                            fontSize: 13.sp,
+                          textStyle: context.bodyPrimary.copyWith(
                             fontWeight: FontWeight.w500,
                             color: textColor,
                           ),

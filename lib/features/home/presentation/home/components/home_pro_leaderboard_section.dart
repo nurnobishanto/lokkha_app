@@ -75,11 +75,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
                   'লিডারবোর্ড । প্রো লীগ',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.bold,
-                    color: context.textPrimary,
-                  ),
+                  style: context.sectionTitle,
                 ),
               ),
               InkWell(
@@ -90,9 +86,7 @@ class HomeProLeaderboardSection extends StatelessWidget {
                 },
                 child: Text(
                   'See All',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w600,
+                  style: context.chipText.copyWith(
                     color: const Color(0xFF006A4E),
                   ),
                 ),

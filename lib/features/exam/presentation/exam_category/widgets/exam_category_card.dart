@@ -243,12 +243,7 @@ class ExamCategoryCard extends StatelessWidget {
                             maxLines: 2,
                             textAlign: TextAlign.start,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.5.sp,
-                              fontWeight: FontWeight.w600,
-                              color: context.textPrimary,
-                              height: 1.25,
-                            ),
+                            style: context.cardTitle.copyWith(height: 1.25),
                           ),
                         ),
                       ],

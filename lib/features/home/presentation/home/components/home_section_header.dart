@@ -58,11 +58,7 @@ class HomeSectionHeader extends StatelessWidget {
                     Flexible(
                       child: Text(
                         title,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: context.textPrimary,
-                        ),
+                        style: context.sectionTitle,
                       ),
                     ),
                     if (trailingBadge != null) ...[
@@ -77,10 +73,7 @@ class HomeSectionHeader extends StatelessWidget {
                     subtitle!,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      color: context.textSecondary,
-                    ),
+                    style: context.caption,
                   ),
                 ],
               ],
@@ -97,9 +90,7 @@ class HomeSectionHeader extends StatelessWidget {
                   children: [
                     Text(
                       seeAllText,
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w600,
+                      style: context.chipText.copyWith(
                         color: context.primaryColor,
                       ),
                     ),
