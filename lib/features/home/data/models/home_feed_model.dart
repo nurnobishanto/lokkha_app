@@ -591,12 +591,23 @@ class HomeCourseCategoryItem {
   });
 
   factory HomeCourseCategoryItem.fromJson(Map<String, dynamic> json) {
+    final rawImageUrl = json['image_url']?.toString().trim();
+    final rawImage = json['image']?.toString().trim();
+    final effectiveRaw = (rawImageUrl != null && rawImageUrl.isNotEmpty)
+        ? rawImageUrl
+        : ((rawImage != null && rawImage.isNotEmpty) ? rawImage : null);
+    final resolvedUrl = effectiveRaw != null
+        ? Endpoints.resolveImageUrl(effectiveRaw)
+        : null;
+
     return HomeCourseCategoryItem(
       id: json['id'] is num ? (json['id'] as num).toInt() : 0,
       title: json['title'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
-      imageUrl: Endpoints.resolveImageUrl(json['image_url'] as String?),
+      imageUrl: (resolvedUrl != null && resolvedUrl.isNotEmpty)
+          ? resolvedUrl
+          : null,
       coursesCount: json['courses_count'] is num
           ? (json['courses_count'] as num).toInt()
           : 0,
@@ -627,12 +638,23 @@ class HomeExamCategoryItem {
   });
 
   factory HomeExamCategoryItem.fromJson(Map<String, dynamic> json) {
+    final rawImageUrl = json['image_url']?.toString().trim();
+    final rawImage = json['image']?.toString().trim();
+    final effectiveRaw = (rawImageUrl != null && rawImageUrl.isNotEmpty)
+        ? rawImageUrl
+        : ((rawImage != null && rawImage.isNotEmpty) ? rawImage : null);
+    final resolvedUrl = effectiveRaw != null
+        ? Endpoints.resolveImageUrl(effectiveRaw)
+        : null;
+
     return HomeExamCategoryItem(
       id: json['id'] is num ? (json['id'] as num).toInt() : 0,
       name: json['name'] as String? ?? '',
       slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
-      imageUrl: Endpoints.resolveImageUrl(json['image_url'] as String?),
+      imageUrl: (resolvedUrl != null && resolvedUrl.isNotEmpty)
+          ? resolvedUrl
+          : null,
       examsCount: json['exams_count'] is num
           ? (json['exams_count'] as num).toInt()
           : 0,

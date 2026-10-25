@@ -247,6 +247,11 @@ class _MockQuickPracticeRepo implements QuickPracticeRepository {
   const _MockQuickPracticeRepo();
 
   @override
+  Future<List<SubjectSectionOverview>> getSubjectSectionsOverview() async {
+    return const [];
+  }
+
+  @override
   Future<List<QuickPracticeSubject>> getTopLevelSubjects({String? search}) async {
     return const [];
   }
@@ -275,6 +280,18 @@ class _MockQuickPracticeRepo implements QuickPracticeRepository {
       success: true,
       items: [],
       meta: PaginationMeta(total: 0),
+    );
+  }
+
+  @override
+  Future<SubjectExamSession> startSubjectExam(
+    int subjectId,
+    SubjectStartExamRequest request,
+  ) async {
+    return const SubjectExamSession(
+      examId: 1,
+      totalQuestions: 10,
+      duration: 15,
     );
   }
 }

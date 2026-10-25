@@ -22,6 +22,8 @@ class HomeCategoriesSection extends StatefulWidget {
       id: 3,
       title: "BCS",
       slug: "bcs",
+      imageUrl:
+          "https://lokkha.com/uploads/course_categories/course_cat_1792922562_bKNVMUjK.svg",
       coursesCount: 1,
       theme: HomeThemeConfig(icon: "ri-graduation-cap-fill"),
     ),

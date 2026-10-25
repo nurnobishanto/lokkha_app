@@ -115,7 +115,7 @@ class ExamCategoryView extends ConsumerWidget {
                     return ExamCategoryCard(
                       title: course.title ?? "",
                       slug: course.slug,
-                      imageUrl: course.image,
+                      imageUrl: course.imageUrl ?? course.image,
                       isPremium: true,
                       onTap: () {
                         context.push(
@@ -159,7 +159,7 @@ class ExamCategoryView extends ConsumerWidget {
                     return ExamCategoryCard(
                       title: exam.name ?? "",
                       slug: exam.slug,
-                      imageUrl: exam.image,
+                      imageUrl: exam.imageUrl ?? exam.image,
                       isPremium: false,
                       onTap: () {
                         if (exam.id != null) {

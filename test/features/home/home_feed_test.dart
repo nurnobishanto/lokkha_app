@@ -822,5 +822,48 @@ void main() {
       expect(find.text('৫০ তম  BCS'), findsNothing);
       expect(find.text('সব দেখুন'), findsNWidgets(2));
     });
+
+    test('CourseCategory and HomeCourseCategoryItem parse SVG image_url and image fallback accurately', () {
+      final apiPayload = {
+        "status": true,
+        "course_categories": [
+          {
+            "id": 3,
+            "title": "BCS",
+            "slug": "bcs",
+            "image": "course_categories/course_cat_1792922562_bKNVMUjK.svg",
+            "description": null,
+            "status": true,
+            "courses_count": 1,
+            "image_url":
+                "https://lokkha.com/uploads/course_categories/course_cat_1792922562_bKNVMUjK.svg"
+          },
+          {
+            "id": 4,
+            "title": "Primary",
+            "slug": "primary",
+            "image": "",
+            "description": null,
+            "status": true,
+            "courses_count": 3,
+            "image_url": null
+          },
+        ]
+      };
+
+      final rawList = apiPayload['course_categories'] as List;
+      final bcsHomeItem = HomeCourseCategoryItem.fromJson(
+        rawList[0] as Map<String, dynamic>,
+      );
+      final primaryHomeItem = HomeCourseCategoryItem.fromJson(
+        rawList[1] as Map<String, dynamic>,
+      );
+
+      expect(
+        bcsHomeItem.imageUrl,
+        'https://lokkha.com/uploads/course_categories/course_cat_1792922562_bKNVMUjK.svg',
+      );
+      expect(primaryHomeItem.imageUrl, isNull);
+    });
   });
 }

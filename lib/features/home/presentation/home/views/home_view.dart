@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/notifications/notifications.dart';
 
@@ -215,6 +216,15 @@ class _HomeViewState extends ConsumerState<HomeView> {
     }
 
     final data = feedState.data;
+    final examCatState = ref.watch(examCategoriesNotifierProvider);
+    final effectiveExamCategories = _resolveExamCategories(
+      data?.examCategories,
+      examCatState,
+    );
+    final effectiveCourseCategories = _resolveCourseCategories(
+      data?.courseCategories,
+      examCatState,
+    );
 
     return ListView(
       padding: EdgeInsets.fromLTRB(8.w, 6.h, 8.w, 24.h),
@@ -251,12 +261,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
         // ── 4. পরীক্ষা ও কোর্স ক্যাটাগরি (Exam & Course Categories) ─────────
         HomeCategoriesSection(
-          examCategories: (data?.examCategories.isNotEmpty == true)
-              ? data!.examCategories
-              : HomeCategoriesSection.defaultExamCategories,
-          courseCategories: (data?.courseCategories.isNotEmpty == true)
-              ? data!.courseCategories
-              : HomeCategoriesSection.defaultCourseCategories,
+          examCategories: effectiveExamCategories,
+          courseCategories: effectiveCourseCategories,
         ),
 
         SizedBox(height: 10.h),
@@ -269,6 +275,113 @@ class _HomeViewState extends ConsumerState<HomeView> {
         SizedBox(height: 16.h),
       ],
     );
+  }
+
+  List<HomeExamCategoryItem> _resolveExamCategories(
+    List<HomeExamCategoryItem>? feedItems,
+    ExamCategoriesState examCatState,
+  ) {
+    final legacyList = examCatState.examCategoriesModel?.examCategories ?? [];
+    final legacyImageById = <int, String>{};
+    final legacyImageBySlug = <String, String>{};
+    for (final c in legacyList) {
+      final url = c.imageUrl ?? Endpoints.resolveImageUrl(c.image);
+      if (url.isNotEmpty) {
+        if (c.id != null) legacyImageById[c.id!] = url;
+        if (c.slug != null && c.slug!.isNotEmpty) {
+          legacyImageBySlug[c.slug!.toLowerCase()] = url;
+        }
+      }
+    }
+
+    if (feedItems != null && feedItems.isNotEmpty) {
+      return feedItems.map((item) {
+        if (item.imageUrl != null && item.imageUrl!.isNotEmpty) return item;
+        final fallbackUrl = legacyImageById[item.id] ??
+            legacyImageBySlug[item.slug.toLowerCase()];
+        if (fallbackUrl == null || fallbackUrl.isEmpty) return item;
+        return HomeExamCategoryItem(
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          description: item.description,
+          imageUrl: fallbackUrl,
+          examsCount: item.examsCount,
+          theme: item.theme,
+        );
+      }).toList();
+    }
+
+    if (legacyList.isNotEmpty) {
+      return legacyList
+          .map(
+            (c) => HomeExamCategoryItem(
+              id: c.id ?? 0,
+              name: c.name ?? '',
+              slug: c.slug ?? '',
+              description: c.description,
+              imageUrl: c.imageUrl ?? Endpoints.resolveImageUrl(c.image),
+              examsCount: c.freeExamsCount ?? 0,
+            ),
+          )
+          .toList();
+    }
+
+    return HomeCategoriesSection.defaultExamCategories;
+  }
+
+  List<HomeCourseCategoryItem> _resolveCourseCategories(
+    List<HomeCourseCategoryItem>? feedItems,
+    ExamCategoriesState examCatState,
+  ) {
+    final legacyList =
+        examCatState.courseCategoriesModel?.courseCategories ?? [];
+    final legacyImageById = <int, String>{};
+    final legacyImageBySlug = <String, String>{};
+    for (final c in legacyList) {
+      final url = c.imageUrl ?? Endpoints.resolveImageUrl(c.image);
+      if (url.isNotEmpty) {
+        if (c.id != null) legacyImageById[c.id!] = url;
+        if (c.slug != null && c.slug!.isNotEmpty) {
+          legacyImageBySlug[c.slug!.toLowerCase()] = url;
+        }
+      }
+    }
+
+    if (feedItems != null && feedItems.isNotEmpty) {
+      return feedItems.map((item) {
+        if (item.imageUrl != null && item.imageUrl!.isNotEmpty) return item;
+        final fallbackUrl = legacyImageById[item.id] ??
+            legacyImageBySlug[item.slug.toLowerCase()];
+        if (fallbackUrl == null || fallbackUrl.isEmpty) return item;
+        return HomeCourseCategoryItem(
+          id: item.id,
+          title: item.title,
+          slug: item.slug,
+          description: item.description,
+          imageUrl: fallbackUrl,
+          coursesCount: item.coursesCount,
+          theme: item.theme,
+        );
+      }).toList();
+    }
+
+    if (legacyList.isNotEmpty) {
+      return legacyList
+          .map(
+            (c) => HomeCourseCategoryItem(
+              id: c.id ?? 0,
+              title: c.title ?? '',
+              slug: c.slug ?? '',
+              description: c.description?.toString(),
+              imageUrl: c.imageUrl ?? Endpoints.resolveImageUrl(c.image),
+              coursesCount: c.coursesCount ?? 0,
+            ),
+          )
+          .toList();
+    }
+
+    return HomeCategoriesSection.defaultCourseCategories;
   }
 }
 

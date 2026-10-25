@@ -52,7 +52,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AppSvgImage(
-              AssetVectorPaths.splashIcon,
+              AssetVectorPaths.google,
               width: 80,
               height: 80,
             ),
