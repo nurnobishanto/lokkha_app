@@ -46,6 +46,11 @@ class HomeTopActionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDark;
+    final cardTitleStyle = context.cardTitle.copyWith(
+      fontWeight: FontWeight.bold,
+    );
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
       child: GridView.builder(
@@ -70,10 +75,10 @@ class HomeTopActionsGrid extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: context.isDark
+                  color: isDark
                       ? const Color(0xFF334155)
                       : const Color(0xFFF1F5F9),
                   width: 1,
@@ -81,14 +86,14 @@ class HomeTopActionsGrid extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(
-                      alpha: context.isDark ? 0.35 : 0.06,
+                      alpha: isDark ? 0.35 : 0.06,
                     ),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
                   BoxShadow(
                     color: Colors.black.withValues(
-                      alpha: context.isDark ? 0.2 : 0.02,
+                      alpha: isDark ? 0.2 : 0.02,
                     ),
                     blurRadius: 3,
                     offset: const Offset(0, 1),
@@ -109,9 +114,7 @@ class HomeTopActionsGrid extends StatelessWidget {
                       item.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: context.cardTitle.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: cardTitleStyle,
                     ),
                   ),
                 ],

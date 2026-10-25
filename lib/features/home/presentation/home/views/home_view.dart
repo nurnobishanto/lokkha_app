@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/core.dart';
+import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/exam/exam.dart';
 import 'package:lokkha/features/home/home.dart';
 import 'package:lokkha/features/notifications/notifications.dart';
@@ -43,6 +44,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           .read(homeFeedNotifierProvider.notifier)
           .fetchHomeFeed(isRefresh: true),
       ref.read(homeNotifierProvider.notifier).refreshHomeViewData(),
+      ref.read(coursesNotifierProvider(null).notifier).fetchCourses(null, refresh: true),
       ref.read(notificationsNotifierProvider.notifier).fetchNotifications(),
     ]);
   }
@@ -271,6 +273,11 @@ class _HomeViewState extends ConsumerState<HomeView> {
         HomeProLeaderboardSection(
           contestHub: data?.contestHub,
         ),
+
+        SizedBox(height: 10.h),
+
+        // ── 6. আমাদের কোর্সসমূহ (Horizontal Scrollable All Courses List) ────
+        const HomeCoursesSection(),
 
         SizedBox(height: 16.h),
       ],

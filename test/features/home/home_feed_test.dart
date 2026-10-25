@@ -756,15 +756,18 @@ void main() {
       expect(find.text('লক্ষ্য'), findsNothing);
     });
 
-    testWidgets('HomeCoursesSection renders our courses list and enroll button',
+    testWidgets('HomeCoursesSection renders horizontal all courses list',
         (tester) async {
       await tester.pumpWidget(
-          createWidgetForTesting(const HomeCoursesSection(courseCategories: [])));
-      await tester.pumpAndSettle();
+          createWidgetForTesting(const HomeCoursesSection()));
+      await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('আমাদের কোর্সসমূহ'), findsOneWidget);
-      expect(find.text('See All'), findsOneWidget);
-      expect(find.text('ভর্তি হন'), findsWidgets);
+      expect(find.text('সব দেখুন'), findsOneWidget);
+      expect(
+        find.text('GK Power Course – BA , IA , & Recent GK'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('HomeNoticeTicker renders announcement text', (tester) async {
