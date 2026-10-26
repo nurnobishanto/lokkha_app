@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lokkha/di/home_provider.dart';
+import 'package:lokkha/features/course/course.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
 import 'package:lokkha/features/home/domain/repositories/home_repository.dart';
 import 'package:lokkha/features/home/domain/usecases/get_home_feed_usecase.dart';
@@ -759,15 +760,27 @@ void main() {
     testWidgets('HomeCoursesSection renders horizontal all courses list',
         (tester) async {
       await tester.pumpWidget(
-          createWidgetForTesting(const HomeCoursesSection()));
+        createWidgetForTesting(
+          const HomeCoursesSection(
+            courses: [
+              V1CourseModel(
+                id: 12,
+                title: '১৯ তম নিবন্ধন পরীক্ষা-স্কুল পর্যায়',
+                category: CourseCategoryBrief(id: 5, title: 'NTRCA'),
+                pricing: CoursePricingModel(
+                  regularPrice: 500,
+                  salePrice: 299,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('আমাদের কোর্সসমূহ'), findsOneWidget);
-      expect(find.text('সব দেখুন'), findsOneWidget);
-      expect(
-        find.text('GK Power Course – BA , IA , & Recent GK'),
-        findsOneWidget,
-      );
+      expect(find.text('See All'), findsOneWidget);
+      expect(find.text('কোর্সটি কিনুন'), findsWidgets);
     });
 
     testWidgets('HomeNoticeTicker renders announcement text', (tester) async {

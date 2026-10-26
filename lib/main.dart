@@ -16,7 +16,6 @@ Future<void> main() async {
     debugPrint(".env load failed: $e");
   }
 
-
   // Init SharedPreferences safely
   try {
     await MySharedPref.init();

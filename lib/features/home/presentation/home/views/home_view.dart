@@ -44,7 +44,9 @@ class _HomeViewState extends ConsumerState<HomeView> {
           .read(homeFeedNotifierProvider.notifier)
           .fetchHomeFeed(isRefresh: true),
       ref.read(homeNotifierProvider.notifier).refreshHomeViewData(),
-      ref.read(coursesNotifierProvider(null).notifier).fetchCourses(null, refresh: true),
+      ref
+          .read(coursesNotifierProvider(null).notifier)
+          .fetchCourses(null, refresh: true),
       ref.read(notificationsNotifierProvider.notifier).fetchNotifications(),
     ]);
   }
@@ -274,8 +276,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           contestHub: data?.contestHub,
         ),
 
-        SizedBox(height: 10.h),
-
+        10.horizontalSpace,
         // ── 6. আমাদের কোর্সসমূহ (Horizontal Scrollable All Courses List) ────
         const HomeCoursesSection(),
 
