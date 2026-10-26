@@ -107,15 +107,86 @@ class HtmlSanitizer {
     return s;
   }
 
+  /// Converts inline LaTeX math expressions (e.g. `$\frac{\sqrt{3}}{4}a^2$`) into clean HTML.
+  static String convertLatexToHtml(String input) {
+    if (!input.contains(r'\') && !input.contains(r'$') && !input.contains('^')) {
+      return input;
+    }
+    var s = input;
+
+    // 1. Convert \sqrt{...} -> √... or √(...)
+    s = s.replaceAllMapped(
+      RegExp(r'\\sqrt\{([^{}]+)\}'),
+      (m) {
+        final inner = m[1]!.trim();
+        return inner.length <= 2 ? '√$inner' : '√($inner)';
+      },
+    );
+
+    // 2. Convert \frac{num}{den} (supports nested \sqrt already converted)
+    for (int i = 0; i < 2; i++) {
+      s = s.replaceAllMapped(
+        RegExp(r'\\frac\{([^{}]+)\}\{([^{}]+)\}'),
+        (m) => '(${m[1]!.trim()}/${m[2]!.trim()})',
+      );
+    }
+
+    // 3. Common LaTeX symbols
+    s = s
+        .replaceAll(r'\times', '×')
+        .replaceAll(r'\div', '÷')
+        .replaceAll(r'\pm', '±')
+        .replaceAll(r'\leq', '≤')
+        .replaceAll(r'\geq', '≥')
+        .replaceAll(r'\neq', '≠')
+        .replaceAll(r'\approx', '≈')
+        .replaceAll(r'\pi', 'π')
+        .replaceAll(r'\theta', 'θ')
+        .replaceAll(r'\alpha', 'α')
+        .replaceAll(r'\beta', 'β')
+        .replaceAll(r'\gamma', 'γ')
+        .replaceAll(r'\degree', '°')
+        .replaceAll(r'\circ', '°');
+
+    // 4. Superscripts: ^{...} or ^x
+    s = s.replaceAllMapped(
+      RegExp(r'\^\{([^{}]+)\}'),
+      (m) => '<sup>${m[1]}</sup>',
+    );
+    s = s.replaceAllMapped(
+      RegExp(r'\^([0-9a-zA-Z+\-]+)'),
+      (m) => '<sup>${m[1]}</sup>',
+    );
+
+    // 5. Subscripts: _{...} or _x
+    s = s.replaceAllMapped(
+      RegExp(r'_\{([^{}]+)\}'),
+      (m) => '<sub>${m[1]}</sub>',
+    );
+    s = s.replaceAllMapped(
+      RegExp(r'_([0-9]+)'),
+      (m) => '<sub>${m[1]}</sub>',
+    );
+
+    // 6. Strip inline math $...$ delimiters
+    s = s.replaceAllMapped(
+      RegExp(r'\$([^$]+)\$'),
+      (m) => m[1]!,
+    );
+
+    return s;
+  }
+
   /// Sanitizes and prepares HTML content for [HtmlWidget].
-  /// Translates MathML, removes hardcoded background styles, and adapts inline colors for dark mode.
+  /// Translates MathML & LaTeX, removes hardcoded background styles, and adapts inline colors for dark mode.
   static String formatForDisplay(String? raw, {bool isDark = false}) {
     if (raw == null || raw.trim().isEmpty) return '';
 
     var s = raw.trim();
 
-    // 1. Convert MathML elements (like <msup>, <msub>, etc.)
+    // 1. Convert MathML elements (like <msup>, <msub>, etc.) and LaTeX math
     s = convertMathMlToHtml(s);
+    s = convertLatexToHtml(s);
 
     // 2. Remove inline background-color so container backgrounds aren't overwritten
     s = s.replaceAll(

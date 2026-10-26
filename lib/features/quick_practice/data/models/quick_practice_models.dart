@@ -477,10 +477,10 @@ class SubjectStartExamRequest {
   final String? questionOption; // random, latest, unanswered, answered, wrong_answered, correct_answered
 
   const SubjectStartExamRequest({
-    this.questionCount = 10,
-    this.enableTimer = true,
+    this.questionCount = 20,
+    this.enableTimer = false,
     this.time = 15,
-    this.enableNegativeMark = true,
+    this.enableNegativeMark = false,
     this.negativeMark = 0.25,
     this.questionOption = 'random',
   });
@@ -489,9 +489,13 @@ class SubjectStartExamRequest {
     final map = <String, dynamic>{};
     if (questionCount != null) map['question_count'] = questionCount;
     map['enable_timer'] = enableTimer;
-    if (time != null) map['time'] = time;
+    if (enableTimer && time != null && time! > 0) {
+      map['time'] = time;
+    }
     map['enable_negative_mark'] = enableNegativeMark;
-    if (negativeMark != null) map['negative_mark'] = negativeMark;
+    if (enableNegativeMark && negativeMark != null && negativeMark! > 0) {
+      map['negative_mark'] = negativeMark;
+    }
     if (questionOption != null) map['question_option'] = questionOption;
     return map;
   }
@@ -499,17 +503,29 @@ class SubjectStartExamRequest {
 
 class SubjectExamSession {
   final int examId;
+  final int? selfExamId;
+  final String? examName;
   final int totalQuestions;
+  final bool enableTimer;
   final int duration;
+  final int? durationMinutes;
+  final int? durationSeconds;
   final List<String> guidelines;
   final Map<String, String> webviewUrls;
+  final List<PracticeQuestion> questions;
 
   const SubjectExamSession({
     required this.examId,
+    this.selfExamId,
+    this.examName,
     this.totalQuestions = 0,
+    this.enableTimer = false,
     this.duration = 0,
+    this.durationMinutes,
+    this.durationSeconds,
     this.guidelines = const [],
     this.webviewUrls = const {},
+    this.questions = const [],
   });
 
   String? get startUrl => webviewUrls['start'];
@@ -523,26 +539,67 @@ class SubjectExamSession {
     final rawGuidelines = data['guidelines'] as List? ?? [];
     final guidelines = rawGuidelines.map((e) => e.toString()).toList();
 
-    final rawUrls = data['webview_urls'] as Map<String, dynamic>? ?? {};
+    final rawUrls = (data['webview_urls'] as Map<String, dynamic>?) ??
+        (data['web_urls'] as Map<String, dynamic>?) ??
+        {};
     final webviewUrls = rawUrls.map((k, v) => MapEntry(k.toString(), v.toString()));
 
+    final directStartUrl = (data['webview_url'] ?? data['web_url'])?.toString();
+    if ((webviewUrls['start'] == null || webviewUrls['start']!.isEmpty) &&
+        directStartUrl != null &&
+        directStartUrl.isNotEmpty) {
+      webviewUrls['start'] = directStartUrl;
+    }
+
+    final directResultUrl =
+        (data['webview_result_url'] ?? data['web_result_url'])?.toString();
+    if ((webviewUrls['result'] == null || webviewUrls['result']!.isEmpty) &&
+        directResultUrl != null &&
+        directResultUrl.isNotEmpty) {
+      webviewUrls['result'] = directResultUrl;
+    }
+
+    final rawQuestions = data['questions'] as List? ?? [];
+    final parsedQuestions = rawQuestions
+        .whereType<Map<String, dynamic>>()
+        .map(PracticeQuestion.fromJson)
+        .toList();
+
+    final rawExamId = data['exam_id'] ?? data['id'] ?? data['self_exam_id'];
+    final parsedExamId = rawExamId is int
+        ? rawExamId
+        : int.tryParse(rawExamId?.toString() ?? '') ?? 0;
+
     return SubjectExamSession(
-      examId: data['exam_id'] is int
-          ? data['exam_id'] as int
-          : int.tryParse(data['exam_id']?.toString() ?? '') ?? 0,
+      examId: parsedExamId,
+      selfExamId: data['self_exam_id'] is int
+          ? data['self_exam_id'] as int
+          : int.tryParse(data['self_exam_id']?.toString() ?? ''),
+      examName: data['exam_name'] as String?,
       totalQuestions: data['total_questions'] as int? ?? 0,
+      enableTimer: data['enable_timer'] == true || data['enable_time'] == true,
       duration: data['duration'] as int? ?? 0,
+      durationMinutes: data['duration_minutes'] as int? ?? data['time'] as int?,
+      durationSeconds: data['duration_seconds'] as int?,
       guidelines: guidelines,
       webviewUrls: webviewUrls,
+      questions: parsedQuestions,
     );
   }
 
   Map<String, dynamic> toJson() => {
         'exam_id': examId,
+        if (selfExamId != null) 'self_exam_id': selfExamId,
+        if (examName != null) 'exam_name': examName,
         'total_questions': totalQuestions,
+        'enable_timer': enableTimer,
         'duration': duration,
+        if (durationMinutes != null) 'duration_minutes': durationMinutes,
+        if (durationSeconds != null) 'duration_seconds': durationSeconds,
         'guidelines': guidelines,
         'webview_urls': webviewUrls,
+        if (questions.isNotEmpty)
+          'questions': questions.map((q) => q.toJson()).toList(),
       };
 }
 
