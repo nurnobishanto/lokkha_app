@@ -62,7 +62,7 @@ class HomeCoursesSection extends ConsumerWidget {
           // ─── Header: আমাদের কোর্সসমূহ + See All ────────────────────────────
           _buildHeader(context),
 
-        5.horizontalSpace,
+          5.verticalSpace,
 
           // ─── Dynamic Horizontal Course Cards List (From API) ───────────────
           SizedBox(
@@ -265,9 +265,7 @@ class _HomeHorizontalCourseCard extends StatelessWidget {
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-              color: isDark
-                  ? const Color(0xFF334155)
-                  : const Color(0xFFF1F5F9),
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
               width: 1,
             ),
             boxShadow: [
@@ -424,11 +422,11 @@ class _HomeHorizontalCourseCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 6.w),
+                        SizedBox(width: 4.w),
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 11.w,
-                            vertical: 6.h,
+                            horizontal: 8.w,
+                            vertical: 5.5.h,
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFDC3545),
@@ -437,7 +435,7 @@ class _HomeHorizontalCourseCard extends StatelessWidget {
                           child: Text(
                             'কোর্সটি কিনুন',
                             style: TextStyle(
-                              fontSize: 11.sp,
+                              fontSize: 10.5.sp,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                               height: 1.1,

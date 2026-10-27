@@ -39,6 +39,7 @@ class _CourseDetailsViewState extends ConsumerState<CourseDetailsView> {
       ref
           .read(myCoursesNotifierProvider.notifier)
           .fetchMyCourses(isRefresh: true);
+      ref.read(profileNotifierProvider.notifier).fetchProfileData();
     });
   }
 

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lokkha/core/core.dart';
@@ -86,11 +87,17 @@ class CoursesRepositoryImpl implements CoursesRepository {
       queryParams['search'] = search.trim();
     }
 
+    final publicHeaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
     try {
       final response = await _client.get(
         Endpoints.v1Courses,
         queryParameters: queryParams,
-        headers: _buildHeaders(),
+        headers: publicHeaders,
+        options: Options(extra: {'skipAuth': true}),
       );
 
       final rawData = response.data;
@@ -101,10 +108,7 @@ class CoursesRepositoryImpl implements CoursesRepository {
         final parsed = V1CoursesResponse.fromJson(rawData as Map<String, dynamic>);
         if (categoryId != null && categoryId > 0) {
           final filtered = parsed.items.where((c) {
-            if (c.category?.id != null) {
-              return c.category!.id == categoryId;
-            }
-            return true;
+            return c.category?.id == categoryId;
           }).toList();
           return V1CoursesResponse(
             success: parsed.success,
@@ -129,10 +133,24 @@ class CoursesRepositoryImpl implements CoursesRepository {
         final legacyRes = await _client.get(
           Endpoints.courses,
           queryParameters: legacyParams,
-          headers: _buildHeaders(),
+          headers: publicHeaders,
+          options: Options(extra: {'skipAuth': true}),
         );
         if (legacyRes.data != null) {
-          return V1CoursesResponse.fromJson(legacyRes.data as Map<String, dynamic>);
+          final parsed = V1CoursesResponse.fromJson(legacyRes.data as Map<String, dynamic>);
+          if (categoryId != null && categoryId > 0) {
+            final filtered = parsed.items.where((c) {
+              return c.category?.id == categoryId;
+            }).toList();
+            return V1CoursesResponse(
+              success: parsed.success,
+              message: parsed.message,
+              items: filtered,
+              totalCourses: filtered.length,
+              meta: parsed.meta,
+            );
+          }
+          return parsed;
         }
       } catch (_) {}
     }

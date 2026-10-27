@@ -15,6 +15,7 @@ class AppStorageCache {
   static final Map<String, dynamic> _memoryCache = {};
 
   // Cache keys
+  static const String homeFeedCacheKey = 'home_feed_v1_cache';
   static const String randomQuestionKey = 'randomQuestionKey';
   static const String favQuestionsKey = 'favQuestionsKey';
   static const String jobKey = 'jobKey';

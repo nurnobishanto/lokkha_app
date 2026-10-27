@@ -38,12 +38,12 @@ Future<void> main() async {
     debugPrint("ONESIGNAL_APP_ID not found in .env");
   }
 
-  // Fetch app version before starting
-  try {
-    await fetchAppVersion();
-  } catch (e) {
-    debugPrint("Fetch app version failed: $e");
-  }
+  // Fetch app version non-blocking so runApp starts immediately
+  unawaited(
+    fetchAppVersion().catchError((Object e) {
+      debugPrint("Fetch app version failed: $e");
+    }),
+  );
 
   // Initialize core app services
   try {

@@ -251,6 +251,10 @@ class V1CourseModel {
         ? Endpoints.resolveUrl(rawImage)
         : '';
 
+    final courseCategoryId = json['course_category_id'] is int
+        ? json['course_category_id']
+        : int.tryParse(json['course_category_id']?.toString() ?? '');
+
     return V1CourseModel(
       id: json['id'] is int
           ? json['id']
@@ -259,7 +263,9 @@ class V1CourseModel {
       slug: json['slug']?.toString(),
       category: json['category'] is Map<String, dynamic>
           ? CourseCategoryBrief.fromJson(json['category'])
-          : null,
+          : (courseCategoryId != null
+              ? CourseCategoryBrief(id: courseCategoryId, title: '')
+              : null),
       imageUrl: resolvedImage,
       duration: json['duration']?.toString(),
       accessDurationText: json['access_duration_text']?.toString(),

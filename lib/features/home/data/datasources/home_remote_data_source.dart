@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:lokkha/core/network/rest_client.dart';
+import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/features/home/data/models/home_feed_model.dart';
 
 abstract class HomeRemoteDataSource {
@@ -37,7 +38,15 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       );
 
       if (response.data is Map<String, dynamic>) {
-        return HomeFeedModel.fromJson(response.data as Map<String, dynamic>);
+        final rawMap = response.data as Map<String, dynamic>;
+        final model = HomeFeedModel.fromJson(rawMap);
+        if (model.success && model.data != null) {
+          AppStorageCache.writeCacheData(
+            AppStorageCache.homeFeedCacheKey,
+            rawMap,
+          );
+        }
+        return model;
       }
       return HomeFeedModel(
         success: false,

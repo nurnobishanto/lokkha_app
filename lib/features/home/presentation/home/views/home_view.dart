@@ -22,19 +22,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 1. Fetch unified Module 23 Home Feed
+      if (!mounted) return;
+
+      // 1. Fetch unified Module 23 Home Feed (shows cache in 0ms + auto-updates from API)
       ref.read(homeFeedNotifierProvider.notifier).fetchHomeFeed();
 
-      // 2. Fetch initial data for other background caches and drawer overview
-      ref.read(homeNotifierProvider.notifier).fetchInitialData();
-
-      // 3. Fetch real unread notifications count in background
-      ref.read(notificationsNotifierProvider.notifier).fetchNotifications();
-
-      // 4. Check for In-App announcement popups
-      if (mounted) {
+      // 2. Stagger secondary background fetches slightly so initial Home frame renders instantly
+      Future.delayed(const Duration(milliseconds: 250), () {
+        if (!mounted) return;
+        ref.read(homeNotifierProvider.notifier).fetchInitialData();
+        ref.read(notificationsNotifierProvider.notifier).fetchNotifications();
         AppUpdateService().showInAppAnnouncementIfAvailable(context: context);
-      }
+      });
     });
   }
 
@@ -166,18 +165,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
     HomeFeedState feedState,
     HomeState homeState,
   ) {
-    // 1. Initial Loading Skeleton
-    if (feedState.isLoading && !feedState.hasData) {
-      return ListView(
-        padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 20.h),
-        children: const [
-          _HomeSkeletonLoader(),
-        ],
-      );
-    }
-
-    // 2. Error State (only if no data)
-    if (!feedState.hasData && feedState.errorMessage != null) {
+    // Error State (only if not loading, no data, and an error occurred)
+    if (!feedState.isLoading &&
+        !feedState.hasData &&
+        feedState.errorMessage != null) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(24.r),
@@ -279,8 +270,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
         10.horizontalSpace,
         // ── 6. আমাদের কোর্সসমূহ (Horizontal Scrollable All Courses List) ────
         const HomeCoursesSection(),
-
-        SizedBox(height: 16.h),
       ],
     );
   }
@@ -399,9 +388,23 @@ class _SliderFallbackSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final feedState = ref.watch(homeFeedNotifierProvider);
     final homeState = ref.watch(homeNotifierProvider);
     final sliders = homeState.sliderModel.sliders ?? [];
-    if (sliders.isEmpty) return const SizedBox.shrink();
+
+    if (sliders.isEmpty) {
+      if (feedState.isLoading) {
+        return Container(
+          height: 136.h,
+          margin: EdgeInsets.symmetric(horizontal: 4.w),
+          decoration: BoxDecoration(
+            color: context.borderColor.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+        );
+      }
+      return const SizedBox.shrink();
+    }
 
     return HomeSliderSection(
       sliders: sliders
@@ -418,50 +421,6 @@ class _SliderFallbackSection extends ConsumerWidget {
             ),
           )
           .toList(),
-    );
-  }
-}
-
-// ─── Loading Skeleton Placeholder ────────────────────────────────────────────
-class _HomeSkeletonLoader extends StatelessWidget {
-  const _HomeSkeletonLoader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          height: 140.h,
-          decoration: BoxDecoration(
-            color: context.borderColor.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-        ),
-        SizedBox(height: 12.h),
-        Row(
-          children: List.generate(
-            2,
-            (index) => Expanded(
-              child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 4.w),
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: context.borderColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(10.r),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 14.h),
-        Container(
-          height: 180.h,
-          decoration: BoxDecoration(
-            color: context.borderColor.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -75,16 +75,18 @@ class HomeNotifier extends Notifier<HomeState> {
     state = state.copyWith(isOverviewLoading: true);
 
     try {
-      // 1. Fetch dashboard overview
-      final overview = await _dashboardRepository.getOverview();
-      if (overview != null && overview.status) {
-        state = state.copyWith(
-          dashboardOverview: () => overview,
-        );
-      }
-
-      // 2. Fetch sliders, subject sections, and contest data in parallel
+      // Fetch dashboard overview, sliders, subject sections, and contest data in parallel
       await Future.wait([
+        () async {
+          try {
+            final overview = await _dashboardRepository.getOverview();
+            if (overview != null && overview.status) {
+              state = state.copyWith(
+                dashboardOverview: () => overview,
+              );
+            }
+          } catch (_) {}
+        }(),
         fetchSliders(),
         fetchSubjectSections(),
         _fetchContestAndExams(),

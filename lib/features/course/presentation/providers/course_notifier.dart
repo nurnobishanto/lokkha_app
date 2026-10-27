@@ -199,6 +199,7 @@ class CourseDetailsState {
 class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
   final int courseId;
   final CoursesRepository? _injectedRepo;
+  Future<void>? _inFlightDetails;
 
   CourseDetailsNotifier(this.courseId, {CoursesRepository? repository, RestClient? client})
       : _injectedRepo = repository ?? (client != null ? CoursesRepositoryImpl(client: client) : null);
@@ -220,6 +221,21 @@ class CourseDetailsNotifier extends Notifier<CourseDetailsState> {
   }
 
   Future<void> fetchCourseDetails(int id) async {
+    if (_inFlightDetails != null) {
+      return _inFlightDetails!;
+    }
+    final future = _performFetchCourseDetails(id);
+    _inFlightDetails = future;
+    try {
+      await future;
+    } finally {
+      if (identical(_inFlightDetails, future)) {
+        _inFlightDetails = null;
+      }
+    }
+  }
+
+  Future<void> _performFetchCourseDetails(int id) async {
     state = state.copyWith(isLoading: true, hasError: false);
     try {
       final model = await _repository.getCourseDetails(id);
@@ -296,18 +312,46 @@ class MyCoursesState {
 class MyCoursesNotifier extends Notifier<MyCoursesState> {
   final RestClient _client;
   bool _disposed = false;
+  Future<void>? _inFlightFetch;
 
   MyCoursesNotifier({RestClient? client}) : _client = client ?? RestClient();
 
   @override
   MyCoursesState build() {
     _disposed = false;
-    ref.onDispose(() => _disposed = true);
+    ref.onDispose(() {
+      _disposed = true;
+      _inFlightFetch = null;
+    });
     Future.microtask(() => fetchMyCourses());
     return MyCoursesState(model: MyCourseModel());
   }
 
-  Future<void> fetchMyCourses({bool isRefresh = false}) async {
+  Future<void> fetchMyCourses({
+    bool isRefresh = false,
+    bool showErrorToast = false,
+  }) async {
+    if (_inFlightFetch != null) {
+      return _inFlightFetch!;
+    }
+    final future = _performFetchMyCourses(
+      isRefresh: isRefresh,
+      showErrorToast: showErrorToast,
+    );
+    _inFlightFetch = future;
+    try {
+      await future;
+    } finally {
+      if (identical(_inFlightFetch, future)) {
+        _inFlightFetch = null;
+      }
+    }
+  }
+
+  Future<void> _performFetchMyCourses({
+    required bool isRefresh,
+    required bool showErrorToast,
+  }) async {
     if (!isRefresh) {
       state = state.copyWith(
         isLoading: true,
@@ -316,7 +360,10 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
       );
     }
 
-    final token = MySharedPref.getUserToken();
+    var token = MySharedPref.getUserToken();
+    if (token.isEmpty && myUser.jwtToken != null && myUser.jwtToken!.isNotEmpty) {
+      token = myUser.jwtToken!;
+    }
     final url = Endpoints.userCourses;
 
     final headers = {
@@ -361,7 +408,9 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
           hasError: true,
           errorMessage: message,
         );
-        CustomSnackBar.showCustomErrorToast(message: message);
+        if (showErrorToast) {
+          CustomSnackBar.showCustomErrorToast(message: message);
+        }
       }
     } catch (error) {
       if (_disposed) return;
@@ -371,9 +420,11 @@ class MyCoursesNotifier extends Notifier<MyCoursesState> {
         hasError: true,
         errorMessage: 'সার্ভার সংযোগে সমস্যা হয়েছে',
       );
-      CustomSnackBar.showCustomErrorToast(
-        message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
-      );
+      if (showErrorToast) {
+        CustomSnackBar.showCustomErrorToast(
+          message: 'সার্ভার সংযোগে সমস্যা হয়েছে',
+        );
+      }
     }
   }
 

@@ -69,7 +69,10 @@ class _MyCoursesViewState extends ConsumerState<MyCoursesView> {
 
           return RefreshIndicator(
             color: LightThemeColors.primaryColor,
-            onRefresh: () => notifier.fetchMyCourses(isRefresh: true),
+            onRefresh: () => notifier.fetchMyCourses(
+              isRefresh: true,
+              showErrorToast: true,
+            ),
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),

@@ -30,6 +30,16 @@ class _CoursesViewState extends ConsumerState<CoursesView> {
   }
 
   @override
+  void didUpdateWidget(CoursesView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.categoryId != oldWidget.categoryId) {
+      setState(() {
+        _activeCategoryId = widget.categoryId;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final state = ref.watch(coursesNotifierProvider(_activeCategoryId));
     final notifier = ref.read(coursesNotifierProvider(_activeCategoryId).notifier);

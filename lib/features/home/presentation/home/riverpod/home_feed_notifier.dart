@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lokkha/core/services/storage/app_storage_cache.dart';
 import 'package:lokkha/di/home_provider.dart';
+import 'package:lokkha/features/home/data/models/home_feed_model.dart';
 import 'package:lokkha/features/home/presentation/home/riverpod/home_feed_state.dart';
 
 final homeFeedNotifierProvider =
@@ -9,6 +11,7 @@ final homeFeedNotifierProvider =
 
 class HomeFeedNotifier extends Notifier<HomeFeedState> {
   Timer? _countdownTimer;
+  DateTime? _lastFetchStartedAt;
 
   @override
   HomeFeedState build() {
@@ -30,7 +33,37 @@ class HomeFeedNotifier extends Notifier<HomeFeedState> {
     String sections = 'all',
     String sliderType = 'app',
   }) async {
-    if (isRefresh) {
+    final now = DateTime.now();
+    // Avoid duplicate network call if Splash already triggered fetch within last 4 seconds
+    if (!isRefresh &&
+        _lastFetchStartedAt != null &&
+        now.difference(_lastFetchStartedAt!) < const Duration(seconds: 4) &&
+        (state.isLoading || state.isRefreshing || state.hasData)) {
+      return;
+    }
+    _lastFetchStartedAt = now;
+    if (!state.hasData) {
+      try {
+        final cached = AppStorageCache.readCache(AppStorageCache.homeFeedCacheKey);
+        if (cached is Map<String, dynamic>) {
+          final cachedModel = HomeFeedModel.fromJson(cached);
+          if (cachedModel.success && cachedModel.data != null) {
+            final cachedSeconds =
+                cachedModel.data?.contestHub?.activeContest?.countdownSeconds ?? 0;
+            state = state.copyWith(
+              isLoading: false,
+              isRefreshing: true,
+              feed: () => cachedModel,
+              contestCountdownSeconds: cachedSeconds,
+              errorMessage: () => null,
+            );
+            _startCountdownTimer(cachedSeconds);
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (isRefresh || state.hasData) {
       state = state.copyWith(isRefreshing: true, errorMessage: () => null);
     } else {
       state = state.copyWith(isLoading: true, errorMessage: () => null);
