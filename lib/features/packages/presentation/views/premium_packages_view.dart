@@ -5,6 +5,8 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/packages.dart';
+import 'package:lokkha/features/profile/presentation/dashboard_portal/riverpod/dashboard_portal_notifier.dart';
+import 'package:lokkha/features/profile/presentation/my_packages/riverpod/my_packages_notifier.dart';
 import 'package:lokkha/shared/models/package.dart';
 
 class PremiumPackagesView extends ConsumerWidget {
@@ -13,6 +15,42 @@ class PremiumPackagesView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(premiumPackagesNotifierProvider);
+    final activeSub = ref.watch(dashboardPortalNotifierProvider).subscription;
+    final activePackageId = activeSub?.packageId;
+    final activePackageName = activeSub?.packageName?.trim();
+    final myPkgs = ref.watch(myPackagesNotifierProvider).model.packages;
+    final activeMyPackageIds = myPkgs
+        .where((p) => p.isActive)
+        .map((p) => p.effectivePackageId)
+        .toSet();
+
+    bool isPackageActive(Package pkg) {
+      if (pkg.isCurrentlyActive == true) return true;
+      if (pkg.userSubscription != null) {
+        if (pkg.userSubscription is Map) {
+          final s =
+              (pkg.userSubscription as Map)["status"]?.toString().toLowerCase();
+          if (s == 'active' || s == 'true' || s == '1') return true;
+        } else {
+          return true;
+        }
+      }
+      if (activePackageId != null &&
+          activePackageId > 0 &&
+          activePackageId == pkg.id) {
+        return true;
+      }
+      if (activePackageName != null &&
+          activePackageName.isNotEmpty &&
+          pkg.name != null &&
+          pkg.name!.trim() == activePackageName) {
+        return true;
+      }
+      if (pkg.id != null && activeMyPackageIds.contains(pkg.id)) {
+        return true;
+      }
+      return false;
+    }
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
@@ -35,15 +73,19 @@ class PremiumPackagesView extends ConsumerWidget {
                   ? _buildEmptyState(context, ref, state.errorMessage)
                   : ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.w,
-                        vertical: 14.h,
+                      padding: EdgeInsets.fromLTRB(
+                        14.w,
+                        14.h,
+                        14.w,
+                        90.h,
                       ),
                       children: [
                         // ─── Package Cards ───────────────────────────────────
                         ...state.packages.map((pkg) {
+                          final bool active = isPackageActive(pkg);
                           return _PackageCard(
                             package: pkg,
+                            isActive: active,
                             onTapDetails: () {
                               context.push(
                                 Routes.packageDetails,
@@ -56,7 +98,7 @@ class PremiumPackagesView extends ConsumerWidget {
                             onTapCheckout: () {
                               final isAuth = isLoggedIn.value;
                               if (isAuth) {
-                                Navigator.of(context).push(
+                                Navigator.of(context, rootNavigator: true).push(
                                   MaterialPageRoute(
                                     builder: (_) => PremiumPackageCheckoutView(
                                       packagesModel: pkg,
@@ -64,7 +106,7 @@ class PremiumPackagesView extends ConsumerWidget {
                                   ),
                                 );
                               } else {
-                                Navigator.of(context).push(
+                                Navigator.of(context, rootNavigator: true).push(
                                   MaterialPageRoute(
                                     builder: (_) => const AuthGatewayView(),
                                   ),
@@ -86,76 +128,88 @@ class PremiumPackagesView extends ConsumerWidget {
     );
   }
 
-  // ─── Trust Footer (Clean & Minimal without Subtitles) ─────────────────────
+  // ─── Trust Footer (3 Titles in 1 Row) ────────────────────────────────────
   Widget _buildTrustFooter(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 9.h),
       decoration: BoxDecoration(
         color: context.surfaceSubtle,
-        borderRadius: BorderRadius.circular(14.r),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: context.borderColor.withValues(alpha: 0.6),
+          width: 0.8,
         ),
       ),
-      child: Column(
+      child: Row(
         children: [
-          _buildTrustRow(
-            context,
-            icon: Icons.security_rounded,
-            iconColor: const Color(0xFF0284C7),
-            title: '১০০% নিরাপদ পেমেন্ট',
+          Expanded(
+            child: _buildTrustItem(
+              context,
+              icon: Icons.security_rounded,
+              iconColor: const Color(0xFF0284C7),
+              title: '১০০% নিরাপদ পেমেন্ট',
+            ),
           ),
-          SizedBox(height: 8.h),
-          Divider(height: 1, thickness: 0.6, color: context.borderColor),
-          SizedBox(height: 8.h),
-          _buildTrustRow(
-            context,
-            icon: Icons.bolt_rounded,
-            iconColor: const Color(0xFFD97706),
-            title: 'তাৎক্ষণিক অ্যাক্টিভেশন',
+          Container(
+            width: 1,
+            height: 14.h,
+            color: context.borderColor.withValues(alpha: 0.7),
           ),
-          SizedBox(height: 8.h),
-          Divider(height: 1, thickness: 0.6, color: context.borderColor),
-          SizedBox(height: 8.h),
-          _buildTrustRow(
-            context,
-            icon: Icons.headset_mic_rounded,
-            iconColor: const Color(0xFF059669),
-            title: 'সার্বক্ষণিক সাপোর্ট',
+          Expanded(
+            child: _buildTrustItem(
+              context,
+              icon: Icons.bolt_rounded,
+              iconColor: const Color(0xFFD97706),
+              title: 'তাৎক্ষণিক অ্যাক্টিভেশন',
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 14.h,
+            color: context.borderColor.withValues(alpha: 0.7),
+          ),
+          Expanded(
+            child: _buildTrustItem(
+              context,
+              icon: Icons.headset_mic_rounded,
+              iconColor: const Color(0xFF059669),
+              title: 'সার্বক্ষণিক সাপোর্ট',
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTrustRow(
+  Widget _buildTrustItem(
     BuildContext context, {
     required IconData icon,
     required Color iconColor,
     required String title,
   }) {
-    return Row(
-      children: [
-        Container(
-          padding: EdgeInsets.all(5.5.r),
-          decoration: BoxDecoration(
-            color: iconColor.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, size: 14.sp, color: iconColor),
-        ),
-        SizedBox(width: 10.w),
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              color: context.textPrimary,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 3.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12.5.sp, color: iconColor),
+          SizedBox(width: 3.5.w),
+          Flexible(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 9.5.sp,
+                fontWeight: FontWeight.w600,
+                color: context.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -322,11 +376,13 @@ class _PackageTierConfig {
 
 class _PackageCard extends StatelessWidget {
   final Package package;
+  final bool isActive;
   final VoidCallback onTapDetails;
   final VoidCallback onTapCheckout;
 
   const _PackageCard({
     required this.package,
+    this.isActive = false,
     required this.onTapDetails,
     required this.onTapCheckout,
   });
@@ -373,11 +429,7 @@ class _PackageCard extends StatelessWidget {
 
     // Dynamic borders & shadows
     final Color cardBorderColor = tier.accentColor.withValues(
-      alpha: tier.isProminent ? (isDark ? 0.45 : 0.35) : (isDark ? 0.25 : 0.18),
-    );
-
-    final Color badgeBgColor = tier.accentColor.withValues(
-      alpha: isDark ? 0.18 : 0.08,
+      alpha: isDark ? 0.45 : 0.35,
     );
 
     // Feature bullet points directly from API
@@ -400,27 +452,27 @@ class _PackageCard extends StatelessWidget {
         : (package.formattedDuration ?? 'মেয়াদ');
 
     return Container(
-      margin: EdgeInsets.only(bottom: 14.h),
+      margin: EdgeInsets.only(bottom: 10.h),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.r),
         border: Border.all(
           color: cardBorderColor,
-          width: tier.isProminent ? 1.4 : 1.1,
+          width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
             color: tier.accentColor.withValues(
-              alpha: tier.isProminent ? (isDark ? 0.18 : 0.07) : 0.02,
+              alpha: tier.isProminent ? (isDark ? 0.16 : 0.06) : 0.02,
             ),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
           BoxShadow(
             color: Colors.black.withValues(
-              alpha: isDark ? 0.25 : 0.03,
+              alpha: isDark ? 0.22 : 0.02,
             ),
-            blurRadius: 6,
+            blurRadius: 5,
             offset: const Offset(0, 2),
           ),
         ],
@@ -429,56 +481,39 @@ class _PackageCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTapDetails,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(14.r),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13.h),
+            padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 10.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ─── Header: Tier Badge & Duration Pill ────────────────────
+                // ─── Header: Package Title & Duration Pill ─────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Left: Plan Badge
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.5.w,
-                        vertical: 3.5.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: badgeBgColor,
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
-                          color: tier.accentColor.withValues(alpha: 0.3),
-                          width: 0.8,
+                    // Left: Package Title (from API)
+                    Expanded(
+                      child: Text(
+                        tier.title,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w800,
+                          color: context.textPrimary,
+                          height: 1.2,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            tier.badgeIcon,
-                            size: 12.sp,
-                            color: tier.accentColor,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            tier.badgeText,
-                            style: TextStyle(
-                              fontSize: 10.5.sp,
-                              fontWeight: FontWeight.w700,
-                              color: tier.accentColor,
-                            ),
-                          ),
-                        ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+
+                    SizedBox(width: 8.w),
 
                     // Right: Duration Pill
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 3.5.h,
+                        horizontal: 7.5.w,
+                        vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
                         color: isDark
@@ -491,16 +526,16 @@ class _PackageCard extends StatelessWidget {
                         children: [
                           Icon(
                             Icons.schedule_rounded,
-                            size: 11.5.sp,
+                            size: 11.sp,
                             color: isDark
                                 ? const Color(0xFF94A3B8)
                                 : const Color(0xFF64748B),
                           ),
-                          SizedBox(width: 4.w),
+                          SizedBox(width: 3.5.w),
                           Text(
                             durationLabel,
                             style: TextStyle(
-                              fontSize: 10.5.sp,
+                              fontSize: 10.sp,
                               fontWeight: FontWeight.w600,
                               color: isDark
                                   ? const Color(0xFFCBD5E1)
@@ -513,64 +548,30 @@ class _PackageCard extends StatelessWidget {
                   ],
                 ),
 
-                SizedBox(height: 10.h),
-
-                // ─── Package Title & Subtitle ──────────────────────────────
-                Text(
-                  tier.title,
-                  style: TextStyle(
-                    fontSize: 15.5.sp,
-                    fontWeight: FontWeight.w800,
-                    color: context.textPrimary,
-                    height: 1.25,
-                  ),
-                ),
-                if (tier.subtitle.isNotEmpty) ...[
-                  SizedBox(height: 3.h),
-                  Text(
-                    tier.subtitle,
-                    style: TextStyle(
-                      fontSize: 11.5.sp,
-                      color: context.textMuted,
-                      height: 1.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-
                 // ─── Key Feature Bullets ───────────────────────────────────
                 if (features.isNotEmpty) ...[
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 7.h),
                   ...features.map((feat) {
                     final cleanFeat = feat.replaceAll(RegExp(r'<[^>]*>'), '').trim();
                     if (cleanFeat.isEmpty) return const SizedBox.shrink();
                     return Padding(
-                      padding: EdgeInsets.only(bottom: 5.h),
+                      padding: EdgeInsets.only(bottom: 3.5.h),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 1.5.h),
-                            padding: EdgeInsets.all(1.5.r),
-                            decoration: BoxDecoration(
-                              color: tier.accentColor.withValues(alpha: 0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.check_rounded,
-                              size: 11.sp,
-                              color: tier.accentColor,
-                            ),
+                          Icon(
+                            Icons.check_circle_rounded,
+                            size: 12.sp,
+                            color: tier.accentColor,
                           ),
-                          SizedBox(width: 7.w),
+                          SizedBox(width: 6.w),
                           Expanded(
                             child: Text(
                               cleanFeat,
                               style: TextStyle(
-                                fontSize: 11.5.sp,
+                                fontSize: 11.sp,
                                 color: context.textSecondary,
-                                height: 1.3,
+                                height: 1.25,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -582,10 +583,10 @@ class _PackageCard extends StatelessWidget {
                   }),
                 ],
 
-                SizedBox(height: 4.h),
+                SizedBox(height: 2.h),
                 Divider(
-                  height: 14.h,
-                  thickness: 0.6,
+                  height: 10.h,
+                  thickness: 0.5,
                   color: context.borderColor.withValues(alpha: 0.6),
                 ),
 
@@ -606,7 +607,7 @@ class _PackageCard extends StatelessWidget {
                               Text(
                                 '৳$salePrice',
                                 style: TextStyle(
-                                  fontSize: 19.sp,
+                                  fontSize: 18.sp,
                                   fontWeight: FontWeight.w800,
                                   color: context.textPrimary,
                                   height: 1.0,
@@ -617,7 +618,7 @@ class _PackageCard extends StatelessWidget {
                                 Text(
                                   '৳$regularPrice',
                                   style: TextStyle(
-                                    fontSize: 11.5.sp,
+                                    fontSize: 11.sp,
                                     color: context.textMuted,
                                     decoration: TextDecoration.lineThrough,
                                     fontWeight: FontWeight.w500,
@@ -628,11 +629,11 @@ class _PackageCard extends StatelessWidget {
                             ],
                           ),
                           if (hasDiscount && discountStr.isNotEmpty) ...[
-                            SizedBox(height: 3.h),
+                            SizedBox(height: 2.h),
                             Text(
                               '$discountStr সাশ্রয় হচ্ছে',
                               style: TextStyle(
-                                fontSize: 10.sp,
+                                fontSize: 9.5.sp,
                                 fontWeight: FontWeight.w700,
                                 color: tier.accentColor,
                               ),
@@ -644,26 +645,32 @@ class _PackageCard extends StatelessWidget {
 
                     SizedBox(width: 8.w),
 
-                    // Action Button with Gradient matching the Tier
+                    // Action Button with Gradient matching the Tier / Active Status
                     InkWell(
-                      onTap: onTapCheckout,
-                      borderRadius: BorderRadius.circular(10.r),
+                      onTap: isActive ? onTapDetails : onTapCheckout,
+                      borderRadius: BorderRadius.circular(8.r),
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                          horizontal: 14.w,
-                          vertical: 7.5.h,
+                          horizontal: 12.w,
+                          vertical: 6.h,
                         ),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: tier.gradientColors,
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(10.r),
+                          color: isActive ? const Color(0xFF059669) : null,
+                          gradient: isActive
+                              ? null
+                              : LinearGradient(
+                                  colors: tier.gradientColors,
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                          borderRadius: BorderRadius.circular(8.r),
                           boxShadow: [
                             BoxShadow(
-                              color: tier.accentColor.withValues(alpha: 0.28),
-                              blurRadius: 6,
+                              color: (isActive
+                                      ? const Color(0xFF059669)
+                                      : tier.accentColor)
+                                  .withValues(alpha: 0.25),
+                              blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),
                           ],
@@ -672,17 +679,19 @@ class _PackageCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'প্যাকেজ কিনুন',
+                              isActive ? 'সক্রিয় আছে' : 'প্যাকেজ কিনুন',
                               style: TextStyle(
-                                fontSize: 11.5.sp,
+                                fontSize: 11.sp,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
                             ),
                             SizedBox(width: 4.w),
                             Icon(
-                              Icons.arrow_forward_rounded,
-                              size: 13.sp,
+                              isActive
+                                  ? Icons.check_circle_rounded
+                                  : Icons.arrow_forward_rounded,
+                              size: 12.sp,
                               color: Colors.white,
                             ),
                           ],

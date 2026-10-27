@@ -284,7 +284,13 @@ class Package {
       isCurrentlyActive: json["is_currently_active"] == true ||
           json["is_currently_active"] == 1 ||
           json["is_currently_active"]?.toString() == '1' ||
-          json["is_currently_active"]?.toString().toLowerCase() == 'true',
+          json["is_currently_active"]?.toString().toLowerCase() == 'true' ||
+          (json["user_subscription"] != null &&
+              (json["user_subscription"] is! Map ||
+                  (json["user_subscription"]["status"] == true ||
+                      json["user_subscription"]["status"] == 1 ||
+                      json["user_subscription"]["status"]?.toString().toLowerCase() == 'active' ||
+                      json["user_subscription"]["status"]?.toString().toLowerCase() == 'true'))),
       userSubscription: json["user_subscription"],
       termsAndConditions: json["terms_and_conditions"],
       termsList: parsedTerms.isNotEmpty ? parsedTerms : null,

@@ -707,7 +707,7 @@ class _PackageDetailsViewState extends ConsumerState<PackageDetailsView> {
             onPressed: () {
               final isAuth = isLoggedIn.value;
               if (isAuth) {
-                Navigator.of(context).push(
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) => PremiumPackageCheckoutView(
                       packagesModel: pkg,
@@ -715,7 +715,7 @@ class _PackageDetailsViewState extends ConsumerState<PackageDetailsView> {
                   ),
                 );
               } else {
-                Navigator.of(context).push(
+                Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) => const AuthGatewayView(),
                   ),
