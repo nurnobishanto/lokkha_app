@@ -37,27 +37,10 @@ class PremiumPackagesView extends ConsumerWidget {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.symmetric(
                         horizontal: 14.w,
-                        vertical: 12.h,
+                        vertical: 14.h,
                       ),
                       children: [
-                        // ─── 1. Hero Pro Banner ──────────────────────────────
-                        _buildHeroBanner(context),
-
-                        SizedBox(height: 16.h),
-
-                        // ─── 2. Section Header ───────────────────────────────
-                        Text(
-                          'প্যাকেজ নির্বাচন করুন',
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            fontWeight: FontWeight.w700,
-                            color: context.textPrimary,
-                          ),
-                        ),
-
-                        SizedBox(height: 10.h),
-
-                        // ─── 3. Package Cards ────────────────────────────────
+                        // ─── Package Cards ───────────────────────────────────
                         ...state.packages.map((pkg) {
                           return _PackageCard(
                             package: pkg,
@@ -93,115 +76,13 @@ class PremiumPackagesView extends ConsumerWidget {
 
                         SizedBox(height: 10.h),
 
-                        // ─── 4. Trust & Security Banner ──────────────────────
+                        // ─── Trust & Security Banner ─────────────────────────
                         _buildTrustFooter(context),
 
                         SizedBox(height: 20.h),
                       ],
                     ),
             ),
-    );
-  }
-
-  // ─── Hero Banner (Sleek, Clean & Fresh) ──────────────────────────────────
-  Widget _buildHeroBanner(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: context.isDark
-              ? [const Color(0xFF064E3B), const Color(0xFF022C22)]
-              : [const Color(0xFF006A4E), const Color(0xFF047857)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF006A4E).withValues(alpha: 0.16),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42.r,
-            height: 42.r,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-                width: 0.8,
-              ),
-            ),
-            child: Icon(
-              Icons.workspace_premium_rounded,
-              size: 22.sp,
-              color: const Color(0xFFFDE047),
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'লক্ষ্য প্রো সাবস্ক্রিপশন',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 5.w,
-                        vertical: 1.5.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDE047),
-                        borderRadius: BorderRadius.circular(4.r),
-                      ),
-                      child: Text(
-                        'PRO',
-                        style: TextStyle(
-                          fontSize: 9.sp,
-                          fontWeight: FontWeight.w900,
-                          color: const Color(0xFF004D38),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 3.h),
-                Text(
-                  'সকল মডেল টেস্ট, বিষয়ভিত্তিক পরীক্ষা ও নির্ভুল ব্যাখ্যা',
-                  style: TextStyle(
-                    fontSize: 11.5.sp,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    height: 1.25,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -342,7 +223,103 @@ class PremiumPackagesView extends ConsumerWidget {
   }
 }
 
-// ─── Clean Modern Package Card ─────────────────────────────────────────────
+// ─── Clean, Minimal & Distinct Package Card ────────────────────────────────
+class _PackageTierConfig {
+  final String title;
+  final String subtitle;
+  final String badgeText;
+  final IconData badgeIcon;
+  final Color accentColor;
+  final List<Color> gradientColors;
+  final bool isProminent;
+
+  const _PackageTierConfig({
+    required this.title,
+    required this.subtitle,
+    required this.badgeText,
+    required this.badgeIcon,
+    required this.accentColor,
+    required this.gradientColors,
+    this.isProminent = false,
+  });
+
+  factory _PackageTierConfig.fromPackage(Package package, String discountStr) {
+    final name = package.name?.trim() ?? '';
+    final title = name.isNotEmpty ? name : 'প্যাকেজ';
+    final subtitle = (package.description != null && package.description!.trim().isNotEmpty)
+        ? package.description!.trim()
+        : '';
+
+    final isAparajita = package.isFemale == true ||
+        name.contains('অপরাজিতা') ||
+        (package.description?.contains('নারী') ?? false) ||
+        (package.description?.contains('মহিলা') ?? false);
+    final isMaster = package.isMega == true ||
+        name.contains('মাস্টার') ||
+        name.toLowerCase().contains('master');
+    final duration = package.duration ?? package.durationDays ?? 0;
+    final isYearly = duration >= 365 || (package.isFeatured == true && duration > 180);
+
+    // 1. Female / Aparajita Special (Rose Theme)
+    if (isAparajita) {
+      return _PackageTierConfig(
+        title: title,
+        subtitle: subtitle,
+        badgeText: discountStr.isNotEmpty
+            ? 'অপরাজিতা স্পেশাল • $discountStr ছাড়'
+            : 'অপরাজিতা স্পেশাল',
+        badgeIcon: Icons.auto_awesome_rounded,
+        accentColor: const Color(0xFFE11D48),
+        gradientColors: const [Color(0xFFE11D48), Color(0xFFBE123C)],
+        isProminent: true,
+      );
+    }
+
+    // 2. Master / Mega All-in-One (Royal Purple Theme)
+    if (isMaster) {
+      return _PackageTierConfig(
+        title: title,
+        subtitle: subtitle,
+        badgeText: discountStr.isNotEmpty
+            ? 'মাস্টার এক্সেস • $discountStr ছাড়'
+            : 'মাস্টার এক্সেস',
+        badgeIcon: Icons.workspace_premium_rounded,
+        accentColor: const Color(0xFF7C3AED),
+        gradientColors: const [Color(0xFF7C3AED), Color(0xFF6D28D9)],
+        isProminent: true,
+      );
+    }
+
+    // 3. Yearly Best Value (Emerald Green Theme)
+    if (isYearly) {
+      return _PackageTierConfig(
+        title: title,
+        subtitle: subtitle,
+        badgeText: discountStr.isNotEmpty
+            ? 'সেরা ভ্যালু • $discountStr ছাড়'
+            : 'সেরা ভ্যালু প্যাক',
+        badgeIcon: Icons.local_fire_department_rounded,
+        accentColor: const Color(0xFF006A4E),
+        gradientColors: const [Color(0xFF006A4E), Color(0xFF047857)],
+        isProminent: true,
+      );
+    }
+
+    // 4. Standard 6-Month / Default (Ocean Blue Theme)
+    return _PackageTierConfig(
+      title: title,
+      subtitle: subtitle,
+      badgeText: discountStr.isNotEmpty
+          ? 'স্ট্যান্ডার্ড প্ল্যান • $discountStr ছাড়'
+          : 'স্ট্যান্ডার্ড প্ল্যান',
+      badgeIcon: Icons.bolt_rounded,
+      accentColor: const Color(0xFF0284C7),
+      gradientColors: const [Color(0xFF0284C7), Color(0xFF0369A1)],
+      isProminent: false,
+    );
+  }
+}
+
 class _PackageCard extends StatelessWidget {
   final Package package;
   final VoidCallback onTapDetails;
@@ -354,11 +331,14 @@ class _PackageCard extends StatelessWidget {
     required this.onTapCheckout,
   });
 
-  String _cleanPrice(String? price) {
-    if (price == null || price.trim().isEmpty) return '0';
-    var p = price.trim();
+  String _cleanPrice(dynamic price) {
+    if (price == null) return '0';
+    var p = price.toString().trim();
     if (p.contains('.')) {
-      p = p.replaceAll(RegExp(r'\.0+$'), '');
+      final val = double.tryParse(p);
+      if (val != null) {
+        p = val % 1 == 0 ? val.toInt().toString() : val.toStringAsFixed(2);
+      }
     }
     return p.isEmpty ? '0' : p;
   }
@@ -369,7 +349,7 @@ class _PackageCard extends StatelessWidget {
     if (d.contains('.')) {
       final val = double.tryParse(d);
       if (val != null) {
-        d = val.toStringAsFixed(val % 1 == 0 ? 0 : 1);
+        d = val.round().toString();
       }
     }
     return d.isEmpty ? '' : '$d%';
@@ -377,14 +357,9 @@ class _PackageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isFemale = package.isFemale == true ||
-        (package.name?.contains('অপরাজিতা') ?? false);
-    final isFeatured = package.isFeatured == true;
-    final isBestValue = (package.duration ?? 0) >= 365 ||
-        (double.tryParse(package.discount ?? '0') ?? 0) >= 20;
-
     final regularPrice = _cleanPrice(package.regularPrice);
-    final salePrice = _cleanPrice(package.discountedPrice ?? package.regularPrice);
+    final salePrice =
+        _cleanPrice(package.discountedPrice ?? package.regularPrice);
     final discountStr = _cleanDiscount(package.discount);
 
     final double? regVal = double.tryParse(regularPrice);
@@ -392,23 +367,20 @@ class _PackageCard extends StatelessWidget {
     final bool hasDiscount =
         regVal != null && saleVal != null && regVal > saleVal && saleVal > 0;
 
-    // Theme Accent Colors
-    final Color accentColor = isFemale
-        ? const Color(0xFFE11D48) // Rose
-        : context.primaryColor; // Emerald
+    // Resolve unique tier identity
+    final tier = _PackageTierConfig.fromPackage(package, discountStr);
+    final isDark = context.isDark;
 
-    final Color badgeBgColor = isFemale
-        ? (context.isDark ? const Color(0xFF4C0519) : const Color(0xFFFFF1F2))
-        : (context.isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5));
+    // Dynamic borders & shadows
+    final Color cardBorderColor = tier.accentColor.withValues(
+      alpha: tier.isProminent ? (isDark ? 0.45 : 0.35) : (isDark ? 0.25 : 0.18),
+    );
 
-    final Color cardBorderColor = isFemale
-        ? const Color(0xFFE11D48).withValues(alpha: context.isDark ? 0.35 : 0.25)
-        : (isFeatured || isBestValue
-            ? context.primaryColor
-                .withValues(alpha: context.isDark ? 0.45 : 0.3)
-            : context.borderColor);
+    final Color badgeBgColor = tier.accentColor.withValues(
+      alpha: isDark ? 0.18 : 0.08,
+    );
 
-    // Feature bullet points
+    // Feature bullet points directly from API
     final features = package.featureTexts.isNotEmpty
         ? package.featureTexts
         : [
@@ -417,19 +389,39 @@ class _PackageCard extends StatelessWidget {
             'লাইভ লিডারবোর্ড ও বিস্তারিত মেধা তালিকা যাচাই',
           ];
 
+    final int durationDays =
+        package.duration ?? package.durationDays ?? 0;
+    final String durationLabel = durationDays > 0
+        ? (durationDays == 365
+            ? '৩৬৫ দিন (১ বছর)'
+            : (durationDays == 180
+                ? '১৮০ দিন (৬ মাস)'
+                : (package.formattedDuration ?? '$durationDays দিন মেয়াদ')))
+        : (package.formattedDuration ?? 'মেয়াদ');
+
     return Container(
       margin: EdgeInsets.only(bottom: 14.h),
       decoration: BoxDecoration(
-        color: context.cardColor,
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: cardBorderColor, width: 1.1),
+        border: Border.all(
+          color: cardBorderColor,
+          width: tier.isProminent ? 1.4 : 1.1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(
-              alpha: context.isDark ? 0.25 : 0.04,
+            color: tier.accentColor.withValues(
+              alpha: tier.isProminent ? (isDark ? 0.18 : 0.07) : 0.02,
             ),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.25 : 0.03,
+            ),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -439,144 +431,59 @@ class _PackageCard extends StatelessWidget {
           onTap: onTapDetails,
           borderRadius: BorderRadius.circular(16.r),
           child: Padding(
-            padding: EdgeInsets.all(14.r),
+            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ─── Header: Badge / Category Pill ──────────────────────────
+                // ─── Header: Tier Badge & Duration Pill ────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: isFemale
-                            ? Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8.w,
-                                  vertical: 3.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: badgeBgColor,
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  border: Border.all(
-                                    color: const Color(0xFFE11D48)
-                                        .withValues(alpha: 0.3),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.auto_awesome_rounded,
-                                      size: 11.5.sp,
-                                      color: const Color(0xFFE11D48),
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Flexible(
-                                      child: Text(
-                                        discountStr.isNotEmpty
-                                            ? 'অপরাজিতা স্পেশাল • $discountStr ছাড়'
-                                            : 'অপরাজিতা স্পেশাল',
-                                        style: TextStyle(
-                                          fontSize: 10.5.sp,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFFE11D48),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : (isBestValue || isFeatured)
-                                ? Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 3.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: badgeBgColor,
-                                      borderRadius: BorderRadius.circular(20.r),
-                                      border: Border.all(
-                                        color: context.primaryColor
-                                            .withValues(alpha: 0.3),
-                                        width: 0.8,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.local_fire_department_rounded,
-                                          size: 12.sp,
-                                          color: context.primaryColor,
-                                        ),
-                                        SizedBox(width: 4.w),
-                                        Flexible(
-                                          child: Text(
-                                            discountStr.isNotEmpty
-                                                ? 'সেরা ভ্যালু • $discountStr ছাড়'
-                                                : 'সেরা ভ্যালু প্যাক',
-                                            style: TextStyle(
-                                              fontSize: 10.5.sp,
-                                              fontWeight: FontWeight.w700,
-                                              color: context.primaryColor,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 3.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: context.surfaceSubtle,
-                                      borderRadius: BorderRadius.circular(20.r),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.star_outline_rounded,
-                                          size: 12.sp,
-                                          color: context.textMuted,
-                                        ),
-                                        SizedBox(width: 4.w),
-                                        Flexible(
-                                          child: Text(
-                                            'স্ট্যান্ডার্ড প্ল্যান',
-                                            style: TextStyle(
-                                              fontSize: 10.5.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: context.textMuted,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                    // Left: Plan Badge
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.5.w,
+                        vertical: 3.5.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: badgeBgColor,
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color: tier.accentColor.withValues(alpha: 0.3),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            tier.badgeIcon,
+                            size: 12.sp,
+                            color: tier.accentColor,
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            tier.badgeText,
+                            style: TextStyle(
+                              fontSize: 10.5.sp,
+                              fontWeight: FontWeight.w700,
+                              color: tier.accentColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(width: 8.w),
 
-                    // Duration Badge Pill
+                    // Right: Duration Pill
                     Container(
                       padding: EdgeInsets.symmetric(
                         horizontal: 8.w,
-                        vertical: 3.h,
+                        vertical: 3.5.h,
                       ),
                       decoration: BoxDecoration(
-                        color: accentColor.withValues(alpha: 0.08),
+                        color: isDark
+                            ? const Color(0xFF334155).withValues(alpha: 0.5)
+                            : const Color(0xFFF1F5F9),
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Row(
@@ -585,17 +492,19 @@ class _PackageCard extends StatelessWidget {
                           Icon(
                             Icons.schedule_rounded,
                             size: 11.5.sp,
-                            color: accentColor,
+                            color: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            package.duration != null
-                                ? '${package.duration} দিন মেয়াদ'
-                                : 'মেয়াদ',
+                            durationLabel,
                             style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.w700,
-                              color: accentColor,
+                              fontSize: 10.5.sp,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? const Color(0xFFCBD5E1)
+                                  : const Color(0xFF475569),
                             ),
                           ),
                         ],
@@ -606,72 +515,93 @@ class _PackageCard extends StatelessWidget {
 
                 SizedBox(height: 10.h),
 
-                // ─── Package Name ────────────────────────────────────────────
+                // ─── Package Title & Subtitle ──────────────────────────────
                 Text(
-                  package.name?.trim().isNotEmpty == true
-                      ? package.name!
-                      : 'প্রো প্যাকেজ',
+                  tier.title,
                   style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15.5.sp,
+                    fontWeight: FontWeight.w800,
                     color: context.textPrimary,
                     height: 1.25,
                   ),
                 ),
-
-                SizedBox(height: 10.h),
-
-                // ─── Key Features (Up to 3 bullets) ──────────────────────────
-                ...features.take(3).map((feat) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 6.h),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 14.5.sp,
-                          color: accentColor,
-                        ),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            feat,
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: context.textSecondary,
-                              height: 1.3,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                if (tier.subtitle.isNotEmpty) ...[
+                  SizedBox(height: 3.h),
+                  Text(
+                    tier.subtitle,
+                    style: TextStyle(
+                      fontSize: 11.5.sp,
+                      color: context.textMuted,
+                      height: 1.3,
                     ),
-                  );
-                }),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
 
-                SizedBox(height: 6.h),
+                // ─── Key Feature Bullets ───────────────────────────────────
+                if (features.isNotEmpty) ...[
+                  SizedBox(height: 10.h),
+                  ...features.map((feat) {
+                    final cleanFeat = feat.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+                    if (cleanFeat.isEmpty) return const SizedBox.shrink();
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 5.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 1.5.h),
+                            padding: EdgeInsets.all(1.5.r),
+                            decoration: BoxDecoration(
+                              color: tier.accentColor.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.check_rounded,
+                              size: 11.sp,
+                              color: tier.accentColor,
+                            ),
+                          ),
+                          SizedBox(width: 7.w),
+                          Expanded(
+                            child: Text(
+                              cleanFeat,
+                              style: TextStyle(
+                                fontSize: 11.5.sp,
+                                color: context.textSecondary,
+                                height: 1.3,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+
+                SizedBox(height: 4.h),
                 Divider(
-                  height: 16.h,
-                  thickness: 0.7,
-                  color: context.borderColor.withValues(alpha: 0.7),
+                  height: 14.h,
+                  thickness: 0.6,
+                  color: context.borderColor.withValues(alpha: 0.6),
                 ),
 
-                // ─── Bottom: Price Display & Action Button ───────────────────
+                // ─── Bottom: Price Block & CTA Button ──────────────────────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Price Block
+                    // Price Details
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: 6.w,
-                            runSpacing: 2.h,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
                             children: [
                               Text(
                                 '৳$salePrice',
@@ -679,9 +609,11 @@ class _PackageCard extends StatelessWidget {
                                   fontSize: 19.sp,
                                   fontWeight: FontWeight.w800,
                                   color: context.textPrimary,
+                                  height: 1.0,
                                 ),
                               ),
-                              if (hasDiscount)
+                              if (hasDiscount) ...[
+                                SizedBox(width: 5.w),
                                 Text(
                                   '৳$regularPrice',
                                   style: TextStyle(
@@ -689,28 +621,30 @@ class _PackageCard extends StatelessWidget {
                                     color: context.textMuted,
                                     decoration: TextDecoration.lineThrough,
                                     fontWeight: FontWeight.w500,
+                                    height: 1.0,
                                   ),
                                 ),
+                              ],
                             ],
                           ),
-                          if (hasDiscount && discountStr.isNotEmpty)
+                          if (hasDiscount && discountStr.isNotEmpty) ...[
+                            SizedBox(height: 3.h),
                             Text(
                               '$discountStr সাশ্রয় হচ্ছে',
                               style: TextStyle(
                                 fontSize: 10.sp,
-                                fontWeight: FontWeight.w600,
-                                color: isFemale
-                                    ? const Color(0xFFE11D48)
-                                    : const Color(0xFF059669),
+                                fontWeight: FontWeight.w700,
+                                color: tier.accentColor,
                               ),
                             ),
+                          ],
                         ],
                       ),
                     ),
 
                     SizedBox(width: 8.w),
 
-                    // Buy Button (Vibrant & Gradient)
+                    // Action Button with Gradient matching the Tier
                     InkWell(
                       onTap: onTapCheckout,
                       borderRadius: BorderRadius.circular(10.r),
@@ -721,22 +655,14 @@ class _PackageCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: isFemale
-                                ? [
-                                    const Color(0xFFE11D48),
-                                    const Color(0xFFBE123C),
-                                  ]
-                                : [
-                                    context.primaryColor,
-                                    const Color(0xFF047857),
-                                  ],
+                            colors: tier.gradientColors,
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(10.r),
                           boxShadow: [
                             BoxShadow(
-                              color: accentColor.withValues(alpha: 0.25),
+                              color: tier.accentColor.withValues(alpha: 0.28),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

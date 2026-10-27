@@ -123,7 +123,7 @@ class Package {
     // 2. Pricing normalization
     final regPrice = json["regular_price"]?.toString();
     final disc = json["discount"]?.toString();
-    final discPrice = json["discounted_price"]?.toString();
+    final discPrice = json["discounted_price"]?.toString() ?? json["price"]?.toString();
     final effPrice = json["effective_price"] != null
         ? num.tryParse(json["effective_price"].toString())?.toDouble()
         : (discPrice != null
@@ -132,8 +132,9 @@ class Package {
 
     // 3. Features checklist parsing
     List<PackageFeature> parsedFeatures = [];
-    if (json["features"] is List) {
-      parsedFeatures = (json["features"] as List)
+    final rawFeaturesList = json["features"] ?? json["feature_list"] ?? json["raw_features"];
+    if (rawFeaturesList is List) {
+      parsedFeatures = rawFeaturesList
           .where((f) => f != null)
           .map((f) => PackageFeature.fromJson(f))
           .where((f) =>
@@ -141,7 +142,7 @@ class Package {
               f.text.trim().toLowerCase() != 'null' &&
               f.text.trim().toLowerCase() != '<p>null</p>')
           .toList();
-    } else if (json["features"] is String) {
+    } else if (rawFeaturesList is String) {
       final str = json["features"].toString().trim();
       if (str.startsWith('[')) {
         try {
