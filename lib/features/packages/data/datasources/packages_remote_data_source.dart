@@ -43,6 +43,30 @@ class PackagesRemoteDataSourceImpl implements PackagesRemoteDataSource {
       if (data != null && (data['success'] == true || data['status'] == true)) {
         return PackageDetailResponseModel.fromJson(data);
       }
+
+      // If server returned status: false due to expired/invalid session, retry once as guest
+      if (data != null && (data['status'] == false || data['success'] == false)) {
+        final msg = data['message']?.toString().toLowerCase() ?? '';
+        if (msg.contains('session') ||
+            msg.contains('device') ||
+            msg.contains('limit') ||
+            msg.contains('unauthenticated') ||
+            msg.contains('token')) {
+          final guestResponse = await _client.get(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          );
+          final guestData = guestResponse.data;
+          if (guestData != null &&
+              (guestData['success'] == true || guestData['status'] == true)) {
+            return PackageDetailResponseModel.fromJson(guestData);
+          }
+        }
+      }
+
       return null;
     } catch (e) {
       debugPrint('[PackagesRemoteDataSource] Error fetching package details: $e');
@@ -78,6 +102,33 @@ class PackagesRemoteDataSourceImpl implements PackagesRemoteDataSource {
       if (data != null && (data['success'] == true || data['status'] == true)) {
         return PremiumPackageModel.fromJson(data);
       }
+
+      // If server returned status: false due to expired/invalid session, retry once as guest
+      if (data != null && (data['status'] == false || data['success'] == false)) {
+        final msg = data['message']?.toString().toLowerCase() ?? '';
+        if (msg.contains('session') ||
+            msg.contains('device') ||
+            msg.contains('limit') ||
+            msg.contains('unauthenticated') ||
+            msg.contains('token')) {
+          debugPrint(
+              '[PackagesRemoteDataSource] Expired token on packages. Retrying as guest...');
+          final guestResponse = await _client.get(
+            Endpoints.packages,
+            queryParameters: queryParams,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          );
+          final guestData = guestResponse.data;
+          if (guestData != null &&
+              (guestData['success'] == true || guestData['status'] == true)) {
+            return PremiumPackageModel.fromJson(guestData);
+          }
+        }
+      }
+
       return null;
     } catch (e) {
       debugPrint('[PackagesRemoteDataSource] Error fetching premium packages: $e');

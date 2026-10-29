@@ -79,20 +79,62 @@ class TokenManager extends Interceptor {
   }
 
   @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    _checkSessionExpiration(response.data, response.requestOptions.uri.toString());
+    return handler.next(response);
+  }
+
+  void _checkSessionExpiration(dynamic data, String url) {
+    if (data is! Map) return;
+
+    final isAuthEndpoint = url.contains('/auth/') ||
+        url.contains('login') ||
+        url.contains('send-otp') ||
+        url.contains('check-phone') ||
+        url.contains('register');
+
+    if (isAuthEndpoint) return;
+
+    final status = data['status'];
+    final success = data['success'];
+    final message = data['message']?.toString();
+
+    // Check if status is explicitly false and session expired message is returned
+    if ((status == false || success == false) && message != null) {
+      final lowerMsg = message.toLowerCase();
+      final isSessionExpired = lowerMsg.contains('session expired') ||
+          lowerMsg.contains('maximum limit') ||
+          lowerMsg.contains('logged-in device') ||
+          lowerMsg.contains('device limit') ||
+          lowerMsg.contains('unauthenticated') ||
+          lowerMsg.contains('token expired') ||
+          lowerMsg.contains('invalid token');
+
+      if (isSessionExpired) {
+        if (kDebugMode) {
+          debugPrint('[TokenManager] Session expired in response ($url): $message');
+        }
+        AuthService().handleSessionExpired(message: message);
+      }
+    }
+  }
+
+  @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final statusCode = err.response?.statusCode;
     final url = err.requestOptions.uri.toString();
 
-    // 401 Unauthorized handling
-    if (statusCode == 401) {
+    // 401 Unauthorized or 403/419 handling
+    if (statusCode == 401 || statusCode == 403 || statusCode == 419) {
       final isAuthEndpoint = url.contains('/auth/') ||
           url.contains('login') ||
           url.contains('send-otp') ||
-          url.contains('check-phone');
+          url.contains('check-phone') ||
+          url.contains('register');
 
       if (!isAuthEndpoint) {
         if (kDebugMode) {
-          debugPrint('[TokenManager] 401 Unauthorized on $url. Expiring session.');
+          debugPrint('[TokenManager] $statusCode Unauthorized on $url. Expiring session.');
         }
         String? serverMsg;
         if (err.response?.data is Map) {

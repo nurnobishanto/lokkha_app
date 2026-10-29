@@ -315,44 +315,6 @@ class JobDetailsScreen extends ConsumerWidget {
                           label: 'বয়সসীমা',
                           value: jobData.ageLimit!.trim(),
                         ),
-
-                      // Application Button
-                      if (jobData.applicationLink != null &&
-                          jobData.applicationLink!.trim().isNotEmpty) ...[
-                        SizedBox(height: 14.h),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 44.h,
-                          child: ElevatedButton.icon(
-                            onPressed: () async {
-                              final uri = Uri.tryParse(
-                                  jobData.applicationLink!.trim());
-                              if (uri != null && await canLaunchUrl(uri)) {
-                                await launchUrl(
-                                  uri,
-                                  mode: LaunchMode.externalApplication,
-                                );
-                              }
-                            },
-                            icon: const Icon(Icons.open_in_new_rounded, size: 17),
-                            label: Text(
-                              "আবেদন করুন",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: LightThemeColors.primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.r),
-                              ),
-                              elevation: 0,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
@@ -565,11 +527,20 @@ class _JobPdfViewerCardState extends State<_JobPdfViewerCard> {
 
   void _openFullScreen(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => PdfViewerScreen(
+      PageRouteBuilder(
+        opaque: true,
+        transitionDuration: const Duration(milliseconds: 200),
+        reverseTransitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (context, animation, secondaryAnimation) => PdfViewerScreen(
           title: widget.jobTitle,
           file: widget.pdfUrl,
         ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
       ),
     );
   }

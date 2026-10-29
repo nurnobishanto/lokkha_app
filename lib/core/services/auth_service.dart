@@ -44,19 +44,44 @@ class AuthService {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bool isBanglaMessage =
-          message != null && RegExp(r'[\u0980-\u09FF]').hasMatch(message);
-      final String dialogMessage = isBanglaMessage
-          ? message
-          : "আপনার অ্যাকাউন্টের সুরক্ষার স্বার্থে সেশনের মেয়াদ শেষ হয়েছে। অ্যাপের সকল সুবিধা পেতে অনুগ্রহ করে পুনরায় লগইন করুন।";
+      final lowerMsg = message?.toLowerCase() ?? '';
+      final bool isDeviceLimit = lowerMsg.contains('device') ||
+          lowerMsg.contains('maximum limit') ||
+          lowerMsg.contains('logged-in device') ||
+          (message?.contains('ডিভাইস') ?? false);
+
+      final String dialogTitle =
+          isDeviceLimit ? "ডিভাইস লিমিট অতিক্রম করেছে" : "সেশনের মেয়াদ শেষ";
+      final IconData dialogIcon =
+          isDeviceLimit ? Icons.devices_other_rounded : Icons.lock_outline_rounded;
+      final Color iconColor =
+          isDeviceLimit ? const Color(0xFFD97706) : LightThemeColors.primaryColor;
+      final Color iconBgColor = isDeviceLimit
+          ? const Color(0xFFFEF3C7)
+          : LightThemeColors.primaryColor.withValues(alpha: 0.1);
+
+      final String dialogMessage;
+      if (isDeviceLimit) {
+        dialogMessage =
+            "আপনার অ্যাকাউন্টটি সর্বোচ্চ ২টি ডিভাইসে সক্রিয় রাখার লিমিট রয়েছে। অন্য ডিভাইসে লগইন করার কারণে এই ডিভাইসের সেশনটি বাতিল করা হয়েছে। অ্যাপটি ব্যবহার করতে পুনরায় লগইন করুন।";
+      } else {
+        final bool isBanglaMessage =
+            message != null && RegExp(r'[\u0980-\u09FF]').hasMatch(message);
+        dialogMessage = isBanglaMessage
+            ? message
+            : "আপনার অ্যাকাউন্টের সুরক্ষার স্বার্থে সেশনের মেয়াদ শেষ হয়েছে। অ্যাপের সকল সুবিধা পেতে অনুগ্রহ করে পুনরায় লগইন করুন।";
+      }
 
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (dialogCtx) => PopScope(
-          canPop: true,
+          canPop: false,
           onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
             _isSessionDialogShowing = false;
+            Navigator.of(dialogCtx).pop();
+            context.go(Routes.home);
           },
           child: Dialog(
             backgroundColor: Colors.white,
@@ -71,21 +96,21 @@ class AuthService {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 56.r,
-                    height: 56.r,
+                    width: 58.r,
+                    height: 58.r,
                     decoration: BoxDecoration(
-                      color: LightThemeColors.primaryColor.withValues(alpha: 0.1),
+                      color: iconBgColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.lock_outline_rounded,
+                      dialogIcon,
                       size: 30.r,
-                      color: LightThemeColors.primaryColor,
+                      color: iconColor,
                     ),
                   ),
                   SizedBox(height: 14.h),
                   Text(
-                    "সেশনের মেয়াদ শেষ",
+                    dialogTitle,
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
@@ -111,6 +136,7 @@ class AuthService {
                           onPressed: () {
                             _isSessionDialogShowing = false;
                             Navigator.of(dialogCtx).pop();
+                            context.go(Routes.home);
                           },
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -120,7 +146,7 @@ class AuthService {
                             side: BorderSide(color: Colors.grey.shade300),
                           ),
                           child: Text(
-                            "বাতিল",
+                            "হোমে যান",
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
