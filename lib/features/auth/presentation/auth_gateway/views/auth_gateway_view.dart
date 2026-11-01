@@ -8,9 +8,7 @@ import 'package:lokkha/core/constants/app_images.dart';
 import 'package:lokkha/core/utils/phone_utils.dart';
 import 'package:lokkha/features/auth/presentation/sign_up/riverpod/sign_up_notifier.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_action_button.dart';
-import 'package:lokkha/features/auth/presentation/widgets/auth_divider.dart';
 import 'package:lokkha/features/auth/presentation/widgets/auth_phone_field.dart';
-import 'package:lokkha/shared/widgets/app_svg_image.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
 
 class AuthGatewayView extends ConsumerStatefulWidget {
@@ -190,21 +188,21 @@ class _AuthGatewayViewState extends ConsumerState<AuthGatewayView> {
                               ),
 
                               // ─── Minimalist Or Divider ──────────────────
-                              AuthDivider(
-                                text: l10n.or,
-                                verticalPadding: 14.h.clamp(10.0, 16.0),
-                              ),
+                              // AuthDivider(
+                              //   text: l10n.or,
+                              //   verticalPadding: 14.h.clamp(10.0, 16.0),
+                              // ),
 
                               // ─── Google Sign-In Button ──────────────────
-                              AuthActionButton.secondary(
-                                text: l10n.continueWithGoogle,
-                                icon: AppSvgImage.asset(
-                                  AssetVectorPaths.google,
-                                  width: 20.r,
-                                  height: 20.r,
-                                ),
-                                onPressed: _handleGoogleSignIn,
-                              ),
+                              // AuthActionButton.secondary(
+                              //   text: l10n.continueWithGoogle,
+                              //   icon: AppSvgImage.asset(
+                              //     AssetVectorPaths.google,
+                              //     width: 20.r,
+                              //     height: 20.r,
+                              //   ),
+                              //   onPressed: _handleGoogleSignIn,
+                              // ),
                             ],
                           ),
 

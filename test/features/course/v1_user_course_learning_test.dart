@@ -346,5 +346,8 @@ class _FakeMyCoursesNotifier extends MyCoursesNotifier {
   }
 
   @override
-  Future<void> fetchMyCourses({bool isRefresh = false}) async {}
+  Future<void> fetchMyCourses({
+    bool isRefresh = false,
+    bool showErrorToast = false,
+  }) async {}
 }
