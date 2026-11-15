@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,11 +53,35 @@ class PremiumPackagesView extends ConsumerWidget {
       return false;
     }
 
+    if (state.packages.isNotEmpty && (Platform.isIOS || Platform.isMacOS)) {
+      InAppPurchaseService.instance.loadProductsForPackages(state.packages);
+    }
+
     return Scaffold(
       backgroundColor: context.scaffoldColor,
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: 'প্রিমিয়াম প্যাকেজ',
         centerTitle: true,
+        actions: [
+          if (Platform.isIOS || Platform.isMacOS)
+            TextButton.icon(
+              onPressed: () =>
+                  InAppPurchaseService.instance.restorePurchases(context),
+              icon: const Icon(
+                Icons.restore_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+              label: const Text(
+                'Restore',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
       ),
       body: state.isLoading
           ? Center(
@@ -97,18 +122,23 @@ class PremiumPackagesView extends ConsumerWidget {
                             },
                             onTapCheckout: () {
                               final isAuth = isLoggedIn.value;
-                              if (isAuth) {
+                              if (!isAuth) {
+                                Navigator.of(context, rootNavigator: true).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const AuthGatewayView(),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (Platform.isIOS || Platform.isMacOS) {
+                                IapCheckoutSheet.show(context, pkg);
+                              } else {
                                 Navigator.of(context, rootNavigator: true).push(
                                   MaterialPageRoute(
                                     builder: (_) => PremiumPackageCheckoutView(
                                       packagesModel: pkg,
                                     ),
-                                  ),
-                                );
-                              } else {
-                                Navigator.of(context, rootNavigator: true).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => const AuthGatewayView(),
                                   ),
                                 );
                               }
@@ -120,6 +150,29 @@ class PremiumPackagesView extends ConsumerWidget {
 
                         // ─── Trust & Security Banner ─────────────────────────
                         _buildTrustFooter(context),
+
+                        if (Platform.isIOS || Platform.isMacOS) ...[
+                          SizedBox(height: 12.h),
+                          Center(
+                            child: TextButton.icon(
+                              onPressed: () => InAppPurchaseService.instance
+                                  .restorePurchases(context),
+                              icon: Icon(
+                                Icons.restore_rounded,
+                                size: 15.sp,
+                                color: context.textSecondary,
+                              ),
+                              label: Text(
+                                'পূর্বে কেনা সাবস্ক্রিপশন পুনরুদ্ধার করুন (Restore Purchases)',
+                                style: TextStyle(
+                                  fontSize: 11.5.sp,
+                                  color: context.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
 
                         SizedBox(height: 20.h),
                       ],

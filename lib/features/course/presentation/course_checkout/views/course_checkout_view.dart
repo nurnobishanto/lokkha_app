@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lokkha/app/router/routes.dart';
 import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/course/presentation/providers/course_notifier.dart';
@@ -294,27 +296,65 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
 
                         Divider(color: context.borderColor),
                         const SizedBox(height: 8.0),
-                        CustomPaymentCardButton(
-                          assetName:
-                              'https://lokkha.com/uploads/files/shares/app/bkash.png',
-                          isSelected: state.selectedPayment == 0,
-                          onTap: () => notifier.setSelectedPayment(0),
-                        ),
-                        const SizedBox(height: 8.0),
-                        CustomPaymentCardButton(
-                          assetName:
-                              'https://lokkha.com/uploads/files/shares/app/nagad.png',
-                          isSelected: state.selectedPayment == 1,
-                          onTap: () => notifier.setSelectedPayment(1),
-                        ),
-                        const SizedBox(height: 8.0),
-                        CustomPaymentCardButton(
-                          assetName:
-                              'https://lokkha.com/uploads/files/shares/app/master_visa_card.png',
-                          isSelected: state.selectedPayment == 2,
-                          onTap: () => notifier.setSelectedPayment(2),
-                        ),
-                        const SizedBox(height: 8.0),
+                        if (Platform.isIOS || Platform.isMacOS) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF006A4E).withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color(0xFF006A4E).withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.workspace_premium_rounded,
+                                        color: Color(0xFF006A4E), size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "মাস্টার এক্সেস সাবস্ক্রিপশন",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  "অ্যাপের 'মাস্টার এক্সেস' সাবস্ক্রিপশন নিলে এই কোর্সসহ সকল কোর্স ও রিসোর্সে সম্পূর্ণ অ্যাক্সেস পাওয়া যাবে।",
+                                  style: TextStyle(
+                                      fontSize: 12, color: context.textSecondary),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                        ] else ...[
+                          CustomPaymentCardButton(
+                            assetName:
+                                'https://lokkha.com/uploads/files/shares/app/bkash.png',
+                            isSelected: state.selectedPayment == 0,
+                            onTap: () => notifier.setSelectedPayment(0),
+                          ),
+                          const SizedBox(height: 8.0),
+                          CustomPaymentCardButton(
+                            assetName:
+                                'https://lokkha.com/uploads/files/shares/app/nagad.png',
+                            isSelected: state.selectedPayment == 1,
+                            onTap: () => notifier.setSelectedPayment(1),
+                          ),
+                          const SizedBox(height: 8.0),
+                          CustomPaymentCardButton(
+                            assetName:
+                                'https://lokkha.com/uploads/files/shares/app/master_visa_card.png',
+                            isSelected: state.selectedPayment == 2,
+                            onTap: () => notifier.setSelectedPayment(2),
+                          ),
+                          const SizedBox(height: 8.0),
+                        ],
 
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -405,6 +445,10 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                             ? const Center(child: CircularProgressIndicator())
                             : CustomActionButton(
                                 onPressed: () async {
+                                  if (Platform.isIOS || Platform.isMacOS) {
+                                    context.push(Routes.packages);
+                                    return;
+                                  }
                                   if (state.isCheckedCondition) {
                                     final courseId = int.tryParse(widget.course.id.toString()) ?? 0;
                                     final paymentUrl = await notifier.makePayment(
@@ -427,7 +471,9 @@ class _CourseCheckoutViewState extends ConsumerState<CourseCheckoutView> {
                                     );
                                   }
                                 },
-                                text: "পেমেন্ট করুন",
+                                text: (Platform.isIOS || Platform.isMacOS)
+                                    ? "মাস্টার এক্সেস প্যাকেজ দেখুন"
+                                    : "পেমেন্ট করুন",
                               ),
                       ],
                     ),

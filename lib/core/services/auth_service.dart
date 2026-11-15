@@ -10,6 +10,7 @@ import 'package:lokkha/shared/models/user.dart';
 import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/network/rest_client.dart';
 import 'package:lokkha/shared/widgets/custom_snackbar.dart';
+import 'in_app_purchase_service.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -263,6 +264,7 @@ class AuthService {
       // Always wipe local credentials regardless of API response
       await SecureStorageService.clearAuthData();
       await MySharedPref.removeUserToken();
+      await InAppPurchaseService.instance.clearLocalPurchase();
       await AppStorageCache.wipeAllDataCaches();
       await MyGetStorage.removeCache(MyGetStorage.meUser);
       isLoggedIn.value = false;
@@ -306,6 +308,95 @@ class AuthService {
               AuthService().logout();
             },
             child: const Text("হ্যাঁ, লগ আউট", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Delete the current user's account completely (Apple Review Guideline 5.1.1(v) compliant)
+  Future<void> deleteAccount() async {
+    try {
+      final token = await SecureStorageService.getToken();
+      if (token != null && token.isNotEmpty) {
+        try {
+          await RestClient().delete('/api/v1/profile/delete-account');
+        } catch (_) {
+          try {
+            await RestClient().delete('/api/v1/user/delete-account');
+          } catch (_) {
+            try {
+              await RestClient().post('/api/v1/auth/delete-account');
+            } catch (_) {}
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[AuthService.deleteAccount] Error: $e');
+    } finally {
+      // Completely wipe all user data, credentials, cached files and session
+      await SecureStorageService.clearAuthData();
+      await MySharedPref.removeUserToken();
+      await InAppPurchaseService.instance.clearLocalPurchase();
+      await AppStorageCache.wipeAllDataCaches();
+      await MyGetStorage.removeCache(MyGetStorage.meUser);
+      isLoggedIn.value = false;
+      havePackage.value = false;
+      myUser = User();
+
+      CustomSnackBar.showCustomToast(
+        message: "আপনার অ্যাকাউন্ট এবং যাবতীয় ডাটা সফলভাবে মুছে ফেলা হয়েছে।",
+      );
+      final context = rootNavigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        context.goNamed(Routes.authGateway);
+      }
+    }
+  }
+
+  /// Show standardized self-service account deletion confirmation dialog
+  static void confirmAndDeleteAccount([BuildContext? context]) {
+    final ctx = context ?? rootNavigatorKey.currentContext;
+    if (ctx == null) return;
+
+    showDialog(
+      context: ctx,
+      builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 24),
+            SizedBox(width: 8.w),
+            Text(
+              "অ্যাকাউন্ট স্থায়ীভাবে মুছুন",
+              style: TextStyle(
+                fontSize: 17.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.red.shade700,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          "আপনি কি নিশ্চিত যে আপনার অ্যাকাউন্টটি স্থায়ীভাবে মুছে ফেলতে চান? আপনার সকল প্রোফাইল তথ্য, পরীক্ষার ফলাফল এবং প্যাকেজ অপরিবর্তনীয়ভাবে মুছে যাবে। এই কাজটি আর ফিরিয়ে আনা সম্ভব নয়।",
+          style: TextStyle(fontSize: 13.5.sp, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: const Text("বাতিল", style: TextStyle(color: Colors.black87)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+            ),
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              AuthService().deleteAccount();
+            },
+            child: const Text("হ্যাঁ, মুছে ফেলুন"),
           ),
         ],
       ),

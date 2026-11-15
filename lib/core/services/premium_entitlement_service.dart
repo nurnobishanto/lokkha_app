@@ -5,6 +5,7 @@ import 'package:lokkha/app/router/router.dart';
 import 'package:lokkha/core/services/storage/secure_storage_service.dart';
 import 'package:lokkha/core/utils/global.dart';
 import 'package:lokkha/features/auth/auth.dart';
+import 'in_app_purchase_service.dart';
 
 /// ─────────────────────────────────────────────────────────────────────────────
 /// PremiumEntitlementService
@@ -94,17 +95,21 @@ class PremiumEntitlementService {
     try {
       final authRepo = AuthRepositoryImpl();
       final res = await authRepo.getCurrentUser();
+      final bool hasLocalIap =
+          InAppPurchaseService.instance.hasActiveLocalPurchase();
+
       if (res != null && res.status) {
         final bool hasPkg = res.havePackage ||
             (res.user?.isSubscribed ?? false) ||
             (res.user?.hasActiveSubscription ?? false) ||
-            res.user?.activePackage != null;
+            res.user?.activePackage != null ||
+            hasLocalIap;
         _updateState(hasPremium: hasPkg);
-        log('✅ Entitlement validated: isPremium=$hasPkg');
+        log('✅ Entitlement validated: isPremium=$hasPkg (backend=${res.havePackage}, localIap=$hasLocalIap)');
         isValidating.value = false;
       } else {
-        _updateState(hasPremium: false);
-        log('⚠️ Entitlement check returned status=false');
+        _updateState(hasPremium: hasLocalIap);
+        log('⚠️ Entitlement check returned status=false (localIap=$hasLocalIap)');
         isValidating.value = false;
       }
     } catch (e) {

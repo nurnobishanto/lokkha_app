@@ -27,6 +27,7 @@ export 'services/auth_service.dart';
 export 'services/app_update_service.dart';
 export 'services/app_lifecycle_service.dart';
 export 'services/premium_entitlement_service.dart';
+export 'services/in_app_purchase_service.dart';
 export 'services/storage/app_storage_cache.dart';
 export 'services/storage/my_shared_pref.dart';
 export 'services/storage/secure_storage_service.dart';

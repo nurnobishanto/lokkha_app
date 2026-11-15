@@ -75,6 +75,7 @@ class Package {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final dynamic deletedAt;
+  final String? appleProductId;
 
   Package({
     this.id,
@@ -113,6 +114,7 @@ class Package {
     this.createdAt,
     this.updatedAt,
     this.deletedAt,
+    this.appleProductId,
   });
 
   factory Package.fromJson(Map<String, dynamic> json) {
@@ -310,6 +312,9 @@ class Package {
           ? null
           : DateTime.tryParse(json["updated_at"].toString()),
       deletedAt: json["deleted_at"],
+      appleProductId: json["apple_product_id"]?.toString() ??
+          json["iap_product_id"]?.toString() ??
+          json["apple_id"]?.toString(),
     );
   }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lokkha/core/core.dart';
-import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/profile/data/models/device_session_model.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
@@ -621,40 +620,9 @@ class SettingsView extends ConsumerWidget {
           icon: Icons.delete_forever_rounded,
           iconColor: Colors.red,
           iconBg: const Color(0xFFFEF2F2),
-          title: "অ্যাকাউন্ট ডিলিট রিকোয়েস্ট",
+          title: "অ্যাকাউন্ট ডিলিট করুন",
           titleColor: Colors.red.shade700,
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text("অ্যাকাউন্ট ডিলিট"),
-                content: const Text(
-                  "অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলতে আমাদের কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।",
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text("বাতিল"),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.of(ctx).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CustomerSupportView(),
-                        ),
-                      );
-                    },
-                    child: const Text("যোগাযোগ করুন"),
-                  ),
-                ],
-              ),
-            );
-          },
+          onTap: () => AuthService.confirmAndDeleteAccount(context),
         ),
         Divider(
           height: 1,

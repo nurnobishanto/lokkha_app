@@ -48,6 +48,7 @@ Future<void> main() async {
   // Initialize core app services
   try {
     AppLifecycleService.init();
+    unawaited(InAppPurchaseService.instance.init());
   } catch (e) {
     debugPrint("Services setup failed: $e");
   }

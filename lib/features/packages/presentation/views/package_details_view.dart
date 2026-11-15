@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,6 +6,7 @@ import 'package:lokkha/core/core.dart';
 import 'package:lokkha/features/auth/auth.dart';
 import 'package:lokkha/features/packages/presentation/providers/package_details_notifier.dart';
 import 'package:lokkha/features/packages/presentation/views/premium_package_checkout_view.dart';
+import 'package:lokkha/features/packages/presentation/views/iap_checkout_sheet.dart';
 import 'package:lokkha/shared/models/package.dart';
 
 class PackageDetailsView extends ConsumerStatefulWidget {
@@ -55,9 +57,29 @@ class _PackageDetailsViewState extends ConsumerState<PackageDetailsView> {
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: 'প্যাকেজ বিস্তারিত',
         centerTitle: true,
+        actions: [
+          if (Platform.isIOS || Platform.isMacOS)
+            TextButton.icon(
+              onPressed: () =>
+                  InAppPurchaseService.instance.restorePurchases(context),
+              icon: const Icon(
+                Icons.restore_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+              label: const Text(
+                'Restore',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
       ),
       body: Builder(
         builder: (context) {
@@ -706,18 +728,23 @@ class _PackageDetailsViewState extends ConsumerState<PackageDetailsView> {
           child: ElevatedButton(
             onPressed: () {
               final isAuth = isLoggedIn.value;
-              if (isAuth) {
+              if (!isAuth) {
+                Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AuthGatewayView(),
+                  ),
+                );
+                return;
+              }
+
+              if (Platform.isIOS || Platform.isMacOS) {
+                IapCheckoutSheet.show(context, pkg);
+              } else {
                 Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
                     builder: (_) => PremiumPackageCheckoutView(
                       packagesModel: pkg,
                     ),
-                  ),
-                );
-              } else {
-                Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(
-                    builder: (_) => const AuthGatewayView(),
                   ),
                 );
               }

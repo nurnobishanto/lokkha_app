@@ -148,6 +148,8 @@ class Endpoints {
   static const String couponApply = '/api/v1/packages/coupon-apply';
   static const String claimFreeTrial = '/api/v1/packages/claim-trial';
   static const String packagePurchase = '/api/v1/packages/purchase';
+  static const String iosIapVerify = '/api/v1/ios/iap/verify';
+  static const String iosIapVerifyLegacy = '/api/ios/iap/verify';
 
   // ─── Module 23: Home Feed & Landing Hub (8 Endpoints) ──────────────────────
   static const String homeFeed = '/api/v1/home';

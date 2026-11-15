@@ -9,7 +9,6 @@ import 'package:lokkha/shared/shared.dart';
 import 'package:lokkha/app/theme/app_theme.dart';
 import 'package:lokkha/shared/widgets/theme/theme_toggle_tile.dart';
 import 'package:lokkha/features/auth/auth.dart';
-import 'package:lokkha/features/app_system/app_system.dart';
 import 'package:lokkha/core/services/auth_service.dart';
 import 'package:lokkha/features/profile/presentation/widgets/devices_management_sheet.dart';
 import 'package:lokkha/features/profile/presentation/widgets/change_password_sheet.dart';
@@ -431,30 +430,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                     ),
                     const Divider(height: 0, indent: 50),
                     _buildListItem(
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text("অ্যাকাউন্ট ডিলিট"),
-                            content: const Text("কাস্টমার সার্ভিসের সাথে যোগাযোগ করুন।"),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(ctx).pop(),
-                                child: const Text("বাতিল"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(ctx).pop();
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => const CustomerSupportView()),
-                                  );
-                                },
-                                child: const Text("যোগাযোগ"),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                      onTap: () => AuthService.confirmAndDeleteAccount(context),
                       text: 'অ্যাকাউন্ট ডিলিট করুন',
                       icon: Icons.delete_forever,
                       color: Colors.red,

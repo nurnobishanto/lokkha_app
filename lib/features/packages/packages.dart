@@ -14,4 +14,5 @@ export 'presentation/providers/package_details_notifier.dart';
 export 'presentation/views/premium_packages_view.dart';
 export 'presentation/views/package_details_view.dart';
 export 'presentation/views/premium_package_checkout_view.dart';
+export 'presentation/views/iap_checkout_sheet.dart';
 export 'presentation/views/payment_webview.dart';

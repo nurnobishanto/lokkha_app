@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -131,6 +132,17 @@ class _PremiumPackageCheckoutViewState
   }
 
   Future<void> _makePayment() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      final success = await InAppPurchaseService.instance.buyPackage(
+        context: context,
+        package: widget.packagesModel,
+      );
+      if (success && mounted) {
+        Navigator.of(context).pop();
+      }
+      return;
+    }
+
     if (!_isTermsAccepted) {
       CustomSnackBar.showCustomErrorToast(
         message: 'শর্তাবলী ও নীতিমালা মেনে নিয়ে এগিয়ে যান।',
@@ -240,9 +252,29 @@ class _PremiumPackageCheckoutViewState
 
     return Scaffold(
       backgroundColor: context.scaffoldColor,
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: "চেকআউট",
         centerTitle: true,
+        actions: [
+          if (Platform.isIOS || Platform.isMacOS)
+            TextButton.icon(
+              onPressed: () =>
+                  InAppPurchaseService.instance.restorePurchases(context),
+              icon: const Icon(
+                Icons.restore_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+              label: const Text(
+                'Restore',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -798,6 +830,65 @@ class _PremiumPackageCheckoutViewState
 
   // ─── 3. Clean Logo-Only Payment Method Tiles (No Redundant Text) ──────────
   Widget _buildCompactPaymentSelector(BuildContext context) {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return Container(
+        padding: EdgeInsets.all(12.r),
+        decoration: BoxDecoration(
+          color: context.isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(
+            color: const Color(0xFF006A4E).withValues(alpha: 0.6),
+            width: 1.2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color: const Color(0xFF006A4E).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.apple_rounded,
+                size: 24,
+                color: Color(0xFF006A4E),
+              ),
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Apple In-App Purchase',
+                    style: TextStyle(
+                      fontSize: 13.5.sp,
+                      fontWeight: FontWeight.bold,
+                      color: context.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    'নিরাপদ অফিসিয়াল Apple App Store পেমেন্ট',
+                    style: TextStyle(
+                      fontSize: 10.5.sp,
+                      color: context.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Color(0xFF006A4E),
+              size: 20,
+            ),
+          ],
+        ),
+      );
+    }
+
     final methods = [
       {
         'id': 0,
@@ -1085,10 +1176,17 @@ class _PremiumPackageCheckoutViewState
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.lock_rounded, size: 14.sp),
+                            Icon(
+                              (Platform.isIOS || Platform.isMacOS)
+                                  ? Icons.apple_rounded
+                                  : Icons.lock_rounded,
+                              size: 16.sp,
+                            ),
                             SizedBox(width: 6.w),
                             Text(
-                              'পেমেন্ট সম্পন্ন করুন',
+                              (Platform.isIOS || Platform.isMacOS)
+                                  ? 'Apple দিয়ে কিনুন'
+                                  : 'পেমেন্ট সম্পন্ন করুন',
                               style: TextStyle(
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.w700,
